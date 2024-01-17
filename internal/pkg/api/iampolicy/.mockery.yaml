@@ -1,0 +1,13 @@
+with-expecter: true
+disable-version-string: true
+packages:
+  github.com/hashicorp/hcp/internal/pkg/api/iampolicy:
+    config:
+      filename: "mock_{{.InterfaceNameSnake}}.go"
+      dir: "{{.InterfaceDir}}"
+      mockname: "Mock{{.InterfaceName}}"
+      outpkg: "{{.PackageName}}"
+      inpackage: true
+    interfaces:
+      Setter:
+      ResourceUpdater:

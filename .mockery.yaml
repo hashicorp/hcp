@@ -1,0 +1,21 @@
+with-expecter: true
+disable-version-string: true
+packages:
+  github.com/hashicorp/hcp-sdk-go/clients/cloud-iam/stable/2019-12-10/client:
+    config:
+      dir: "internal/pkg/api/mocks/{{.PackagePath}}"
+      outpkg: "mock_{{.PackageName}}"
+      all: true
+      recursive: true
+  github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client:
+    config:
+      dir: "internal/pkg/api/mocks/{{.PackagePath}}"
+      outpkg: "mock_{{.PackageName}}"
+      all: true
+      recursive: true
+  github.com/hashicorp/hcp-sdk-go/clients/cloud-billing/preview/2020-11-05/client:
+    config:
+      dir: "internal/pkg/api/mocks/{{.PackagePath}}"
+      outpkg: "mock_{{.PackageName}}"
+      all: true
+      recursive: true

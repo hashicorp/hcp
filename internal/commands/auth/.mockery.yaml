@@ -1,0 +1,10 @@
+with-expecter: true
+disable-version-string: true
+packages:
+  github.com/hashicorp/hcp-sdk-go/config:
+    config:
+      dir: "mocks"
+      filename: "mock_{{.InterfaceNameSnake}}.go"
+      outpkg: "mocks"
+    interfaces:
+      HCPConfig:
