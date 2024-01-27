@@ -33,8 +33,8 @@ func NewCmdAdd(ctx *cmd.Context, runF func(*AddOpts) error) *cmd.Command {
 			{
 				Preamble: `Add members to the "platform-team"`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp iam groups members add --group=team-platform
-				  --member=7f8a81b2-1320-4e49-a2e5-44f628ec74c3
+				$ hcp iam groups members add --group=team-platform \
+				  --member=7f8a81b2-1320-4e49-a2e5-44f628ec74c3 \
 				  --member=f74f44b9-414a-409e-a257-72805d2c067b
 				`),
 			},
@@ -45,7 +45,7 @@ func NewCmdAdd(ctx *cmd.Context, runF func(*AddOpts) error) *cmd.Command {
 					Name:         "group",
 					Shorthand:    "g",
 					DisplayValue: "NAME",
-					Description:  heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Mustf(helper.GroupNameArgDoc, "add a member to"),
+					Description:  heredoc.New(ctx.IO).Mustf(helper.GroupNameArgDoc, "add a member to"),
 					Value:        flagvalue.Simple("", &opts.GroupName),
 					Autocomplete: helper.PredictGroupResourceNameSuffix(opts.Ctx, opts.Profile.OrganizationID, opts.Client),
 				},

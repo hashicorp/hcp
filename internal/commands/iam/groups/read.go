@@ -44,7 +44,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 			Args: []cmd.PositionalArgument{
 				{
 					Name:          "GROUP_NAME",
-					Documentation: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Mustf(helper.GroupNameArgDoc, "read"),
+					Documentation: heredoc.New(ctx.IO).Mustf(helper.GroupNameArgDoc, "read"),
 				},
 			},
 			Autocomplete: helper.PredictGroupResourceNameSuffix(opts.Ctx, opts.Profile.OrganizationID, opts.Client),

@@ -41,7 +41,8 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 			{
 				Preamble: `Delete a service principal using its resource name`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp iam service-principals delete iam/project/example-project/service-principal/example-sp
+				$ hcp iam service-principals delete \
+				  iam/project/example-project/service-principal/example-sp
 				`),
 			},
 		},
@@ -49,7 +50,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 			Args: []cmd.PositionalArgument{
 				{
 					Name:          "SP_NAME",
-					Documentation: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Mustf(helper.SPNameArgDoc, "delete"),
+					Documentation: heredoc.New(ctx.IO).Mustf(helper.SPNameArgDoc, "delete"),
 				},
 			},
 		},

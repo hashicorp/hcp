@@ -9,6 +9,8 @@ import (
 	"golang.org/x/exp/maps"
 )
 
+const preserveNewLinesToken = "__preserveNewLines__"
+
 // templateFuncs returns template helpers based on the IOStreams.
 func (f *Formatter) templateFuncs() template.FuncMap {
 	cs := f.io.ColorScheme()
@@ -42,12 +44,13 @@ func (f *Formatter) templateFuncs() template.FuncMap {
 
 			return s.String(), nil
 		},
-		"Bold":      styleFunc(cs, iostreams.String.Bold),
-		"Faint":     styleFunc(cs, iostreams.String.Faint),
-		"Italic":    styleFunc(cs, iostreams.String.Italic),
-		"Underline": styleFunc(cs, iostreams.String.Underline),
-		"Blink":     styleFunc(cs, iostreams.String.Blink),
-		"CrossOut":  styleFunc(cs, iostreams.String.CrossOut),
+		"Bold":             styleFunc(cs, iostreams.String.Bold),
+		"Faint":            styleFunc(cs, iostreams.String.Faint),
+		"Italic":           styleFunc(cs, iostreams.String.Italic),
+		"Underline":        styleFunc(cs, iostreams.String.Underline),
+		"Blink":            styleFunc(cs, iostreams.String.Blink),
+		"CrossOut":         styleFunc(cs, iostreams.String.CrossOut),
+		"PreserveNewLines": func() string { return preserveNewLinesToken },
 	}
 }
 
