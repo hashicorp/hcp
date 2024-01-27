@@ -28,12 +28,13 @@ func NewCmdSetPolicy(ctx *cmd.Context, runF func(*SetPolicyOpts) error) *cmd.Com
 	cmd := &cmd.Command{
 		Name:      "set-policy",
 		ShortHelp: "Set the IAM policy for a project.",
-		LongHelp: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+		LongHelp: heredoc.New(ctx.IO).Must(`
 		    Sets the IAM policy for a project, given a project ID and a file encoded in
 			JSON that contains the IAM policy.
 
 			The format for the policy JSON file is an object with the following format:
 
+			{{ PreserveNewLines }}
 			{
 			  "bindings": [
 			    {
@@ -48,6 +49,7 @@ func NewCmdSetPolicy(ctx *cmd.Context, runF func(*SetPolicyOpts) error) *cmd.Com
 			  ],
 			  "etag": "ETAG",
 			}
+			{{ PreserveNewLines }}
 
 			If set, the etag of the policy must be equal to that of the existing policy. To view the
 			existing policy and its etag, run {{ Bold "hcp projects iam read-policy --format=json" }}.

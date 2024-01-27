@@ -15,6 +15,15 @@ func Example() {
 
 	Really long lines will automatically get wrapped for you. So you don't need to worry about being super rigorous about where you wrap a line.
 
+	However if you have a block of text that you want to preserve the formatting of, you can use the PreserveNewLines function as shown below.
+
+	{{ PreserveNewLines }}
+	{
+	  "description": "JSON block to preserve the formatting of",
+	  "cool": true
+	}
+	{{ PreserveNewLines }}
+
 	You can also colorize and stylize text. This is useful if you want to highlight a command.
 
 	Such as, run {{ Bold "hcp your command" }} to do awesome things.
@@ -41,6 +50,14 @@ func Example() {
 	//
 	// Really long lines will automatically get wrapped for you. So you don't need to
 	// worry about being super rigorous about where you wrap a line.
+	//
+	// However if you have a block of text that you want to preserve the formatting of,
+	// you can use the PreserveNewLines function as shown below.
+	//
+	// {
+	//   "description": "JSON block to preserve the formatting of",
+	//   "cool": true
+	// }
 	//
 	// You can also colorize and stylize text. This is useful if you want to highlight
 	// a command.

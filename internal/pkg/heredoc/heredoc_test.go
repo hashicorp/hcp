@@ -54,6 +54,60 @@ func TestTemplate_AutoParagraph(t *testing.T) {
 	r.Equal(expectedPreserve, out)
 }
 
+func TestTemplate_PreserveNewLine(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		Name     string
+		Input    string
+		Expected string
+	}{
+		{
+			Name: "Longer example",
+			Input: `
+	Input before preserve new lines.
+
+	{{ PreserveNewLines }}
+	This is a line in
+	a longer, preserved paragraph.
+	{{ PreserveNewLines }}
+
+	Versus this is a new paragraph since it is separated by a blank line. But since it is long, it gets split.
+	`,
+			Expected: "Input before preserve new lines.\n\nThis is a line in\na longer, preserved paragraph.\n\nVersus this is a new paragraph since it is separated by a blank line. But since\nit is long, it gets split.",
+		},
+		{
+			Name: "Bullets",
+			Input: `
+The name of the group to delete. The name may be specified as either:
+
+{{ PreserveNewLines }}
+  * The group's resource name. Formatted as:
+	{{ Italic "iam/organization/ORG_ID/group/GROUP_NAME" }}
+  * The resource name suffix, GROUP_NAME.
+{{ PreserveNewLines }}`,
+			Expected: `The name of the group to delete. The name may be specified as either:
+
+  * The group's resource name. Formatted as:
+	iam/organization/ORG_ID/group/GROUP_NAME
+  * The resource name suffix, GROUP_NAME.`,
+		},
+	}
+
+	for _, c := range cases {
+		c := c
+		t.Run(c.Name, func(t *testing.T) {
+			r := require.New(t)
+			io := iostreams.Test()
+			f := New(io)
+
+			out, err := f.Doc(c.Input)
+			r.NoError(err)
+			r.Equal(c.Expected, out)
+		})
+	}
+}
+
 func TestTemplate_Format(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)

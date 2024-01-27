@@ -7,7 +7,7 @@ import (
 	"text/template"
 
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
-	"github.com/muesli/reflow/dedent"
+	"github.com/lithammer/dedent"
 	"github.com/muesli/reflow/wordwrap"
 )
 
@@ -44,7 +44,9 @@ func WithNoWrap() ConfigOption {
 	}
 }
 
-// WithPreserveNewlines is used to disable the auto-formation of paragraphs.
+// WithPreserveNewlines is used to disable the auto-formation of paragraphs for
+// the entire template. To preserve new lines over just a section of the
+// template, use the {{ PreserveNewLines }} template function.
 func WithPreserveNewlines() ConfigOption {
 	return func(c *Config) {
 		c.autoParagraph = false
@@ -105,14 +107,16 @@ func (f *Formatter) Docf(tmpl string, args ...any) (string, error) {
 // Doc takes a text/template string and renders it. The formatter adds the
 // following functions that are available to the template string.
 //
-// - Color <text-color> "string"
-// - Color <text-color> <background-color> "string"
-// - Bold "string"
-// - Italic "string"
-// - Faint "string"
-// - Underline "string"
-// - Blink "string"
-// - CrossOut "string"
+//   - PreserveNewLines: Must be paired. Any text between the two calls will have
+//     new lines preserved.
+//   - Color <text-color> "string"
+//   - Color <text-color> <background-color> "string"
+//   - Bold "string"
+//   - Italic "string"
+//   - Faint "string"
+//   - Underline "string"
+//   - Blink "string"
+//   - CrossOut "string"
 //
 // Valid Color values are: "red", "green", "yellow", "orange", "gray", white",
 // "black" (case insensitive), or "#<hex>".
@@ -140,17 +144,39 @@ func (f *Formatter) Doc(tmpl string) (string, error) {
 		return "", fmt.Errorf("failed executing text/template: %w", err)
 	}
 
-	dedented := dedent.String(buf.String())
+	dedented := dedent.Dedent(buf.String())
 
 	// Form paragraphs automatically
 	chunked := dedented
 	if f.c.autoParagraph {
-		parts := strings.Split(dedented, "\n\n")
-		for i, p := range parts {
-			parts[i] = strings.ReplaceAll(p, "\n", " ")
+		// Look for any preserve line sentinels
+		preserveGroups := strings.Split(dedented, preserveNewLinesToken)
+		if len(preserveGroups)%2 != 1 {
+			return "", fmt.Errorf("{{ PreserveNewLines }} calls are not balanced")
 		}
 
-		chunked = strings.Join(parts, "\n\n")
+		// [Normal, Preserve, Normal, Preserve, ...]
+		text := ""
+		for i, group := range preserveGroups {
+			if i%2 == 1 {
+				// Should be preserved but strip the new lines that come from
+				// the {{ PreserveNewLines }} call.
+				group, _ = strings.CutPrefix(group, "\n")
+				group, _ = strings.CutSuffix(group, "\n")
+				text += group
+				continue
+			}
+
+			// Drop new lines within the paragraph.
+			paragraphs := strings.Split(group, "\n\n")
+			for i, p := range paragraphs {
+				paragraphs[i] = strings.ReplaceAll(p, "\n", " ")
+			}
+
+			text += strings.Join(paragraphs, "\n\n")
+		}
+
+		chunked = text
 	}
 
 	// Word wrap

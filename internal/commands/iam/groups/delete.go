@@ -46,7 +46,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 			Args: []cmd.PositionalArgument{
 				{
 					Name:          "GROUP_NAME",
-					Documentation: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Mustf(helper.GroupNameArgDoc, "delete"),
+					Documentation: heredoc.New(ctx.IO).Mustf(helper.GroupNameArgDoc, "delete"),
 				},
 			},
 			Autocomplete: helper.PredictGroupResourceNameSuffix(opts.Ctx, opts.Profile.OrganizationID, opts.Client),

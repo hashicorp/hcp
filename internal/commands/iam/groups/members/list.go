@@ -34,7 +34,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 			{
 				Preamble: `List the members of "team-platform"`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp iam groups members list --group=team-platform
+				$ hcp iam groups members list --group=team-platform \
 				  --description "Team Platform engineering group"
 				`),
 			},
@@ -45,7 +45,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 					Name:         "group",
 					Shorthand:    "g",
 					DisplayValue: "NAME",
-					Description:  heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Mustf(helper.GroupNameArgDoc, "list membership from"),
+					Description:  heredoc.New(ctx.IO).Mustf(helper.GroupNameArgDoc, "list membership from"),
 					Value:        flagvalue.Simple("", &opts.GroupName),
 					Autocomplete: helper.PredictGroupResourceNameSuffix(opts.Ctx, opts.Profile.OrganizationID, opts.Client),
 				},

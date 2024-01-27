@@ -28,7 +28,7 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 			{
 				Preamble: "Update a project's name and description.",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp projects update --project=cd3d34d5-ceeb-493d-b004-9297365a01af
+				$ hcp projects update --project=cd3d34d5-ceeb-493d-b004-9297365a01af \
 				  --name=new-name --description="updated description"
 				`),
 			},

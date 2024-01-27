@@ -22,9 +22,11 @@ const (
 	GroupNameArgDoc = `
 	The name of the group to %s. The name may be specified as either:
 
+	{{ PreserveNewLines }}
 	  * The group's resource name. Formatted as:
 		{{ Italic "iam/organization/ORG_ID/group/GROUP_NAME" }}
 	  * The resource name suffix, GROUP_NAME.
+	{{ PreserveNewLines }}
 	`
 )
 

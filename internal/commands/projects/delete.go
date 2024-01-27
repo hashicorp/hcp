@@ -99,19 +99,21 @@ func deleteRun(opts *DeleteOpts) error {
 
 	if len(impacted) > 0 {
 		fmt.Fprintln(opts.IO.Err())
-		fmt.Fprintln(opts.IO.Err(), heredoc.New(opts.IO, heredoc.WithPreserveNewlines()).Mustf(`
-		%s The following profiles have their project_id property set to the deleted project:
+		fmt.Fprintln(opts.IO.Err(), heredoc.New(opts.IO).Mustf(`
+%s The following profiles have their project_id property set to the deleted project:
 
+{{ PreserveNewLines }}
 %s
+{{ PreserveNewLines }}
 
-		To update the profile's project_id property interactively, run:
+To update the profile's project_id property interactively, run:
 
-		  {{ Bold "$ hcp profile init --profile=PROFILE" }}
+  {{ Bold "$ hcp profile init --profile=PROFILE" }}
 
-		Or, to directly set the property, run:
+Or, to directly set the property, run:
 
-		  {{ Bold "$ hcp profile set --profile=PROFILE project_id PROJECT_ID" }}
-		`, opts.IO.ColorScheme().WarningLabel(), indent.String(strings.Join(impacted, "\n"), 4)))
+  {{ Bold "$ hcp profile set --profile=PROFILE project_id PROJECT_ID" }}
+		`, opts.IO.ColorScheme().WarningLabel(), indent.String(strings.Join(impacted, "\n"), 2)))
 		fmt.Fprintln(opts.IO.Err())
 	}
 

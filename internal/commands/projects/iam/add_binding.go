@@ -34,7 +34,7 @@ func NewCmdAddBinding(ctx *cmd.Context, runF func(*AddBindingOpts) error) *cmd.C
 				Preamble: `Bind a principal to role "roles/viewer"`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp projects add-binding \
-				  --project=8647ae06-ca65-467a-b72d-edba1f908fc8
+				  --project=8647ae06-ca65-467a-b72d-edba1f908fc8 \
 				  --member=ef938a22-09cf-4be9-b4d0-1f4587f80f53 \
 				  --role=roles/viewer
 				`),
