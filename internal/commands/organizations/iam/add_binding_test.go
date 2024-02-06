@@ -30,7 +30,7 @@ func TestNewCmdAddBinding(t *testing.T) {
 			Name:    "No Org",
 			Profile: profile.TestProfile,
 			Args:    []string{"--member=123", "--role=admin"},
-			Error:   "Organization ID  must be configured",
+			Error:   "Organization ID must be configured",
 		},
 		{
 			Name: "Too many args",

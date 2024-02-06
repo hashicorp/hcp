@@ -18,7 +18,7 @@ func RequireOrganization(ctx *Context) error {
 	Please run %v to interactively set the Organization ID, or run:
 
 	%v`,
-		cs.String("Organization ID  must be configured before running the command.").Color(cs.Orange()),
+		cs.String("Organization ID must be configured before running the command.").Color(cs.Orange()),
 		cs.String("hcp profile init").Bold(),
 		cs.String("$ hcp profile set organization_id <organization_id>").Bold(),
 	)

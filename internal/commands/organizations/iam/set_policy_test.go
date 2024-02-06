@@ -32,7 +32,7 @@ func TestNewCmdSetPolicy(t *testing.T) {
 			Name:    "No Org",
 			Profile: profile.TestProfile,
 			Args:    []string{"--policy-file=test-policy.json"},
-			Error:   "Organization ID  must be configured",
+			Error:   "Organization ID must be configured",
 		},
 		{
 			Name: "Too many args",

@@ -16,5 +16,6 @@ func NewCmdUsers(ctx *cmd.Context) *cmd.Command {
 
 	cmd.AddChild(NewCmdList(ctx, nil))
 	cmd.AddChild(NewCmdRead(ctx, nil))
+	cmd.AddChild(NewCmdDelete(ctx, nil))
 	return cmd
 }

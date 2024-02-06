@@ -38,7 +38,7 @@ func TestNewCmdCreate(t *testing.T) {
 			Name:    "No Org",
 			Profile: profile.TestProfile,
 			Args:    []string{},
-			Error:   "Organization ID  must be configured",
+			Error:   "Organization ID must be configured",
 		},
 		{
 			Name: "No name",
