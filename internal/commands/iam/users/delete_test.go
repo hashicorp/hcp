@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-openapi/runtime/client"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-iam/stable/2019-12-10/client/iam_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-iam/stable/2019-12-10/models"
 	mock_iam_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-iam/stable/2019-12-10/client/iam_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -17,7 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewCmdRead(t *testing.T) {
+func TestNewCmdDelete(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
@@ -67,8 +66,8 @@ func TestNewCmdRead(t *testing.T) {
 				ShutdownCtx: context.Background(),
 			}
 
-			var gotOpts *ReadOpts
-			readCmd := NewCmdRead(ctx, func(o *ReadOpts) error {
+			var gotOpts *DeleteOpts
+			readCmd := NewCmdDelete(ctx, func(o *DeleteOpts) error {
 				gotOpts = o
 				return nil
 			})
@@ -88,7 +87,7 @@ func TestNewCmdRead(t *testing.T) {
 	}
 }
 
-func TestReadRun(t *testing.T) {
+func TestDeleteRun(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
@@ -99,7 +98,7 @@ func TestReadRun(t *testing.T) {
 		{
 			Name:    "Server error",
 			RespErr: true,
-			Error:   "failed to read user principal: [GET /iam/2019-12-10/organizations/{organization_id}/user-principals/{user_principal_id}][403]",
+			Error:   "failed to delete user principal from organization: [DELETE /iam/2019-12-10/organizations/{organization_id}/user-principals/{user_principal_id}][403]",
 		},
 		{
 			Name: "Good",
@@ -114,45 +113,35 @@ func TestReadRun(t *testing.T) {
 
 			io := iostreams.Test()
 			iam := mock_iam_service.NewMockClientService(t)
-			opts := &ReadOpts{
+			opts := &DeleteOpts{
 				Ctx:     context.Background(),
 				Profile: profile.TestProfile(t).SetOrgID("123"),
-				Output:  format.New(io),
+				IO:      io,
 				Client:  iam,
 				ID:      "456",
 			}
 
 			// Expect a request to get the user.
-			call := iam.EXPECT().IamServiceGetUserPrincipalByIDInOrganization(mock.MatchedBy(func(req *iam_service.IamServiceGetUserPrincipalByIDInOrganizationParams) bool {
+			call := iam.EXPECT().IamServiceDeleteOrganizationMembership(mock.MatchedBy(func(req *iam_service.IamServiceDeleteOrganizationMembershipParams) bool {
 				return req.OrganizationID == "123" && req.UserPrincipalID == "456"
 			}), nil).Once()
 
 			if c.RespErr {
-				call.Return(nil, iam_service.NewIamServiceGetUserPrincipalByIDInOrganizationDefault(http.StatusForbidden))
+				call.Return(nil, iam_service.NewIamServiceDeleteOrganizationMembershipDefault(http.StatusForbidden))
 			} else {
-				ok := iam_service.NewIamServiceGetUserPrincipalByIDInOrganizationOK()
-				ok.Payload = &models.HashicorpCloudIamUserPrincipalResponse{
-					UserPrincipal: &models.HashicorpCloudIamUserPrincipal{
-						ID:       "456",
-						FullName: "Test User",
-						Email:    "test@hcp.com",
-					},
-				}
-
+				ok := iam_service.NewIamServiceDeleteOrganizationMembershipOK()
 				call.Return(ok, nil)
 			}
 
 			// Run the command
-			err := readRun(opts)
+			err := deleteRun(opts)
 			if c.Error != "" {
 				r.ErrorContains(err, c.Error)
 				return
 			}
 
 			r.NoError(err)
-			r.Contains(io.Output.String(), "Test User")
-			r.Contains(io.Output.String(), "test@hcp.com")
-			r.Contains(io.Output.String(), "456")
+			r.Contains(io.Error.String(), "User \"456\" deleted from organization")
 		})
 	}
 }
