@@ -57,6 +57,8 @@ type GlobalFlags struct {
 	format    string
 	verbosity string
 
+	v int
+
 	// Quiet indicates the user has requested minimal output
 	Quiet bool
 }
@@ -128,7 +130,15 @@ func ConfigureRootCommand(ctx *Context, cmd *Command) {
 		Hidden:       true, // Helpful for power users but hidden for all.
 		global:       true,
 		Autocomplete: complete.PredictSet(logLevels...),
-	})
+	}, &Flag{
+		Shorthand:     "V",
+		Description:   "Increase the verbosity",
+		Value:         flagvalue.Counter(0, &ctx.flags.v),
+		IsBooleanFlag: true,
+		global:        true,
+		Autocomplete:  complete.PredictSet(logLevels...),
+	},
+	)
 
 	// Setup the pre-run command
 	cmd.PersistentPreRun = func(c *Command, args []string) error {
@@ -168,7 +178,18 @@ func (ctx *Context) applyGlobalFlags(c *Command, args []string) error {
 	// Set the verbosity if the flag is set.
 	verbosity := ctx.flags.verbosity
 	if verbosity == "" {
-		verbosity = ctx.Profile.Core.GetVerbosity()
+		if ctx.flags.v > 0 {
+			switch ctx.flags.v {
+			case 1:
+				verbosity = "INFO"
+			case 2:
+				verbosity = "DEBUG"
+			default:
+				verbosity = "TRACE"
+			}
+		} else {
+			verbosity = ctx.Profile.Core.GetVerbosity()
+		}
 	}
 	if verbosity != "" {
 		l := hclog.LevelFromString(verbosity)
@@ -177,6 +198,8 @@ func (ctx *Context) applyGlobalFlags(c *Command, args []string) error {
 		}
 
 		c.Logger().SetLevel(l)
+
+		c.Logger().Debug("configured log level", "level", l.String())
 	}
 
 	// Set the project if the flag is set.
