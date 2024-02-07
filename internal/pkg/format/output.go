@@ -5,10 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
 	"text/tabwriter"
 	"text/template"
 
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // Displayer is the interface for displaying a given payload. By implementing
@@ -36,6 +39,80 @@ func NewDisplayer[T any](payload T, defaultFormat Format, fields []Field) Displa
 		fields:        fields,
 		defaultFormat: defaultFormat,
 	}
+}
+
+// DisplayFields displays the given fields about the given payload. If no fields are
+// provided, then all fields are displayed. The fields can be specified using
+// either the direct struct field name or the json tag name.
+func DisplayFields[T any](payload T, fields ...string) Displayer {
+	return NewDisplayer[T](payload, Table, inferFields(payload, fields))
+}
+
+func inferFields[T any](payload T, columns []string) []Field {
+	rv := reflect.ValueOf(payload)
+
+	for rv.Kind() == reflect.Pointer {
+		rv = rv.Elem()
+	}
+
+	if rv.Kind() == reflect.Slice {
+		rv = rv.Index(0)
+
+		for rv.Kind() == reflect.Pointer {
+			rv = rv.Elem()
+		}
+	}
+
+	if rv.Kind() != reflect.Struct {
+		return []Field{NewField("Value", "{{ . }}")}
+	}
+
+	toField := map[string]int{}
+
+	for i, col := range columns {
+		toField[col] = i
+	}
+
+	st := rv.Type()
+
+	var ret []Field
+
+	all := len(toField) == 0
+
+	if !all {
+		ret = make([]Field, len(toField))
+	}
+
+	for i := 0; i < st.NumField(); i++ {
+		f := st.Field(i)
+		if !f.IsExported() {
+			continue
+		}
+
+		var (
+			tag   string
+			title string
+		)
+
+		if t := f.Tag.Get("json"); t != "" {
+			tag, _, _ = strings.Cut(t, ",")
+			title = cases.Title(language.AmericanEnglish).String(tag)
+		} else {
+			title = f.Name
+		}
+
+		df := NewField(title, fmt.Sprintf("{{ .%s }}", f.Name))
+
+		if all {
+			ret = append(ret, df)
+		} else if idx, ok := toField[tag]; ok {
+			ret[idx] = df
+		} else if idx, ok := toField[f.Name]; ok {
+			ret[idx] = df
+		}
+	}
+
+	return ret
 }
 
 type internalDisplayer[T any] struct {
@@ -153,6 +230,21 @@ func (o *Outputter) Display(d Displayer) error {
 	}
 
 	return fmt.Errorf("invalid output format")
+}
+
+// Show outputs the given val using the DisplayFields function. This defaults
+// to the table view. If fields are specified, only those fields are shown, otherwise
+// all fields are shown. The json tag of a field is honored and can be used to
+// specified a field.
+//
+// This is a simplified version of using .Display, which should be used for all more
+// advanced cases that require formatting fields differently.
+//
+// This function can accept a slice of values as well and formats them correctly.
+// If the value being considered (directly or within in a slice) is not a struct,
+// it is displayed as is under the field named 'Value'.
+func (o *Outputter) Show(val any, fields ...string) error {
+	return o.Display(DisplayFields(val, fields...))
 }
 
 // outputJSON outputs the payload in JSON.
