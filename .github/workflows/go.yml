@@ -31,6 +31,7 @@ jobs:
         git diff --exit-code -- go.mod go.sum
 
     - name: Lint # Check syntax with the linter
+      uses: golangci/golangci-lint-action@v3
       run: make go/lint
 
     - name: Test # Run the golang tests!
