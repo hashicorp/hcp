@@ -12,6 +12,7 @@ require (
 	github.com/hashicorp/go-hclog v1.5.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/hcl/v2 v2.19.1
+	github.com/hashicorp/hcp-cli-sdk v0.0.0-20231102170701-61a6fed540fa
 	github.com/hashicorp/hcp-sdk-go v0.75.0
 	github.com/lithammer/dedent v1.1.0
 	github.com/manifoldco/promptui v0.9.0
@@ -27,6 +28,17 @@ require (
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 	golang.org/x/oauth2 v0.15.0
 	golang.org/x/term v0.15.0
+)
+
+require (
+	github.com/containerd/console v1.0.3 // indirect
+	github.com/gookit/color v1.3.1 // indirect
+	github.com/kelseyhightower/envconfig v1.4.0 // indirect
+	github.com/kr/text v0.2.0 // indirect
+	github.com/mitchellh/go-glint v0.0.0-20210722152315-6515ceb4a127 // indirect
+	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
+	github.com/morikuni/aec v1.0.0 // indirect
+	github.com/olekukonko/tablewriter v0.0.5 // indirect
 )
 
 require (
@@ -69,7 +81,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
-	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
+	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
