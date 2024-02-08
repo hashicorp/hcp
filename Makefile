@@ -31,6 +31,10 @@ go/mocks: ## Generates Go mock files.
 		mockery; \
     done
 
+.PHONY: test
+test: ## Run the unit tests
+	@go test -v -cover ./...
+
 HELP_FORMAT="    \033[36m%-25s\033[0m %s\n"
 .PHONY: help
 help: ## Display this usage information
