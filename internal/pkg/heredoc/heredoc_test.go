@@ -97,6 +97,7 @@ The name of the group to delete. The name may be specified as either:
 	for _, c := range cases {
 		c := c
 		t.Run(c.Name, func(t *testing.T) {
+			t.Parallel()
 			r := require.New(t)
 			io := iostreams.Test()
 			f := New(io)
