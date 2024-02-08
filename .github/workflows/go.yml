@@ -30,6 +30,10 @@ jobs:
         go mod tidy
         git diff --exit-code -- go.mod go.sum
 
+    # Linter
+    - name: Run code linting
+      run: make go/lint
+
     - name: Test # Run the golang tests!
       run: make test
 
