@@ -93,7 +93,7 @@ func setRun(opts *TFCConfigOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return fmt.Errorf("error setting TFC confi: %s", err)
+		return fmt.Errorf("error setting TFC config: %s", err)
 
 	}
 
