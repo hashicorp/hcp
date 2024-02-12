@@ -36,7 +36,7 @@ func NewCmdSet(ctx *cmd.Context, runF func(opts *TFCConfigOpts) error) *cmd.Comm
 					Documentation: heredoc.New(ctx.IO).Must(`Name of the Terraform Cloud Organization`),
 				},
 				{
-					Name: "token",
+					Name: "TOKEN",
 					Documentation: heredoc.New(ctx.IO).Must(`Terraform Cloud Team token for the TFC organization. 
 						Team token must be set in order to perform HCP Waypoint commands. You can learn more about API tokens 
 						at https://developer.hashicorp.com/terraform/cloud-docs/users-teams-organizations/api-tokens
