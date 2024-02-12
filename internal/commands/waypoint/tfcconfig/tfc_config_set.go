@@ -32,7 +32,7 @@ func NewCmdSet(ctx *cmd.Context, runF func(opts *TFCConfigOpts) error) *cmd.Comm
 		Args: cmd.PositionalArguments{
 			Args: []cmd.PositionalArgument{
 				{
-					Name:          "tfcOrg",
+					Name:          "TFC_ORG",
 					Documentation: heredoc.New(ctx.IO).Must(`Name of the Terraform Cloud Organization`),
 				},
 				{
