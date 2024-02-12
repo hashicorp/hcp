@@ -27,7 +27,7 @@ func NewCmdSet(ctx *cmd.Context, runF func(opts *TFCConfigOpts) error) *cmd.Comm
 		ShortHelp: "Set TFC Config properties TFC Organization Name and TFC Team Token.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
         The {{Bold "hcp waypoint tfc-config set"}} command sets the TFC Organization Name and TFC Team token that will be used in Waypoint.
-		There can only be one TFC Config set for each HCP Project Id. TFC Configs can be reviewed using the {{Bold "hcp waypoint tfc-config get" }} command
+		There can only be one TFC Config set for each HCP Project. TFC Configs can be reviewed using the {{Bold "hcp waypoint tfc-config get" }} command
 		and removed with the {{Bold "hcp waypoint tfc-config unset"}} command.`),
 		Examples: []cmd.Example{
 			{
