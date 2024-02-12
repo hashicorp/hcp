@@ -22,12 +22,12 @@ func NewCmdTFCConfig(ctx *cmd.Context) *cmd.Command {
 	return cmd
 }
 
-func GetNamespace(ctx context.Context, client waypoint_service.ClientService, orgId, projectId string) (string, error) {
+func GetNamespace(ctx context.Context, client waypoint_service.ClientService, orgID, projectID string) (string, error) {
 
 	resp, err := client.WaypointServiceGetNamespace(
 		&waypoint_service.WaypointServiceGetNamespaceParams{
-			LocationOrganizationID: orgId,
-			LocationProjectID:      projectId,
+			LocationOrganizationID: orgID,
+			LocationProjectID:      projectID,
 			Context:                ctx,
 		}, nil,
 	)

@@ -26,9 +26,16 @@ func NewCmdSet(ctx *cmd.Context, runF func(opts *TFCConfigOpts) error) *cmd.Comm
 		Name:      "set",
 		ShortHelp: "Set TFC Config properties TFC Organization Name and TFC Team Token.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
-        {{Bold "tfc-config set"}} Use: <<command>>{{ Bold "tfc-config set <<tfcOrg>> <<token>>" }}
-		Set Terraform Cloud configuration, requires TFC Organization Name and TFC Team Token. There is only one 
-		TFC config allowed per HCP Project.`),
+        The {{Bold "hcp waypoint tfc-config set"}} command sets the TFC Organization Name and TFC Team token that will be used in Waypoint.
+		There can only be one TFC Config set for each HCP Project Id. TFC Configs can be reviewed using the {{Bold "hcp waypoint tfc-config get" }} command
+		and removed with the {{Bold "hcp waypoint tfc-config unset"}} command.`),
+		Examples: []cmd.Example{
+			{
+				Preamble: `Create a new TFC Config in Waypoint.`,
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				hcp waypoint tfc-config hashicorp 8flrsjF0eWqSp.atlasv1.yBaqNqprixal0cpqsdGFLAd5T2Ns9jiqhsPAcsLrA4f75sywp80oeOn2jwyZzY5u9`),
+			},
+		},
 		Args: cmd.PositionalArguments{
 			Args: []cmd.PositionalArgument{
 				{
@@ -74,7 +81,7 @@ type TFCConfigOpts struct {
 func setRun(opts *TFCConfigOpts) error {
 	nsID, err := GetNamespace(opts.Ctx, opts.WaypointClient, opts.Profile.OrganizationID, opts.Profile.ProjectID)
 	if err != nil {
-		return fmt.Errorf("error getting namespace: %s", err)
+		return fmt.Errorf("error getting namespace: %w", err)
 	}
 
 	ns := &models.HashicorpCloudWaypointRefNamespace{ID: nsID}
@@ -93,7 +100,7 @@ func setRun(opts *TFCConfigOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return fmt.Errorf("error setting TFC config: %s", err)
+		return fmt.Errorf("error setting TFC config: %w", err)
 
 	}
 

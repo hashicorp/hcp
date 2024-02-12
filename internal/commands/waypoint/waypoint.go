@@ -13,7 +13,7 @@ func NewCmdWaypoint(ctx *cmd.Context) *cmd.Command {
 		Examples: []cmd.Example{
 			{
 				Title:   "TFC Config Set",
-				Command: "$ hcp waypoint tfc-config set",
+				Command: "$ hcp waypoint tfc-config set TFC_ORG_NAME TFC_TEAM_TOKEN",
 			},
 		},
 	}
