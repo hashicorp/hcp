@@ -9,7 +9,7 @@ func NewCmdWaypoint(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "waypoint",
 		ShortHelp: "Manage Waypoint",
-		LongHelp:  "Managing Waypoint with CLI commands",
+		LongHelp:  "Managing HCP Waypoint with CLI commands",
 		Examples: []cmd.Example{
 			{
 				Title:   "TFC Config Set",
