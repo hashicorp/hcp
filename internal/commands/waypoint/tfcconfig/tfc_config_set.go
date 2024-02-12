@@ -28,7 +28,7 @@ func NewCmdSet(ctx *cmd.Context, runF func(opts *TFCConfigOpts) error) *cmd.Comm
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
         {{Bold "tfc-config set"}} Use: <<command>>{{ Bold "tfc-config set <<tfcOrg>> <<token>>" }}
 		Set Terraform Cloud configuration, requires TFC Organization Name and TFC Team Token. There is only one 
-		TFCConfig allowed per HCP Project ID.`),
+		TFC config allowed per HCP Project.`),
 		Args: cmd.PositionalArguments{
 			Args: []cmd.PositionalArgument{
 				{
