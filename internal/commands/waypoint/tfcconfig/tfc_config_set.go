@@ -31,7 +31,7 @@ func NewCmdSet(ctx *cmd.Context, runF func(opts *TFCConfigOpts) error) *cmd.Comm
 		and removed with the {{Bold "hcp waypoint tfc-config unset"}} command.`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Create a new TFC Config in Waypoint.`,
+				Preamble: `Create a new TFC Config in HCP Waypoint.`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				hcp waypoint tfc-config set hashicorp 8flrsjF0eWqSp.atlasv1.yBaqNqprixal0cpqsdGFLAd5T2Ns9jiqhsPAcsLrA4f75sywp80oeOn2jwyZzY5u9`),
 			},
