@@ -11,6 +11,10 @@ MOCKERY_OUTPUT_FILES=internal/pkg/api/iampolicy/mock_setter.go \
 
 default: help
 
+.PHONY: build
+build: ## Build the HCP CLI binary
+	@go build -o bin/ ./...
+
 .PHONY: go/lint
 go/lint: ## Run the Go Linter
 	@golangci-lint run
