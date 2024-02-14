@@ -18,24 +18,41 @@ var (
 	// the command name is lower case and contains only letters and hyphens.
 	commandNameRegex = regexp.MustCompile(`^[a-z]+([-][a-z]+)*$`)
 
+	// commandNameInvalidError is returned when the command name is invalid.
+	commandNameInvalidError = fmt.Errorf("only lower case names with hyphens are allowed")
+
 	// shortHelpRegex is used to validate the short help text. It enforces that
 	// the short help text starts with a capital letter, ends with a period, and
 	// contains only letters, apostrophes, hyphens, and spaces.
 	shortHelpRegex = regexp.MustCompile(`^[A-Z][a-zA-Z-\s']+\.$`)
 
+	// shortHelpInvalidError is returned when the short help text is invalid.
+	shortHelpInvalidError = fmt.Errorf("short help text must start with a capital letter, end with a period, and contain only letters, apostrophes, hyphens, and spaces")
+
 	// flagDescriptionRegex is used to validate the flag descriptions. It enforces that the
 	// flag description starts with a capital letter and ends with a period.
 	flagDescriptionRegex = regexp.MustCompile(`(?s)^[A-Z].+\.$`)
+
+	// flagDescriptionInvalidError is returned when the flag description is invalid.
+	flagDescriptionInvalidError = fmt.Errorf("description must start with a capital letter and end with a period")
 
 	// argsPreambleRegex is used to validate the preamble of the positional
 	// arguments. It enforces that the preamble starts with a capital letter and
 	// ends with a period.
 	argsPreambleRegex = regexp.MustCompile(`(?s)^[A-Z].+\.$`)
 
+	// argsPreambleInvalidError is returned when the preamble of the positional
+	// arguments is invalid.
+	argsPreambleInvalidError = fmt.Errorf("preable must start with a capital letter and end with a period")
+
 	// examplePreambleRegex is used to validate the preamble of the examples. It
 	// enforces that the preamble starts with a capital letter and ends with a
 	// colon.
 	examplePreambleRegex = regexp.MustCompile(`(?s)^[A-Z].+:$`)
+
+	// eaxmplePreambleInvalidError is returned when the preamble of the example
+	// is invalid.
+	examplePreambleInvalidError = fmt.Errorf("preamble must start with a capital letter and end with a colon")
 )
 
 // Validate validates the command and all of its children.
@@ -75,7 +92,7 @@ func (c *Command) validate() error {
 	if c.Name == "" {
 		return fmt.Errorf("command name cannot be empty")
 	} else if !commandNameRegex.MatchString(c.Name) {
-		return fmt.Errorf("only lower case names with hyphens are allowed")
+		return commandNameInvalidError
 	}
 
 	// Ensure the aliases are valid and there are no duplicates in the aliases
@@ -96,7 +113,7 @@ func (c *Command) validate() error {
 		if alias == "" {
 			return fmt.Errorf("alias name is empty")
 		} else if !commandNameRegex.MatchString(alias) {
-			return fmt.Errorf("alias %q: only lower case names with hyphens are allowed", alias)
+			return fmt.Errorf("alias %q: %w", alias, commandNameInvalidError)
 		}
 	}
 
@@ -110,7 +127,7 @@ func (c *Command) validate() error {
 		return fmt.Errorf("short help text is too long. Max length is %d; got %q (%d)",
 			shortHelpMaxLength, c.ShortHelp, len(c.ShortHelp))
 	} else if !shortHelpRegex.MatchString(c.ShortHelp) {
-		return fmt.Errorf("short help text must start with a capital letter, end with a period, and contain only letters, apostrophes, hyphens, and spaces; got %q", c.ShortHelp)
+		return fmt.Errorf("%v; got %q", shortHelpInvalidError, c.ShortHelp)
 	}
 
 	// Validate the additional documentation sections
@@ -210,7 +227,7 @@ func (f *Flag) validate() error {
 		return fmt.Errorf("display value %q is not uppercase", f.DisplayValue)
 	}
 	if !flagDescriptionRegex.MatchString(f.Description) {
-		return fmt.Errorf("description must start with a capital letter and end with a period; got %q", f.Description)
+		return fmt.Errorf("%w; got %q", flagDescriptionInvalidError, f.Description)
 	}
 	if f.Value == nil {
 		return fmt.Errorf("value cannot be nil")
@@ -237,7 +254,7 @@ func (d *DocSection) validate() error {
 func (p *PositionalArguments) validate() error {
 	// Start capital and end with a period if set.
 	if p.Preamble != "" && !argsPreambleRegex.MatchString(p.Preamble) {
-		return fmt.Errorf("preable must start with a capital letter and end with a period")
+		return argsPreambleInvalidError
 	}
 
 	l := len(p.Args)
@@ -280,7 +297,7 @@ func (e *Example) validate() error {
 	if e.Preamble == "" {
 		return fmt.Errorf("preamble cannot be empty")
 	} else if !examplePreambleRegex.MatchString(e.Preamble) {
-		return fmt.Errorf("preamble must start with a capital letter and end with a colon")
+		return examplePreambleInvalidError
 	}
 
 	if e.Command == "" {
