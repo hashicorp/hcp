@@ -118,7 +118,7 @@ type Command struct {
 // Example is an example of how to use a given command.
 type Example struct {
 	// Preamble is plaintext displayed before the command. Must be set, start
-	// with a captial letter, and end with a colon.
+	// with a captital letter, and end with a colon.
 	Preamble string
 
 	// Command is the command example and any output it may contain

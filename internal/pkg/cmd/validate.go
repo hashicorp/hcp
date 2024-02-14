@@ -217,14 +217,14 @@ func (d *DocSection) validate() error {
 }
 
 // validate validates the positional arguments.
-func (a *PositionalArguments) validate() error {
+func (p *PositionalArguments) validate() error {
 	// Start capital and end with a period if set.
-	if a.Preamble != "" && !argsPreambleRegex.MatchString(a.Preamble) {
+	if p.Preamble != "" && !argsPreambleRegex.MatchString(p.Preamble) {
 		return fmt.Errorf("preable must start with a capital letter and end with a period")
 	}
 
-	l := len(a.Args)
-	for i, p := range a.Args {
+	l := len(p.Args)
+	for i, p := range p.Args {
 		if err := p.validate(i == l-1); err != nil {
 			return fmt.Errorf("error validating positional argument %d: %w", i, err)
 		}
