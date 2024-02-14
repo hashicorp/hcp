@@ -80,6 +80,7 @@ func getGoodCommand() *Command {
 		},
 	}
 	parent.AddChild(child)
+
 	return parent
 }
 
@@ -121,6 +122,28 @@ func TestCommand_Validate(t *testing.T) {
 				return c
 			},
 			error: "both RunF and Children cannot be set",
+		},
+		{
+			name: "siblings have conflicting names",
+			command: func() *Command {
+				c := getGoodCommand()
+				child2 := *c.children[0]
+				c.AddChild(&child2)
+				return c
+			},
+			error: "child command name \"child-cmd\" used by a sibling name or alias",
+		},
+		{
+			name: "siblings have conflicting aliases",
+			command: func() *Command {
+				c := getGoodCommand()
+				child2 := *c.children[0]
+				child2.Name = "child-two"
+				child2.Aliases = []string{c.children[0].Name}
+				c.AddChild(&child2)
+				return c
+			},
+			error: "child command \"child-two\" has alias \"child-cmd\" already used by a sibling name or alias",
 		},
 		{
 			name: "no name",

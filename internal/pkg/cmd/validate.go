@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	// ShortHelpMaxLength is the maximum length of the short help text.
+	// shortHelpMaxLength is the maximum length of the short help text.
 	shortHelpMaxLength = 60
 )
 
@@ -38,15 +38,32 @@ var (
 	examplePreambleRegex = regexp.MustCompile(`(?s)^[A-Z].+:$`)
 )
 
+// Validate validates the command and all of its children.
 func (c *Command) Validate() error {
 	// Validate ourselves and then the children.
 	if err := c.validate(); err != nil {
 		return err
 	}
 
+	namesAndAliases := make(map[string]struct{}, len(c.children))
 	for _, child := range c.children {
 		if err := child.Validate(); err != nil {
 			return fmt.Errorf("error validating command %s: %w", child.Name, err)
+		}
+
+		// Ensure the child name and its aliases are unique.
+		if _, ok := namesAndAliases[child.Name]; ok {
+			return fmt.Errorf("child command name %q used by a sibling name or alias", child.Name)
+		} else {
+			namesAndAliases[child.Name] = struct{}{}
+		}
+
+		for _, alias := range child.Aliases {
+			if _, ok := namesAndAliases[alias]; ok {
+				return fmt.Errorf("child command %q has alias %q already used by a sibling name or alias", child.Name, alias)
+			} else {
+				namesAndAliases[alias] = struct{}{}
+			}
 		}
 	}
 
