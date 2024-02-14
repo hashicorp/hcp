@@ -27,7 +27,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Create a new service principal key`,
+				Preamble: `Create a new service principal key:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam service-principals keys delete \
 				  iam/project/example/service-principal/example-sp/key/3KgtSLWTSs

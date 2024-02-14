@@ -31,7 +31,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Delete members from the "platform-team"`,
+				Preamble: `Delete members from the "platform-team":`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam groups members delete --group=team-platform \
 				  --member=7f8a81b2-1320-4e49-a2e5-44f628ec74c3 \

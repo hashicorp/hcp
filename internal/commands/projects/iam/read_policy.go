@@ -29,7 +29,7 @@ func NewCmdReadPolicy(ctx *cmd.Context, runF func(*ReadPolicyOpts) error) *cmd.C
 		LongHelp:  "Read the IAM policy for a project.",
 		Examples: []cmd.Example{
 			{
-				Preamble: "Read the IAM Policy for a project",
+				Preamble: "Read the IAM Policy for a project:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp projects iam read-policy \
 				  --project=8647ae06-ca65-467a-b72d-edba1f908fc8

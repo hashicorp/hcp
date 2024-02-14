@@ -45,16 +45,16 @@ func NewCmdLogin(ctx *cmd.Context) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Title:   "Browser Login",
-				Command: "$ hcp auth login",
+				Preamble: "Login interactively using a browser:",
+				Command:  "$ hcp auth login",
 			},
 			{
-				Title:   "Service Principal Login",
-				Command: "$ hcp auth login --client-id=spID --client-secret=spSecret",
+				Preamble: "Login using service principal credentials:",
+				Command:  "$ hcp auth login --client-id=spID --client-secret=spSecret",
 			},
 			{
-				Title:   "Workload Identity Federated Login",
-				Command: "$ hcp auth login --cred-file=workload_cred_file.json",
+				Preamble: "Login using Workload Identity credentials:",
+				Command:  "$ hcp auth login --cred-file=workload_cred_file.json",
 			},
 		},
 		Flags: cmd.Flags{

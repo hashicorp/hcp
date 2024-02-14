@@ -30,14 +30,14 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Create a new group for the platform engineering team`,
+				Preamble: `Create a new group for the platform engineering team:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam groups create team-platform \
 				  --description "Team Platform engineering group"
 				`),
 			},
 			{
-				Preamble: `Create a new group and specify the initial members`,
+				Preamble: `Create a new group and specify the initial members:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam groups create team-platform \
 				  --description "Team Platform engineering group" \

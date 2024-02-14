@@ -57,7 +57,7 @@ func NewCmdSetPolicy(ctx *cmd.Context, runF func(*SetPolicyOpts) error) *cmd.Com
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: "Set the IAM Policy for a project",
+				Preamble: "Set the IAM Policy for a project:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 					$ cat >policy.json <<EOF
 					{

@@ -31,7 +31,7 @@ func NewCmdDeleteBinding(ctx *cmd.Context, runF func(*DeleteBindingOpts) error) 
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Delete a role binding for a principal previously granted role "roles/viewer"`,
+				Preamble: `Delete a role binding for a principal previously granted role "roles/viewer":`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp projects iam delete-binding \
 				  --project=8647ae06-ca65-467a-b72d-edba1f908fc8 \

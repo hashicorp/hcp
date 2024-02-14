@@ -23,16 +23,15 @@ func NewCmdDelete(ctx *cmd.Context) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Title:   "Delete a profile",
-				Command: "$ hcp profile profiles delete my-profile",
+				Preamble: "Delete a profile:",
+				Command:  "$ hcp profile profiles delete my-profile",
 			},
 			{
-				Title:   "Delete multiple profiles",
-				Command: "$ hcp profile profiles delete my-profile-1 my-profile-2 my-profile-3",
+				Preamble: "Delete multiple profiles:",
+				Command:  "$ hcp profile profiles delete my-profile-1 my-profile-2 my-profile-3",
 			},
 			{
-				Title:    "Delete the active profile",
-				Preamble: "To delete the active profile, my-profile, run:",
+				Preamble: "Delete the active profile:",
 				Command: heredoc.New(ctx.IO).Must(`
 				$ hcp profile profiles active my-other-profile
 				$ hcp profile profiles delete my-profile
