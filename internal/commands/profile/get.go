@@ -22,7 +22,7 @@ func NewCmdGet(ctx *cmd.Context) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "get",
-		ShortHelp: "Get a HCP CLI Property",
+		ShortHelp: "Get a HCP CLI Property.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
 		{{ Bold "hcp profile get" }} gets the specified property in your active profile.
 
@@ -32,7 +32,7 @@ func NewCmdGet(ctx *cmd.Context) *cmd.Command {
 			Autocomplete: opts.Profile,
 			Args: []cmd.PositionalArgument{
 				{
-					Name: "component/property",
+					Name: "COMPONENT/PROPERTY",
 					Documentation: heredoc.New(ctx.IO).Must(`
 					Property to be unset. Note that COMPONENT/ is optional when referring to
 					top-level profile fields, i.e., such as organization_id and project_id.

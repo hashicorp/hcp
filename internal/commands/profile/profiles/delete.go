@@ -15,7 +15,7 @@ func NewCmdDelete(ctx *cmd.Context) *cmd.Command {
 	}
 	cmd := &cmd.Command{
 		Name:      "delete",
-		ShortHelp: "delete an existing HCP profile.",
+		ShortHelp: "Delete an existing HCP profile.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		Deletes an existing HCP profiles. If the profile is the active profile, it may not be deleted.
 
@@ -43,7 +43,7 @@ func NewCmdDelete(ctx *cmd.Context) *cmd.Command {
 			Autocomplete: predictProfiles(true, false),
 			Args: []cmd.PositionalArgument{
 				{
-					Name:          "profile_names",
+					Name:          "PROFILE_NAMES",
 					Documentation: "The name of the profile to delete. May not be the active profile.",
 					Repeatable:    true,
 				},
