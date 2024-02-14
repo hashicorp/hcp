@@ -22,7 +22,8 @@ func NewCmdLogout(ctx *cmd.Context) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Command: "$ hcp auth logout",
+				Preamble: "Logout the HCP CLI:",
+				Command:  "$ hcp auth logout",
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {

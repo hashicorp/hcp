@@ -22,7 +22,7 @@ func NewCmdServicePrincipals(ctx *cmd.Context) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Create a new service principal and grant it "admin" on the project set in the profile`,
+				Preamble: `Create a new service principal and grant it "admin" on the project set in the profile:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam service-principals create my-app --format=json
 				$ hcp projects add-iam-binding --member=my-app-sp-id --role=roles/admin

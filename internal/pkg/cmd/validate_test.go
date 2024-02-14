@@ -65,7 +65,7 @@ func getGoodCommand() *Command {
 		},
 		Examples: []Example{
 			{
-				Preamble: "This is an example invocation",
+				Preamble: "This is an example invocation:",
 				Command:  "$ hcp parent child --count 5",
 			},
 		},
@@ -247,6 +247,33 @@ func TestCommand_Validate(t *testing.T) {
 				return c
 			},
 			error: "error validating documentation section 0: documentation cannot be empty",
+		},
+		{
+			name: "example preamble set",
+			command: func() *Command {
+				c := getGoodCommand()
+				c.children[0].Examples[0].Preamble = ""
+				return c
+			},
+			error: "error validating example 0: preamble cannot be empty",
+		},
+		{
+			name: "example preamble start with capital",
+			command: func() *Command {
+				c := getGoodCommand()
+				c.children[0].Examples[0].Preamble = "bad preamble:"
+				return c
+			},
+			error: "error validating example 0: preamble must start with a capital letter and end with a colon",
+		},
+		{
+			name: "example preamble end with colon",
+			command: func() *Command {
+				c := getGoodCommand()
+				c.children[0].Examples[0].Preamble = "Bad preamble"
+				return c
+			},
+			error: "error validating example 0: preamble must start with a capital letter and end with a colon",
 		},
 		{
 			name: "examples start with a $",

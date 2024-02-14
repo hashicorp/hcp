@@ -342,19 +342,12 @@ func (c *Command) flagsHelpEntry() []helpEntry {
 func (e *Example) text(cs *iostreams.ColorScheme) string {
 	var buf bytes.Buffer
 
-	if e.Title != "" {
-		fmt.Fprintln(&buf, cs.String(wordWrap(e.Title, 80)).Underline().Faint().Color(cs.Gray()))
-	}
 	if e.Preamble != "" {
 		fmt.Fprintln(&buf, wordWrap(e.Preamble, 80))
 		fmt.Fprintln(&buf)
 	}
 	if e.Command != "" {
 		fmt.Fprintln(&buf, cs.String(wordWrap(e.Command, 80)).Italic().Color(cs.Green()))
-	}
-	if e.Postamble != "" {
-		fmt.Fprintln(&buf)
-		fmt.Fprintln(&buf, wordWrap(e.Postamble, 80))
 	}
 
 	return buf.String()

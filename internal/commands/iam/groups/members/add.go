@@ -31,7 +31,7 @@ func NewCmdAdd(ctx *cmd.Context, runF func(*AddOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Add members to the "platform-team"`,
+				Preamble: `Add members to the "platform-team":`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam groups members add --group=team-platform \
 				  --member=7f8a81b2-1320-4e49-a2e5-44f628ec74c3 \

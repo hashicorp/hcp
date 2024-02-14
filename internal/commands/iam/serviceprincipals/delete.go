@@ -33,13 +33,13 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Delete a service principal using its name suffix`,
+				Preamble: `Delete a service principal using its name suffix:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam service-principals delete example-sp
 				`),
 			},
 			{
-				Preamble: `Delete a service principal using its resource name`,
+				Preamble: `Delete a service principal using its resource name:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam service-principals delete \
 				  iam/project/example-project/service-principal/example-sp

@@ -27,7 +27,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Read the user principal with ID "example-id-123"`,
+				Preamble: `Read the user principal with ID "example-id-123":`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam users read example-id-123
 				`),

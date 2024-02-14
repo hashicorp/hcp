@@ -32,7 +32,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `List the members of "team-platform"`,
+				Preamble: `List the members of "team-platform":`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam groups members list --group=team-platform \
 				  --description "Team Platform engineering group"

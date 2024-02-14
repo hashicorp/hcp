@@ -31,7 +31,7 @@ func NewCmdAddBinding(ctx *cmd.Context, runF func(*AddBindingOpts) error) *cmd.C
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Bind a principal to role "roles/viewer"`,
+				Preamble: `Bind a principal to role "roles/viewer":`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp projects add-binding \
 				  --project=8647ae06-ca65-467a-b72d-edba1f908fc8 \

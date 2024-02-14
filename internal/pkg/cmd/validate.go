@@ -31,6 +31,11 @@ var (
 	// arguments. It enforces that the preamble starts with a capital letter and
 	// ends with a period.
 	argsPreambleRegex = regexp.MustCompile(`(?s)^[A-Z].+\.$`)
+
+	// examplePreambleRegex is used to validate the preamble of the examples. It
+	// enforces that the preamble starts with a capital letter and ends with a
+	// colon.
+	examplePreambleRegex = regexp.MustCompile(`(?s)^[A-Z].+:$`)
 )
 
 func (c *Command) Validate() error {
@@ -47,9 +52,6 @@ func (c *Command) Validate() error {
 
 	return nil
 }
-
-// TODO
-// Deprecate Example Title/Postamble
 
 func (c *Command) validate() error {
 	// Validate the name
@@ -258,7 +260,15 @@ func (a *PositionalArgument) validate(isLast bool) error {
 
 // validate validates the example.
 func (e *Example) validate() error {
-	if !strings.HasPrefix(e.Command, "$ ") {
+	if e.Preamble == "" {
+		return fmt.Errorf("preamble cannot be empty")
+	} else if !examplePreambleRegex.MatchString(e.Preamble) {
+		return fmt.Errorf("preamble must start with a capital letter and end with a colon")
+	}
+
+	if e.Command == "" {
+		return fmt.Errorf("command cannot be empty")
+	} else if !strings.HasPrefix(e.Command, "$ ") {
 		return fmt.Errorf("example command must start with $")
 	}
 
