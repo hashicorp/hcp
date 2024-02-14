@@ -23,7 +23,7 @@ var (
 	// contains only letters, apostrophes, hyphens, and spaces.
 	shortHelpRegex = regexp.MustCompile(`^[A-Z][a-zA-Z-\s']+\.$`)
 
-	// flagNameRegex is used to validate the flag names. It enforces that the
+	// flagDescriptionRegex is used to validate the flag descriptions. It enforces that the
 	// flag description starts with a capital letter and ends with a period.
 	flagDescriptionRegex = regexp.MustCompile(`(?s)^[A-Z].+\.$`)
 
@@ -75,7 +75,7 @@ func (c *Command) validate() error {
 		}
 		aliases[alias] = struct{}{}
 
-		// Vaidate the alias
+		// Validate the alias
 		if alias == "" {
 			return fmt.Errorf("alias name is empty")
 		} else if !commandNameRegex.MatchString(alias) {
