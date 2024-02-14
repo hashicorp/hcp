@@ -15,6 +15,14 @@ default: help
 build: ## Build the HCP CLI binary
 	@go build -o bin/ ./...
 
+.PHONY: screenshot
+screenshot: go/install ## Create a screenshot of the HCP CLI
+	@go run github.com/homeport/termshot/cmd/termshot@v0.2.7 -c -f assets/hcp.png -- hcp
+
+.PHONY: go/install
+go/install: ## Install the HCP CLI binary
+	@go install
+
 .PHONY: go/lint
 go/lint: ## Run the Go Linter
 	@golangci-lint run
