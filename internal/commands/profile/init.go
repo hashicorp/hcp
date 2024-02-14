@@ -30,7 +30,7 @@ func NewCmdInit(ctx *cmd.Context) *cmd.Command {
 	}
 	cmd := &cmd.Command{
 		Name:      "init",
-		ShortHelp: "Initialize the current profile",
+		ShortHelp: "Initialize the current profile.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
 		init configures the HCP CLI to run commands against the correct context; namely against the desired organization and project ID.
 		This command is interactive. To set configuration using non-interactively prefer using {{ Bold "hcp profile set" }}.

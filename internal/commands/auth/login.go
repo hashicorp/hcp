@@ -29,7 +29,7 @@ func NewCmdLogin(ctx *cmd.Context) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "login",
-		ShortHelp: "Login to HCP",
+		ShortHelp: "Login to HCP.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		Login is used to authenticate to HCP.
 

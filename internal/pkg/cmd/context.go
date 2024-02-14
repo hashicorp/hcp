@@ -123,7 +123,7 @@ func ConfigureRootCommand(ctx *Context, cmd *Command) {
 	}, &Flag{
 		Name:         "verbosity",
 		DisplayValue: "LEVEL",
-		Description:  "Sets the log verbosity",
+		Description:  "Sets the log verbosity.",
 		Value:        flagvalue.Enum[string](logLevels, "", &ctx.flags.verbosity),
 		Hidden:       true, // Helpful for power users but hidden for all.
 		global:       true,

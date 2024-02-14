@@ -42,6 +42,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam service-principals create example-sp
 				`),
+				Postamble: "This command creates a new service principal named example-sp.",
 			},
 			{
 				Preamble: `Create a new organization service principal`,

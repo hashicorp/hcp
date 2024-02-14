@@ -183,28 +183,30 @@ type Flags struct {
 //	Flag{
 //	  Name: "project",
 //	  Shorthand: "p",
+//	  DisplayValue: "ID",
 //	  Description: "project sets the project ID to target.",
 //	  Value: flagvalue.Simple("", &projectID),
 //	  Required: true,
 //	}
 type Flag struct {
-	// Name is the name of the flag
+	// Name is the name of the flag. The name must be lower case.
 	Name string
 
 	// Shorthand is an optional shorthand for the flag. Name must still be set
-	// and shorthand can only be a single character.
+	// and shorthand can only be a single, lowercase character.
 	Shorthand string
 
 	// Description is the description of the flag.
 	Description string
 
-	// TODO Validate that it is upper case
 	// DisplayValue is an optional string that will be used when displaying
 	// help for using the flag. If set, the displayed value will be
-	// --Name=DisplayName, otherwise it will just be --Name.
+	// --Name=DISPLAY_NAME, otherwise it will just be --Name.
 	//
 	// As an example, a Flag with the name "project" and display value of "ID",
 	// would be displayed as "--project=ID".
+	//
+	// DisplayValue must be upper case.
 	DisplayValue string
 
 	// Value is the value that will be set by the flag. The value should be set
@@ -216,7 +218,6 @@ type Flag struct {
 	//   flagvalue.Enum[string]([]string{"ONE", "TWO"}, "", &myEnum)
 	Value flagvalue.Value
 
-	// TODO Determine if needed.
 	// IsBooleanFlag indicates that the flag is a boolean flag.
 	IsBooleanFlag bool
 

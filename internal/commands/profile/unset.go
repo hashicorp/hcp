@@ -21,7 +21,7 @@ func NewCmdUnset(ctx *cmd.Context) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "unset",
-		ShortHelp: "Unset a HCP CLI Property",
+		ShortHelp: "Unset a HCP CLI Property.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
 		{{ Bold "hcp profile unset" }} unsets the specified property in your active profile.
 
@@ -31,7 +31,7 @@ func NewCmdUnset(ctx *cmd.Context) *cmd.Command {
 			Autocomplete: opts.Profile,
 			Args: []cmd.PositionalArgument{
 				{
-					Name: "component/property",
+					Name: "COMPONENT/PROPERTY",
 					Documentation: heredoc.New(ctx.IO).Must(`
 					Property to be unset. Note that COMPONENT/ is optional when referring to
 					top-level profile fields, i.e., such as organization_id and project_id.

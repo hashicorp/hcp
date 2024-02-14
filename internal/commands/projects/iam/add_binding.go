@@ -22,7 +22,7 @@ func NewCmdAddBinding(ctx *cmd.Context, runF func(*AddBindingOpts) error) *cmd.C
 
 	cmd := &cmd.Command{
 		Name:      "add-binding",
-		ShortHelp: "Add an IAM policy binding for a project",
+		ShortHelp: "Add an IAM policy binding for a project.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		Add an IAM policy binding for the given project. A binding grants the
 		specified principal the given role on the project.
@@ -52,7 +52,7 @@ func NewCmdAddBinding(ctx *cmd.Context, runF func(*AddBindingOpts) error) *cmd.C
 				{
 					Name:         "role",
 					DisplayValue: "ROLE_ID",
-					Description:  `The role ID (e.g. "roles/admin", "roles/contributor", "roles/viewer") to bind the member to`,
+					Description:  `The role ID (e.g. "roles/admin", "roles/contributor", "roles/viewer") to bind the member to.`,
 					Value:        flagvalue.Simple("", &opts.Role),
 					Required:     true,
 					Autocomplete: iampolicy.AutocompleteRoles(opts.Ctx, ctx.Profile.OrganizationID, organization_service.New(ctx.HCP, nil)),

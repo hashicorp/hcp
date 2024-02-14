@@ -47,8 +47,8 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		Args: cmd.PositionalArguments{
 			Args: []cmd.PositionalArgument{
 				{
-					Name:          "name",
-					Documentation: "Name of the project to create",
+					Name:          "NAME",
+					Documentation: "Name of the project to create.",
 				},
 			},
 		},

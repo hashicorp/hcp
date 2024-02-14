@@ -27,7 +27,7 @@ func NewCmdActivate(ctx *cmd.Context) *cmd.Command {
 			Autocomplete: predictProfiles(false, false),
 			Args: []cmd.PositionalArgument{
 				{
-					Name:          "name",
+					Name:          "NAME",
 					Documentation: "The name of the profile to activate.",
 				},
 			},

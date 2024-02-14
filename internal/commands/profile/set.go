@@ -28,7 +28,7 @@ func NewCmdSet(ctx *cmd.Context) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "set",
-		ShortHelp: "Set a HCP CLI Property",
+		ShortHelp: "Set a HCP CLI Property.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
 		{{ Bold "hcp profile set" }} sets the specified property in your active profile.
 		A property governs the behavior of a specific aspect of the HCP CLI. This could be
@@ -48,7 +48,7 @@ func NewCmdSet(ctx *cmd.Context) *cmd.Command {
 			Autocomplete: opts.Profile,
 			Args: []cmd.PositionalArgument{
 				{
-					Name: "component/property",
+					Name: "COMPONENT/PROPERTY",
 					Documentation: heredoc.New(ctx.IO).Must(`
 					Property to be set. Note that COMPONENT/ is optional when referring to
 					top-level profile fields, i.e., such as organization_id and project_id.
@@ -57,7 +57,7 @@ func NewCmdSet(ctx *cmd.Context) *cmd.Command {
 					`),
 				},
 				{
-					Name:          "value",
+					Name:          "VALUE",
 					Documentation: "Value to be set.",
 				},
 			},

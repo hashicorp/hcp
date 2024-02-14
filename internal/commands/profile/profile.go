@@ -16,7 +16,7 @@ import (
 func NewCmdProfile(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "profile",
-		ShortHelp: "View and edit HCP CLI properties",
+		ShortHelp: "View and edit HCP CLI properties.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ Bold "hcp profile" }} command group lets you initialize, set, view and unset
 		properties used by HCP CLI.

@@ -29,7 +29,7 @@ func NewCmdRename(ctx *cmd.Context) *cmd.Command {
 			Autocomplete: predictProfiles(false, true),
 			Args: []cmd.PositionalArgument{
 				{
-					Name:          "name",
+					Name:          "NAME",
 					Documentation: "The name of the profile to rename.",
 				},
 			},
