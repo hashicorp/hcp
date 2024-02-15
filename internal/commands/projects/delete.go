@@ -29,7 +29,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: "Delete a project.",
+				Preamble: "Delete a project:",
 				Command:  "$ hcp projects delete --project=cd3d34d5-ceeb-493d-b004-9297365a01af",
 			},
 		},

@@ -16,13 +16,14 @@ import (
 func NewCmdLogout(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "logout",
-		ShortHelp: "Logout from HCP",
+		ShortHelp: "Logout from HCP.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		Log out to remove access to HCP.
 		`),
 		Examples: []cmd.Example{
 			{
-				Command: "$ hcp auth logout",
+				Preamble: "Logout the HCP CLI:",
+				Command:  "$ hcp auth logout",
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {

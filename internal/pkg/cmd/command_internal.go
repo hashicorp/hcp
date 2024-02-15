@@ -21,15 +21,6 @@ import (
 	"github.com/spf13/pflag"
 )
 
-// TODO:
-// Validate the short text
-// Validate the long text
-// Validate the flag descriptions and display value
-// Validate that there is documentation for all positional arguments
-// Validate the additional documentation sections.
-// Validate that aliases don't overlap.
-// Validate any optional positional argument is the last argument.
-
 // Run runs the given command.
 func (c *Command) Run(args []string) int {
 	if c.RunF == nil {
@@ -218,9 +209,9 @@ func (c *Command) help() string {
 			}
 
 			names = append(names, rpad(c.Name+":", namePadding)+c.ShortHelp)
-			slices.Sort(names)
 		}
 
+		slices.Sort(names)
 		if len(names) == 0 {
 			return
 		}
@@ -351,19 +342,12 @@ func (c *Command) flagsHelpEntry() []helpEntry {
 func (e *Example) text(cs *iostreams.ColorScheme) string {
 	var buf bytes.Buffer
 
-	if e.Title != "" {
-		fmt.Fprintln(&buf, cs.String(wordWrap(e.Title, 80)).Underline().Faint().Color(cs.Gray()))
-	}
 	if e.Preamble != "" {
 		fmt.Fprintln(&buf, wordWrap(e.Preamble, 80))
 		fmt.Fprintln(&buf)
 	}
 	if e.Command != "" {
 		fmt.Fprintln(&buf, cs.String(wordWrap(e.Command, 80)).Italic().Color(cs.Green()))
-	}
-	if e.Postamble != "" {
-		fmt.Fprintln(&buf)
-		fmt.Fprintln(&buf, wordWrap(e.Postamble, 80))
 	}
 
 	return buf.String()
@@ -418,14 +402,14 @@ func (c *Command) usageHelp() string {
 		namePadding := maxLength + 2
 		var names []string
 		for _, c := range c.children {
-			names = append(names, rpad("  "+c.Name+":", namePadding)+c.ShortHelp)
+			names = append(names, rpad(c.Name+":", namePadding)+c.ShortHelp)
 		}
 
 		// Sort the names
 		slices.Sort(names)
 
 		fmt.Fprintln(&buf, "Commands:")
-		fmt.Fprint(&buf, strings.Join(names, "\n"))
+		fmt.Fprint(&buf, indent.String(strings.Join(names, "\n"), 2))
 		return buf.String()
 	}
 

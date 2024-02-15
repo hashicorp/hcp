@@ -26,7 +26,7 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 		LongHelp:  "Update can be used to update the name or description of an existing project.",
 		Examples: []cmd.Example{
 			{
-				Preamble: "Update a project's name and description.",
+				Preamble: "Update a project's name and description:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp projects update --project=cd3d34d5-ceeb-493d-b004-9297365a01af \
 				  --name=new-name --description="updated description"

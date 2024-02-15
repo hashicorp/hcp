@@ -43,20 +43,20 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Create a new service principal key`,
+				Preamble: `Create a new service principal key:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam service-principals keys create my-service-principal
 				`),
 			},
 			{
-				Preamble: `Create a new service principal key specifying the resource name of the service principal`,
+				Preamble: `Create a new service principal key specifying the resource name of the service principal:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam service-principals keys create \
 				  iam/project/123/service-principal/my-service-principal
 				`),
 			},
 			{
-				Preamble: `Output the new service principal key to a credential file`,
+				Preamble: `Output the new service principal key to a credential file:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam service-principals keys create my-service-principal \
 				  --output-cred-file=my-service-principal-creds.json

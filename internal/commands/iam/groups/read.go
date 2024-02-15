@@ -28,13 +28,13 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Read the group using the resource name suffix "example-group"`,
+				Preamble: `Read the group using the resource name suffix "example-group":`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam groups read example-group
 				`),
 			},
 			{
-				Preamble: `Read the group using the group's resource name`,
+				Preamble: `Read the group using the group's resource name:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam groups read iam/organization/example-org/group/example-group
 				`),

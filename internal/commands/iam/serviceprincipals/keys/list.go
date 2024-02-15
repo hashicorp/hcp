@@ -31,13 +31,13 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `List a service principal's keys`,
+				Preamble: `List a service principal's keys:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam service-principals keys list my-service-principal
 				`),
 			},
 			{
-				Preamble: `List a service principal's keys specifying the resource name of the service principal`,
+				Preamble: `List a service principal's keys specifying the resource name of the service principal:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam service-principals keys list \
 				  iam/project/123/service-principal/my-service-principal

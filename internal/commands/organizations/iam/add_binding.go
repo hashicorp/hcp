@@ -24,7 +24,7 @@ func NewCmdAddBinding(ctx *cmd.Context, runF func(*AddBindingOpts) error) *cmd.C
 
 	cmd := &cmd.Command{
 		Name:      "add-binding",
-		ShortHelp: "Add an IAM policy binding for the organization",
+		ShortHelp: "Add an IAM policy binding for the organization.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		Add an IAM policy binding for the organization. A binding grants the
 		specified principal the given role on the organization.
@@ -33,7 +33,7 @@ func NewCmdAddBinding(ctx *cmd.Context, runF func(*AddBindingOpts) error) *cmd.C
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Bind a principal to role "roles/viewer"`,
+				Preamble: `Bind a principal to role "roles/viewer":`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp organizations iam add-binding \
 				  --member=ef938a22-09cf-4be9-b4d0-1f4587f80f53 \
@@ -53,7 +53,7 @@ func NewCmdAddBinding(ctx *cmd.Context, runF func(*AddBindingOpts) error) *cmd.C
 				{
 					Name:         "role",
 					DisplayValue: "ROLE_ID",
-					Description:  `The role ID (e.g. "roles/admin", "roles/contributor", "roles/viewer") to bind the member to`,
+					Description:  `The role ID (e.g. "roles/admin", "roles/contributor", "roles/viewer") to bind the member to.`,
 					Value:        flagvalue.Simple("", &opts.Role),
 					Required:     true,
 					Autocomplete: iampolicy.AutocompleteRoles(opts.Ctx, opts.Profile.OrganizationID, organization_service.New(ctx.HCP, nil)),

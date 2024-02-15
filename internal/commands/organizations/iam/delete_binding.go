@@ -21,7 +21,7 @@ func NewCmdDeleteBinding(ctx *cmd.Context, runF func(*DeleteBindingOpts) error) 
 
 	cmd := &cmd.Command{
 		Name:      "delete-binding",
-		ShortHelp: "Delete an IAM policy binding for the organization",
+		ShortHelp: "Delete an IAM policy binding for the organization.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		Deletes an IAM policy binding for the organization. A binding consists of a
 		principal and a role.
@@ -30,7 +30,7 @@ func NewCmdDeleteBinding(ctx *cmd.Context, runF func(*DeleteBindingOpts) error) 
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Delete a role binding for a principal previously granted role "roles/viewer"`,
+				Preamble: `Delete a role binding for a principal previously granted role "roles/viewer":`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp organizations iam delete-binding \
 				  --member=ef938a22-09cf-4be9-b4d0-1f4587f80f53 \
@@ -50,7 +50,7 @@ func NewCmdDeleteBinding(ctx *cmd.Context, runF func(*DeleteBindingOpts) error) 
 				{
 					Name:         "role",
 					DisplayValue: "ROLE_ID",
-					Description:  `The role ID (e.g. "roles/admin", "roles/contributor", "roles/viewer") to remove the member from`,
+					Description:  `The role ID (e.g. "roles/admin", "roles/contributor", "roles/viewer") to remove the member from.`,
 					Value:        flagvalue.Simple("", &opts.Role),
 					Required:     true,
 					Autocomplete: iampolicy.AutocompleteRoles(opts.Ctx, ctx.Profile.OrganizationID, organization_service.New(ctx.HCP, nil)),

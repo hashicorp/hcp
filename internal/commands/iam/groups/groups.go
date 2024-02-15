@@ -9,7 +9,7 @@ import (
 func NewCmdGroups(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "groups",
-		ShortHelp: "Manage HCP Groups",
+		ShortHelp: "Manage HCP Groups.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ Bold "hcp iam groups" }} command group allows you to manage HCP
 		groups as well as their memberships.
