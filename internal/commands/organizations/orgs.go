@@ -16,6 +16,8 @@ func NewCmdOrganizations(ctx *cmd.Context) *cmd.Command {
 		`),
 	}
 
+	cmd.AddChild(NewCmdRead(ctx, nil))
+	cmd.AddChild(NewCmdList(ctx, nil))
 	cmd.AddChild(iam.NewCmdIAM(ctx))
 	return cmd
 }
