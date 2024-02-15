@@ -30,13 +30,13 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Delete a group using its name suffix`,
+				Preamble: `Delete a group using its name suffix:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam groups delete team-platform
 				`),
 			},
 			{
-				Preamble: `Delete a group using its resource name`,
+				Preamble: `Delete a group using its resource name:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam groups delete iam/organization/example-org/group/team-platform
 				`),

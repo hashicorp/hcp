@@ -16,7 +16,7 @@ func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
 	}
 	cmd := &cmd.Command{
 		Name:      "create",
-		ShortHelp: "create a new name HCP profile.",
+		ShortHelp: "Create a new HCP profile.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
 		Creates a new named profile.
 
@@ -33,7 +33,7 @@ func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
 		Args: cmd.PositionalArguments{
 			Args: []cmd.PositionalArgument{
 				{
-					Name:          "name",
+					Name:          "NAME",
 					Documentation: "The name of the profile to create.",
 				},
 			},

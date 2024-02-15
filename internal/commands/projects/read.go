@@ -26,7 +26,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 		LongHelp:  "Show metadata for the project.",
 		Examples: []cmd.Example{
 			{
-				Preamble: "Read a project.",
+				Preamble: "Read a project:",
 				Command:  "$ hcp projects read --project=cd3d34d5-ceeb-493d-b004-9297365a01af",
 			},
 		},

@@ -7,20 +7,20 @@ import (
 func NewCmdAuth(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "auth",
-		ShortHelp: "Authenticate to HCP",
+		ShortHelp: "Authenticate to HCP.",
 		LongHelp:  "Manage authentication to HCP.",
 		Examples: []cmd.Example{
 			{
-				Title:   "Browser Login",
-				Command: "$ hcp auth login",
+				Preamble: "Login interactively using a browser:",
+				Command:  "$ hcp auth login",
 			},
 			{
-				Title:   "Service Principal Login",
-				Command: "$ hcp auth login --client-id=spID --client-secret=spSecret",
+				Preamble: "Login using service principal credentials:",
+				Command:  "$ hcp auth login --client-id=spID --client-secret=spSecret",
 			},
 			{
-				Title:   "Logout",
-				Command: "$ hcp auth logout",
+				Preamble: "Logout the CLI:",
+				Command:  "$ hcp auth logout",
 			},
 		},
 	}

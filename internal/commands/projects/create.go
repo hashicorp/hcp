@@ -40,15 +40,15 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: "Creating a project with a description.",
+				Preamble: "Creating a project with a description:",
 				Command:  "$ hcp projects create example-project --description=\"my test project\"",
 			},
 		},
 		Args: cmd.PositionalArguments{
 			Args: []cmd.PositionalArgument{
 				{
-					Name:          "name",
-					Documentation: "Name of the project to create",
+					Name:          "NAME",
+					Documentation: "Name of the project to create.",
 				},
 			},
 		},

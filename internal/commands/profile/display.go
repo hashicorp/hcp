@@ -14,7 +14,7 @@ import (
 func NewCmdDisplay(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "display",
-		ShortHelp: "Display the active profile",
+		ShortHelp: "Display the active profile.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
 		{{ Bold "hcp profile display" }} displays the active profile.
 		`),
