@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/hcp/internal/commands/iam/roles"
 	serviceprincipals "github.com/hashicorp/hcp/internal/commands/iam/serviceprincipals"
 	"github.com/hashicorp/hcp/internal/commands/iam/users"
+	"github.com/hashicorp/hcp/internal/commands/iam/workloadidentityproviders"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
@@ -27,6 +28,7 @@ func NewCmdIam(ctx *cmd.Context) *cmd.Command {
 	cmd.AddChild(users.NewCmdUsers(ctx))
 	cmd.AddChild(groups.NewCmdGroups(ctx))
 	cmd.AddChild(serviceprincipals.NewCmdServicePrincipals(ctx))
+	cmd.AddChild(workloadidentityproviders.NewCmdWIPs(ctx))
 
 	return cmd
 }
