@@ -3,19 +3,14 @@ package waypoint
 import (
 	"github.com/hashicorp/hcp/internal/commands/waypoint/tfcconfig"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
 
 func NewCmdWaypoint(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "waypoint",
 		ShortHelp: "Manage Waypoint",
-		LongHelp:  "Managing HCP Waypoint with CLI commands",
-		Examples: []cmd.Example{
-			{
-				Title:   "TFC Config Set",
-				Command: "$ hcp waypoint tfc-config set TFC_ORG_NAME TFC_TEAM_TOKEN",
-			},
-		},
+		LongHelp:  heredoc.New(ctx.IO).Must(`"Managing HCP Waypoint with CLI commands"`),
 	}
 
 	cmd.AddChild(tfcconfig.NewCmdTFCConfig(ctx))
