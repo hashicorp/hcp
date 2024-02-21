@@ -43,7 +43,7 @@ and removed with the {{Bold "hcp waypoint tfc-config delete"}} command.{{ Preser
 			Args: []cmd.PositionalArgument{
 				{
 					Name:          "TFC_ORG",
-					Documentation: heredoc.New(ctx.IO).Must(`Name of the Terraform Cloud Organization`),
+					Documentation: heredoc.New(ctx.IO).Must(`Name of the Terraform Cloud Organization.`),
 				},
 				{
 					Name: "TOKEN",
