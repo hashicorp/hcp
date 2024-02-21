@@ -68,7 +68,7 @@ func showActionConfig(c *cmd.Command, args []string, opts *ShowOpts) error {
 	// latestRun := respPayload.LatestRun
 	// totalRuns := respPayload.TotalRuns
 
-	// TODO(briancain): add a displayer.go
+	// TODO(briancain): https://github.com/hashicorp/hcp/issues/16
 
 	return nil
 }
