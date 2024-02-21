@@ -37,6 +37,7 @@ func NewCmdShow(ctx *cmd.Context) *cmd.Command {
 					Shorthand:   "n",
 					Description: "The name of the action configuration.",
 					Value:       flagvalue.Simple("", &opts.Name),
+					Required:    true,
 				},
 			},
 		},
