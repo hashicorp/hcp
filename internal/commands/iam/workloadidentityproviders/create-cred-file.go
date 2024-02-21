@@ -221,7 +221,7 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFile) error) *c
 					{{ PreserveNewLines }}
 
 					For more details on the resource parameter, see the Azure documentation:
-					https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/how-to-use-vm-token#get-a-token-using-http
+					https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/how-to-use-vm-token#get-a-token-using-http.
 					`),
 					Value: flagvalue.Simple("", &opts.AzureResource),
 				},

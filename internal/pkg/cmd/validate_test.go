@@ -259,7 +259,7 @@ func TestCommand_Validate(t *testing.T) {
 			command: func(c *Command) {
 				c.children[0].Examples[0].Command = "hcp parent child --count 5"
 			},
-			error: "error validating example 0: example command must start with $",
+			error: "error validating example 0: example command must start with $ or #",
 		},
 		{
 			name: "flag name is set",

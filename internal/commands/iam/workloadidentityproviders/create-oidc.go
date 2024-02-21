@@ -117,7 +117,8 @@ func NewCmdCreateOIDC(ctx *cmd.Context, runF func(*CreateOIDCOpts) error) *cmd.C
 					The access token must have an audience that is contained in this set.
 
 					If no audience is set, the default allowed audience will be the resource name of the provider. The format will be:
-					{{ Italic "iam/project/PROJECT_ID/service-principal/SP_NAME/workload-identity-provider/WIP_NAME" }}					`),
+					{{ Italic "iam/project/PROJECT_ID/service-principal/SP_NAME/workload-identity-provider/WIP_NAME" }}.
+					`),
 					Value:      flagvalue.SimpleSlice(nil, &opts.AllowedAudiences),
 					Repeatable: true,
 				},

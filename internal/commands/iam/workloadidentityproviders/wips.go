@@ -10,7 +10,7 @@ const (
 	// provider name as an argument.
 	WIPNameArgDoc = `
 	The resource name of the workload identity provider to %s. The format of the resource name is:
-	{{ Italic "iam/project/PROJECT_ID/service-principal/SP_NAME/workload-identity-provider/WIP_NAME" }}
+	{{ Italic "iam/project/PROJECT_ID/service-principal/SP_NAME/workload-identity-provider/WIP_NAME" }}.
 	`
 )
 
