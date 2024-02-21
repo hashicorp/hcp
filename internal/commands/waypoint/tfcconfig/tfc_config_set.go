@@ -33,7 +33,7 @@ func NewCmdSet(ctx *cmd.Context, runF func(opts *TFCConfigOpts) error) *cmd.Comm
 			{
 				Preamble: `Create a new TFC Config in HCP Waypoint.`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				hcp waypoint tfc-config set hashicorp <token>`),
+				$ hcp waypoint tfc-config set hashicorp <token>`),
 			},
 		},
 		Args: cmd.PositionalArguments{
