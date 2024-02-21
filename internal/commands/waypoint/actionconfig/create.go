@@ -108,7 +108,7 @@ func createActionConfig(c *cmd.Command, args []string, opts *CreateOpts) error {
 			opts.RequestHeaders = make(map[string]string)
 			for _, header := range opts.RequestHeadersRaw {
 				// Split the header into key and value with the string package
-				kv := strings.Split(header, ":")
+				kv := strings.Split(header, "=")
 				if len(kv) != 2 {
 					return errors.New("invalid header format. Must be in the format 'key=value'")
 				}
