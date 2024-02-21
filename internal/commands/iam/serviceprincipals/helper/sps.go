@@ -64,13 +64,37 @@ func PredictSPResourceNameSuffix(ctx *cmd.Context, c *cmd.Command, client servic
 		}
 
 		names := make([]string, len(sps))
-		for i, g := range sps {
-			_, parts, err := resourcename.Parse(g.ResourceName)
+		for i, sp := range sps {
+			_, parts, err := resourcename.Parse(sp.ResourceName)
 			if err != nil {
 				return nil
 			}
 
 			names[i] = parts[len(parts)-1].Name
+		}
+
+		return names
+	}
+}
+
+// PredictSPResourceName is an argument prediction function that predicts
+// a service-principal resource name.
+func PredictSPResourceName(ctx *cmd.Context, c *cmd.Command, client service_principals_service.ClientService) complete.PredictFunc {
+	return func(args complete.Args) []string {
+		// Parse the args
+		_, err := ctx.ParseFlags(c, args.All)
+		if err != nil {
+			return nil
+		}
+
+		sps, err := GetSPs(ctx.ShutdownCtx, ctx.Profile.OrganizationID, ctx.Profile.ProjectID, client)
+		if err != nil {
+			return nil
+		}
+
+		names := make([]string, len(sps))
+		for i, sp := range sps {
+			names[i] = sp.ResourceName
 		}
 
 		return names

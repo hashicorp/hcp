@@ -5,6 +5,15 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
 
+const (
+	// WIPNameArgDoc is the documentation for accepting a workload identity
+	// provider name as an argument.
+	WIPNameArgDoc = `
+	The resource name of the workload identity provider to %s. The format of the resource name is:
+	{{ Italic "iam/project/PROJECT_ID/service-principal/SP_NAME/workload-identity-provider/WIP_NAME" }}
+	`
+)
+
 func NewCmdWIPs(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "workload-identity-providers",
@@ -32,6 +41,13 @@ func NewCmdWIPs(ctx *cmd.Context) *cmd.Command {
 		can be used and authenticated using a credential file.
 		`),
 	}
+
+	cmd.AddChild(NewCmdCreateAWS(ctx, nil))
+	cmd.AddChild(NewCmdCreateOIDC(ctx, nil))
+	cmd.AddChild(NewCmdCreateCredFile(ctx, nil))
+	cmd.AddChild(NewCmdDelete(ctx, nil))
+	cmd.AddChild(NewCmdList(ctx, nil))
+	cmd.AddChild(NewCmdRead(ctx, nil))
 
 	return cmd
 }
