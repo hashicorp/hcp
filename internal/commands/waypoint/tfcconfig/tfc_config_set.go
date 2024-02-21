@@ -24,11 +24,14 @@ func NewCmdSet(ctx *cmd.Context, runF func(opts *TFCConfigOpts) error) *cmd.Comm
 
 	cmd := &cmd.Command{
 		Name:      "set",
-		ShortHelp: "Set TFC configuration.",
-		LongHelp: heredoc.New(ctx.IO).Mustf(`
-        The {{Bold "hcp waypoint tfc-config set"}} command sets the TFC Organization Name and TFC Team token that will be used in Waypoint.
-		There can only be one TFC Config set for each HCP Project. TFC Configs can be reviewed using the {{Bold "hcp waypoint tfc-config get" }} command
-		and removed with the {{Bold "hcp waypoint tfc-config unset"}} command.`),
+		ShortHelp: "Set TFC Configuration.",
+		LongHelp: heredoc.New(ctx.IO).Mustf(`{{ PreserveNewLines }}The {{Bold "hcp waypoint tfc-config set"}} command 
+sets the TFC Organization Name and TFC Team token that will be used in Waypoint.
+
+There can only be one TFC Config set for each HCP Project. 
+
+TFC Configs can be reviewed using the {{Bold "hcp waypoint tfc-config get" }} command
+and removed with the {{Bold "hcp waypoint tfc-config unset"}} command.{{ PreserveNewLines }}`),
 		Examples: []cmd.Example{
 			{
 				Preamble: `Create a new TFC Config in HCP Waypoint.`,
@@ -44,11 +47,18 @@ func NewCmdSet(ctx *cmd.Context, runF func(opts *TFCConfigOpts) error) *cmd.Comm
 				},
 				{
 					Name: "TOKEN",
-					Documentation: heredoc.New(ctx.IO).Must(`Terraform Cloud Team token for the TFC organization. 
-						Team token must be set in order to perform HCP Waypoint commands. You can learn more about API tokens 
-						at https://developer.hashicorp.com/terraform/cloud-docs/users-teams-organizations/api-tokens
-						HCP Waypoint requires Team level access tokens in order to run correctly. Please ensure that your
-						TFCConfig token has the correct permissions.`),
+					Documentation: heredoc.New(ctx.IO).Must(`{{ PreserveNewLines }}
+Terraform Cloud Team token for the TFC organization. 
+
+Team token must be set in order to perform HCP Waypoint commands. 	
+						
+You can learn more about API tokens at: https://developer.hashicorp.com/terraform/cloud-docs/users-teams-organizations/api-tokens
+						
+HCP Waypoint requires Team level access tokens in order to run correctly. 
+
+Please ensure that your TFCConfig token has the correct permissions.
+					{{ PreserveNewLines }}
+					`),
 				},
 			},
 		},
