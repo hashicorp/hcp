@@ -13,8 +13,6 @@ type ShowOpts struct {
 	opts.WaypointOpts
 
 	Name string
-	// We intentionally don't support ID for delete yet.
-	Id string
 }
 
 func NewCmdShow(ctx *cmd.Context) *cmd.Command {
@@ -55,7 +53,7 @@ func showActionConfig(c *cmd.Command, args []string, opts *ShowOpts) error {
 
 	// Make action name a string pointer
 	actionName := &opts.Name
-	resp, err := opts.WS.WaypointServiceGetActionConfig(&waypoint_service.WaypointServiceGetActionConfigParams{
+	_, err = opts.WS.WaypointServiceGetActionConfig(&waypoint_service.WaypointServiceGetActionConfigParams{
 		NamespaceID: ns.ID,
 		Context:     opts.Ctx,
 		ActionName:  actionName,
@@ -65,10 +63,10 @@ func showActionConfig(c *cmd.Command, args []string, opts *ShowOpts) error {
 		return err
 	}
 
-	respPayload := resp.GetPayload()
-	actionCfg := respPayload.ActionConfig
-	latestRun := respPayload.LatestRun
-	totalRuns := respPayload.TotalRuns
+	// respPayload := resp.GetPayload()
+	// actionCfg := respPayload.ActionConfig
+	// latestRun := respPayload.LatestRun
+	// totalRuns := respPayload.TotalRuns
 
 	// TODO(briancain): add a displayer.go
 

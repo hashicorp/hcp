@@ -13,8 +13,6 @@ type DeleteOpts struct {
 	opts.WaypointOpts
 
 	Name string
-	// We intentionally don't support ID for delete yet.
-	Id string
 }
 
 func NewCmdDelete(ctx *cmd.Context) *cmd.Command {
