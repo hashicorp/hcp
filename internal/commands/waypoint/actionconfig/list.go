@@ -48,11 +48,11 @@ func listActionConfig(c *cmd.Command, args []string, opts *ListOpts) error {
 	}
 
 	/*
-			respPayload := resp.GetPayload()
-			if len(respPayload.ActionConfigs) > 0 {
-				// Print them
-		// TODO(briancain): https://github.com/hashicorp/hcp/issues/16
-			}
+		respPayload := resp.GetPayload()
+		if len(respPayload.ActionConfigs) > 0 {
+			// Print them
+			// TODO(briancain): https://github.com/hashicorp/hcp/issues/16
+		}
 	*/
 
 	return nil
