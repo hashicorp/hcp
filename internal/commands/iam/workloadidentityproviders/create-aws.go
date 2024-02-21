@@ -92,8 +92,9 @@ func NewCmdCreateAWS(ctx *cmd.Context, runF func(*CreateAWSOpts) error) *cmd.Com
 					Name:         "conditional-access",
 					DisplayValue: "STATEMENT",
 					Description: heredoc.New(ctx.IO).Must(`
-					conditional_access is a hashicorp/go-bexpr string that is evaluated when exchanging tokens.
-					It restricts which upstream identities are allowed to access the service principal.
+					The conditional access statement is a hashicorp/go-bexpr string that is evaluated
+					when exchanging tokens. It restricts which upstream identities are allowed to access
+					the service principal.
 
 					The conditional_access statement can access the following variables:
 
