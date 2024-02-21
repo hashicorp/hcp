@@ -43,6 +43,9 @@ func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
 		RunF: func(c *cmd.Command, args []string) error {
 			return createActionConfig(c, args, opts)
 		},
+		PersistentPreRun: func(c *cmd.Command, args []string) error {
+			return cmd.RequireOrgAndProject(ctx)
+		},
 		Flags: cmd.Flags{
 			Local: []*cmd.Flag{
 				{
