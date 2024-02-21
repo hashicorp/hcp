@@ -36,7 +36,7 @@ and removed with the {{Bold "hcp waypoint tfc-config unset"}} command.{{ Preserv
 			{
 				Preamble: `Create a new TFC Config in HCP Waypoint.`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp waypoint tfc-config set hashicorp <token>`),
+				$ hcp waypoint tfc-config set example-org <token>`),
 			},
 		},
 		Args: cmd.PositionalArguments{
