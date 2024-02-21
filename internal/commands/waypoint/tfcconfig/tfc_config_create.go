@@ -56,8 +56,9 @@ You can learn more about API tokens at: https://developer.hashicorp.com/terrafor
 						
 HCP Waypoint requires Team level access tokens in order to run correctly. 
 
-Please ensure that your TFCConfig token has the correct permissions.
-					{{ PreserveNewLines }}
+Please ensure that your TFCConfig token has the correct permissions
+{{ PreserveNewLines }}.
+					
 					`),
 				},
 			},
