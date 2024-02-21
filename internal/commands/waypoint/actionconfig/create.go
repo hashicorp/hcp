@@ -1,6 +1,13 @@
 package actionconfig
 
-import "github.com/hashicorp/hcp/internal/pkg/cmd"
+import (
+	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
+	"github.com/hashicorp/hcp/internal/pkg/cmd"
+)
+
+type CreateOpts struct {
+	opts.WaypointOpts
+}
 
 func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{

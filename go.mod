@@ -20,6 +20,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/muesli/reflow v0.3.0
 	github.com/muesli/termenv v0.15.2
+	github.com/pkg/errors v0.9.1
 	github.com/posener/complete v1.2.3
 	github.com/rodaine/table v1.1.0
 	github.com/spf13/pflag v1.0.5
