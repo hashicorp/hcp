@@ -9,7 +9,7 @@ import (
 func NewCmdWaypoint(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "waypoint",
-		ShortHelp: "Manage Waypoint",
+		ShortHelp: "Manage Waypoint.",
 		LongHelp:  heredoc.New(ctx.IO).Must(`"Managing HCP Waypoint with CLI commands"`),
 	}
 
