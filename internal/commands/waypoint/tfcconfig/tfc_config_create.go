@@ -23,20 +23,20 @@ func NewCmdSet(ctx *cmd.Context, runF func(opts *TFCConfigOpts) error) *cmd.Comm
 	}
 
 	cmd := &cmd.Command{
-		Name:      "set",
+		Name:      "create",
 		ShortHelp: "Set TFC Configuration.",
-		LongHelp: heredoc.New(ctx.IO).Mustf(`{{ PreserveNewLines }}The {{Bold "hcp waypoint tfc-config set"}} command 
+		LongHelp: heredoc.New(ctx.IO).Mustf(`{{ PreserveNewLines }}The {{Bold "hcp waypoint tfc-config create"}} command 
 sets the TFC Organization Name and TFC Team token that will be used in Waypoint.
 
 There can only be one TFC Config set for each HCP Project. 
 
-TFC Configs can be reviewed using the {{Bold "hcp waypoint tfc-config get" }} command
-and removed with the {{Bold "hcp waypoint tfc-config unset"}} command.{{ PreserveNewLines }}`),
+TFC Configs can be reviewed using the {{Bold "hcp waypoint tfc-config read" }} command
+and removed with the {{Bold "hcp waypoint tfc-config delete"}} command.{{ PreserveNewLines }}`),
 		Examples: []cmd.Example{
 			{
 				Preamble: `Create a new TFC Config in HCP Waypoint.`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp waypoint tfc-config set example-org <token>`),
+				$ hcp waypoint tfc-config create example-org <token>`),
 			},
 		},
 		Args: cmd.PositionalArguments{
@@ -68,7 +68,7 @@ Please ensure that your TFCConfig token has the correct permissions.
 			if runF != nil {
 				return runF(opts)
 			}
-			return setRun(opts)
+			return createRun(opts)
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
 			return cmd.RequireOrgAndProject(ctx)
@@ -88,7 +88,7 @@ type TFCConfigOpts struct {
 	WaypointClient waypoint_service.ClientService
 }
 
-func setRun(opts *TFCConfigOpts) error {
+func createRun(opts *TFCConfigOpts) error {
 	nsID, err := GetNamespace(opts.Ctx, opts.WaypointClient, opts.Profile.OrganizationID, opts.Profile.ProjectID)
 	if err != nil {
 		return fmt.Errorf("error getting namespace: %w", err)
