@@ -2,7 +2,6 @@ package workloadidentityproviders
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/hashicorp/hcp-sdk-go/auth"
 	"github.com/hashicorp/hcp-sdk-go/auth/workload"
@@ -298,7 +297,7 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFile) error) *c
 					Name:         "source-header",
 					DisplayValue: "KEY=VALUE",
 					Description:  "Headers to send to the URL when obtaining the credential.",
-					Value:        flagvalue.SimpleSlice(nil, &opts.SourceURLHeaders),
+					Value:        flagvalue.SimpleMap(nil, &opts.SourceURLHeaders),
 					Repeatable:   true,
 				},
 			},
@@ -342,7 +341,7 @@ type CreateCredFile struct {
 	CredentialJSONPointer string
 
 	// Headers to sent to SourceURL
-	SourceURLHeaders []string
+	SourceURLHeaders map[string]string
 }
 
 func (c *CreateCredFile) Validate() error {
@@ -452,19 +451,8 @@ func createCredFileRun(opts *CreateCredFile) error {
 	} else if opts.SourceURL != "" {
 		cf.Workload.URL = &workload.URLCredentialSource{
 			URL:              opts.SourceURL,
+			Headers:          opts.SourceURLHeaders,
 			CredentialFormat: format,
-		}
-
-		if len(opts.SourceURLHeaders) > 0 {
-			cf.Workload.URL.Headers = make(map[string]string, len(opts.SourceURLHeaders))
-			for _, h := range opts.SourceURLHeaders {
-				kv := strings.SplitN(h, "=", 2)
-				if len(kv) != 2 {
-					return fmt.Errorf("invalid header %q, expected KEY=VALUE", h)
-				}
-
-				cf.Workload.URL.Headers[kv[0]] = kv[1]
-			}
 		}
 	} else if opts.SourceFile != "" {
 		cf.Workload.File = &workload.FileCredentialSource{
