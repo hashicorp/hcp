@@ -13,8 +13,8 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
 
-func NewCmdCreate(ctx *cmd.Context, runF func(opts *TFCConfigOpts) error) *cmd.Command {
-	opts := &TFCConfigOpts{
+func NewCmdCreate(ctx *cmd.Context, runF func(opts *TFCConfigCreateOpts) error) *cmd.Command {
+	opts := &TFCConfigCreateOpts{
 		Ctx:            ctx.ShutdownCtx,
 		Output:         ctx.Output,
 		Profile:        ctx.Profile,
@@ -78,7 +78,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(opts *TFCConfigOpts) error) *cmd.C
 	return cmd
 }
 
-type TFCConfigOpts struct {
+type TFCConfigCreateOpts struct {
 	Ctx     context.Context
 	Profile *profile.Profile
 	Output  *format.Outputter
@@ -89,7 +89,7 @@ type TFCConfigOpts struct {
 	WaypointClient waypoint_service.ClientService
 }
 
-func createRun(opts *TFCConfigOpts) error {
+func createRun(opts *TFCConfigCreateOpts) error {
 	nsID, err := GetNamespace(opts.Ctx, opts.WaypointClient, opts.Profile.OrganizationID, opts.Profile.ProjectID)
 	if err != nil {
 		return fmt.Errorf("error getting namespace: %w", err)
