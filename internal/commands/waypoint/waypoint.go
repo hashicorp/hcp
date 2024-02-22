@@ -13,7 +13,6 @@ func NewCmdWaypoint(ctx *cmd.Context) *cmd.Command {
 		ShortHelp: "Manage Waypoint.",
 		LongHelp: heredoc.New(ctx.IO).Must(`The {{ Bold "hcp waypoint" }} command group allows users to manage HCP Waypoint resources through the CLI.
 These commands allow the user to interact with their HCP Waypoint instance to manage their application deployment process.`),
-		Examples: []cmd.Example{},
 	}
 
 	cmd.AddChild(tfcconfig.NewCmdTFCConfig(ctx))

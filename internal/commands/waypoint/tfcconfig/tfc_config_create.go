@@ -96,16 +96,15 @@ func createRun(opts *TFCConfigOpts) error {
 	}
 
 	ns := &models.HashicorpCloudWaypointRefNamespace{ID: nsID}
-	request := &models.HashicorpCloudWaypointCreateTFCConfigRequest{
-		Namespace: ns,
-		TfcConfig: &models.HashicorpCloudWaypointTFCConfig{
-			OrganizationName: opts.TfcOrg,
-			Token:            opts.Token,
-		},
-	}
 	resp, err := opts.WaypointClient.WaypointServiceCreateTFCConfig(
 		&waypoint_service.WaypointServiceCreateTFCConfigParams{
-			Body:        request,
+			Body: &models.HashicorpCloudWaypointWaypointServiceCreateTFCConfigBody{
+				Namespace: ns,
+				TfcConfig: &models.HashicorpCloudWaypointTFCConfig{
+					OrganizationName: opts.TfcOrg,
+					Token:            opts.Token,
+				},
+			},
 			NamespaceID: nsID,
 			Context:     opts.Ctx,
 		}, nil,
