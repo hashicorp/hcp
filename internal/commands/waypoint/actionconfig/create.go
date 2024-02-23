@@ -3,7 +3,6 @@ package actionconfig
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
@@ -22,9 +21,7 @@ type CreateOpts struct {
 	Request *models.HashicorpCloudWaypointActionConfigRequest
 	// Workarounds due to not being able to set these values directly in cmd.Flag
 	RequestCustomMethod string
-	// Must be hacked to work, there's no supporting string map flag type
-	RequestHeaders    map[string]string
-	RequestHeadersRaw []string // Expected to be "key=value" and will return an err if not
+	RequestHeaders      map[string]string
 }
 
 func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
@@ -79,7 +76,7 @@ func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
 				{
 					Name:        "header",
 					Description: "The headers to include in the request. This flag can be specified multiple times.",
-					Value:       flagvalue.SimpleSlice([]string{}, &opts.RequestHeadersRaw),
+					Value:       flagvalue.SimpleMap(map[string]string{}, &opts.RequestHeaders),
 					Repeatable:  true,
 				},
 				// GitHub Requests
@@ -101,22 +98,14 @@ func createActionConfig(c *cmd.Command, args []string, opts *CreateOpts) error {
 		}
 	}
 
-	// Work arounds for missing flag support
+	// Mutate flag values to Custom options
 	if opts.Request.Custom != nil {
-		// Parse the headers. This is a workaround for not having a map string flag type
-		if len(opts.RequestHeadersRaw) > 0 {
-			opts.RequestHeaders = make(map[string]string)
-			for _, header := range opts.RequestHeadersRaw {
-				// Split the header into key and value with the string package
-				kv := strings.Split(header, "=")
-				if len(kv) != 2 {
-					return errors.New("invalid header format. Must be in the format 'key=value'")
-				}
-				opts.Request.Custom.Headers = append(opts.Request.Custom.Headers, &models.HashicorpCloudWaypointActionConfigFlavorCustomHeader{
-					Key:   kv[0],
-					Value: kv[1],
-				})
-			}
+		// Parse the headers
+		for k, v := range opts.RequestHeaders {
+			opts.Request.Custom.Headers = append(opts.Request.Custom.Headers, &models.HashicorpCloudWaypointActionConfigFlavorCustomHeader{
+				Key:   k,
+				Value: v,
+			})
 		}
 
 		// Cast the method to the correct type
