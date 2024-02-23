@@ -61,35 +61,39 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFile) error) *c
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				# Set the --imdsv1 flag if the AWS instance metadata service is using version 1.
 				$ hcp iam workload-identity-providers create-cred-file \
+				  iam/project/123/service-principal/my-sp/workload-identity-provider/aws \
 				  --aws \
-				  --output-file credentials.json
+				  --output-file=credentials.json
 				`),
 			},
 			{
 				Preamble: `Create a credential file for a GCP workload:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam workload-identity-providers create-cred-file \
+				  iam/project/123/service-principal/my-sp/workload-identity-provider/gcp \
 				  --gcp \
-				  --output-file credentials.json
+				  --output-file=credentials.json
 				`),
 			},
 			{
 				Preamble: `Create a credential file for an Azure workload using a User Managed Identity:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam workload-identity-providers create-cred-file \
+				  iam/project/123/service-principal/my-sp/workload-identity-provider/azure \
 				  --azure \
 				  --azure-resource=MANAGED_IDENTITY_CLIENT_ID \
-				  --output-file credentials.json
+				  --output-file=credentials.json
 				`),
 			},
 			{
 				Preamble: `Create a credential file for an Azure workload that has multiple User Managed Identities:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam workload-identity-providers create-cred-file \
+				  iam/project/123/service-principal/my-sp/workload-identity-provider/azure \
 				  --azure \
 				  --azure-resource=MANAGED_IDENTITY_CLIENT_ID \
 				  --azure-client-id=MANAGED_IDENTITY_CLIENT_ID \
-				  --output-file credentials.json
+				  --output-file=credentials.json
 				`),
 			},
 			{
@@ -97,10 +101,11 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFile) error) *c
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				# ENTRA_ID_APP_ID_URL generally has the form "api://123-456-678-901"
 				$ hcp iam workload-identity-providers create-cred-file \
+				  iam/project/123/service-principal/my-sp/workload-identity-provider/azure \
 				  --azure \
 				  --azure-resource=ENTRA_ID_APP_ID_URI \
 				  --azure-client-id=MANAGED_IDENTITY_CLIENT_ID \
-				  --output-file credentials.json
+				  --output-file=credentials.json
 				`),
 			},
 			{
@@ -112,14 +117,16 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFile) error) *c
 				#   ...
 				# }
 				$ hcp iam workload-identity-providers create-cred-file \
-				  --source-file \
-				  --source-json-pointer "/access_token" \
-				  --output-file credentials.json
+				  iam/project/123/service-principal/my-sp/workload-identity-provider/k8s \
+				  --source-file=/var/run/secrets/tokens/hcp_token \
+				  --source-json-pointer=/access_token \
+				  --output-file=credentials.json
 
 				# Assuming the file only contains the access token:
 				$ hcp iam workload-identity-providers create-cred-file \
+				  iam/project/123/service-principal/my-sp/workload-identity-provider/k8s \
 				  --source-file \
-				  --output-file credentials.json
+				  --output-file=credentials.json
 				`),
 			},
 			{
@@ -131,21 +138,24 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFile) error) *c
 				#   ...
 				# }
 				$ hcp iam workload-identity-providers create-cred-file \
-				  --source-url=https://example-oidc-provider.com/token \
-				  --source-json-pointer "/access_token" \
-				  --output-file credentials.json
+				  iam/project/123/service-principal/my-sp/workload-identity-provider/example \
+				  --source-url="https://example-oidc-provider.com/token" \
+				  --source-json-pointer=/access_token \
+				  --output-file=credentials.json
 
 				# Assuming the response only contains the access token:
 				$ hcp iam workload-identity-providers create-cred-file \
+				  iam/project/123/service-principal/my-sp/workload-identity-provider/example \
 				  --source-url=https://example-oidc-provider.com/token \
-				  --output-file credentials.json
+				  --output-file=credentials.json
 
 				# To add headers to the request, use the --source-header flag:
 				$ hcp iam workload-identity-providers create-cred-file \
+				  iam/project/123/service-principal/my-sp/workload-identity-provider/example \
 				  --source-url=https://example-oidc-provider.com/token \
-				  --source-header Metadata=True \
-				  --source-header Token=Identity \
-				  --output-file credentials.json
+				  --source-header=Metadata=True \
+				  --source-header=Token=Identity \
+				  --output-file=credentials.json
 				`),
 			},
 			{
@@ -157,14 +167,16 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFile) error) *c
 				#   ...
 				# }
 				$ hcp iam workload-identity-providers create-cred-file \
+				  iam/project/123/service-principal/my-sp/workload-identity-provider/example \
 				  --source-env=ACCESS_TOKEN \
-				  --source-json-pointer "/access_token" \
-				  --output-file credentials.json
+				  --source-json-pointer=/access_token \
+				  --output-file=credentials.json
 
 				# Assuming the environment variable only contains the access token:
 				$ hcp iam workload-identity-providers create-cred-file \
+				  iam/project/123/service-principal/my-sp/workload-identity-provider/example \
 				  --source-env=ACCESS_TOKEN \
-				  --output-file credentials.json
+				  --output-file=credentials.json
 				`),
 			},
 		},

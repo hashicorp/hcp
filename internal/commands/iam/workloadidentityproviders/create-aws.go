@@ -57,10 +57,10 @@ func NewCmdCreateAWS(ctx *cmd.Context, runF func(*CreateAWSOpts) error) *cmd.Com
 				Preamble: `Create a provider that allows exchanging identities for AWS workloads with role "example-role":`,
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap(), heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam workload-identity-providers create-aws aws-my-role \
-				  --service-principal iam/project/PROJECT/service-principal/example-sp \
-				  --account-id 123456789012 \
-				  --conditional-access 'aws.arn matches "arn:aws:iam::123456789012:role/example-role/*"' \
-				  --description "Allow exchanging AWS workloads that have role example-role"
+				  --service-principal=iam/project/PROJECT/service-principal/example-sp \
+				  --account-id=123456789012 \
+				  --conditional-access='aws.arn matches "arn:aws:iam::123456789012:role/example-role/*"' \
+				  --description="Allow exchanging AWS workloads that have role example-role"
 				`),
 			},
 		},

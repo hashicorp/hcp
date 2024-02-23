@@ -55,11 +55,11 @@ func NewCmdCreateOIDC(ctx *cmd.Context, runF func(*CreateOIDCOpts) error) *cmd.C
 				Preamble: `Azure - Allow exchanging a User Managed Identity:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap(), heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam workload-identity-providers create-oidc azure-example-user-managed \
-				  --service-principal iam/project/PROJECT/service-principal/example-sp \
-				  --issuer "https://sts.windows.net/AZURE_AD_TENANT_ID/" \
-				  --allowed-audience "MANAGED_IDENTITY_CLIENT_ID" \
-				  --conditional-access 'jwt_claims.sub == "MANAGED_IDENTITY_OBJECT_PRINCIPAL_ID"' \
-				  --description "Azure User Managed Identity Example"
+				  --service-principal=iam/project/PROJECT/service-principal/example-sp \
+				  --issuer=https://sts.windows.net/AZURE_AD_TENANT_ID/ \
+				  --allowed-audience=MANAGED_IDENTITY_CLIENT_ID \
+				  --conditional-access='jwt_claims.sub == "MANAGED_IDENTITY_OBJECT_PRINCIPAL_ID"' \
+				  --description="Azure User Managed Identity Example"
 				`),
 			},
 			{
@@ -67,10 +67,10 @@ func NewCmdCreateOIDC(ctx *cmd.Context, runF func(*CreateOIDCOpts) error) *cmd.C
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap(), heredoc.WithPreserveNewlines()).Must(`
 				# List of claims: https://cloud.google.com/compute/docs/instances/verifying-instance-identity#payload
 				$ hcp iam workload-identity-providers create-oidc gcp-example-service-account \
-				  --service-principal iam/project/PROJECT/service-principal/example-sp \
-				  --issuer "https://accounts.google.com" \
-				  --conditional-access 'jwt_claims.sub == "SERVICE_ACCOUNT_UNIQUE_ID"' \
-				  --description "GCP Service Account Example"
+				  --service-principal=iam/project/PROJECT/service-principal/example-sp \
+				  --issuer=https://accounts.google.com \
+				  --conditional-access='jwt_claims.sub == "SERVICE_ACCOUNT_UNIQUE_ID"' \
+				  --description="GCP Service Account Example"
 				`),
 			},
 			{
@@ -78,10 +78,10 @@ func NewCmdCreateOIDC(ctx *cmd.Context, runF func(*CreateOIDCOpts) error) *cmd.C
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap(), heredoc.WithPreserveNewlines()).Must(`
 				# Full list of claims: https://docs.gitlab.com/ee/ci/secrets/id_token_authentication.html#token-payload
 				$ hcp iam workload-identity-providers create-oidc gcp-example-service-account \
-				  --service-principal iam/project/PROJECT/service-principal/example-sp \
-				  --issuer "https://gitlab.com" \
-				  --conditional-access 'jwt_claims.project_path == "example-org/example-repo" and jwt_cliams.job_id == 302' \
-				  --description "GitLab example-repo access for job 302"
+				  --service-principal=iam/project/PROJECT/service-principal/example-sp \
+				  --issuer=https://gitlab.com \
+				  --conditional-access='jwt_claims.project_path == "example-org/example-repo" and jwt_cliams.job_id == 302' \
+				  --description="GitLab example-repo access for job 302"
 				`),
 			},
 		},
