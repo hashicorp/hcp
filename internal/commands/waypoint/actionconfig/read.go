@@ -10,23 +10,23 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/format"
 )
 
-type ShowOpts struct {
+type ReadOpts struct {
 	opts.WaypointOpts
 
 	Name string
 }
 
-func NewCmdShow(ctx *cmd.Context) *cmd.Command {
-	opts := &ShowOpts{
+func NewCmdRead(ctx *cmd.Context) *cmd.Command {
+	opts := &ReadOpts{
 		WaypointOpts: opts.New(ctx),
 	}
 
 	cmd := &cmd.Command{
-		Name:      "show",
-		ShortHelp: "Show more details about an action configurations.",
-		LongHelp:  "Show more details about an action configurations.",
+		Name:      "read",
+		ShortHelp: "Read more details about an action configurations.",
+		LongHelp:  "Read more details about an action configurations.",
 		RunF: func(c *cmd.Command, args []string) error {
-			return showActionConfig(c, args, opts)
+			return readActionConfig(c, args, opts)
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
 			return cmd.RequireOrgAndProject(ctx)
@@ -47,7 +47,7 @@ func NewCmdShow(ctx *cmd.Context) *cmd.Command {
 	return cmd
 }
 
-func showActionConfig(c *cmd.Command, args []string, opts *ShowOpts) error {
+func readActionConfig(c *cmd.Command, args []string, opts *ReadOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
 		return err
