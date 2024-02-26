@@ -60,8 +60,7 @@ func deleteActionConfig(c *cmd.Command, args []string, opts *DeleteOpts) error {
 		ActionName:  actionName,
 	}, nil)
 	if err != nil {
-		fmt.Fprintf(opts.IO.Err(), "Error deleting action config: %s", err)
-		return err
+		return fmt.Errorf("failed to delete action config %q: %w", opts.Name, err)
 	}
 
 	fmt.Fprintf(opts.IO.Out(), "Action config %q deleted.", opts.Name)

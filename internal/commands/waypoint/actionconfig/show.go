@@ -60,8 +60,8 @@ func showActionConfig(c *cmd.Command, args []string, opts *ShowOpts) error {
 		ActionName:  actionName,
 	}, nil)
 	if err != nil {
-		fmt.Fprintf(opts.IO.Err(), "Error getting action config: %s", err)
-		return err
+		return fmt.Errorf("error getting action configuration for %q: %w",
+			opts.Name, err)
 	}
 
 	// respPayload := resp.GetPayload()

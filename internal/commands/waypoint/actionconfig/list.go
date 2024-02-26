@@ -43,8 +43,7 @@ func listActionConfig(c *cmd.Command, args []string, opts *ListOpts) error {
 		Context:     opts.Ctx,
 	}, nil)
 	if err != nil {
-		fmt.Fprintf(opts.IO.Err(), "Error listing action configs: %s", err)
-		return err
+		return fmt.Errorf("error listing action configurations: %w", err)
 	}
 
 	/*
