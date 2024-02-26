@@ -134,7 +134,7 @@ func createActionConfig(c *cmd.Command, args []string, opts *CreateOpts) error {
 		return fmt.Errorf("failed to create action config %q: %w", opts.Name, err)
 	}
 
-	fmt.Fprintf(opts.IO.Out(), "Action config %q created.", opts.Name)
+	fmt.Fprintf(opts.IO.Err(), "Action config %q created.", opts.Name)
 
 	return nil
 }
