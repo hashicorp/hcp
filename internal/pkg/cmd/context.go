@@ -52,10 +52,10 @@ type GlobalFlags struct {
 
 	// Unexported global flags. These should generally be access via other
 	// helpers exported in the Context.
-	project   string
-	profile   string
-	format    string
-	verbosity string
+	project string
+	profile string
+	format  string
+	debug   int
 
 	// Quiet indicates the user has requested minimal output
 	Quiet bool
@@ -78,7 +78,6 @@ func ConfigureRootCommand(ctx *Context, cmd *Command) {
 
 	// Configure the global flags
 	formats := []string{"pretty", "table", "json"}
-	logLevels := []string{"trace", "debug", "warn", "info", "error"}
 
 	cmd.Flags.Persistent = append(cmd.Flags.Persistent, &Flag{
 		Name:         "project",
@@ -121,13 +120,11 @@ func ConfigureRootCommand(ctx *Context, cmd *Command) {
 		global:        true,
 		Autocomplete:  complete.PredictNothing,
 	}, &Flag{
-		Name:         "verbosity",
-		DisplayValue: "LEVEL",
-		Description:  "Sets the log verbosity.",
-		Value:        flagvalue.Enum[string](logLevels, "", &ctx.flags.verbosity),
-		Hidden:       true, // Helpful for power users but hidden for all.
-		global:       true,
-		Autocomplete: complete.PredictSet(logLevels...),
+		Name:          "debug",
+		Description:   "Enable debug output.",
+		Value:         flagvalue.Counter(0, &ctx.flags.debug),
+		IsBooleanFlag: true,
+		global:        true,
 	})
 
 	// Setup the pre-run command
@@ -166,10 +163,16 @@ func (ctx *Context) applyGlobalFlags(c *Command, args []string) error {
 	}
 
 	// Set the verbosity if the flag is set.
-	verbosity := ctx.flags.verbosity
-	if verbosity == "" {
-		verbosity = ctx.Profile.Core.GetVerbosity()
+	verbosity := ctx.Profile.Core.GetVerbosity()
+	switch ctx.flags.debug {
+	case 0:
+		// nothing
+	case 1:
+		verbosity = "debug"
+	default:
+		verbosity = "trace"
 	}
+
 	if verbosity != "" {
 		l := hclog.LevelFromString(verbosity)
 		if l == hclog.NoLevel {
