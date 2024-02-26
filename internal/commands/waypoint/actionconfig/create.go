@@ -108,9 +108,9 @@ func createActionConfig(c *cmd.Command, args []string, opts *CreateOpts) error {
 			})
 		}
 
-		// Cast the method to the correct type
-		// TODO(briancain): this isn't working
-		// opts.Request.Custom.Method = models.HashicorpCloudWaypointActionConfigFlavorCustomMethod(opts.RequestCustomMethod)
+		// Cast the string to a const for the sdk API
+		customMethod := models.HashicorpCloudWaypointActionConfigFlavorCustomMethod(opts.RequestCustomMethod)
+		opts.Request.Custom.Method = &customMethod
 	}
 
 	// Ok, run the command!!
