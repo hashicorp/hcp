@@ -61,6 +61,6 @@ func readRun(opts *ReadOpts) error {
 		return fmt.Errorf("failed to read project: %w", err)
 	}
 
-	d := newDisplayer(format.Pretty, true, resp.Payload.Project)
+	d := format.NewDisplayer(resp.Payload.Project, format.Pretty, projectFields)
 	return opts.Output.Display(d)
 }

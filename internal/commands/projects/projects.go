@@ -3,7 +3,18 @@ package projects
 import (
 	"github.com/hashicorp/hcp/internal/commands/projects/iam"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
+	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
+)
+
+var (
+	// projectFields is the set of fields to display for a project.
+	projectFields = []format.Field{
+		format.NewField("Name", "{{ .Name }}"),
+		format.NewField("ID", "{{ .ID }}"),
+		format.NewField("Description", "{{ .Description }}"),
+		format.NewField("Created At", "{{ .CreatedAt }}"),
+	}
 )
 
 func NewCmdProjects(ctx *cmd.Context) *cmd.Command {
