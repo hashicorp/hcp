@@ -55,7 +55,7 @@ type GlobalFlags struct {
 	project string
 	profile string
 	format  string
-	debug   bool
+	debug   int
 
 	// Quiet indicates the user has requested minimal output
 	Quiet bool
@@ -122,7 +122,7 @@ func ConfigureRootCommand(ctx *Context, cmd *Command) {
 	}, &Flag{
 		Name:          "debug",
 		Description:   "Enable debug output.",
-		Value:         flagvalue.Simple(false, &ctx.flags.debug),
+		Value:         flagvalue.Counter(0, &ctx.flags.debug),
 		IsBooleanFlag: true,
 		global:        true,
 	})
@@ -164,9 +164,15 @@ func (ctx *Context) applyGlobalFlags(c *Command, args []string) error {
 
 	// Set the verbosity if the flag is set.
 	verbosity := ctx.Profile.Core.GetVerbosity()
-	if ctx.flags.debug && verbosity == "" {
+	switch ctx.flags.debug {
+	case 0:
+		// nothing
+	case 1:
 		verbosity = "debug"
+	default:
+		verbosity = "trace"
 	}
+
 	if verbosity != "" {
 		l := hclog.LevelFromString(verbosity)
 		if l == hclog.NoLevel {
