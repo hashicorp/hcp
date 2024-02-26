@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
+	"github.com/hashicorp/hcp/internal/pkg/format"
 )
 
 type ListOpts struct {
@@ -38,7 +39,7 @@ func listActionConfig(c *cmd.Command, args []string, opts *ListOpts) error {
 		return err
 	}
 
-	_, err = opts.WS.WaypointServiceListActionConfigs(&waypoint_service.WaypointServiceListActionConfigsParams{
+	resp, err := opts.WS.WaypointServiceListActionConfigs(&waypoint_service.WaypointServiceListActionConfigsParams{
 		NamespaceID: ns.ID,
 		Context:     opts.Ctx,
 	}, nil)
@@ -46,13 +47,9 @@ func listActionConfig(c *cmd.Command, args []string, opts *ListOpts) error {
 		return fmt.Errorf("error listing action configurations: %w", err)
 	}
 
-	/*
-		respPayload := resp.GetPayload()
-		if len(respPayload.ActionConfigs) > 0 {
-			// Print them
-			// TODO(briancain): https://github.com/hashicorp/hcp/issues/16
-		}
-	*/
+	// TODO(briancain): https://github.com/hashicorp/hcp/issues/16
+	respPayload := resp.GetPayload()
+	d := newDisplayer(format.Pretty, false, respPayload.ActionConfigs...)
 
-	return nil
+	return opts.Output.Display(d)
 }

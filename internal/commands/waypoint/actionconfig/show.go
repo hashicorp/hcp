@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
+	"github.com/hashicorp/hcp/internal/pkg/format"
 )
 
 type ShowOpts struct {
@@ -54,7 +55,7 @@ func showActionConfig(c *cmd.Command, args []string, opts *ShowOpts) error {
 
 	// Make action name a string pointer
 	actionName := &opts.Name
-	_, err = opts.WS.WaypointServiceGetActionConfig(&waypoint_service.WaypointServiceGetActionConfigParams{
+	resp, err := opts.WS.WaypointServiceGetActionConfig(&waypoint_service.WaypointServiceGetActionConfigParams{
 		NamespaceID: ns.ID,
 		Context:     opts.Ctx,
 		ActionName:  actionName,
@@ -64,12 +65,12 @@ func showActionConfig(c *cmd.Command, args []string, opts *ShowOpts) error {
 			opts.Name, err)
 	}
 
-	// respPayload := resp.GetPayload()
+	// TODO(briancain): https://github.com/hashicorp/hcp/issues/16
 	// actionCfg := respPayload.ActionConfig
 	// latestRun := respPayload.LatestRun
 	// totalRuns := respPayload.TotalRuns
+	respPayload := resp.GetPayload()
 
-	// TODO(briancain): https://github.com/hashicorp/hcp/issues/16
-
-	return nil
+	d := newDisplayer(format.Pretty, true, respPayload.ActionConfig)
+	return opts.Output.Display(d)
 }
