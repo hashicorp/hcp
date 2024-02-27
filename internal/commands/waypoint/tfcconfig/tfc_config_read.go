@@ -32,7 +32,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(opts *TFCConfigReadOpts) error) *cmd
 			{
 				Preamble: `Retrieve the saved TFC Config from Waypoint for this HCP Project ID:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp waypoint tfc-config get example-org`),
+				$ hcp waypoint tfc-config get`),
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {
