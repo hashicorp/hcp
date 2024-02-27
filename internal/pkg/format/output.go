@@ -28,6 +28,26 @@ type Displayer interface {
 	FieldTemplates() []Field
 }
 
+// NewDisplayer creates a new Displayer with the given payload, default format,
+// and fields.
+func NewDisplayer[T any](payload T, defaultFormat Format, fields []Field) Displayer {
+	return &internalDisplayer[T]{
+		payload:       payload,
+		fields:        fields,
+		defaultFormat: defaultFormat,
+	}
+}
+
+type internalDisplayer[T any] struct {
+	payload       T
+	fields        []Field
+	defaultFormat Format
+}
+
+func (i *internalDisplayer[T]) DefaultFormat() Format   { return i.defaultFormat }
+func (i *internalDisplayer[T]) FieldTemplates() []Field { return i.fields }
+func (i *internalDisplayer[T]) Payload() any            { return i.payload }
+
 // TemplatedPayload allows a Displayer to return a different payload if the
 // output will be templated using the field templates. This can be useful when
 // raw output (e.g. JSON) requires a specific payload but the templated output
@@ -68,6 +88,12 @@ type Field struct {
 	// A ValueFormat of '{{ .CreatedAt }}' will now invoke this function. If the
 	// cluster was recently created an output may display "4s ago".
 	ValueFormat string
+}
+
+// NewField creates a new Field with the given name and value format string. See
+// the Field struct for more information.
+func NewField(name, valueFormat string) Field {
+	return Field{Name: name, ValueFormat: valueFormat}
 }
 
 // Outputter is used to output data to users in a consistent manner. The

@@ -119,7 +119,7 @@ func createRun(opts *CreateOpts) error {
 	}
 
 	// Display the created project
-	d := newDisplayer(format.Pretty, true, resp.Payload.Project)
+	d := format.NewDisplayer(resp.Payload.Project, format.Pretty, projectFields)
 	if err := opts.Output.Display(d); err != nil {
 		return err
 	}

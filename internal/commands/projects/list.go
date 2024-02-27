@@ -70,6 +70,6 @@ func listRun(opts *ListOpts) error {
 		req.PaginationNextPageToken = &next
 	}
 
-	d := newDisplayer(format.Table, false, projects...)
+	d := format.NewDisplayer(projects, format.Table, projectFields)
 	return opts.Output.Display(d)
 }
