@@ -65,7 +65,7 @@ func deleteRun(opts *TFCConfigDeleteOpts) error {
 	}
 
 	if resp.IsSuccess() {
-		fmt.Fprintf(opts.IO.Err(), "%s TFC Config Successfully Deleted!", opts.IO.ColorScheme().SuccessIcon())
+		fmt.Fprintf(opts.IO.Err(), "%s TFC Config successfully deleted!", opts.IO.ColorScheme().SuccessIcon())
 	}
 
 	return nil
