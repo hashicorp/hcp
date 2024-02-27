@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -32,7 +33,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(opts *TFCConfigReadOpts) error) *cmd
 			{
 				Preamble: `Retrieve the saved TFC Config from Waypoint for this HCP Project ID:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp waypoint tfc-config get`),
+				$ hcp waypoint tfc-config read`),
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {
@@ -63,26 +64,36 @@ func readRun(opts *TFCConfigReadOpts) error {
 		return fmt.Errorf("error retrieving TFC config: %w", err)
 
 	}
-	return opts.Output.Display(rolesDisplayer(roles))
+	d := newDisplayer(format.Pretty, resp.Payload.TfcConfig)
+	return opts.Output.Display(d)
 }
 
-type configDisplayer *models.HashicorpCloudWaypointTFCConfig
+type configDisplayer struct {
+	config        *models.HashicorpCloudWaypointTFCConfig
+	defaultFormat format.Format
+}
 
-func (d configDisplayer) DefaultFormat() format.Format { return format.Pretty }
-func (d configDisplayer) Payload() any                 { return d }
+func newDisplayer(defaultFormat format.Format, config *models.HashicorpCloudWaypointTFCConfig) *configDisplayer {
+	return &configDisplayer{
+		config:        config,
+		defaultFormat: defaultFormat,
+	}
+}
+
+func (d configDisplayer) DefaultFormat() format.Format { return d.defaultFormat }
+func (d configDisplayer) Payload() any                 { return d.config }
 
 func (d configDisplayer) FieldTemplates() []format.Field {
 	return []format.Field{
 		{
 			Name:        "Organization Name",
-			ValueFormat: "{{ . OrganizationName }}",
+			ValueFormat: "{{ .OrganizationName }}",
 		},
 		{
 			Name:        "Token",
-			ValueFormat: "{{ . Token }}",
+			ValueFormat: "{{ .Token }}",
 		},
 	}
-}
 }
 
 type TFCConfigReadOpts struct {
