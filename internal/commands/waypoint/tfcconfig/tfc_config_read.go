@@ -63,9 +63,26 @@ func readRun(opts *TFCConfigReadOpts) error {
 		return fmt.Errorf("error retrieving TFC config: %w", err)
 
 	}
-	fmt.Fprintf(opts.IO.Err(), "%s TFC Config for TFC Organization %q found!  Token: %s \n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.TfcConfig.OrganizationName, resp.Payload.TfcConfig.Token)
+	return opts.Output.Display(rolesDisplayer(roles))
+}
 
-	return nil
+type configDisplayer *models.HashicorpCloudWaypointTFCConfig
+
+func (d configDisplayer) DefaultFormat() format.Format { return format.Pretty }
+func (d configDisplayer) Payload() any                 { return d }
+
+func (d configDisplayer) FieldTemplates() []format.Field {
+	return []format.Field{
+		{
+			Name:        "Organization Name",
+			ValueFormat: "{{ . OrganizationName }}",
+		},
+		{
+			Name:        "Token",
+			ValueFormat: "{{ . Token }}",
+		},
+	}
+}
 }
 
 type TFCConfigReadOpts struct {
