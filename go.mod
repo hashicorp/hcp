@@ -6,6 +6,7 @@ toolchain go1.21.3
 
 require (
 	github.com/MakeNowJust/heredoc/v2 v2.0.1
+	github.com/buildkite/shellwords v0.0.0-20180315110454-59467a9b8e10
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-openapi/runtime v0.26.2
 	github.com/go-openapi/strfmt v0.21.10
@@ -81,7 +82,7 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
-	github.com/zclconf/go-cty v1.13.0 // indirect
+	github.com/zclconf/go-cty v1.13.0
 	go.mongodb.org/mongo-driver v1.13.1 // indirect
 	go.opentelemetry.io/otel v1.17.0 // indirect
 	go.opentelemetry.io/otel/metric v1.17.0 // indirect

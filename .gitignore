@@ -20,5 +20,7 @@
 # Go workspace file
 go.work
 
+tmp/
+
 # bin/ directory
 bin/*

@@ -1,0 +1,217 @@
+package agent
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/hashicorp/go-hclog"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
+	"github.com/hashicorp/hcp/internal/pkg/cmd"
+	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
+	"github.com/hashicorp/hcp/internal/pkg/waypoint/agent"
+	"github.com/pkg/errors"
+)
+
+type RunOpts struct {
+	opts.WaypointOpts
+	Groups []string
+
+	ConfigPath string
+	Config     *agent.Config
+}
+
+func NewCmdRun(ctx *cmd.Context) *cmd.Command {
+	opts := &RunOpts{
+		WaypointOpts: opts.New(ctx),
+	}
+
+	cmd := &cmd.Command{
+		Name:      "run",
+		ShortHelp: "Start the Waypoint Agent.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+		The {{ Bold "hcp waypoint agent run" }} commands executes a local Waypoint Agent.
+		`),
+		Flags: cmd.Flags{
+			Local: []*cmd.Flag{
+				{
+					Name:         "config",
+					Shorthand:    "c",
+					DisplayValue: "PATH",
+					Description:  "Path to configuration file for agent.",
+					Value:        flagvalue.Simple("agent.hcl", &opts.ConfigPath),
+				},
+			},
+		},
+		PersistentPreRun: func(c *cmd.Command, args []string) error {
+			return cmd.RequireOrgAndProject(ctx)
+		},
+		RunF: func(c *cmd.Command, args []string) error {
+			return agentRun(c.Logger(), opts)
+		},
+	}
+
+	return cmd
+}
+
+var agentRunDuration = 60 * time.Second
+
+func agentRun(log hclog.Logger, opts *RunOpts) error {
+	cfg, err := agent.ParseConfigFile(opts.ConfigPath)
+	if err != nil {
+		return err
+	}
+
+	opts.Groups = cfg.Groups()
+
+	ns, err := opts.Namespace()
+	if err != nil {
+		return errors.Wrapf(err, "Unable to access HCP project")
+	}
+
+	ctx := opts.Ctx
+
+	// check the groups!
+	resp2, err := opts.WS.WaypointServiceValidateAgentGroups(&waypoint_service.WaypointServiceValidateAgentGroupsParams{
+		NamespaceID: ns.ID,
+		Body: &models.HashicorpCloudWaypointWaypointServiceValidateAgentGroupsBody{
+			Groups: opts.Groups,
+		},
+		Context: opts.Ctx,
+	}, nil)
+	if err != nil {
+		return errors.Wrapf(err, "Error validating agent group names")
+	}
+
+	if len(resp2.Payload.UnknownGroups) > 0 {
+		fmt.Fprintf(opts.IO.Err(), "Unknown agent groups detected:\n")
+
+		for _, g := range resp2.Payload.UnknownGroups {
+			fmt.Fprintf(opts.IO.Err(), "  %s\n ", g)
+		}
+		return nil
+	}
+
+	retry := time.NewTimer(agentRunDuration)
+	defer retry.Stop()
+
+	log.Info("Waypoint agent initialized",
+		"hcp-org", opts.Profile.OrganizationID,
+		"hcp-project", opts.Profile.ProjectID,
+		"waypoint-namespace", ns.ID,
+		"groups", opts.Groups,
+	)
+
+	exec := &agent.Executor{
+		Log:    log,
+		Config: cfg,
+	}
+
+	for {
+		opCfg, err := opts.WS.WaypointServiceRetrieveAgentOperation(&waypoint_service.WaypointServiceRetrieveAgentOperationParams{
+			Body: &models.HashicorpCloudWaypointWaypointServiceRetrieveAgentOperationBody{
+				Groups: opts.Groups,
+			},
+			NamespaceID: ns.ID,
+			Context:     ctx,
+		}, nil)
+
+		if err != nil {
+			log.Error("error reading agent operation", "error", err)
+		} else if ao := opCfg.Payload.Operation; ao != nil {
+			runOp(log, ctx, opts, ao, exec, ns.ID)
+		}
+
+		retry.Reset(agentRunDuration)
+
+		select {
+		case <-opts.Ctx.Done():
+			return nil
+		case <-retry.C:
+			// ok
+		}
+	}
+}
+
+func runOp(
+	log hclog.Logger,
+	ctx context.Context,
+	opts *RunOpts,
+	ao *models.HashicorpCloudWaypointAgentOperation,
+	exec *agent.Executor,
+	ns string,
+) {
+
+	var (
+		status     string
+		statusCode int
+	)
+
+	if ao.ActionConfigID != "" {
+		log.Info("reporting action run starting", "action-config-id", ao.ActionConfigID)
+
+		resp, err := opts.WS.WaypointServiceStartingAction(&waypoint_service.WaypointServiceStartingActionParams{
+			NamespaceID: ns,
+			Body: &models.HashicorpCloudWaypointWaypointServiceStartingActionBody{
+				ActionConfigID: ao.ActionConfigID,
+				GroupName:      ao.Group,
+			},
+			Context: ctx,
+		}, nil)
+
+		if err != nil {
+			log.Error("unable to register action as starting", "error", err)
+		} else {
+			defer func() {
+				log.Info("reporting action run ended", "id", resp.Payload.ActionRunID, "status", status, "status-code", statusCode)
+
+				_, err = opts.WS.WaypointServiceEndingAction(&waypoint_service.WaypointServiceEndingActionParams{
+					NamespaceID: ns,
+					Body: &models.HashicorpCloudWaypointWaypointServiceEndingActionBody{
+						ActionRunID: resp.Payload.ActionRunID,
+						FinalStatus: status,
+						StatusCode:  int32(statusCode),
+					},
+					Context: ctx,
+				}, nil)
+
+				if err != nil {
+					log.Error("unable to send ending action", "error", err)
+				}
+			}()
+		}
+	}
+
+	ok, err := exec.IsAvailable(ao)
+	if err != nil {
+		status = "internal error: " + err.Error()
+		statusCode = 1
+
+		log.Error("error resolving operation", "group", ao.Group, "operation", ao.ID, "error", err)
+		return
+	}
+
+	if !ok {
+		status = "unknown operation: " + ao.ID
+		statusCode = 127
+
+		log.Error("requested unknown operation", "id", ao.ID)
+		return
+	}
+
+	opStat, err := exec.Execute(ctx, ao)
+	if err != nil {
+		status = "error execution operation: " + err.Error()
+
+		log.Error("error executing operation", "group", ao.Group, "operation", ao.ID, "error", err)
+		return
+	}
+
+	status = opStat.Status
+	statusCode = opStat.Code
+
+	log.Info("finished operation", "id", ao.ID, "status", status, "status-code", statusCode)
+}
