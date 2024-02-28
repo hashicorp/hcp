@@ -21,35 +21,25 @@ func TestInferFields(t *testing.T) {
 		{Name: "Name", ValueFormat: "{{ .Name }}"},
 	}, inferFields(s1, nil))
 
-	s2 := struct {
-		Name string `json:"owner,omitempty"`
-	}{
-		Name: "s2",
-	}
-
-	r.Equal([]Field{
-		{Name: "Owner", ValueFormat: "{{ .Name }}"},
-	}, inferFields(s2, nil))
-
 	s3 := struct {
-		Name string `json:"owner,omitempty"`
+		Name string
 		Age  int
 	}{
 		Name: "s3",
 	}
 
 	r.Equal([]Field{
-		{Name: "Owner", ValueFormat: "{{ .Name }}"},
-	}, inferFields(s3, []string{"owner"}))
+		{Name: "Name", ValueFormat: "{{ .Name }}"},
+	}, inferFields(s3, []string{"Name"}))
 
 	// Shows that the json tag wins as the title even if it's specified as
 	// by struct field name
 	r.Equal([]Field{
-		{Name: "Owner", ValueFormat: "{{ .Name }}"},
+		{Name: "Name", ValueFormat: "{{ .Name }}"},
 	}, inferFields(s3, []string{"Name"}))
 
 	s4 := []struct {
-		Name string `json:"owner,omitempty"`
+		Name string
 		Age  int
 	}{
 		{
@@ -58,8 +48,8 @@ func TestInferFields(t *testing.T) {
 	}
 
 	r.Equal([]Field{
-		{Name: "Owner", ValueFormat: "{{ .Name }}"},
-	}, inferFields(s4, []string{"owner"}))
+		{Name: "Name", ValueFormat: "{{ .Name }}"},
+	}, inferFields(s4, []string{"Name"}))
 
 	r.Equal([]Field{
 		{Name: "Value", ValueFormat: "{{ . }}"},

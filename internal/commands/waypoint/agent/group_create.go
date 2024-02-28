@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
+	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/pkg/errors"
 )
@@ -82,5 +83,5 @@ func agentGroupCreate(log hclog.Logger, opts *GroupOpts) error {
 		return fmt.Errorf("error creating group: %w", err)
 	}
 
-	return opts.Output.Show(grp, "name", "description")
+	return opts.Output.Show(grp, format.Pretty, "name", "description")
 }

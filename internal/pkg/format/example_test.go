@@ -39,7 +39,7 @@ func ExampleOutputter() {
 	}
 
 	// For displaying a table of the exact values, Show can be used:
-	_ = outputter.Show(payload)
+	_ = outputter.Show(payload, format.Table)
 
 	// Since the IO is a test io, manually print it.
 	// We trim the lines to make examples testing pass correctly.
