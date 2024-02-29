@@ -177,11 +177,11 @@ func (l *Loader) LoadProfile(name string) (*Profile, error) {
 
 	// Honor environment variables around org and project over whatever
 	// we load from the profile file.
-	if orgID, ok := os.LookupEnv(envVarHCPOrganizationID); ok {
+	if orgID, ok := os.LookupEnv(envVarHCPOrganizationID); ok && orgID != "" {
 		c.OrganizationID = orgID
 	}
 
-	if projID, ok := os.LookupEnv(envVarHCPProjectID); ok {
+	if projID, ok := os.LookupEnv(envVarHCPProjectID); ok && projID != "" {
 		c.ProjectID = projID
 	}
 

@@ -78,6 +78,7 @@ func TestLoader_GetActiveProfile(t *testing.T) {
 		r.NoError(err)
 		r.Equal(t.Name(), p.Name)
 	})
+
 }
 
 func TestLoader_ListProfiles(t *testing.T) {
@@ -205,6 +206,62 @@ project_id = "456"`,
 
 		_, err := l.NewProfile("test!@#$")
 		r.ErrorContains(err, "profile name may only include")
+	})
+}
+
+//nolint:paralleltest
+func TestLoader_LoadProfileEnv(t *testing.T) {
+
+	// These tests aren't parallel because they manipulate the environment
+	// and can't run concurrently.
+
+	//nolint:paralleltest
+	t.Run("default profile, env set", func(t *testing.T) {
+		defer os.Unsetenv(envVarHCPOrganizationID)
+		defer os.Unsetenv(envVarHCPProjectID)
+
+		os.Setenv(envVarHCPOrganizationID, "xyz")
+		os.Setenv(envVarHCPProjectID, "abc")
+
+		r := require.New(t)
+		l, err := newLoader(t.TempDir())
+		r.NoError(err)
+		prof := l.DefaultProfile()
+
+		r.Equal("xyz", prof.OrganizationID)
+		r.Equal("abc", prof.ProjectID)
+	})
+
+	//nolint:paralleltest
+	t.Run("valid active profile, env set", func(t *testing.T) {
+		r := require.New(t)
+		l := TestLoader(t)
+
+		defer os.Unsetenv(envVarHCPOrganizationID)
+		defer os.Unsetenv(envVarHCPProjectID)
+
+		p, err := l.NewProfile("test")
+		r.NoError(err)
+		p.OrganizationID = "123"
+		p.ProjectID = "456"
+		r.NoError(p.Write())
+
+		os.Setenv(envVarHCPOrganizationID, "xyz")
+
+		out, err := l.LoadProfile(p.Name)
+		r.NoError(err)
+		r.NotNil(out)
+		r.Equal("xyz", out.OrganizationID)
+		r.Equal(p.ProjectID, out.ProjectID)
+
+		os.Setenv(envVarHCPProjectID, "abc")
+
+		out, err = l.LoadProfile(p.Name)
+		r.NoError(err)
+		r.NotNil(out)
+		r.Equal("xyz", out.OrganizationID)
+		r.Equal("abc", out.ProjectID)
+
 	})
 }
 
