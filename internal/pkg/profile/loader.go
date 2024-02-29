@@ -175,6 +175,16 @@ func (l *Loader) LoadProfile(name string) (*Profile, error) {
 		return nil, fmt.Errorf("profile path name does not match name in file. %q versus %q. Please rename file or name within the profile file to reconcile", name, c.Name)
 	}
 
+	// Honor environment variables around org and project over whatever
+	// we load from the profile file.
+	if orgID, ok := os.LookupEnv(envVarHCPOrganizationID); ok {
+		c.OrganizationID = orgID
+	}
+
+	if projID, ok := os.LookupEnv(envVarHCPProjectID); ok {
+		c.ProjectID = projID
+	}
+
 	c.dir = l.profilesDir
 	return &c, nil
 }
