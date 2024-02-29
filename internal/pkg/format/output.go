@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
 	"text/tabwriter"
 	"text/template"
+	"unicode"
 
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 )
@@ -43,6 +45,30 @@ func NewDisplayer[T any](payload T, defaultFormat Format, fields []Field) Displa
 // either the direct struct field name or the json tag name.
 func DisplayFields[T any](payload T, format Format, fields ...string) Displayer {
 	return NewDisplayer[T](payload, format, inferFields(payload, fields))
+}
+
+func formatName(name string) string {
+	var sb strings.Builder
+
+	spaced := true
+
+	for i, r := range name {
+		if i == 0 {
+			sb.WriteRune(r)
+			continue
+		}
+
+		if !spaced && unicode.IsUpper(r) {
+			sb.WriteRune(' ')
+			spaced = true
+		} else {
+			spaced = false
+		}
+
+		sb.WriteRune(r)
+	}
+
+	return sb.String()
 }
 
 func inferFields[T any](payload T, columns []string) []Field {
@@ -86,7 +112,7 @@ func inferFields[T any](payload T, columns []string) []Field {
 			continue
 		}
 
-		df := NewField(f.Name, fmt.Sprintf("{{ .%s }}", f.Name))
+		df := NewField(formatName(f.Name), fmt.Sprintf("{{ .%s }}", f.Name))
 
 		if all {
 			ret = append(ret, df)

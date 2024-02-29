@@ -67,4 +67,16 @@ func TestInferFields(t *testing.T) {
 		{Name: "Name", ValueFormat: "{{ .Name }}"},
 	}, inferFields(s5, nil))
 
+	s6 := struct {
+		CreatedAt string
+		max       int
+	}{
+		CreatedAt: "s2",
+		max:       10,
+	}
+
+	r.Equal([]Field{
+		{Name: "Created At", ValueFormat: "{{ .CreatedAt }}"},
+	}, inferFields(s6, nil))
+
 }
