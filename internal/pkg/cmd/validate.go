@@ -302,8 +302,8 @@ func (e *Example) validate() error {
 
 	if e.Command == "" {
 		return fmt.Errorf("command cannot be empty")
-	} else if !strings.HasPrefix(e.Command, "$ ") {
-		return fmt.Errorf("example command must start with $")
+	} else if !(strings.HasPrefix(e.Command, "$ ") || strings.HasPrefix(e.Command, "#")) {
+		return fmt.Errorf("example command must start with $ or #")
 	}
 
 	return nil

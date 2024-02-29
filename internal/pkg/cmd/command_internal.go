@@ -347,7 +347,9 @@ func (e *Example) text(cs *iostreams.ColorScheme) string {
 		fmt.Fprintln(&buf)
 	}
 	if e.Command != "" {
-		fmt.Fprintln(&buf, cs.String(wordWrap(e.Command, 80)).Italic().Color(cs.Green()))
+		// Use a higher limit for command wrapping since they may include
+		// potentially long identifiers.
+		fmt.Fprintln(&buf, cs.String(wordWrap(e.Command, 120)).Italic().Color(cs.Green()))
 	}
 
 	return buf.String()
@@ -734,7 +736,7 @@ func flagsetUsage(flags *pflag.FlagSet) string {
 		}
 
 		// Add the usage
-		fmt.Fprintf(&buf, "%s\n\n", indent.String(wordWrap(flag.Usage, 75), 2))
+		fmt.Fprintf(&buf, "%s\n\n", indent.String(wordWrap(flag.Usage, 80), 2))
 	})
 
 	return buf.String()

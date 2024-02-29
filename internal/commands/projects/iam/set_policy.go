@@ -29,7 +29,7 @@ func NewCmdSetPolicy(ctx *cmd.Context, runF func(*SetPolicyOpts) error) *cmd.Com
 		Name:      "set-policy",
 		ShortHelp: "Set the IAM policy for a project.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		    Sets the IAM policy for a project, given a project ID and a file encoded in
+			Sets the IAM policy for a project, given a project ID and a file encoded in
 			JSON that contains the IAM policy.
 
 			The format for the policy JSON file is an object with the following format:
@@ -40,10 +40,10 @@ func NewCmdSetPolicy(ctx *cmd.Context, runF func(*SetPolicyOpts) error) *cmd.Com
 			    {
 			      "role_id": "ROLE_ID",
 			      "members": [
-				    {
+			        {
 			          "member_id": "PRINCIPAL_ID",
 			          "member_type": "USER" | "GROUP" | "SERVICE_PRINCIPAL",
-				    }
+			        }
 			      ]
 			    }
 			  ],
