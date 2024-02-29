@@ -273,7 +273,28 @@ func TestCommand_Validate(t *testing.T) {
 			command: func(c *Command) {
 				c.Flags.Persistent[0].Name = "BAD"
 			},
-			error: "error validating persistent flag \"BAD\": name is not lowercase",
+			error: "error validating persistent flag \"BAD\": only lower case letters, numbers, and hyphens are allowed",
+		},
+		{
+			name: "flag name can't end in hyphen",
+			command: func(c *Command) {
+				c.Flags.Persistent[0].Name = "test-"
+			},
+			error: "error validating persistent flag \"test-\": only lower case letters, numbers, and hyphens are allowed",
+		},
+		{
+			name: "flag name no underscores",
+			command: func(c *Command) {
+				c.Flags.Persistent[0].Name = "test_flag"
+			},
+			error: "error validating persistent flag \"test_flag\": only lower case letters, numbers, and hyphens are allowed",
+		},
+		{
+			name: "flag name no special",
+			command: func(c *Command) {
+				c.Flags.Persistent[0].Name = "test!"
+			},
+			error: "error validating persistent flag \"test!\": only lower case letters, numbers, and hyphens are allowed",
 		},
 		{
 			name: "flag shorthand must be lower",

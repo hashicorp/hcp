@@ -29,6 +29,13 @@ var (
 	// errShortHelpInvalid is returned when the short help text is invalid.
 	errShortHelpInvalid = fmt.Errorf("short help text must start with a capital letter, end with a period, and contain only letters, apostrophes, hyphens, and spaces")
 
+	// flagNameRegex is used to validate the flag names. It enforces that the flag
+	// name is lower case and contains only letters and hyphens.
+	flagNameRegex = regexp.MustCompile(`^[a-z0-9]+([-][a-z0-9]+)*$`)
+
+	// errFlagNameInvalid is returned when the flag name is invalid.
+	errFlagNameInvalid = fmt.Errorf("only lower case letters, numbers, and hyphens are allowed")
+
 	// flagDescriptionRegex is used to validate the flag descriptions. It enforces that the
 	// flag description starts with a capital letter and ends with a period.
 	flagDescriptionRegex = regexp.MustCompile(`(?s)^[A-Z].+\.$`)
@@ -215,8 +222,8 @@ func (c *Command) validateFlags() error {
 func (f *Flag) validate() error {
 	if f.Name == "" {
 		return fmt.Errorf("name cannot be empty")
-	} else if f.Name != strings.ToLower(f.Name) {
-		return fmt.Errorf("name is not lowercase")
+	} else if !flagNameRegex.MatchString(f.Name) {
+		return fmt.Errorf("%w; got %q", errFlagNameInvalid, f.Name)
 	}
 	if f.Shorthand != strings.ToLower(f.Shorthand) {
 		return fmt.Errorf("shorthand %q is not lowercase", f.Shorthand)
