@@ -151,6 +151,10 @@ type CreateAWSOpts struct {
 }
 
 func createAWSRun(opts *CreateAWSOpts) error {
+	if !helper.SPResourceName.MatchString(opts.SP) {
+		return fmt.Errorf("invalid service principal resource name: %s", opts.SP)
+	}
+
 	req := service_principals_service.NewServicePrincipalsServiceCreateWorkloadIdentityProviderParamsWithContext(opts.Ctx)
 	req.ParentResourceName = opts.SP
 

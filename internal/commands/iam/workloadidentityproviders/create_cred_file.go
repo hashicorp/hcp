@@ -2,6 +2,7 @@ package workloadidentityproviders
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/hcp-sdk-go/auth"
 	"github.com/hashicorp/hcp-sdk-go/auth/workload"
@@ -37,8 +38,8 @@ var (
 	}
 )
 
-func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFile) error) *cmd.Command {
-	opts := &CreateCredFile{
+func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error) *cmd.Command {
+	opts := &CreateCredFileOpts{
 		IO: ctx.IO,
 	}
 
@@ -328,7 +329,7 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFile) error) *c
 	return cmd
 }
 
-type CreateCredFile struct {
+type CreateCredFileOpts struct {
 	IO iostreams.IOStreams
 
 	WIP        string
@@ -356,7 +357,12 @@ type CreateCredFile struct {
 	SourceURLHeaders map[string]string
 }
 
-func (c *CreateCredFile) Validate() error {
+func (c *CreateCredFileOpts) Validate() error {
+	// Check that the resource name is valid
+	if !WIPResourceName.MatchString(c.WIP) {
+		return fmt.Errorf("invalid workload identity provider resource name: %s", c.WIP)
+	}
+
 	// Ensure we only received on of the source options
 	sources := 0
 	if c.AWS {
@@ -391,8 +397,13 @@ func (c *CreateCredFile) Validate() error {
 		return fmt.Errorf("--azure-resource must be set if --azure is set")
 	}
 
+	// Ensure Azure Resource is only set if Azure is set
+	if c.AzureResource != "" && !c.Azure {
+		return fmt.Errorf("--azure-resource can only be set if --azure is set")
+	}
+
 	// Ensure the Azure client ID is set if Azure is set and the resource is set
-	if c.Azure && c.AzureClientID != "" {
+	if c.AzureClientID != "" && !c.Azure {
 		return fmt.Errorf("--azure-client-id can only be set if --azure is set")
 	}
 
@@ -406,10 +417,15 @@ func (c *CreateCredFile) Validate() error {
 		return fmt.Errorf("--source-header can only be set if --source-url is set")
 	}
 
+	// Ensure the output file has a .json extension
+	if !strings.HasSuffix(c.OutputFile, ".json") {
+		return fmt.Errorf("output file must have a .json extension")
+	}
+
 	return nil
 }
 
-func createCredFileRun(opts *CreateCredFile) error {
+func createCredFileRun(opts *CreateCredFileOpts) error {
 	if err := opts.Validate(); err != nil {
 		return err
 	}

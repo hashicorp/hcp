@@ -178,6 +178,10 @@ type CreateOIDCOpts struct {
 }
 
 func createOIDCRun(opts *CreateOIDCOpts) error {
+	if !helper.SPResourceName.MatchString(opts.SP) {
+		return fmt.Errorf("invalid service principal resource name: %s", opts.SP)
+	}
+
 	req := service_principals_service.NewServicePrincipalsServiceCreateWorkloadIdentityProviderParamsWithContext(opts.Ctx)
 	req.ParentResourceName = opts.SP
 

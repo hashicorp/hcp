@@ -1,6 +1,8 @@
 package workloadidentityproviders
 
 import (
+	"regexp"
+
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
@@ -12,6 +14,11 @@ const (
 	The resource name of the workload identity provider to %s. The format of the resource name is:
 	{{ Italic "iam/project/PROJECT_ID/service-principal/SP_NAME/workload-identity-provider/WIP_NAME" }}.
 	`
+)
+
+var (
+	// WIPResourceName is a regex that matches a workload identity provider resource name
+	WIPResourceName = regexp.MustCompile(`^iam/project/.+/service-principal/.+/workload-identity-provider/.+$`)
 )
 
 func NewCmdWIPs(ctx *cmd.Context) *cmd.Command {
