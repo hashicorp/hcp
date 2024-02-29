@@ -1,6 +1,7 @@
 package heredoc
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -83,13 +84,13 @@ The name of the group to delete. The name may be specified as either:
 
 {{ PreserveNewLines }}
   * The group's resource name. Formatted as:
-	{{ Italic "iam/organization/ORG_ID/group/GROUP_NAME" }}
+    {{ Italic "iam/organization/ORG_ID/group/GROUP_NAME" }}
   * The resource name suffix, GROUP_NAME.
 {{ PreserveNewLines }}`,
 			Expected: `The name of the group to delete. The name may be specified as either:
 
   * The group's resource name. Formatted as:
-	iam/organization/ORG_ID/group/GROUP_NAME
+    iam/organization/ORG_ID/group/GROUP_NAME
   * The resource name suffix, GROUP_NAME.`,
 		},
 	}
@@ -235,10 +236,19 @@ Has starting spaces.`,
 				  More Further Indent.
 			`,
 			Expected: `Has starting spaces.
-	Further Indent.
+  Further Indent.
 Has starting spaces.
-	Further Indent.
-	  More Further Indent.`,
+  Further Indent.
+    More Further Indent.`,
+		},
+		{
+			Name: "Shared prefix has mixed tabs and spaces",
+			Input: `
+			Has starting tabs.
+` + strings.Repeat(" ", 6) + `Has starting spaces.
+			`,
+			Expected: `Has starting tabs.
+Has starting spaces.`,
 		},
 	}
 
