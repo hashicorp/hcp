@@ -47,6 +47,26 @@ go/mocks: ## Generates Go mock files.
 test: ## Run the unit tests
 	@go test -v -cover ./...
 
+# Docker build and publish variables and targets
+REGISTRY_NAME?=docker.io/hashicorp
+IMAGE_NAME=hcp
+IMAGE_TAG_DEV?=$(REGISTRY_NAME)/$(IMAGE_NAME):latest-$(shell git rev-parse --short HEAD)
+DEV_DOCKER_GOOS ?= linux
+DEV_DOCKER_GOARCH ?= amd64
+
+.PHONY: docker-build-dev
+# Builds from the locally generated binary in ./bin/
+docker-build-dev: export GOOS=$(DEV_DOCKER_GOOS)
+docker-build-dev: export GOARCH=$(DEV_DOCKER_GOARCH)
+docker-build-dev: build
+	docker buildx build \
+		--load \
+		--platform $(DEV_DOCKER_GOOS)/$(DEV_DOCKER_GOARCH) \
+		--tag $(IMAGE_TAG_DEV) \
+		--target=dev \
+		.
+	@echo "Successfully built $(IMAGE_TAG_DEV)"
+
 HELP_FORMAT="    \033[36m%-25s\033[0m %s\n"
 .PHONY: help
 help: ## Display this usage information
