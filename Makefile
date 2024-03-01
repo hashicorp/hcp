@@ -67,6 +67,10 @@ docker-build-dev: build
 		.
 	@echo "Successfully built $(IMAGE_TAG_DEV)"
 
+crt-build:
+	go build -o ${BIN_PATH} -trimpath -buildvcs=false \
+    	-ldflags "-X github.com/hashicorp/hcp/version.GitCommit=${PRODUCT_REVISION}"
+
 HELP_FORMAT="    \033[36m%-25s\033[0m %s\n"
 .PHONY: help
 help: ## Display this usage information
