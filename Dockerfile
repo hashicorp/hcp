@@ -14,7 +14,7 @@ RUN touch ~/.bashrc && hcp --autocomplete-install
 CMD ["/bin/bash"]
 
 ## DOCKERHUB DOCKERFILE ##
-FROM alpine:3.19 as default
+FROM alpine:3.19 as release
 
 ARG BIN_NAME
 ARG NAME=hcp
@@ -33,11 +33,14 @@ LABEL name="HCP CLI" \
       description="The hcp CLI allows interaction with the HashiCorp Cloud Platform using the command-line."
 
 COPY dist/$TARGETOS/$TARGETARCH/$BIN_NAME /bin/
+RUN ls -lh /bin
 RUN apk --no-cache upgrade && apk --no-cache add \
 	bash \
 	curl \
 	jq \
 	nano \
 	vim
-RUN touch ~/.bashrc && hcp --autocomplete-install
+RUN touch ~/.bashrc
+RUN echo $PATH
+# RUN hcp --autocomplete-install
 CMD ["/bin/bash"]
