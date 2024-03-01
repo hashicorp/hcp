@@ -104,7 +104,7 @@ jobs:
           maintainer: "HashiCorp"
           homepage: "https://github.com/hashicorp/hcp"
           license: "MPL-2.0"
-          binary: "dist/${{ matrix.goos }}/${{ matrix.goarch }}/${{ env.PKG_NAME }}"
+          binary: "dist/${{ env.PKG_NAME }}"
           deb_depends: "openssl"
           rpm_depends: "openssl"
 
@@ -130,14 +130,14 @@ jobs:
     name: Docker release ${{matrix.runner}}/${{ matrix.arch }}
     needs:
       - set-product-version
-      - build-linux
+      - build
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
         include:
-          - { runner: "ubuntu-22.04", arch: "amd64", dockerfile: "Dockerfile" }
-          - { runner: "ubuntu-22.04", arch: "arm64", dockerfile: "Dockerfile" }
-          - { runner: "ubuntu-22.04", arch: "arm", dockerfile: "Dockerfile" }
+          - { runner: "ubuntu-latest", arch: "amd64", dockerfile: "Dockerfile" }
+          - { runner: "ubuntu-latest", arch: "arm64", dockerfile: "Dockerfile" }
+          - { runner: "ubuntu-latest", arch: "arm", dockerfile: "Dockerfile" }
       fail-fast: true
     env:
       repo: ${{ github.event.repository.name }}
