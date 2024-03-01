@@ -149,8 +149,8 @@ jobs:
         uses: hashicorp/actions-docker-build@v1
         with:
           smoke_test: |
-            TEST_VERSION="$(docker run "${IMAGE_NAME}" version | awk '/hcp v/{print $2}')"
-            if [ "${TEST_VERSION}" != "${{ env.product_version }}" ]; then
+            TEST_VERSION="$(docker run "${IMAGE_NAME}" hcp version | awk '/hcp v/{print $2}')"
+            if [ "${TEST_VERSION}" != "v${{ env.product_version }}" ]; then
               printf "fail: container smoke test, got=%q want=%q\n" "${TEST_VERSION}" "${{ env.product_version }}"
               exit 1
             fi

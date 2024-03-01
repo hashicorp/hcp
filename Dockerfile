@@ -14,7 +14,7 @@ RUN touch ~/.bashrc && hcp --autocomplete-install
 CMD ["/bin/bash"]
 
 ## DOCKERHUB DOCKERFILE ##
-FROM alpine:3.19 as default
+FROM alpine:3.19 as release
 
 ARG BIN_NAME
 ARG NAME=hcp
@@ -39,5 +39,6 @@ RUN apk --no-cache upgrade && apk --no-cache add \
 	jq \
 	nano \
 	vim
-RUN touch ~/.bashrc && hcp --autocomplete-install
+RUN touch ~/.bashrc
+RUN hcp --autocomplete-install
 CMD ["/bin/bash"]

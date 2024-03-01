@@ -13,7 +13,7 @@ default: help
 
 .PHONY: build
 build: ## Build the HCP CLI binary
-	@go build -o bin/ ./...
+	@CGO_ENABLED=0 go build -o bin/ ./...
 
 .PHONY: screenshot
 screenshot: go/install ## Create a screenshot of the HCP CLI
@@ -68,7 +68,7 @@ docker-build-dev: build
 	@echo "Successfully built $(IMAGE_TAG_DEV)"
 
 crt-build:
-	go build -o ${BIN_PATH} -trimpath -buildvcs=false \
+	CGO_ENABLED=0 go build -o ${BIN_PATH} -trimpath -buildvcs=false \
     	-ldflags "-X github.com/hashicorp/hcp/version.GitCommit=${PRODUCT_REVISION}"
 
 HELP_FORMAT="    \033[36m%-25s\033[0m %s\n"
