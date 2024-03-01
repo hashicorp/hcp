@@ -175,6 +175,16 @@ func (l *Loader) LoadProfile(name string) (*Profile, error) {
 		return nil, fmt.Errorf("profile path name does not match name in file. %q versus %q. Please rename file or name within the profile file to reconcile", name, c.Name)
 	}
 
+	// Honor environment variables around org and project over whatever
+	// we load from the profile file.
+	if orgID, ok := os.LookupEnv(envVarHCPOrganizationID); ok && orgID != "" {
+		c.OrganizationID = orgID
+	}
+
+	if projID, ok := os.LookupEnv(envVarHCPProjectID); ok && projID != "" {
+		c.ProjectID = projID
+	}
+
 	c.dir = l.profilesDir
 	return &c, nil
 }
@@ -218,8 +228,29 @@ func (l *Loader) DeleteProfile(name string) error {
 	return nil
 }
 
-// DefaultProfile returns the minimal default profile.
+// These are pulled over from hcp-sdk-go. We honor the same env vars
+// it does, but do it directly here.
+
+const (
+	envVarHCPOrganizationID = "HCP_ORGANIZATION_ID"
+	envVarHCPProjectID      = "HCP_PROJECT_ID"
+)
+
+// DefaultProfile returns the minimal default profile. If environment
+// variables related to organization and project are set, they are honored here.
 func (l *Loader) DefaultProfile() *Profile {
+	hcpOrganizationID, hcpOrganizationIDOK := os.LookupEnv(envVarHCPOrganizationID)
+	hcpProjectID, hcpProjectIDOK := os.LookupEnv(envVarHCPProjectID)
+
+	if hcpOrganizationIDOK && hcpProjectIDOK {
+		return &Profile{
+			Name:           "default",
+			OrganizationID: hcpOrganizationID,
+			ProjectID:      hcpProjectID,
+			dir:            l.profilesDir,
+		}
+	}
+
 	return &Profile{
 		Name: "default",
 		dir:  l.profilesDir,
