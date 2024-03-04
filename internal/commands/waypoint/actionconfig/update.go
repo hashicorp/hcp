@@ -36,8 +36,8 @@ func NewCmdUpdate(ctx *cmd.Context) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "update",
-		ShortHelp: "Update a new action configuration.",
-		LongHelp:  "Update a new action configuration to be used to launch an action with.",
+		ShortHelp: "Update a action configuration.",
+		LongHelp:  "Update a action configuration to be used to launch an action with.",
 		RunF: func(c *cmd.Command, args []string) error {
 			return updateActionConfig(c, args, opts)
 		},
@@ -140,7 +140,5 @@ func updateActionConfig(c *cmd.Command, args []string, opts *UpdateOpts) error {
 	fmt.Fprintf(opts.IO.Err(), "Action config %q updated.", opts.Name)
 
 	respPayload := resp.GetPayload()
-	d := format.NewDisplayer(respPayload.ActionConfig, format.Pretty, actionConfigFields)
-
-	return opts.Output.Display(d)
+	return opts.Output.Show(respPayload.ActionConfig, format.Pretty)
 }

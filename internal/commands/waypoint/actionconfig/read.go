@@ -66,6 +66,5 @@ func readActionConfig(c *cmd.Command, args []string, opts *ReadOpts) error {
 	}
 
 	respPayload := resp.GetPayload()
-	d := format.NewDisplayer(respPayload.ActionConfig, format.Pretty, actionConfigFields)
-	return opts.Output.Display(d)
+    return opts.Output.Show(respPayload.ActionConfig, format.Pretty)
 }

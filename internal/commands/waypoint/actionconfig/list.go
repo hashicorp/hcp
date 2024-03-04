@@ -48,7 +48,5 @@ func listActionConfig(c *cmd.Command, args []string, opts *ListOpts) error {
 	}
 
 	respPayload := resp.GetPayload()
-	d := format.NewDisplayer(respPayload.ActionConfigs, format.Pretty, actionConfigFields)
-
-	return opts.Output.Display(d)
+	return opts.Output.Show(respPayload.ActionConfigs, format.Pretty)
 }
