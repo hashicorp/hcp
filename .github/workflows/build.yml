@@ -148,13 +148,13 @@ jobs:
       - name: Docker Build (Action)
         uses: hashicorp/actions-docker-build@v1
         with:
-          smoke_test: |
-            TEST_VERSION="$(docker run "${IMAGE_NAME}" hcp version | awk '/hcp v/{print $2}')"
-            if [ "${TEST_VERSION}" != "${{ env.product_version }}" ]; then
-              printf "fail: container smoke test, got=%q want=%q\n" "${TEST_VERSION}" "${{ env.product_version }}"
-              exit 1
-            fi
-            printf "ok: container smoke test\n"
+          #smoke_test: |
+          #  TEST_VERSION="$(docker run "${IMAGE_NAME}" hcp version | awk '/hcp v/{print $2}')"
+          #  if [ "${TEST_VERSION}" != "${{ env.product_version }}" ]; then
+          #    printf "fail: container smoke test, got=%q want=%q\n" "${TEST_VERSION}" "${{ env.product_version }}"
+          #    exit 1
+          #  fi
+          #  printf "ok: container smoke test\n"
           version: ${{ env.product_version }}
           revision: ${{env.revision}}
           target: release
@@ -164,3 +164,7 @@ jobs:
           dev_tags: |
             docker.io/hashicorppreview/${{ env.repo }}:${{ env.product_version }}-dev
             docker.io/hashicorppreview/${{ env.repo }}:${{ env.product_version }}-${{ env.revision }}
+
+      # ensure the workflow fails while we're testing w/o the smoketest
+      - name: Fail the Workflow
+        run: /bin/false
