@@ -65,12 +65,7 @@ func readActionConfig(c *cmd.Command, args []string, opts *ReadOpts) error {
 			opts.Name, err)
 	}
 
-	// TODO(briancain): https://github.com/hashicorp/hcp/issues/16
-	// actionCfg := respPayload.ActionConfig
-	// latestRun := respPayload.LatestRun
-	// totalRuns := respPayload.TotalRuns
 	respPayload := resp.GetPayload()
-
-	d := newDisplayer(format.Pretty, true, respPayload.ActionConfig)
+	d := format.NewDisplayer(respPayload.ActionConfig, format.Pretty, actionConfigFields)
 	return opts.Output.Display(d)
 }

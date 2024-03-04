@@ -2,7 +2,16 @@ package actionconfig
 
 import (
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
+	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
+)
+
+var (
+	actionConfigFields = []format.Field{
+		format.NewField("Name", "{{ .Name }}"),
+		format.NewField("ID", "{{ .ID }}"),
+		format.NewField("Description", "{{ .Description }}"),
+	}
 )
 
 func NewCmdActionConfig(ctx *cmd.Context) *cmd.Command {

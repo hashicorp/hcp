@@ -47,9 +47,8 @@ func listActionConfig(c *cmd.Command, args []string, opts *ListOpts) error {
 		return fmt.Errorf("error listing action configurations: %w", err)
 	}
 
-	// TODO(briancain): https://github.com/hashicorp/hcp/issues/16
 	respPayload := resp.GetPayload()
-	d := newDisplayer(format.Pretty, false, respPayload.ActionConfigs...)
+	d := format.NewDisplayer(respPayload.ActionConfigs, format.Pretty, actionConfigFields)
 
 	return opts.Output.Display(d)
 }
