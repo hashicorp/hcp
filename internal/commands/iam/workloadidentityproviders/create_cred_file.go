@@ -47,14 +47,16 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 		Name:      "create-cred-file",
 		ShortHelp: "Create a credential file.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam workload-identity-providers create-cred-file" }} command creates a
-		credential file that allow access authenticating to HCP from a variety of external accounts.
+		The {{ template "mdCodeOrBold" "hcp iam workload-identity-providers create-cred-file" }}
+		command creates a credential file that allow access authenticating to HCP from a variety
+		of external accounts.
 
 		The generated credential file contains details on how to obtain the credential from the
 		external identity provider and how to exchange them for an HCP access token.
 
 		After creating the credential file, the HCP CLI can be authenticated by the workload by running
-		{{ Bold "hcp auth login --cred-file=PATH" }} where PATH is the path to the generated credential file.
+		{{ template "mdCodeOrBold" "hcp auth login --cred-file=PATH" }} where PATH is the path to
+		the generated credential file.
 		`),
 		Examples: []cmd.Example{
 			{
@@ -232,8 +234,8 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 					    (api://123-456-678-901).
 					{{ PreserveNewLines }}
 
-					For more details on the resource parameter, see the Azure documentation:
-					https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/how-to-use-vm-token#get-a-token-using-http.
+					For more details on the resource parameter, see the
+					{{ Link "Azure documentation" "https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/how-to-use-vm-token#get-a-token-using-http" }}.
 					`),
 					Value: flagvalue.Simple("", &opts.AzureResource),
 				},
@@ -282,27 +284,26 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 					Name:         "source-json-pointer",
 					DisplayValue: "/PATH/TO/CREDENTIAL",
 					Description: heredoc.New(ctx.IO).Must(`
-					A JSON pointer that indicates how to access the credential from a JSON.
-					If used with the "source-url" flag, the pointer is used to extract the
-					credential from the JSON response from calling the URL. If used with the
-					"source-file" flag, the pointer is used to extract the credential read from
-					the JSON file. Similarly, if used with the "source-env" flag, the pointer
-					is used to extract the credential from the environment variable whose value
-					is a JSON object.
+A JSON pointer that indicates how to access the credential from a JSON.
+If used with the "source-url" flag, the pointer is used to extract the
+credential from the JSON response from calling the URL. If used with the
+"source-file" flag, the pointer is used to extract the credential read from
+the JSON file. Similarly, if used with the "source-env" flag, the pointer
+is used to extract the credential from the environment variable whose value
+is a JSON object.
 
-					As an example, if the JSON payload containing the credential file is:
+As an example, if the JSON payload containing the credential file is:
 
-					{{ PreserveNewLines }}
-					{
-					  "access_token": "credentials",
-					  "nested": {
-					    "access_token": "nested-credentials"
-					  }
-					}
-					{{ PreserveNewLines }}
+{{ define "credentials" -}} {
+  "access_token": "credentials",
+  "nested": {
+	"access_token": "nested-credentials"
+  }
+} {{- end }}
+{{- CodeBlock "credentials" "json" }}
 
-					The top level access token can be accessed using the pointer "/access_token" and the
-					nested access token can be accessed using the pointer "/nested/access_token".
+The top level access token can be accessed using the pointer "/access_token" and the
+nested access token can be accessed using the pointer "/nested/access_token".
 					`),
 					Value: flagvalue.Simple("", &opts.CredentialJSONPointer),
 				},

@@ -172,19 +172,10 @@ func (c *Command) help() string {
 
 	// Print any available aliases
 	if len(c.Aliases) > 0 {
-		aliases := make([]string, len(c.Aliases))
-		for i, a := range c.Aliases {
-			var useline string
-			if c.hasParent() {
-				useline = c.parent.commandPath() + " " + a
-			} else {
-				useline = a
-			}
-			if c.RunF == nil {
-				useline += " <command>"
-			}
-
-			aliases[i] = fmt.Sprintf("%s - %s", a, useline)
+		usages := c.aliasUsages()
+		var aliases []string
+		for a, u := range usages {
+			aliases = append(aliases, fmt.Sprintf("%s - %s", a, u))
 		}
 
 		helpEntries = append(helpEntries, helpEntry{"ALIASES", strings.Join(aliases, "\n")})
@@ -385,6 +376,26 @@ func (a PositionalArgument) text(cs *iostreams.ColorScheme) string {
 	fmt.Fprintln(&buf, indent.String(wordWrap(a.Documentation, 80), 2))
 
 	return buf.String()
+}
+
+// aliasUsages returns a map from the alias to its usage
+func (c *Command) aliasUsages() map[string]string {
+	aliases := make(map[string]string)
+	for _, a := range c.Aliases {
+		var useline string
+		if c.hasParent() {
+			useline = c.parent.commandPath() + " " + a
+		} else {
+			useline = a
+		}
+		if c.RunF == nil {
+			useline += " <command>"
+		}
+
+		aliases[a] = useline
+	}
+
+	return aliases
 }
 
 // usageHelp returns the short usage help that displays the commands usage and

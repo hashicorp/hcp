@@ -29,31 +29,30 @@ func NewCmdSetPolicy(ctx *cmd.Context, runF func(*SetPolicyOpts) error) *cmd.Com
 		Name:      "set-policy",
 		ShortHelp: "Set the IAM policy for a project.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-			Sets the IAM policy for a project, given a project ID and a file encoded in
-			JSON that contains the IAM policy.
+Sets the IAM policy for a project, given a project ID and a file encoded in
+JSON that contains the IAM policy.
 
-			The format for the policy JSON file is an object with the following format:
+The format for the policy JSON file is an object with the following format:
 
-			{{ PreserveNewLines }}
-			{
-			  "bindings": [
-			    {
-			      "role_id": "ROLE_ID",
-			      "members": [
-			        {
-			          "member_id": "PRINCIPAL_ID",
-			          "member_type": "USER" | "GROUP" | "SERVICE_PRINCIPAL",
-			        }
-			      ]
-			    }
-			  ],
-			  "etag": "ETAG",
-			}
-			{{ PreserveNewLines }}
+{{ define "bindings" -}} {
+  "bindings": [
+    {
+      "role_id": "ROLE_ID",
+      "members": [
+        {
+          "member_id": "PRINCIPAL_ID",
+          "member_type": "USER" | "GROUP" | "SERVICE_PRINCIPAL",
+        }
+      ]
+    }
+  ],
+  "etag": "ETAG",
+} {{- end }}
+{{- CodeBlock "bindings" "json" }}
 
-			If set, the etag of the policy must be equal to that of the existing policy. To view the
-			existing policy and its etag, run {{ Bold "hcp projects iam read-policy --format=json" }}.
-			If unset, the existing policy's etag will be fetched and used.
+If set, the etag of the policy must be equal to that of the existing policy. To view the
+existing policy and its etag, run {{ template "mdCodeOrBold" "hcp projects iam read-policy --format=json" }}.
+If unset, the existing policy's etag will be fetched and used.
 		`),
 		Examples: []cmd.Example{
 			{

@@ -16,23 +16,52 @@ const (
 	gray   = "#C2C5CB"
 )
 
+// Emphasis is used to style text.
+type Emphasis int
+
+const (
+	EmphasisBold Emphasis = iota
+	EmphasisItalic
+	EmphasisUnderline
+	EmphasisCrossOut
+	EmphasisCode
+	EmphasisCodeBlock
+)
+
 // ColorScheme is used to style and color text according to the capabilities of
 // the current terminal. It will automatically degrade the requested styling to
 // what the system is capable for outputting.
 type ColorScheme struct {
 	profile termenv.Profile
+
+	// md marks that we are emitting markdown
+	md bool
 }
 
 // String is a stylized string.
 type String struct {
 	style termenv.Style
+
+	// md marks that we are emitting markdown
+	md bool
+
+	// rawString is the underlying string with no styling applied
+	rawString string
+
+	// emphases is the set of emphases being applied to the String
+	emphases []Emphasis
+
+	// codeBlockExtension is the extension for the code block.
+	codeBlockExtension string
 }
 
 // String wraps the given string. The wrapped String can then have style or
 // color applied to it.
 func (cs *ColorScheme) String(s string) String {
 	return String{
-		style: cs.profile.String(s),
+		style:     cs.profile.String(s),
+		md:        cs.md,
+		rawString: s,
 	}
 }
 
@@ -40,6 +69,10 @@ func (cs *ColorScheme) String(s string) String {
 // printed with the appropriate control sequences applied to have the string
 // stylized as requested.
 func (s String) String() string {
+	if s.md {
+		return s.markdownString()
+	}
+
 	return s.style.String()
 }
 
@@ -65,58 +98,68 @@ func (cs *ColorScheme) ErrorLabel() String {
 
 // Color applies the given color to the texts foreground.
 func (s String) Color(c Color) String {
-	return String{
-		style: s.style.Foreground(c.color),
-	}
+	s.style = s.style.Foreground(c.color)
+	return s
 }
 
 // Background applies the given color to the texts background.
 func (s String) Background(c Color) String {
-	return String{
-		style: s.style.Background(c.color),
-	}
+	s.style = s.style.Background(c.color)
+	return s
 }
 
 // Bold makes the string bold.
 func (s String) Bold() String {
-	return String{
-		style: s.style.Bold(),
-	}
+	s.style = s.style.Bold()
+	s.emphases = append(s.emphases, EmphasisBold)
+	return s
 }
 
 // Faint makes the text faint.
 func (s String) Faint() String {
-	return String{
-		style: s.style.Faint(),
-	}
+	s.style = s.style.Faint()
+	return s
 }
 
 // Italic makes the text italic.
 func (s String) Italic() String {
-	return String{
-		style: s.style.Italic(),
-	}
+	s.style = s.style.Italic()
+	s.emphases = append(s.emphases, EmphasisItalic)
+	return s
 }
 
 // Underline makes the text underlined.
 func (s String) Underline() String {
-	return String{
-		style: s.style.Underline(),
-	}
+	s.style = s.style.Underline()
+	s.emphases = append(s.emphases, EmphasisUnderline)
+	return s
 }
 
 // CrossOut makes the text have a cross through it middle height wise.
 func (s String) CrossOut() String {
-	return String{
-		style: s.style.CrossOut(),
-	}
+	s.style = s.style.CrossOut()
+	s.emphases = append(s.emphases, EmphasisCrossOut)
+	return s
 }
 
 // Blink makes the text blink.
 func (s String) Blink() String {
-	return String{
-		style: s.style.Blink(),
-	}
+	s.style = s.style.Blink()
+	return s
+}
+
+// Code makes the text output as code. Only applies to markdown output.
+func (s String) Code() String {
+	s.emphases = append(s.emphases, EmphasisCode)
+	return s
+}
+
+// CodeBlock makes the text output as a code block and sets the extension for
+// highlighting. Only applies to markdown output.
+func (s String) CodeBlock(extension string) String {
+	s.emphases = append(s.emphases, EmphasisCodeBlock)
+	s.codeBlockExtension = extension
+	return s
 }
 
 // Color is represents a color.

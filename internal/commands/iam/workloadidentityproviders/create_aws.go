@@ -28,8 +28,8 @@ func NewCmdCreateAWS(ctx *cmd.Context, runF func(*CreateAWSOpts) error) *cmd.Com
 		Name:      "create-aws",
 		ShortHelp: "Create an AWS Workload Identity Provider.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam workload-identity-providers create-aws" }} command creates a new
-		AWS workload identity provider.
+		The {{ template "mdCodeOrBold" "hcp iam workload-identity-providers create-aws" }}
+		command creates a new AWS workload identity provider.
 
 		Once created, workloads running in the specified AWS account can exchange their AWS
 		identity for an HCP access token which maps to the identity of the specified service
@@ -47,9 +47,11 @@ func NewCmdCreateAWS(ctx *cmd.Context, runF func(*CreateAWSOpts) error) *cmd.Com
 		{{ PreserveNewLines }}
 
 		An example conditional access statement that restricts access to a specific role is,
-		'aws.arn matches "arn:aws:iam::123456789012:role/example-role/*"'.
+		{{ with "'aws.arn matches \"arn:aws:iam::123456789012:role/example-role/*\"'" }}
+		{{- if IsMD -}} {{ . | Code }} {{- else -}} {{ . }} {{- end }}
+		{{- end }}.
 
-		To aide in creating the conditional access statement, run {{ Bold "aws sts get-caller-identity" }}
+		To aide in creating the conditional access statement, run {{ template "mdCodeOrBold" "aws sts get-caller-identity" }}
 		on the AWS workload to determine the values that will be available to the conditional access statement.
 		`),
 		Examples: []cmd.Example{
@@ -105,7 +107,8 @@ func NewCmdCreateAWS(ctx *cmd.Context, runF func(*CreateAWSOpts) error) *cmd.Com
 					  * "aws.user_id": The unique identifier of the calling entity.
 					{{ PreserveNewLines }}
 
-					For details on the values of each variable, see the AWS documentation (https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html#API_GetCallerIdentity_ResponseElements).
+					For details on the values of each variable, see the
+					{{ Link "AWS documentation" "https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html#API_GetCallerIdentity_ResponseElements" }}.
 					`),
 					Value:    flagvalue.Simple("", &opts.ConditionalAccess),
 					Required: true,

@@ -18,7 +18,7 @@ func NewCmdGroupCreate(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
 		Name:      "create",
 		ShortHelp: "Create a new HCP Waypoint Agent group.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp waypoint agent group create" }} command creates a new Agent group.
+		The {{ template "mdCodeOrBold" "hcp waypoint agent group create" }} command creates a new Agent group.
 		`),
 		Flags: cmd.Flags{
 			Local: []*cmd.Flag{

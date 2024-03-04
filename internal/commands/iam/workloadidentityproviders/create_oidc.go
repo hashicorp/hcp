@@ -28,8 +28,8 @@ func NewCmdCreateOIDC(ctx *cmd.Context, runF func(*CreateOIDCOpts) error) *cmd.C
 		Name:      "create-oidc",
 		ShortHelp: "Create an OIDC Workload Identity Provider.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam workload-identity-providers create-oidc" }} command creates a new
-		OIDC based workload identity provider.
+		The {{ template "mdCodeOrBold" "hcp iam workload-identity-providers create-oidc" }} command creates
+		a new OIDC based workload identity provider.
 
 		Common OIDC providers include Azure, GCP, Kubernetes Clusters, HashiCorp Vault, GitHub, GitLab, and more.
 
@@ -47,8 +47,8 @@ func NewCmdCreateOIDC(ctx *cmd.Context, runF func(*CreateOIDCOpts) error) *cmd.C
 		conditional access statement that restricts access to a specific subject claim is 'jwt_claims.sub == "example"'.
 
 		If unset, the allowed audiences will default to the resource name of the provider. The format will be:
-		{{ Italic "iam/project/PROJECT_ID/service-principal/SP_NAME/workload-identity-provider/WIP_NAME" }}. If set,
-		the presented access token must have an audience that is contained in the set of allowed audiences.
+		{{ template "mdCodeOrBold" "iam/project/PROJECT_ID/service-principal/SP_NAME/workload-identity-provider/WIP_NAME" }}.
+		If set, the presented access token must have an audience that is contained in the set of allowed audiences.
 		`),
 		Examples: []cmd.Example{
 			{

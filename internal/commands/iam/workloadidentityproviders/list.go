@@ -27,8 +27,8 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 		Name:      "list",
 		ShortHelp: "List workload identity providers.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam workload-identity-providers list" }} command lists the workload
-		identity providers for a given service principal.
+		The {{ template "mdCodeOrBold" "hcp iam workload-identity-providers list" }} command
+		lists the workload identity providers for a given service principal.
 		`),
 		Examples: []cmd.Example{
 			{

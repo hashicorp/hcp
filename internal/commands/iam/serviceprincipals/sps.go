@@ -12,7 +12,8 @@ func NewCmdServicePrincipals(ctx *cmd.Context) *cmd.Command {
 		Aliases:   []string{"sp"},
 		ShortHelp: "Create and manage service principals.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam service-principals" }} command group is used to create and manage service principals.
+		The {{ template "mdCodeOrBold" "hcp iam service-principals" }} command group is used to create
+		and manage service principals.
 
 		A service principals is a principal that is typically used by an application or workload that
 		interacts with HCP. Your application uses the service principal to authenticate to HCP so that

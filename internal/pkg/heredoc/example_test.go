@@ -83,3 +83,70 @@ func Example() {
 	// Lastly, blank spaces at the start and end will be stripped so that you can start
 	// your text on a new line and end it like this.
 }
+
+// This example demonstrates how to use codeblocks
+func Example_second() {
+	io, _ := iostreams.System(context.Background())
+	out := heredoc.New(io).Must(`
+When displaying code blocks,the heredoc should have no indentation.
+
+The code block gets defined then passed to the code block function.
+
+{{ define "example" -}} {
+  "bindings": [
+    {
+      "role_id": "ROLE_ID",
+      "members": [
+        {
+          "member_id": "PRINCIPAL_ID",
+          "member_type": "USER" | "GROUP" | "SERVICE_PRINCIPAL",
+        }
+      ]
+    }
+  ],
+  "etag": "ETAG",
+} {{- end }}
+{{- CodeBlock "example" "json" | Color "green" }}
+	`)
+
+	fmt.Fprintln(io.Out(), out)
+	// Output:
+	// When displaying code blocks,the heredoc should have no indentation.
+	//
+	// The code block gets defined then passed to the code block function.
+	//
+	//{
+	//   "bindings": [
+	//     {
+	//       "role_id": "ROLE_ID",
+	//       "members": [
+	//         {
+	//           "member_id": "PRINCIPAL_ID",
+	//           "member_type": "USER" | "GROUP" | "SERVICE_PRINCIPAL",
+	//         }
+	//       ]
+	//     }
+	//   ],
+	//   "etag": "ETAG",
+	//}
+}
+
+// This example demonstrates how to use the mdCodeOrBold template
+func Example_third() {
+	io, _ := iostreams.System(context.Background())
+	out := heredoc.New(io).Must(`
+	To display text as bold for non-markdown output and as a code block for
+	markdown output, use the mdCodeOrBold template.
+
+	The {{ template "mdCodeOrBold" "hcp projects iam read-policy" }} command
+	is used to display the IAM policy for a project.
+	`)
+
+	fmt.Fprintln(io.Out(), out)
+	// Output:
+	// To display text as bold for non-markdown output and as a code block for
+	// markdown output, use the mdCodeOrBold template.
+	//
+	// The hcp projects iam read-policy command is used to display the IAM policy for a
+	// project.
+}

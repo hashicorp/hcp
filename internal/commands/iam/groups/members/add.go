@@ -25,7 +25,7 @@ func NewCmdAdd(ctx *cmd.Context, runF func(*AddOpts) error) *cmd.Command {
 		Name:      "add",
 		ShortHelp: "Add members to a group.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam groups members add" }} command adds members to a group.
+		The {{ template "mdCodeOrBold" "hcp iam groups members add" }} command adds members to a group.
 
 		All added members will inherit any roles that have been granted to the group.
 		`),

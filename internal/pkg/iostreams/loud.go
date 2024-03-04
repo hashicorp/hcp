@@ -20,15 +20,15 @@ func (t *Testing) LoudErr() io.Writer {
 // UseLoud takes an IOStream and if it implements the Load interfaces, it will
 // be used instead of the quiet alternatives.
 func UseLoud(io IOStreams) IOStreams {
-	lo := &loudWrap{
-		IOStreams: io,
+	l, ok := io.(Loud)
+	if !ok {
+		return io
 	}
 
-	if l, ok := io.(Loud); ok {
-		lo.l = l
+	return &loudWrap{
+		IOStreams: l,
+		l:         l,
 	}
-
-	return lo
 
 }
 
@@ -38,9 +38,5 @@ type loudWrap struct {
 }
 
 func (l *loudWrap) Err() io.Writer {
-	if l.l != nil {
-		return l.l.LoudErr()
-	}
-
-	return l.Err()
+	return l.l.LoudErr()
 }

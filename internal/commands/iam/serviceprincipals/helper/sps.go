@@ -24,10 +24,10 @@ const (
 	The name of the service principal to %s. The name may be specified as either:
 
 	{{ PreserveNewLines }}
-	  * The service principal's resource name. Formatted as:
-		{{ Italic "iam/project/PROJECT_ID/service-principal/SP_NAME" }} or
-		{{ Italic "iam/organization/ORG_ID/service-principal/SP_NAME" }}
-	  * The resource name suffix, SP_NAME.
+	* The service principal's resource name. Formatted as one of the following:
+	    * {{ template "mdCodeOrBold" "iam/project/PROJECT_ID/service-principal/SP_NAME" }}
+	    * {{ template "mdCodeOrBold" "iam/organization/ORG_ID/service-principal/SP_NAME" }}
+	* The resource name suffix, {{ template "mdCodeOrBold" "SP_NAME" }}.
 	{{ PreserveNewLines }}
 	`
 )

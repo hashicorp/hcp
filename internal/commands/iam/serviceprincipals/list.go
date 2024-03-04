@@ -25,7 +25,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 		Name:      "list",
 		ShortHelp: "List service principals.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam service-principals list" }} command lists the service principals.
+		The {{ template "mdCodeOrBold" "hcp iam service-principals list" }} command lists the service principals.
 
 		To list organization service principals, set the --project flag to "-".
 		`),

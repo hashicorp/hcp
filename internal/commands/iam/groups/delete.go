@@ -24,7 +24,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		Name:      "delete",
 		ShortHelp: "Delete a group.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam groups create" }} command deletes a group.
+		The {{ template "mdCodeOrBold" "hcp iam groups delete" }} command deletes a group.
 
 		Once the group is deleted, all permissions granted to members based on group membership will also be revoked.
 		`),

@@ -11,8 +11,8 @@ func NewCmdGroups(ctx *cmd.Context) *cmd.Command {
 		Name:      "groups",
 		ShortHelp: "Manage HCP Groups.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam groups" }} command group allows you to manage HCP
-		groups as well as their memberships.
+		The {{ template "mdCodeOrBold" "hcp iam groups" }} command group allows you to
+		manage HCP groups as well as their memberships.
 
 		Groups help manage users and their access at scale. Each member of a
 		group inherits the roles granted to that group. This allows assigning

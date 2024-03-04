@@ -22,14 +22,15 @@ func NewCmdProjects(ctx *cmd.Context) *cmd.Command {
 		Name:      "projects",
 		ShortHelp: "Create and manage projects.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp projects" }} command group lets you create a new HCP Project, view
-		existing projects, and manage access to a project.
+		The {{ template "mdCodeOrBold" "hcp projects" }} command group lets you create a new
+		HCP Project, view existing projects, and manage access to a project.
 
-		A principal can be granted access to a project by using {{ Bold "hcp projects iam add-binding" }}.
+		A principal can be granted access to a project by using {{ template "mdCodeOrBold" "hcp projects iam add-binding" }}.
 
-		To view the IAM Policy for the project, run {{ Bold "hcp projects iam read-policy" }}.
+		To view the IAM Policy for the project, run {{ template "mdCodeOrBold" "hcp projects iam read-policy" }}.
 
-		To set a project as the default project for the active profile, run {{ Bold "hcp profile set project_id PROJECT_ID" }}.
+		To set a project as the default project for the active profile,
+		run {{ template "mdCodeOrBold" "hcp profile set project_id PROJECT_ID" }}.
 		`),
 	}
 

@@ -24,8 +24,9 @@ func NewCmdDelete(ctx *cmd.Context, runF func(opts *TFCConfigDeleteOpts) error) 
 		Name:      "delete",
 		ShortHelp: "Delete TFC Configuration.",
 		LongHelp: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-			The {{Bold "hcp waypoint tfc-config delete"}} command deletes the TFC Organization name and team token 
-that is set for this HCP Project. There is only be one TFC Config allowed for each HCP Project.
+			The {{ template "mdCodeOrBold" "hcp waypoint tfc-config delete" }} command deletes
+			the TFC Organization name and team token that is set for this HCP
+			Project. Only one TFC Config is allowed for each HCP Project.
 		`),
 		Examples: []cmd.Example{
 			{

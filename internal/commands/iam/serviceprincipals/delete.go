@@ -24,7 +24,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		Name:      "delete",
 		ShortHelp: "Delete a service principal.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam service-principals delete" }} command deletes a service principal.
+		The {{ template "mdCodeOrBold" "hcp iam service-principals delete" }} command deletes a service principal.
 
 		Once the service-principal is deleted, all IAM policy that bound the service principal will be updated.
 

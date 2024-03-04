@@ -23,11 +23,13 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		Name:      "create",
 		ShortHelp: "Create a new service principal.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam service-principals create" }} command creates a new service principal.
+		The {{ template "mdCodeOrBold" "hcp iam service-principals create" }} command creates a
+		new service principal.
 
 		Once a service principal is created, access to the service principal can be granted by
-		generating keys using the {{ Bold "hcp iam service-principals keys create" }} command or by federating
-		access using an external workload identity provider using {{ Bold "hcp iam service-principals workload-identity-provider create" }}.
+		generating keys using the {{ template "mdCodeOrBold" "hcp iam service-principals keys create" }}
+		command or by federating access using an external workload identity provider using
+		{{ template "mdCodeOrBold" "hcp iam service-principals workload-identity-provider create" }}.
 
 		Service principals can be created at the organization scope or project
 		scope. It is recommended to create service principals at the project

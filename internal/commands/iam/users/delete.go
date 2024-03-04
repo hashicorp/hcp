@@ -23,7 +23,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		Name:      "delete",
 		ShortHelp: "Delete a user from the organization.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam users delete" }} command deletes a user from the organization.
+		The {{ template "mdCodeOrBold" "hcp iam users delete" }} command deletes a user from the organization.
 		`),
 		Examples: []cmd.Example{
 			{

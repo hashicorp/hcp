@@ -23,7 +23,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		Name:      "delete",
 		ShortHelp: "Delete a service principal key.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam service-principals keys delete" }} command deletes a service principal key.
+		The {{ template "mdCodeOrBold" "hcp iam service-principals keys delete" }} command deletes a service principal key.
 		`),
 		Examples: []cmd.Example{
 			{

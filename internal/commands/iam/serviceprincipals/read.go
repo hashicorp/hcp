@@ -24,7 +24,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 		Name:      "read",
 		ShortHelp: "Show metadata for the given service principal.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam service-principals read" }} command reads details about the given
+		The {{ template "mdCodeOrBold" "hcp iam service-principals read" }} command reads details about the given
 		service principal.
 
 		To read an organization service principal, pass the service principal's resource name or set the --project

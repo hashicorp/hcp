@@ -30,13 +30,13 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		Name:      "create",
 		ShortHelp: "Create a new service principal key.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam service-principals keys create" }} command creates a new service principal key.
+		The {{ template "mdCodeOrBold" "hcp iam service-principals keys create" }} command creates a new service principal key.
 
 		To output the generated keys to a credential file, pass the --output-cred-file flag. The credential file can be used
 		to authenticate as the service principal. The benefit of using the credential file is that it avoids printing the
 		Client ID and Client Secret to the terminal, and allows the credentials to be stored in a way that is less likely
-		to leak into shell history. The HCP CLI allows authenticating via credential files using {{ Bold "hcp auth login --cred-file=PATH" }}.
-		Prefer using credential files if your workflow allows it.
+		to leak into shell history. The HCP CLI allows authenticating via credential files using
+		{{ template "mdCodeOrBold" "hcp auth login --cred-file=PATH" }}. Prefer using credential files if your workflow allows it.
 
 		To create a key for an organization service principal, pass the service principal's resource name or set the --project
 		flag to "-" and pass its resource name suffix.

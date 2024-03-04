@@ -11,13 +11,19 @@ MOCKERY_OUTPUT_FILES=internal/pkg/api/iampolicy/mock_setter.go \
 
 default: help
 
-.PHONY: build
-build: ## Build the HCP CLI binary
-	@CGO_ENABLED=0 go build -o bin/ ./...
-
-.PHONY: screenshot
-screenshot: go/install ## Create a screenshot of the HCP CLI
+.PHONY: gen/screenshot
+gen/screenshot: go/install ## Create a screenshot of the HCP CLI
 	@go run github.com/homeport/termshot/cmd/termshot@v0.2.7 -c -f assets/hcp.png -- hcp
+
+.PHONY: gen/docs
+gen/docs: go/build ## Generate the HCP CLI documentation
+	@mkdir -p web-docs
+	@rm -rf web-docs/*
+	@./bin/gendocs -output-dir web-docs/
+
+.PHONY: go/build
+go/build: ## Build the HCP CLI binary
+	@CGO_ENABLED=0 go build -o bin/ ./...
 
 .PHONY: go/install
 go/install: ## Install the HCP CLI binary
