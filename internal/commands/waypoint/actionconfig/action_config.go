@@ -27,9 +27,10 @@ configuration is used to launch action runs depending on the Request type.
 	}
 
 	cmd.AddChild(NewCmdCreate(ctx))
+	cmd.AddChild(NewCmdRead(ctx))
+	cmd.AddChild(NewCmdUpdate(ctx))
 	cmd.AddChild(NewCmdDelete(ctx))
 	cmd.AddChild(NewCmdList(ctx))
-	cmd.AddChild(NewCmdRead(ctx))
 
 	return cmd
 }
