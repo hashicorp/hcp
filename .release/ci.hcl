@@ -27,7 +27,7 @@ event "build" {
   depends = ["merge"]
   action "build" {
     organization = "hashicorp"
-    repository = "vlt"
+    repository = "hcp"
     workflow = "build"
   }
 }

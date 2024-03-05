@@ -112,7 +112,7 @@ jobs:
           deb_depends: "openssl"
           rpm_depends: "openssl"
           postinstall: .release/linux/postinst
-          postremove: .release/linux/postrm
+          preremove: .release/linux/prerm
 
       - name: Set Package Names
         if: ${{ matrix.goos == 'linux' }}
