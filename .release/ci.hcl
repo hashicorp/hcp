@@ -57,26 +57,13 @@ event "trigger-staging" {
 // and is required - do not delete.
 }
 
-event "enos-run" {
-    depends = ["trigger-staging"]
-      action "enos-run" {
-        organization = "hashicorp"
-        repository = "crt-core-helloworld"
-        workflow = "enos-run"
-      }
-
-      notification {
-        on = "fail"
-      }
-}
-
 event "promote-staging" {
-  depends = ["enos-run"]
+  depends = ["trigger-staging"]
   action "promote-staging" {
     organization = "hashicorp"
     repository = "crt-workflows-common"
     workflow = "promote-staging"
-    config = "oss-release-metadata.hcl"
+    config = "release-metadata.hcl"
   }
 
   notification {
@@ -162,7 +149,7 @@ event "promote-production-packaging" {
 event "bump-version-patch" {
   depends = ["promote-production-packaging"]
   action "bump-version" {
-    organization = "HashiCorp-RelEng-Dev"
+    organization = "hashicorp"
     repository = "crt-workflows-common"
     workflow = "bump-version"
   }

@@ -2,6 +2,10 @@ name: build
 
 on: [workflow_dispatch, push]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 env:
   PKG_NAME: "hcp"
 
