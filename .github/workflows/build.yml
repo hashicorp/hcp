@@ -1,6 +1,11 @@
 name: build
 
-on: [workflow_dispatch, push]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - release/**
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}

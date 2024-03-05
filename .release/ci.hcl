@@ -157,15 +157,3 @@ event "bump-version-patch" {
     on = "fail"
   }
 }
-
-event "update-ironbank" {
-  depends = ["bump-version-patch"]
-  action "update-ironbank" {
-    organization = "hashicorp"
-    repository = "crt-workflows-common"
-    workflow = "update-ironbank"
-  }
-  notification {
-    on = "always"
-  }
-}
