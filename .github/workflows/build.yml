@@ -1,0 +1,177 @@
+name: build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - release/**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PKG_NAME: "hcp"
+
+jobs:
+  get-go-version:
+    name: "Determine Go toolchain version"
+    runs-on: ubuntu-latest
+    outputs:
+      go-version: ${{ steps.get-go-version.outputs.go-version }}
+    steps:
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+      - name: Determine Go version
+        id: get-go-version
+        # We use .go-version as our source of truth for current Go
+        # version, because "goenv" can react to it automatically.
+        run: |
+          echo "Building with Go $(cat .go-version)"
+          echo "go-version=$(cat .go-version)" >> "$GITHUB_OUTPUT"
+
+  set-product-version:
+    runs-on: ubuntu-latest
+    outputs:
+      product-version: ${{ steps.set-product-version.outputs.product-version }}
+      product-base-version: ${{ steps.set-product-version.outputs.base-product-version }}
+      product-prerelease-version: ${{ steps.set-product-version.outputs.prerelease-product-version }}
+      product-minor-version: ${{ steps.set-product-version.outputs.minor-product-version }}
+    steps:
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+      - name: Set Product version
+        id: set-product-version
+        uses: hashicorp/actions-set-product-version@v1
+
+  generate-metadata-file:
+    needs: set-product-version
+    runs-on: ubuntu-latest
+    outputs:
+      filepath: ${{ steps.generate-metadata-file.outputs.filepath }}
+    steps:
+      - name: "Checkout directory"
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+      - name: Generate metadata file
+        id: generate-metadata-file
+        uses: hashicorp/actions-generate-metadata@v1
+        with:
+          version: ${{ needs.set-product-version.outputs.product-version }}
+          product: ${{ env.PKG_NAME }}
+          repositoryOwner: "hashicorp"
+      - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        with:
+          name: metadata.json
+          path: ${{ steps.generate-metadata-file.outputs.filepath }}
+
+  build:
+    needs:
+      - get-go-version
+      - set-product-version
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - {goos: "linux", goarch: "386", runs-on: "ubuntu-latest" }
+          - {goos: "linux", goarch: "amd64", runs-on: "ubuntu-latest" }
+          - {goos: "linux", goarch: "arm", runs-on: "ubuntu-latest" }
+          - {goos: "linux", goarch: "arm64", runs-on: "ubuntu-latest" }
+          - {goos: "windows", goarch: "386", runs-on: "ubuntu-latest"}
+          - {goos: "windows", goarch: "amd64", runs-on: "ubuntu-latest"}
+          - {goos: "windows", goarch: "arm", runs-on: "ubuntu-latest"}
+          - {goos: "windows", goarch: "arm64", runs-on: "ubuntu-latest"}
+          - { goos: "darwin", goarch: "amd64", runs-on: "macos-latest" }
+          - { goos: "darwin", goarch: "arm64", runs-on: "macos-latest" }
+    name: Go ${{ needs.get-go-version.outputs.go-version }} ${{ matrix.goos }} ${{ matrix.goarch }} build
+    steps:
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+
+      - uses: hashicorp/actions-go-build@v0.1.7
+        env:
+          BASE_VERSION: ${{ needs.set-product-version.outputs.product-base-version }}
+          PRERELEASE_VERSION: ${{ needs.set-product-version.outputs.product-prerelease-version}}
+          METADATA_VERSION: ${{ env.METADATA }}
+        with:
+          product_name: ${{ env.PKG_NAME }}
+          product_version: ${{ needs.set-product-version.outputs.product-version }}
+          go_version: ${{ needs.get-go-version.outputs.go-version }}
+          os: ${{ matrix.goos }}
+          arch: ${{ matrix.goarch }}
+          reproducible: report
+          instructions: |
+            make crt-build
+
+      - name: Package
+        if: ${{ matrix.goos == 'linux' }}
+        uses: hashicorp/actions-packaging-linux@v1
+        with:
+          name: ${{ github.event.repository.name }}
+          description: "HashiCorp Cloud Platform CLI"
+          arch: ${{ matrix.goarch }}
+          version: ${{ needs.get-product-version.outputs.product-version }}
+
+          maintainer: "HashiCorp"
+          homepage: "https://github.com/hashicorp/hcp"
+          license: "MPL-2.0"
+          binary: "dist/${{ env.PKG_NAME }}"
+          deb_depends: "openssl"
+          rpm_depends: "openssl"
+          postinstall: .release/linux/postinst
+          preremove: .release/linux/prerm
+
+      - name: Set Package Names
+        if: ${{ matrix.goos == 'linux' }}
+        run: |
+          echo "RPM_PACKAGE=$(basename out/*.rpm)" >> $GITHUB_ENV
+          echo "DEB_PACKAGE=$(basename out/*.deb)" >> $GITHUB_ENV
+
+      - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        if: ${{ matrix.goos == 'linux' }}
+        with:
+          name: ${{ env.RPM_PACKAGE }}
+          path: out/${{ env.RPM_PACKAGE }}
+
+      - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        if: ${{ matrix.goos == 'linux' }}
+        with:
+          name: ${{ env.DEB_PACKAGE }}
+          path: out/${{ env.DEB_PACKAGE }}
+
+  build-docker:
+    name: Docker release ${{matrix.runner}}/${{ matrix.arch }}
+    needs:
+      - set-product-version
+      - build
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - { runner: "ubuntu-latest", arch: "amd64", dockerfile: "Dockerfile" }
+          - { runner: "ubuntu-latest", arch: "arm64", dockerfile: "Dockerfile" }
+          - { runner: "ubuntu-latest", arch: "arm", dockerfile: "Dockerfile" }
+      fail-fast: true
+    env:
+      repo: ${{ github.event.repository.name }}
+      product_version: ${{ needs.set-product-version.outputs.product-version }}
+      revision: ${{github.sha}}
+    steps:
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+      - name: Docker Build (Action)
+        uses: hashicorp/actions-docker-build@v1
+        with:
+          smoke_test: |
+            TEST_VERSION="$(docker run "${IMAGE_NAME}" hcp version | awk '/hcp v/{print $2}')"
+            if [ "${TEST_VERSION}" != "v${{ env.product_version }}" ]; then
+              printf "fail: container smoke test, got=%q want=%q\n" "${TEST_VERSION}" "${{ env.product_version }}"
+              exit 1
+            fi
+            printf "ok: container smoke test\n"
+          version: ${{ env.product_version }}
+          revision: ${{env.revision}}
+          target: release
+          arch: ${{ matrix.arch }}
+          tags: |
+            docker.io/hashicorp/${{ env.repo }}:${{ env.product_version }}
+          dev_tags: |
+            docker.io/hashicorppreview/${{ env.repo }}:${{ env.product_version }}-dev
+            docker.io/hashicorppreview/${{ env.repo }}:${{ env.product_version }}-${{ env.revision }}
