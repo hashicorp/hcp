@@ -297,7 +297,7 @@ As an example, if the JSON payload containing the credential file is:
 {{ define "credentials" -}} {
   "access_token": "credentials",
   "nested": {
-	"access_token": "nested-credentials"
+    "access_token": "nested-credentials"
   }
 } {{- end }}
 {{- CodeBlock "credentials" "json" }}
