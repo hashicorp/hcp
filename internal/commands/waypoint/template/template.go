@@ -9,6 +9,7 @@ import (
 type TemplateOpts struct {
 	opts.WaypointOpts
 
+	ID                         string
 	Name                       string
 	Summary                    string
 	Description                string
@@ -41,6 +42,7 @@ func NewCmdTemplate(ctx *cmd.Context) *cmd.Command {
 	}
 
 	cmd.AddChild(NewCmdCreate(ctx, opts))
+	cmd.AddChild(NewCmdDelete(ctx, opts))
 
 	return cmd
 }
