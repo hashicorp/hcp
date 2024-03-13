@@ -17,7 +17,7 @@ var (
 	//go:embed VERSION
 	fullVersion string
 
-	Version, VersionPrerelease, _ = strings.Cut(strings.TrimSpace(fullVersion), "-")
+	Version, VersionPrerelease, _ = strings.Cut(FullVersion(), "-")
 	VersionMetadata               = ""
 )
 
@@ -51,4 +51,9 @@ func GetHumanVersion() string {
 	version = fmt.Sprintf("hcp v%s", version)
 
 	return version
+}
+
+// FullVersion returns the full version string including any prerelease tags.
+func FullVersion() string {
+	return strings.TrimSpace(fullVersion)
 }

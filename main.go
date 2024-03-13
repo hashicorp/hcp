@@ -16,6 +16,7 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"github.com/hashicorp/hcp/version"
 	"github.com/mitchellh/cli"
 	"github.com/posener/complete"
 )
@@ -104,7 +105,12 @@ func realMain() int {
 		return 1
 	}
 
-	hcpClient, err := httpclient.New(httpclient.Config{HCPConfig: hcpCfg})
+	hconfig := httpclient.Config{
+		HCPConfig:     hcpCfg,
+		SourceChannel: getSourceChannel(),
+	}
+
+	hcpClient, err := httpclient.New(hconfig)
 	if err != nil {
 		fmt.Fprintf(io.Err(), "failed to create HCP API client: %v\n", err)
 		return 1
@@ -142,4 +148,9 @@ func realMain() int {
 	}
 
 	return status
+}
+
+// getSourceChannel returns the source channel for the CLI
+func getSourceChannel() string {
+	return fmt.Sprintf("hcp-cli/%s", version.FullVersion())
 }
