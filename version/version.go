@@ -52,3 +52,12 @@ func GetHumanVersion() string {
 
 	return version
 }
+
+// FullVersion returns the full version string including any prerelease tags.
+func FullVersion() string {
+	if VersionPrerelease != "" {
+		return fmt.Sprintf("%s-%s", Version, VersionPrerelease)
+	}
+
+	return Version
+}
