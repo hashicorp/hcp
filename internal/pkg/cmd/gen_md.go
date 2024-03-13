@@ -2,12 +2,10 @@ package cmd
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -26,7 +24,9 @@ func GenMarkdownTree(c *Command, dir string, link LinkHandler) error {
 		return err
 	}
 
-	// Determine the filename
+	// Determine the filename. If the command is a command group parent and has
+	// no run function, we create an index file, otherwise we name the file
+	// after the command name.
 	filename := "index" + markdownExtension
 	if c.RunF != nil {
 		filename = c.Name + markdownExtension
@@ -60,7 +60,10 @@ func GenMarkdownTree(c *Command, dir string, link LinkHandler) error {
 
 // GenMarkdown creates custom markdown output.
 func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
-	cs := c.getIO().ColorScheme()
+	mdIO, ok := c.getRawIO().(iostreams.IsMarkdownOutput)
+	if !ok {
+		return fmt.Errorf("IOStream instance must be configured for markdown output")
+	}
 
 	buf := new(bytes.Buffer)
 	name := c.commandPath()
@@ -81,11 +84,10 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 	// Disable markdown escaping and then re-enable. This is needed because
 	// the flags / args would otherwise generate markdown that will not render
 	// because we are using a code block.
-	io := c.getIO()
-	c.SetIO(iostreams.Test())
+	mdIO.SetMD(false)
 	buf.WriteString("## Usage\n\n")
 	buf.WriteString(fmt.Sprintf("```shell-session\n$ %s\n```\n\n", c.useLine()))
-	c.SetIO(io)
+	mdIO.SetMD(true)
 
 	// Description
 	if len(c.LongHelp) > 0 {
@@ -137,10 +139,10 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 	}
 
 	// Positional arguments
-	genMarkdownPositionalArgs(c, cs, buf)
+	genMarkdownPositionalArgs(c, buf)
 
 	// Print flags
-	genMarkdownFlags(c, cs, buf)
+	genMarkdownFlags(c, buf)
 
 	// Additional docs
 	for _, d := range c.AdditionalDocs {
@@ -152,11 +154,12 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 	return err
 }
 
-func genMarkdownPositionalArgs(c *Command, cs *iostreams.ColorScheme, buf *bytes.Buffer) {
+func genMarkdownPositionalArgs(c *Command, buf *bytes.Buffer) {
 	if len(c.Args.Args) == 0 {
 		return
 	}
 
+	cs := c.getIO().ColorScheme()
 	buf.WriteString("## Positional Arguments\n\n")
 	p := c.Args
 	if p.Preamble != "" {
@@ -179,7 +182,7 @@ func genMarkdownPositionalArgs(c *Command, cs *iostreams.ColorScheme, buf *bytes
 	}
 }
 
-func genMarkdownFlags(c *Command, cs *iostreams.ColorScheme, buf *bytes.Buffer) {
+func genMarkdownFlags(c *Command, buf *bytes.Buffer) {
 	// If we are the root command, just print global flags.
 	if c.parent == nil && c.RunF == nil {
 		buf.WriteString("## Global Flags\n\n")
@@ -238,74 +241,4 @@ func genMarkdownFlagsetUsage(flags *pflag.FlagSet, buf *bytes.Buffer) {
 		// Add the usage
 		fmt.Fprintf(buf, "%s\n\n", flag.Usage)
 	})
-}
-
-// navItem is a single item in the navigation JSON.
-type navItem struct {
-	Title  string     `json:"title"`
-	Path   string     `json:"path,omitempty"`
-	Routes []*navItem `json:"routes,omitempty"`
-}
-
-// GenNavJSON generates the navigation JSON for the command structure.
-func GenNavJSON(c *Command, w io.Writer) error {
-
-	root := &navItem{}
-	genNavJSON(c, root, "cli/commands")
-
-	// Create the top level nav item
-	nav := &navItem{
-		Title:  "Command Reference",
-		Routes: root.Routes[0].Routes,
-	}
-
-	// Serialize the JSON
-	e := json.NewEncoder(w)
-	e.SetIndent("", "  ")
-	if err := e.Encode(nav); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// genNavJSON is a recursive function that generates the navigation JSON for
-// the command structure.
-func genNavJSON(c *Command, nav *navItem, path string) {
-	// Generate a new nav item for this command
-	var self *navItem
-
-	if c.parent != nil {
-		path = filepath.Join(path, c.Name)
-	}
-
-	// Handle being a command group
-	if len(c.children) > 0 {
-		self = &navItem{
-			Title: c.Name,
-			Routes: []*navItem{
-				{
-					Title: "Overview",
-					Path:  path,
-				},
-			},
-		}
-	} else {
-		self = &navItem{
-			Title: c.Name,
-			Path:  path,
-		}
-	}
-
-	// Sort the children by name
-	slices.SortFunc(c.children, func(i, j *Command) int {
-		return strings.Compare(i.Name, j.Name)
-	})
-
-	// If we have children, create a new nav item for each child
-	for _, child := range c.children {
-		genNavJSON(child, self, path)
-	}
-
-	nav.Routes = append(nav.Routes, self)
 }

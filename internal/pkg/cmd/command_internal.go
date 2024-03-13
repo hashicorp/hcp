@@ -794,18 +794,20 @@ func flagString(f *pflag.Flag) string {
 	return fmt.Sprintf("--%s", f.Name)
 }
 
-// getIO retrieves the IO configured for the command.
+// getIO retrieves the IO configured for the command and configures it to output
+// to Err even if quiet is specified. To access the raw IOStreams, use
+// getRawIO.
 func (c *Command) getIO() iostreams.IOStreams {
+	return iostreams.UseLoud(c.getRawIO())
+}
+
+// getRawIO gets the configured IO for the command.
+func (c *Command) getRawIO() iostreams.IOStreams {
 	if c.io != nil {
-		return iostreams.UseLoud(c.io)
+		return c.io
 	}
 
-	if c.parent != nil {
-		return c.parent.getIO()
-	}
-
-	// TODO Validation error
-	return iostreams.Test()
+	return c.parent.getRawIO()
 }
 
 // hasParent determines if the command is a child command.

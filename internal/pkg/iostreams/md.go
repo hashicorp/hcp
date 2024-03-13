@@ -9,26 +9,37 @@ import (
 // IsMarkdownOutput is an interface that when met, indicates that the IOStreams
 // instance is configured to output markdown.
 type IsMarkdownOutput interface {
-	MarkdownOutput() bool
+	IOStreams
+
+	// SetMD sets the IOStreams instance to output markdown or not. This can be
+	// useful to temporarily change the output format.
+	SetMD(bool)
 }
 
 type mdStream struct {
 	*Testing
+
+	// enabled is true if the IOStreams instance is configured to output markdown.
+	enabled bool
 }
 
 // MD returns a new IOStreams instance that is configured to output markdown.
 func MD() IOStreams {
 	return &mdStream{
 		Testing: Test(),
+		enabled: true,
 	}
 }
 
-func (m *mdStream) MarkdownOutput() bool { return true }
+// SetMD sets the IOStreams instance to output markdown or not.
+func (m *mdStream) SetMD(enable bool) {
+	m.enabled = enable
+}
 
 func (m *mdStream) ColorScheme() *ColorScheme {
 	return &ColorScheme{
 		profile: termenv.Ascii,
-		md:      true,
+		md:      m.enabled,
 	}
 }
 

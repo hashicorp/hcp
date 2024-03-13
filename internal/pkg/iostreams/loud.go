@@ -29,7 +29,6 @@ func UseLoud(io IOStreams) IOStreams {
 		IOStreams: l,
 		l:         l,
 	}
-
 }
 
 type loudWrap struct {
