@@ -23,7 +23,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 		Name:      "read",
 		ShortHelp: "Show metadata for the given user.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam users read" }} command reads details about the given user.
+		The {{ template "mdCodeOrBold" "hcp iam users read" }} command reads details about the given user.
 		`),
 		Examples: []cmd.Example{
 			{

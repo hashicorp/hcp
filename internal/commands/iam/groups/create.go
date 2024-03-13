@@ -24,9 +24,10 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		Name:      "create",
 		ShortHelp: "Create a new group.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam groups create" }} command creates a new group.
+		The {{ template "mdCodeOrBold" "hcp iam groups create" }} command creates a new group.
 
-		Once a group is created, membership can be managed using the {{ Bold "hcp iam groups members" }} command group.
+		Once a group is created, membership can be managed using the
+		{{ template "mdCodeOrBold" "hcp iam groups members" }} command group.
 		`),
 		Examples: []cmd.Example{
 			{

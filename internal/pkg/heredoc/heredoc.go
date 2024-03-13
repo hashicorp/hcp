@@ -117,12 +117,23 @@ func (f *Formatter) Docf(tmpl string, args ...any) (string, error) {
 //   - Underline "string"
 //   - Blink "string"
 //   - CrossOut "string"
+//   - Link "name" "url" {{ Link "
+//   - Code "string"
+//   - CodeBlock "string" "extension" (shell-session, json, go)
+//   - IsMD: Returns true if the output is markdown.
 //
 // Valid Color values are: "red", "green", "yellow", "orange", "gray", white",
 // "black" (case insensitive), or "#<hex>".
 //
 // These functions can be chained such as:
 // {{ Color "Red" ( Italic (CrossOut "example" ) ) }}
+//
+// Additionally, the following templates are made available:
+//
+//   - mdCodeOrBold: If the output is markdown, it will return the string in a
+//     code stanza. Otherwise, it will return the string in bold.
+//     An example usage is:
+//     {{ template "mdCodeOrBold" "hcp projects iam read-policy --format=json" }}
 //
 // After rendering the template following manipulations are made:
 // - The text is dedented. This allows you to use a Go string literal and not
@@ -132,10 +143,15 @@ func (f *Formatter) Docf(tmpl string, args ...any) (string, error) {
 // - Starting and ending blank spaces are stripped.
 func (f *Formatter) Doc(tmpl string) (string, error) {
 	// Parse the string as template
-	tpl := template.New("tpl").Funcs(f.templateFuncs())
+	tpl := template.New("tpl")
+	tpl.Funcs(f.templateFuncs(tpl))
 	tpl, err := tpl.Parse(tmpl)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse input as a text/template: %w", err)
+	}
+
+	if err := addTemplates(tpl); err != nil {
+		return "", fmt.Errorf("failed to add templates: %w", err)
 	}
 
 	// Run the template

@@ -16,8 +16,8 @@ func NewCmdPrintAccessToken(ctx *cmd.Context) *cmd.Command {
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		Print an access token for the currently authenticated account.
 
-		The output of this command can be used to set the {{ Italic
-		"Authorization: Bearer <token>" }} HTTP header when manually making API requests.
+		The output of this command can be used to set the {{ template "mdCodeOrBold"
+		"Authorization: Bearer <access_token>" }} HTTP header when manually making API requests.
 		`),
 		Examples: []cmd.Example{
 			{

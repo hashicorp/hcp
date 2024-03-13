@@ -9,10 +9,15 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-const preserveNewLinesToken = "__preserveNewLines__"
+const (
+	// preserveNewLinesToken is a token that can be used in a template to
+	// preserve new lines. It is expected to be paired around lines that have
+	// their new lines preserved.
+	preserveNewLinesToken = "__preserveNewLines__"
+)
 
 // templateFuncs returns template helpers based on the IOStreams.
-func (f *Formatter) templateFuncs() template.FuncMap {
+func (f *Formatter) templateFuncs(t *template.Template) template.FuncMap {
 	cs := f.io.ColorScheme()
 
 	return template.FuncMap{
@@ -44,13 +49,40 @@ func (f *Formatter) templateFuncs() template.FuncMap {
 
 			return s.String(), nil
 		},
-		"Bold":             styleFunc(cs, iostreams.String.Bold),
-		"Faint":            styleFunc(cs, iostreams.String.Faint),
-		"Italic":           styleFunc(cs, iostreams.String.Italic),
-		"Underline":        styleFunc(cs, iostreams.String.Underline),
-		"Blink":            styleFunc(cs, iostreams.String.Blink),
-		"CrossOut":         styleFunc(cs, iostreams.String.CrossOut),
+		"Bold":      styleFunc(cs, iostreams.String.Bold),
+		"Faint":     styleFunc(cs, iostreams.String.Faint),
+		"Italic":    styleFunc(cs, iostreams.String.Italic),
+		"Underline": styleFunc(cs, iostreams.String.Underline),
+		"Blink":     styleFunc(cs, iostreams.String.Blink),
+		"CrossOut":  styleFunc(cs, iostreams.String.CrossOut),
+		"Code":      styleFunc(cs, iostreams.String.Code),
+		"CodeBlock": func(name, extension string) (string, error) {
+			var buf strings.Builder
+			if err := t.ExecuteTemplate(&buf, name, nil); err != nil {
+				return "", err
+			}
+
+			return preserveNewLinesToken +
+					cs.String(buf.String()).CodeBlock(extension).String() +
+					preserveNewLinesToken,
+				nil
+		},
+
 		"PreserveNewLines": func() string { return preserveNewLinesToken },
+		"IsMD": func() bool {
+			if _, ok := f.io.(iostreams.IsMarkdownOutput); ok {
+				return true
+			}
+
+			return false
+		},
+		"Link": func(text, url string) string {
+			if _, ok := f.io.(iostreams.IsMarkdownOutput); ok {
+				return fmt.Sprintf("[%s](%s)", text, url)
+			}
+
+			return fmt.Sprintf("%s (%s)", text, url)
+		},
 	}
 }
 
@@ -78,9 +110,9 @@ func getColor(cs *iostreams.ColorScheme, c string) (iostreams.Color, error) {
 	return cs.Black(), fmt.Errorf("unknown color. Must either be an RGB value (#<hex>) or one of %v", maps.Keys(valid))
 }
 
-func styleFunc(cs *iostreams.ColorScheme, f func(iostreams.String) iostreams.String) func(...interface{}) string {
-	return func(values ...interface{}) string {
-		s := cs.String(values[0].(string))
+func styleFunc(cs *iostreams.ColorScheme, f func(iostreams.String) iostreams.String) func(input string) string {
+	return func(input string) string {
+		s := cs.String(input)
 		return f(s).String()
 	}
 }

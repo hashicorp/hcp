@@ -27,7 +27,7 @@ func NewCmdAddBinding(ctx *cmd.Context, runF func(*AddBindingOpts) error) *cmd.C
 		Add an IAM policy binding for the given project. A binding grants the
 		specified principal the given role on the project.
 
-		To view the available roles to bind, run {{ Bold "hcp iam roles list" }}.
+		To view the available roles to bind, run {{ template "mdCodeOrBold" "hcp iam roles list" }}.
 		`),
 		Examples: []cmd.Example{
 			{

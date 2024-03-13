@@ -10,7 +10,7 @@ func NewCmdMembers(ctx *cmd.Context) *cmd.Command {
 		Name:      "members",
 		ShortHelp: "Manage group membership.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam groups members" }} command group allows you to manage group membership.
+		The {{ template "mdCodeOrBold" "hcp iam groups members" }} command group allows you to manage group membership.
 		`),
 	}
 

@@ -26,9 +26,9 @@ func NewCmdRead(ctx *cmd.Context, runF func(opts *TFCConfigReadOpts) error) *cmd
 		Name:      "read",
 		ShortHelp: "Read TFC Config properties.",
 		LongHelp: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-			The {{Bold "hcp waypoint tfc-config read"}} command returns the TFC Organization name
-			and a redacted form of the TFC Team token that is set for this HCP Project.
-			There can only be one TFC Config set for each HCP Project.
+			The {{template "mdCodeOrBold" "hcp waypoint tfc-config read"}} command returns
+			the TFC Organization name and a redacted form of the TFC Team token that is set
+			for this HCP Project. There can only be one TFC Config set for each HCP Project.
 		`),
 		Examples: []cmd.Example{
 			{

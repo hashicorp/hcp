@@ -23,9 +23,9 @@ func NewCmdUnset(ctx *cmd.Context) *cmd.Command {
 		Name:      "unset",
 		ShortHelp: "Unset a HCP CLI Property.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
-		{{ Bold "hcp profile unset" }} unsets the specified property in your active profile.
+		{{ template "mdCodeOrBold" "hcp profile unset" }} unsets the specified property in your active profile.
 
-		To view all currently set properties, run {{ Bold "hcp profile display" }}.
+		To view all currently set properties, run {{ template "mdCodeOrBold" "hcp profile display" }}.
 		`),
 		Args: cmd.PositionalArguments{
 			Autocomplete: opts.Profile,
@@ -33,10 +33,14 @@ func NewCmdUnset(ctx *cmd.Context) *cmd.Command {
 				{
 					Name: "COMPONENT/PROPERTY",
 					Documentation: heredoc.New(ctx.IO).Must(`
-					Property to be unset. Note that COMPONENT/ is optional when referring to
-					top-level profile fields, i.e., such as organization_id and project_id.
-					Using component names is required for setting other properties like {{ Bold "core/output_format" }}.
-					Consult the Available Properties section below for a comprehensive list of properties.
+					Property to be unset. Note that {{ template "mdCodeOrBold" "COMPONENT/" }} is
+					optional when referring to top-level profile fields, i.e., such as
+					{{ template "mdCodeOrBold" "organization_id" }} and
+					{{ template "mdCodeOrBold" "project_id" }}.
+
+					Using component names is required for setting other properties like
+					{{ template "mdCodeOrBold" "core/output_format" }}. Consult the Available
+					Properties section below for a comprehensive list of properties.
 					`),
 				},
 			},

@@ -16,7 +16,7 @@ func NewCmdDisplay(ctx *cmd.Context) *cmd.Command {
 		Name:      "display",
 		ShortHelp: "Display the active profile.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
-		{{ Bold "hcp profile display" }} displays the active profile.
+		{{ template "mdCodeOrBold" "hcp profile display" }} displays the active profile.
 		`),
 		RunF: func(c *cmd.Command, args []string) error {
 			return displayRun(&DisplayOpts{

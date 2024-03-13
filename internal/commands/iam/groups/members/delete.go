@@ -25,7 +25,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		Name:      "delete",
 		ShortHelp: "Delete a membership from a group.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam groups members delete" }} command deletes a membership from a group.
+		The {{ template "mdCodeOrBold" "hcp iam groups members delete" }} command deletes a membership from a group.
 
 		All members that are deleted will no longer inherit any roles that have been granted to the group.
 		`),

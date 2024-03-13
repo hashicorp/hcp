@@ -11,8 +11,8 @@ const (
 	// WIPNameArgDoc is the documentation for accepting a workload identity
 	// provider name as an argument.
 	WIPNameArgDoc = `
-	The resource name of the workload identity provider to %s. The format of the resource name is:
-	{{ Italic "iam/project/PROJECT_ID/service-principal/SP_NAME/workload-identity-provider/WIP_NAME" }}.
+	The resource name of the workload identity provider to %s. The format of the resource name is
+	{{ Code "iam/project/PROJECT_ID/service-principal/SP_NAME/workload-identity-provider/WIP_NAME" }}.
 	`
 )
 
@@ -27,8 +27,8 @@ func NewCmdWIPs(ctx *cmd.Context) *cmd.Command {
 		Aliases:   []string{"wips"},
 		ShortHelp: "Manage Workload Identity Providers.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam workload-identity-providers" }} command group allows you to
-		create and manage Workload Identity Providers.
+		The {{ template "mdCodeOrBold" "hcp iam workload-identity-providers" }} command group
+		allows you to create and manage Workload Identity Providers.
 
 		Creating a workload identity provider creates a trust relationship
 		between HCP and an external identity provider. Once created, a workload
@@ -40,12 +40,13 @@ func NewCmdWIPs(ctx *cmd.Context) *cmd.Command {
 		credentials.
 
 		To make exchanging external credentials as easy as possible, create a credential file using
-		{{ Bold "hcp iam workload-identity-providers create-cred-file" }} after creating your provider.
+		{{ template "mdCodeOrBold" "hcp iam workload-identity-providers create-cred-file" }}
+		after creating your provider.
 
 		The credential file contains details on how to source the external identity token and exchange
-		it for an HCP access token. The {{ Bold "hcp" }} CLI can be authenticated using a credential file by
-		running {{ Bold "hcp auth login --cred-file" }}. For programatic access, the HCP Go SDK
-		can be used and authenticated using a credential file.
+		it for an HCP access token. The {{ template "mdCodeOrBold" "hcp" }} CLI can be authenticated
+		using a credential file by running {{ template "mdCodeOrBold" "hcp auth login --cred-file" }}.
+		For programatic access, the HCP Go SDK can be used and authenticated using a credential file.
 		`),
 	}
 

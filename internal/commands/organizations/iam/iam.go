@@ -10,7 +10,8 @@ func NewCmdIAM(ctx *cmd.Context) *cmd.Command {
 		Name:      "iam",
 		ShortHelp: "Manage an organization's IAM policy.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp organizations iam" }} command group is used to manage an organization's IAM Policy.
+		The {{ template "mdCodeOrBold" "hcp organizations iam" }} command group is used
+		to manage an organization's IAM Policy.
 		`),
 	}
 

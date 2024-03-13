@@ -24,7 +24,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 		Name:      "read",
 		ShortHelp: "Show metadata for the given group.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam groups read" }} command reads details about the given group.
+		The {{ template "mdCodeOrBold" "hcp iam groups read" }} command reads details about the given group.
 		`),
 		Examples: []cmd.Example{
 			{

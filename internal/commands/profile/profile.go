@@ -18,24 +18,27 @@ func NewCmdProfile(ctx *cmd.Context) *cmd.Command {
 		Name:      "profile",
 		ShortHelp: "View and edit HCP CLI properties.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp profile" }} command group lets you initialize, set, view and unset
-		properties used by HCP CLI.
+		The {{ template "mdCodeOrBold" "hcp profile" }} command group lets you initialize,
+		set, view and unset properties used by HCP CLI.
 
 		A profile is a collection of properties/configuration values that inform the behavior
-		of {{ Bold "hcp" }} CLI. To initialize a profile, run {{ Bold "hcp profile init" }}.
-		You can create additional profiles using {{ Bold "hcp profile profiles create" }}.
+		of {{ template "mdCodeOrBold" "hcp" }} CLI. To initialize a profile, run
+		{{ template "mdCodeOrBold" "hcp profile init" }}. You can create additional profiles
+		using {{ template "mdCodeOrBold" "hcp profile profiles create" }}.
 
-		To switch between profiles, use {{ Bold "hcp profile profiles activate" }}.
+		To switch between profiles, use {{ template "mdCodeOrBold" "hcp profile profiles activate" }}.
 
-		{{ Bold "hcp" }} has several global flags that have matching profile properties. Examples are
-		the {{ Bold "project_id" }} and {{ Bold "core/output_format" }} properties and their respective flags
-		{{ Bold "--project" }} and {{ Bold "--format" }}. The difference between properties and flags is
-		that flags apply only on the invoked command, while properties are persistent across all invocations.
-		Thus profiles allow you to conviently maintain the same settings across command executions and
-		multiple profiles allow you to easily switch between different projects and settings.
+		{{ template "mdCodeOrBold" "hcp" }} has several global flags that have matching profile properties.
+		Examples are the {{ template "mdCodeOrBold" "project_id" }} and
+		{{ template "mdCodeOrBold" "core/output_format" }} properties and their respective flags
+		{{ template "mdCodeOrBold" "--project" }} and {{ template "mdCodeOrBold" "--format" }}.
+		The difference between properties and flags is that flags apply only on the invoked command,
+		while properties are persistent across all invocations. Thus profiles allow you to conviently
+		maintain the same settings across command executions and multiple profiles allow you to easily
+		switch between different projects and settings.
 
 		To run a command using a profile other than the active profile, pass the
-		{{ Bold "--profile" }} flag to the command.
+		{{ template "mdCodeOrBold" "--profile" }} flag to the command.
 		`),
 	}
 

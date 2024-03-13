@@ -25,8 +25,8 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 		Name:      "read",
 		ShortHelp: "Show metadata about a workload identity provider.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam workload-identity-providers read" }} command shows metadata
-		about the specified workload identity provider.
+		The {{ template "mdCodeOrBold" "hcp iam workload-identity-providers read" }} command
+		shows metadata about the specified workload identity provider.
 		`),
 		Examples: []cmd.Example{
 			{

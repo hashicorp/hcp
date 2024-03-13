@@ -12,7 +12,8 @@ func NewCmdOrganizations(ctx *cmd.Context) *cmd.Command {
 		Aliases:   []string{"orgs"},
 		ShortHelp: "Interact with an existing organization.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp organizations" }} command group lets you interact with an existing HCP organization.
+		The {{ template "mdCodeOrBold" "hcp organizations" }} command group lets you
+		interact with an existing HCP organization.
 		`),
 	}
 

@@ -30,19 +30,19 @@ func NewCmdSet(ctx *cmd.Context) *cmd.Command {
 		Name:      "set",
 		ShortHelp: "Set a HCP CLI Property.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
-		{{ Bold "hcp profile set" }} sets the specified property in your active profile.
-		A property governs the behavior of a specific aspect of the HCP CLI. This could be
-		setting the organization and project to target, or configuring the default output
-		format across commands.
+		{{ template "mdCodeOrBold" "hcp profile set" }} sets the specified property in your
+		active profile. A property governs the behavior of a specific aspect of the HCP CLI.
+		This could be setting the organization and project to target, or configuring the default
+		output format across commands.
 
-		To view all currently set properties, run {{ Bold "hcp profile display" }} or run
-		{{ Bold "hcp profile read" }} to read the value of an individual property.
+		To view all currently set properties, run {{ template "mdCodeOrBold" "hcp profile display" }}
+		or run {{ template "mdCodeOrBold" "hcp profile read" }} to read the value of an individual property.
 
-		To unset properties, use {{ Bold "hcp profile unset" }}.
+		To unset properties, use {{ template "mdCodeOrBold" "hcp profile unset" }}.
 
 		HCP CLI comes with a default profile but supports multiple. To create multiple
-		configurations, use {{ Bold "hcp profile profiles create" }}, and {{ Bold "hcp profile profiles activate" }}
-		to switch between them.
+		configurations, use {{ template "mdCodeOrBold" "hcp profile profiles create" }},
+		and {{ template "mdCodeOrBold" "hcp profile profiles activate" }} to switch between them.
 		`),
 		Args: cmd.PositionalArguments{
 			Autocomplete: opts.Profile,
@@ -50,10 +50,14 @@ func NewCmdSet(ctx *cmd.Context) *cmd.Command {
 				{
 					Name: "COMPONENT/PROPERTY",
 					Documentation: heredoc.New(ctx.IO).Must(`
-					Property to be set. Note that COMPONENT/ is optional when referring to
-					top-level profile fields, i.e., such as organization_id and project_id.
-					Using component names is required for setting other properties like {{ Bold "core/output_format" }}.
-					Consult the Available Properties section below for a comprehensive list of properties.
+					Property to be set. Note that {{ template "mdCodeOrBold" "COMPONENT/" }} is
+					optional when referring to top-level profile fields, i.e., such as
+					{{ template "mdCodeOrBold" "organization_id" }} and
+					{{ template "mdCodeOrBold" "project_id" }}.
+
+					Using component names is required for setting other properties like
+					{{ template "mdCodeOrBold" "core/output_format" }}. Consult the Available
+					Properties section below for a comprehensive list of properties.
 					`),
 				},
 				{

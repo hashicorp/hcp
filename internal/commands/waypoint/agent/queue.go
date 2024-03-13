@@ -36,7 +36,7 @@ func NewCmdQueue(ctx *cmd.Context) *cmd.Command {
 		Name:      "queue",
 		ShortHelp: "Queue an operation for an agent to execute.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp waypoint agent queue" }} command queues an operation for an agent to run.
+		The {{ template "mdCodeOrBold" "hcp waypoint agent queue" }} command queues an operation for an agent to run.
 		`),
 		Flags: cmd.Flags{
 			Local: []*cmd.Flag{

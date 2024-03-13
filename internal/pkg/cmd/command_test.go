@@ -13,7 +13,11 @@ func TestCommand_PersistentPrerun(t *testing.T) {
 	r := require.New(t)
 
 	// Create the command tree
-	root := &Command{Name: "root"}
+	io := iostreams.Test()
+	root := &Command{
+		Name: "root",
+		io:   io,
+	}
 	child := &Command{
 		Name: "child",
 		RunF: func(c *Command, args []string) error {
@@ -57,7 +61,11 @@ func TestCommand_Flags(t *testing.T) {
 	r := require.New(t)
 
 	// Create the command tree
-	root := &Command{Name: "root"}
+	io := iostreams.Test()
+	root := &Command{
+		Name: "root",
+		io:   io,
+	}
 	rootFlag := root.persistentFlags().String("root-flag", "", "testing")
 
 	seenFlags := 0

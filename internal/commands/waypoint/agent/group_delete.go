@@ -16,7 +16,7 @@ func NewCmdGroupDelete(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
 		Name:      "delete",
 		ShortHelp: "Delete a HCP Waypoint Agent group.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "waypoint agent group delete" }} command delete an Agent group.
+		The {{ template "mdCodeOrBold" "waypoint agent group delete" }} command delete an Agent group.
 		`),
 		Flags: cmd.Flags{
 			Local: []*cmd.Flag{

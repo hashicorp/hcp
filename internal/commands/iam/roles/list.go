@@ -25,7 +25,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 		Name:      "list",
 		ShortHelp: "List an organization's roles.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam roles list" }} command lists the roles that exist for an HCP organization.
+		The {{ template "mdCodeOrBold" "hcp iam roles list" }} command lists the roles that exist for an HCP organization.
 
 		When referring to a role in an IAM binding, use the role's ID (e.g. "roles/admin").
 		`),

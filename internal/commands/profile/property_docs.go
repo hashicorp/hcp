@@ -29,18 +29,22 @@ func availableProperties(io iostreams.IOStreams) *availablePropertiesBuilder {
 
 func addCoreProperties(b *availablePropertiesBuilder) {
 	b.AddProperty("", "organization_id", "Organization ID of the HCP organization to operate on.")
-	b.AddProperty("", "project_id", `Project ID of the HCP project to operate on by default. This can be overridden by using the global {{ Bold "--project" }} flag.`)
+	b.AddProperty("", "project_id", `
+	Project ID of the HCP project to operate on by default.
+	This can be overridden by using the global {{ template "mdCodeOrBold" "--project" }} flag.`)
 
 	b.AddProperty("core", "no_color", "If True, color will not be used when printing messages in the terminal.")
 	b.AddProperty("core", "verbosity", `
-		Default logging verbosity for {{ Bold "hcp" }} commands. This is the
+		Default logging verbosity for {{ template "mdCodeOrBold" "hcp" }} commands. This is the
 		equivalent of using the global --verbosity flag. Supported log levels:
-		{{ Bold "trace" }}, {{ Bold "debug" }}, {{ Bold "info" }}, {{ Bold "warn" }}, and
-		{{ Bold "error" }}. `)
+		{{ template "mdCodeOrBold" "trace" }}, {{ template "mdCodeOrBold" "debug" }},
+		{{ template "mdCodeOrBold" "info" }}, {{ template "mdCodeOrBold" "warn" }}, and
+		{{ template "mdCodeOrBold" "error" }}. `)
 	b.AddProperty("core", "output_format", `
-		Default output format for {{ Bold "hcp" }} commands. This is the
+		Default output format for {{ template "mdCodeOrBold" "hcp" }} commands. This is the
 		equivalent of using the global --format flag. Supported output foramts:
-		{{ Bold "pretty" }}, {{ Bold "table" }}, and {{ Bold "json" }}.`)
+		{{ template "mdCodeOrBold" "pretty" }}, {{ template "mdCodeOrBold" "table" }},
+		and {{ template "mdCodeOrBold" "json" }}.`)
 }
 
 type availablePropertiesBuilder struct {
@@ -66,6 +70,14 @@ func (b availablePropertiesBuilder) AddProperty(component, property, description
 }
 
 func (b availablePropertiesBuilder) build() string {
+	if _, ok := b.io.(iostreams.IsMarkdownOutput); ok {
+		return b.buildMD()
+	}
+
+	return b.buildCLI()
+}
+
+func (b availablePropertiesBuilder) buildCLI() string {
 	var buf bytes.Buffer
 	cs := b.io.ColorScheme()
 
@@ -75,7 +87,7 @@ func (b availablePropertiesBuilder) build() string {
 		keys := maps.Keys(topLevel)
 		slices.Sort(keys)
 		for _, k := range keys {
-			fmt.Fprintln(&buf, cs.String(k).Bold())
+			fmt.Fprintln(&buf, k)
 			fmt.Fprintln(&buf, indent.String(topLevel[k], 2))
 			fmt.Fprintln(&buf)
 		}
@@ -94,8 +106,46 @@ func (b availablePropertiesBuilder) build() string {
 		keys := maps.Keys(b.properties[c])
 		slices.Sort(keys)
 		for _, k := range keys {
-			fmt.Fprintln(&buf, indent.String(cs.String(k).Bold().String(), 2))
+			fmt.Fprintln(&buf, indent.String(k, 2))
 			fmt.Fprintln(&buf, indent.String(b.properties[c][k], 4))
+			fmt.Fprintln(&buf)
+		}
+	}
+
+	return buf.String()
+}
+
+func (b availablePropertiesBuilder) buildMD() string {
+	var buf bytes.Buffer
+	cs := b.io.ColorScheme()
+
+	// Start with the core section first
+	topLevel, ok := b.properties[""]
+	if ok {
+		keys := maps.Keys(topLevel)
+		slices.Sort(keys)
+		for _, k := range keys {
+			fmt.Fprintf(&buf, "* `%s`\n", k)
+			fmt.Fprintln(&buf, indent.String(fmt.Sprintf("* %s", topLevel[k]), 4))
+			fmt.Fprintln(&buf)
+		}
+	}
+
+	allComponents := maps.Keys(b.properties)
+	slices.Sort(allComponents)
+	for _, c := range allComponents {
+		if c == "" {
+			continue
+		}
+
+		// Print the component
+		fmt.Fprintf(&buf, "* `%s`\n\n", c)
+
+		keys := maps.Keys(b.properties[c])
+		slices.Sort(keys)
+		for _, k := range keys {
+			fmt.Fprintln(&buf, indent.String(fmt.Sprintf("* `%s`", cs.String(k)), 4))
+			fmt.Fprintln(&buf, indent.String(fmt.Sprintf("* %s", b.properties[c][k]), 8))
 			fmt.Fprintln(&buf)
 		}
 	}

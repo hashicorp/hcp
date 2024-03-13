@@ -24,7 +24,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 		Name:      "list",
 		ShortHelp: "List the organization's users.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam users list" }} command lists the users for an HCP organization.
+		The {{ template "mdCodeOrBold" "hcp iam users list" }} command lists the users for an HCP organization.
 		`),
 		RunF: func(c *cmd.Command, args []string) error {
 			if runF != nil {

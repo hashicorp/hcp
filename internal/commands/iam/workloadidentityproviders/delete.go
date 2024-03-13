@@ -23,7 +23,8 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		Name:      "delete",
 		ShortHelp: "Delete a workload identity provider.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp iam workload-identity-providers delete" }} command deletes a workload identity provider.
+		The {{ template "mdCodeOrBold" "hcp iam workload-identity-providers delete" }} command
+		deletes a workload identity provider.
 		`),
 		Examples: []cmd.Example{
 			{
