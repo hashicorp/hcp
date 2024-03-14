@@ -18,6 +18,15 @@ func NewCmdHcp(ctx *cmd.Context) *cmd.Command {
 		LongHelp:  "The HCP Command Line Interface is a unified tool to manage your HCP services.",
 	}
 
+	//  _   _  ___ _____ _____
+	// | \ | |/ _ \_   _| ____|
+	// |  \| | | | || | |  _|
+	// | |\  | |_| || | | |___
+	// |_| \_|\___/ |_| |_____|
+	//
+	// When adding a top level command group, be sure to regenerate the
+	// screenshot in the README by running `make gen/screenshot`.
+
 	// Add the subcommands
 	c.AddChild(version.NewCmdVersion(ctx))
 	c.AddChild(auth.NewCmdAuth(ctx))
