@@ -340,7 +340,7 @@ func (e *Example) text(cs *iostreams.ColorScheme) string {
 	if e.Command != "" {
 		// Use a higher limit for command wrapping since they may include
 		// potentially long identifiers.
-		fmt.Fprintln(&buf, cs.String(wordWrap(e.Command, 120)).Italic().Color(cs.Green()))
+		fmt.Fprintln(&buf, cs.String(wordWrap(e.Command, 120)).Color(cs.Green()))
 	}
 
 	return buf.String()
