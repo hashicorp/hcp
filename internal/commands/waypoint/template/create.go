@@ -8,15 +8,35 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/pkg/errors"
 )
 
 func NewCmdCreate(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "create",
-		ShortHelp: "Create a new Waypoint template.",
-		LongHelp: "Create a new Waypoint template, from which applications " +
+		ShortHelp: "Create a new HCP Waypoint template.",
+		LongHelp: "Create a new HCP Waypoint template, from which applications " +
 			"can be created.",
+		Examples: []cmd.Example{
+			{
+				Preamble: "Create a new HCP Waypoint template:",
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+$ hcp waypoint templates create -n my-template \
+-s "My Template Summary" \
+-d "My Template Description" \
+-readme-markdown-template-file "README.tpl" \
+-tfc-no-code-module-source "app.terraform.io/hashicorp/dir/template" \
+-tfc-no-code-module-version "1.0.2" \
+-tfc-project-name "my-tfc-project" \
+-tfc-project-id "prj-123456 \
+-l "label1" \
+-l "label2" \
+-t "key1=value1" \
+-t "key2=value2"
+`),
+			},
+		},
 		RunF: func(c *cmd.Command, args []string) error {
 			if opts.testFunc != nil {
 				return opts.testFunc(c, args)
@@ -74,30 +94,35 @@ func NewCmdCreate(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 					Value:        flagvalue.SimpleMap(nil, &opts.Tags),
 				},
 				{
-					Name:         "terraform-no-code-module-source",
-					DisplayValue: "TERRAFORM_NO_CODE_MODULE_SOURCE",
-					Description:  "The source of the Terraform no-code module.",
-					Value:        flagvalue.Simple("", &opts.TerraformNoCodeModuleSource),
-					Required:     true,
+					Name:         "tfc-no-code-module-source",
+					DisplayValue: "TFC_NO_CODE_MODULE_SOURCE",
+					Description: heredoc.New(ctx.IO).Must(`
+			The source of the Terraform no-code module. 
+			The expected format is "NAMESPACE/NAME/PROVIDER". An
+			optional "HOSTNAME/" can be added at the beginning for
+			a private registry.
+					`),
+					Value:    flagvalue.Simple("", &opts.TerraformNoCodeModuleSource),
+					Required: true,
 				},
 				{
-					Name:         "terraform-no-code-module-version",
-					DisplayValue: "TERRAFORM_NO_CODE_MODULE_VERSION",
+					Name:         "tfc-no-code-module-version",
+					DisplayValue: "TFC_NO_CODE_MODULE_VERSION",
 					Description:  "The version of the Terraform no-code module.",
 					Value:        flagvalue.Simple("", &opts.TerraformNoCodeModuleVersion),
 					Required:     true,
 				},
 				{
-					Name:         "terraform-cloud-project-name",
-					DisplayValue: "TERRAFORM_CLOUD_PROJECT_NAME",
+					Name:         "tfc-project-name",
+					DisplayValue: "TFC_PROJECT_NAME",
 					Description: "The name of the Terraform Cloud project where" +
 						" applications using this template will be created.",
 					Value:    flagvalue.Simple("", &opts.TerraformCloudProjectName),
 					Required: true,
 				},
 				{
-					Name:         "terraform-cloud-project-id",
-					DisplayValue: "TERRAFORM_CLOUD_PROJECT_ID",
+					Name:         "tfc-project-id",
+					DisplayValue: "TFC_PROJECT_ID",
 					Description: "The ID of the Terraform Cloud project where" +
 						" applications using this template will be created.",
 					Value:    flagvalue.Simple("", &opts.TerraformCloudProjectID),

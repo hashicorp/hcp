@@ -32,7 +32,7 @@ func NewCmdTemplate(ctx *cmd.Context) *cmd.Command {
 	}
 
 	cmd := &cmd.Command{
-		Name:      "template",
+		Name:      "templates",
 		ShortHelp: "Manage HCP Waypoint templates.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ Bold "hcp waypoint template" }} commands manage templates. A
