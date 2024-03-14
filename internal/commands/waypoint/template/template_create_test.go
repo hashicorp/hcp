@@ -42,12 +42,12 @@ func TestCmdTemplateCreate(t *testing.T) {
 				return profile.TestProfile(t).SetOrgID("123")
 			},
 			Args: []string{
-				"--name=cli-test",
+				"-n=cli-test",
 				"-s", "A template created using the CLI.",
-				"--terraform-cloud-project-id", "prj-abcdefghij",
-				"--terraform-cloud-project-name", "test",
-				"--terraform-no-code-module-source", "private/waypoint/waypoint-nocode-module/null",
-				"--terraform-no-code-module-version", "0.0.1",
+				"--tfc-project-id", "prj-abcdefghij",
+				"--tfc-project-name", "test",
+				"--tfc-no-code-module-source", "private/waypoint/waypoint-nocode-module/null",
+				"--tfc-no-code-module-version", "0.0.1",
 				"-l", "cli",
 				"-d", "A template created with the CLI.",
 				"-t", "cli=true",
@@ -99,6 +99,14 @@ func TestCmdTemplateCreate(t *testing.T) {
 
 				r.Equal(c.Expect.Name, tplOpts.Name)
 				r.Equal(c.Expect.Description, tplOpts.Description)
+				r.Equal(c.Expect.Summary, tplOpts.Summary)
+				r.Equal(c.Expect.TerraformCloudProjectID, tplOpts.TerraformCloudProjectID)
+				r.Equal(c.Expect.TerraformCloudProjectName, tplOpts.TerraformCloudProjectName)
+				r.Equal(c.Expect.TerraformNoCodeModuleSource, tplOpts.TerraformNoCodeModuleSource)
+				r.Equal(c.Expect.TerraformNoCodeModuleVersion, tplOpts.TerraformNoCodeModuleVersion)
+				r.Equal(c.Expect.ReadmeMarkdownTemplateFile, tplOpts.ReadmeMarkdownTemplateFile)
+				r.Equal(c.Expect.Labels, tplOpts.Labels)
+				r.Equal(c.Expect.Tags, tplOpts.Tags)
 			}
 		})
 	}
