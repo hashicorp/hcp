@@ -35,18 +35,18 @@ JSON that contains the IAM policy.
 The format for the policy JSON file is an object with the following format:
 
 {{ define "bindings" -}} {
-  "bindings": [
-    {
-      "role_id": "ROLE_ID",
-      "members": [
-        {
-          "member_id": "PRINCIPAL_ID",
-          "member_type": "USER" | "GROUP" | "SERVICE_PRINCIPAL",
-        }
-      ]
-    }
-  ],
-  "etag": "ETAG",
+	"bindings": [
+		{
+			"role_id": "ROLE_ID",
+			"members": [
+				{
+					"member_id": "PRINCIPAL_ID",
+					"member_type": "USER" | "GROUP" | "SERVICE_PRINCIPAL"
+				}
+			]
+		}
+	],
+	"etag": "ETAG"
 } {{- end }}
 {{- CodeBlock "bindings" "json" }}
 
@@ -60,28 +60,28 @@ If unset, the existing policy's etag will be fetched and used.
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 					$ cat >policy.json <<EOF
 					{
-					  "bindings": [
-						{
-						  "role_id": "roles/viewer",
-						  "members": [
-						    {
-							  "member_id": "97e2c752-4285-419e-a5cc-bf05ce811d7d",
-							  "member_type": "USER"
-						    },
-						    {
-							  "member_id": "334514c1-4650-4699-891a-a7261fba9607",
-							  "member_type": "GROUP"
-						    }
-						  ]
+						"bindings": [
+							{
+								"role_id": "roles/viewer",
+								"members": [
+								{
+									"member_id": "97e2c752-4285-419e-a5cc-bf05ce811d7d",
+									"member_type": "USER"
+								},
+								{
+									"member_id": "334514c1-4650-4699-891a-a7261fba9607",
+									"member_type": "GROUP"
+								}
+							]
 						},
 						{
-						  "role_id": "roles/admin",
-						  "members": [
-						    {
-							  "member_id": "efa07942-17e8-4ef4-ae2d-ec51d32a0767",
-							  "member_type": "SERVICE_PRINCIPAL"
-						    }
-						  ]
+							"role_id": "roles/admin",
+							"members": [
+								{
+									"member_id": "efa07942-17e8-4ef4-ae2d-ec51d32a0767",
+									"member_type": "SERVICE_PRINCIPAL"
+								}
+							]
 						}
 					  ],
 					  "etag": "14124142"

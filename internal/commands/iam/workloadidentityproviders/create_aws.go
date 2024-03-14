@@ -42,7 +42,7 @@ func NewCmdCreateAWS(ctx *cmd.Context, runF func(*CreateAWSOpts) error) *cmd.Com
 		{{ PreserveNewLines }}
 		  * "aws.arn": The AWS ARN associated with the calling entity.
 		  * "aws.account_id": The AWS account ID number of the account that owns
-			or contains the calling entity.
+		    or contains the calling entity.
 		  * "aws.user_id": The unique identifier of the calling entity.
 		{{ PreserveNewLines }}
 

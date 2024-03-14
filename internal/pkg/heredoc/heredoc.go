@@ -142,6 +142,9 @@ func (f *Formatter) Docf(tmpl string, args ...any) (string, error) {
 // be overridden using WithWidth.
 // - Starting and ending blank spaces are stripped.
 func (f *Formatter) Doc(tmpl string) (string, error) {
+	// Replace tabs with spaces
+	tmpl = strings.ReplaceAll(tmpl, "\t", "  ")
+
 	// Parse the string as template
 	tpl := template.New("tpl")
 	tpl.Funcs(f.templateFuncs(tpl))
