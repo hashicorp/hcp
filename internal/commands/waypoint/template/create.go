@@ -25,15 +25,13 @@ func NewCmdCreate(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 $ hcp waypoint templates create -n my-template \
 -s "My Template Summary" \
 -d "My Template Description" \
--readme-markdown-template-file "README.tpl" \
--tfc-no-code-module-source "app.terraform.io/hashicorp/dir/template" \
--tfc-no-code-module-version "1.0.2" \
--tfc-project-name "my-tfc-project" \
--tfc-project-id "prj-123456 \
+--readme-markdown-template-file "README.tpl" \
+--tfc-no-code-module-source "app.terraform.io/hashicorp/dir/template" \
+--tfc-no-code-module-version "1.0.2" \
+--tfc-project-name "my-tfc-project" \
+--tfc-project-id "prj-123456"" \
 -l "label1" \
--l "label2" \
--t "key1=value1" \
--t "key2=value2"
+-l "label2"
 `),
 			},
 		},
@@ -92,6 +90,7 @@ $ hcp waypoint templates create -n my-template \
 					Description:  "A tag to apply to the template.",
 					Repeatable:   true,
 					Value:        flagvalue.SimpleMap(nil, &opts.Tags),
+					Hidden:       true,
 				},
 				{
 					Name:         "tfc-no-code-module-source",
@@ -100,8 +99,7 @@ $ hcp waypoint templates create -n my-template \
 			The source of the Terraform no-code module. 
 			The expected format is "NAMESPACE/NAME/PROVIDER". An
 			optional "HOSTNAME/" can be added at the beginning for
-			a private registry. See the {{ Link "Terraform documentation" "https://www.terraform.io/docs/language/modules/sources.html" }}
-			for more information.
+			a private registry.
 					`),
 					Value:    flagvalue.Simple("", &opts.TerraformNoCodeModuleSource),
 					Required: true,
