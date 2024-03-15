@@ -9,8 +9,15 @@ import (
 type TemplateOpts struct {
 	opts.WaypointOpts
 
-	ID                         string
-	Name                       string
+	ID string
+
+	// Name is the name of a new template, or the name of an existing template.
+	// When used during update operations, it is the name of the template to be
+	// updated.
+	Name string
+
+	// UpdatedName is used for updates, and is the new name for the template.
+	UpdatedName                string
 	Summary                    string
 	Description                string
 	ReadmeMarkdownTemplateFile string
@@ -45,6 +52,7 @@ func NewCmdTemplate(ctx *cmd.Context) *cmd.Command {
 	cmd.AddChild(NewCmdDelete(ctx, opts))
 	cmd.AddChild(NewCmdRead(ctx, opts))
 	cmd.AddChild(NewCmdList(ctx, opts))
+	cmd.AddChild(NewCmdUpdate(ctx, opts))
 
 	return cmd
 }
