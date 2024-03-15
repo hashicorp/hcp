@@ -100,7 +100,8 @@ $ hcp waypoint templates create -n my-template \
 			The source of the Terraform no-code module. 
 			The expected format is "NAMESPACE/NAME/PROVIDER". An
 			optional "HOSTNAME/" can be added at the beginning for
-			a private registry.
+			a private registry. See the {{ Link "Terraform documentation" "https://www.terraform.io/docs/language/modules/sources.html" }}
+			for more information.
 					`),
 					Value:    flagvalue.Simple("", &opts.TerraformNoCodeModuleSource),
 					Required: true,
