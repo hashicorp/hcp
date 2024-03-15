@@ -43,6 +43,7 @@ func NewCmdTemplate(ctx *cmd.Context) *cmd.Command {
 
 	cmd.AddChild(NewCmdCreate(ctx, opts))
 	cmd.AddChild(NewCmdDelete(ctx, opts))
+	cmd.AddChild(NewCmdRead(ctx, opts))
 
 	return cmd
 }

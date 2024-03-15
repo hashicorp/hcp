@@ -23,8 +23,8 @@ func NewCmdRead(ctx *cmd.Context) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "read",
-		ShortHelp: "Read more details about an action configurations.",
-		LongHelp:  "Read more details about an action configurations.",
+		ShortHelp: "Read more details about an action configuration.",
+		LongHelp:  "Read more details about an action configuration.",
 		RunF: func(c *cmd.Command, args []string) error {
 			return readActionConfig(c, args, opts)
 		},
