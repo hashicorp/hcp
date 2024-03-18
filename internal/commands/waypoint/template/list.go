@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 )
@@ -30,6 +31,8 @@ func listTemplates(opts *TemplateOpts) error {
 		return err
 	}
 
+	var templates []*models.HashicorpCloudWaypointApplicationTemplate
+
 	resp, err := opts.WS.WaypointServiceListApplicationTemplates(
 		&waypoint_service.WaypointServiceListApplicationTemplatesParams{
 			NamespaceID: ns.ID,
@@ -39,6 +42,20 @@ func listTemplates(opts *TemplateOpts) error {
 		return fmt.Errorf("error listing templates: %w", err)
 	}
 
-	respPayload := resp.GetPayload()
-	return opts.Output.Show(respPayload.ApplicationTemplates, format.Pretty)
+	templates = append(templates, resp.GetPayload().ApplicationTemplates...)
+
+	for resp.GetPayload().Pagination.NextPageToken != "" {
+		resp, err = opts.WS.WaypointServiceListApplicationTemplates(
+			&waypoint_service.WaypointServiceListApplicationTemplatesParams{
+				NamespaceID:             ns.ID,
+				Context:                 opts.Ctx,
+				PaginationNextPageToken: &resp.GetPayload().Pagination.NextPageToken,
+			}, nil)
+		if err != nil {
+			return fmt.Errorf("error listing templates: %w", err)
+		}
+
+		templates = append(templates, resp.GetPayload().ApplicationTemplates...)
+	}
+	return opts.Output.Show(templates, format.Pretty)
 }
