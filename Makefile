@@ -69,7 +69,7 @@ changelog/new-entry:
 ifeq (, $(shell which changelog-entry))
 	@go install github.com/hashicorp/go-changelog/cmd/changelog-entry@latest
 endif
-	changelog-entry -dir .changelog
+	changelog-entry -dir .changelog -allowed-types-file .changelog/types.txt
 
 .PHONY: changelog/check
 changelog/check:
