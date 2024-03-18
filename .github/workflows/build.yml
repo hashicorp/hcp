@@ -108,7 +108,7 @@ jobs:
           name: ${{ github.event.repository.name }}
           description: "HashiCorp Cloud Platform CLI"
           arch: ${{ matrix.goarch }}
-          version: ${{ needs.get-product-version.outputs.product-version }}
+          version: ${{ needs.set-product-version.outputs.product-version }}
 
           maintainer: "HashiCorp"
           homepage: "https://github.com/hashicorp/hcp"
