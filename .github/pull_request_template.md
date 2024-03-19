@@ -10,8 +10,8 @@
 -->
 
 ### Checklist:
-- [ ] Tests added
-- [ ] CHANGELOG entry added
+- [ ] Tests added if applicable
+- [ ] CHANGELOG entry added or label 'pr/no-changelog' added to PR
   > Run `make changelog-entry` for guidance in authoring a changelog entry, and
   > commit the resulting file, which should have a name matching your PR number.
   > Entries should use imperative present tense (e.g. Add support for...)

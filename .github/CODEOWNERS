@@ -1,0 +1,7 @@
+# Individual command groups will be owned by product teams but the overall CLI
+# will be owned as follows.
+* @dadgar
+
+# Waypoint Owned
+internal/commands/waypoint @hashicorp/cloud-waypoint
+internal/pkg/waypoint @hashicorp/cloud-waypoint
