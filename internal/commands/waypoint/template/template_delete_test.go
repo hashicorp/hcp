@@ -42,10 +42,10 @@ func TestCmdTemplateDelete(t *testing.T) {
 				return profile.TestProfile(t).SetOrgID("123")
 			},
 			Args: []string{
-				"--id=123",
+				"--name=cli-template",
 			},
 			Expect: &TemplateOpts{
-				ID: "123",
+				Name: "cli-template",
 			},
 		},
 	}
@@ -78,7 +78,7 @@ func TestCmdTemplateDelete(t *testing.T) {
 			cmd.Run(c.Args)
 
 			if c.Expect != nil {
-				r.Equal(&c.Expect.ID, &tplOpts.ID)
+				r.Equal(&c.Expect.Name, &tplOpts.Name)
 			}
 		})
 	}
