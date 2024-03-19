@@ -69,7 +69,11 @@ changelog/new-entry:
 ifeq (, $(shell which changelog-entry))
 	@go install github.com/hashicorp/go-changelog/cmd/changelog-entry@latest
 endif
-	changelog-entry -dir .changelog -allowed-types-file .changelog/types.txt
+ifeq (, $(CHANGELOG_PR))
+	@echo "Please set the CHANGELOG_PR environment variable to the PR number to associate with the changelog."
+else
+	changelog-entry -dir .changelog -allowed-types-file .changelog/types.txt -pr ${CHANGELOG_PR}
+endif
 
 .PHONY: changelog/check
 changelog/check:
