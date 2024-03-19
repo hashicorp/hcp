@@ -15,7 +15,7 @@ jobs:
   # checks that a .changelog entry is present for a PR
   changelog-check:
     # If there  a `pr/no-changelog` label we ignore this check.
-    if: "! ( contains(github.event.pull_request.labels.*.name, 'pr/no-changelog')"
+    if: "! ( contains(github.event.pull_request.labels.*.name, 'pr/no-changelog') )"
     runs-on: ubuntu-latest
 
     steps:
