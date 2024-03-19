@@ -27,25 +27,12 @@ func NewCmdDelete(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 		Flags: cmd.Flags{
 			Local: []*cmd.Flag{
 				{
-					Name:         "id",
-					DisplayValue: "ID",
-					Description:  "The ID of the template to be deleted.",
-					Value:        flagvalue.Simple("", &opts.ID),
-					// When the API supports deleting by name, instead of only ID,
-					// this should no longer be required, and a name flag should
-					// be added.
-					Required: true,
-				},
-				{
 					Name:         "name",
 					Shorthand:    "n",
 					DisplayValue: "NAME",
 					Description:  "The name of the template to be deleted.",
 					Value:        flagvalue.Simple("", &opts.Name),
-					Required:     false,
-					// When the API supports deleting by name, instead of only ID,
-					// this should no longer be hidden.
-					Hidden: true,
+					Required:     true,
 				},
 			},
 		},
@@ -60,19 +47,18 @@ func templateDelete(opts *TemplateOpts) error {
 		return errors.Wrapf(err, "Unable to access HCP project")
 	}
 
-	_, err = opts.WS.WaypointServiceDeleteApplicationTemplate(
-		&waypoint_service.WaypointServiceDeleteApplicationTemplateParams{
+	_, err = opts.WS.WaypointServiceDeleteApplicationTemplate2(
+		&waypoint_service.WaypointServiceDeleteApplicationTemplate2Params{
 			NamespaceID:             ns.ID,
 			Context:                 opts.Ctx,
-			ApplicationTemplateID:   opts.ID,
-			ApplicationTemplateName: &opts.Name,
+			ApplicationTemplateName: opts.Name,
 		}, nil,
 	)
 	if err != nil {
-		return fmt.Errorf("failed to delete template %q: %w", opts.ID, err)
+		return fmt.Errorf("failed to delete template %q: %w", opts.Name, err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Template %q deleted.", opts.ID)
+	fmt.Fprintf(opts.IO.Err(), "Template %q deleted.", opts.Name)
 
 	return nil
 }
