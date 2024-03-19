@@ -18,7 +18,7 @@ func NewCmdRename(ctx *cmd.Context) *cmd.Command {
 	renameCmd := &cmd.Command{
 		Name:      "rename",
 		ShortHelp: "Rename an existing profile.",
-		LongHelp:  "Rename an existing profile.",
+		LongHelp:  "The `hcp profile profiles rename` command renames an existing profile.",
 		Examples: []cmd.Example{
 			{
 				Preamble: "To rename profile my-profile to new-profile, run:",

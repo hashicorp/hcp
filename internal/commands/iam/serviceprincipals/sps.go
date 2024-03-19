@@ -19,7 +19,7 @@ func NewCmdServicePrincipals(ctx *cmd.Context) *cmd.Command {
 		interacts with HCP. Your application uses the service principal to authenticate to HCP so that
 		users aren't directly involved.
 
-		Because service principals are principals, you can grant it permissions by granting a role. See the examples for guidance.
+		Because service principals are principals, you can grant it permissions by granting a role. Refer to the examples for guidance.
 		`),
 		Examples: []cmd.Example{
 			{

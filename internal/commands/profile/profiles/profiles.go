@@ -18,9 +18,10 @@ func NewCmdProfiles(ctx *cmd.Context) *cmd.Command {
 		Name:      "profiles",
 		ShortHelp: "Manage HCP profiles.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		Manage the set of named HCP profiles. New profiles can be created using
-		{{ template "mdCodeOrBold" "hcp profile profiles create" }} and existing
-		profiles can be activated using {{ template "mdCodeOrBold" "hcp profile profiles activate" }}.
+		The {{ template "mdCodeOrBold" "hcp profile profiles" }} command group lets you 
+		manage the set of named HCP profiles. You can create new profiles using
+		{{ template "mdCodeOrBold" "hcp profile profiles create" }} and activate existing
+		profiles using {{ template "mdCodeOrBold" "hcp profile profiles activate" }}.
 		To run a single command against a profile other than the active profile,
 		run the command with the flag {{ template "mdCodeOrBold" "--profile" }}.
 		`),

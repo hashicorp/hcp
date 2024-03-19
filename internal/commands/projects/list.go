@@ -24,7 +24,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "list",
 		ShortHelp: "List HCP projects.",
-		LongHelp:  "List HCP projects.",
+		LongHelp:  "The `hcp products create` command lists HCP projects.",
 		RunF: func(c *cmd.Command, args []string) error {
 			if runF != nil {
 				return runF(opts)

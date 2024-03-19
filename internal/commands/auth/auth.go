@@ -8,7 +8,7 @@ func NewCmdAuth(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "auth",
 		ShortHelp: "Authenticate to HCP.",
-		LongHelp:  "Manage authentication to HCP.",
+		LongHelp:  "The `hcp auth` command group lets you manage authentication to HCP.",
 		Examples: []cmd.Example{
 			{
 				Preamble: "Login interactively using a browser:",

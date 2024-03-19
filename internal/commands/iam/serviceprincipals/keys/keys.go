@@ -10,7 +10,7 @@ func NewCmdKeys(ctx *cmd.Context) *cmd.Command {
 		Name:      "keys",
 		ShortHelp: "Create and manage service principals keys.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp iam service-principals keys" }} command group is used to create
+		The {{ template "mdCodeOrBold" "hcp iam service-principals keys" }} command group lets you create
 		and manage service principals keys.
 
 		A service principal key is the credential used by a service principal to authenticate with HCP

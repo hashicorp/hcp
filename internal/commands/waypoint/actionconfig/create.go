@@ -36,7 +36,7 @@ func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "create",
 		ShortHelp: "Create a new action configuration.",
-		LongHelp:  "Create a new action configuration to be used to launch an action with.",
+		LongHelp:  "The `hcp waypoint action-config create` command creates a new action configuration to be used to launch an action with.",
 		RunF: func(c *cmd.Command, args []string) error {
 			return createActionConfig(c, args, opts)
 		},

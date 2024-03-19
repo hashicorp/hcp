@@ -16,7 +16,7 @@ func NewCmdActivate(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "activate",
 		ShortHelp: "Activates an existing profile.",
-		LongHelp:  "Activates an existing profile.",
+		LongHelp:  "The `hcp profile profiles activate` command activates an existing profile.",
 		Examples: []cmd.Example{
 			{
 				Preamble: "To active profile my-profile, run:",

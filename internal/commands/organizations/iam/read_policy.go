@@ -25,7 +25,7 @@ func NewCmdReadPolicy(ctx *cmd.Context, runF func(*ReadPolicyOpts) error) *cmd.C
 	cmd := &cmd.Command{
 		Name:      "read-policy",
 		ShortHelp: "Read the IAM policy for the organization.",
-		LongHelp:  "Read the IAM policy for the organization.",
+		LongHelp:  "The `hcp organizations iam read-policy` command reads the IAM policy for the organization.",
 		Examples: []cmd.Example{
 			{
 				Preamble: "Read the IAM Policy for the organization:",

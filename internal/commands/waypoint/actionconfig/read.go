@@ -24,7 +24,7 @@ func NewCmdRead(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "read",
 		ShortHelp: "Read more details about an action configurations.",
-		LongHelp:  "Read more details about an action configurations.",
+		LongHelp:  "The `hcp waypoint action-config read` command returns more details about an action configurations.",
 		RunF: func(c *cmd.Command, args []string) error {
 			return readActionConfig(c, args, opts)
 		},

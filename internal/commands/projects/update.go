@@ -23,7 +23,7 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "update",
 		ShortHelp: "Update an existing project.",
-		LongHelp:  "Update can be used to update the name or description of an existing project.",
+		LongHelp:  "The `hcp products update` command lets you update the name or description of an existing project.",
 		Examples: []cmd.Example{
 			{
 				Preamble: "Update a project's name and description:",

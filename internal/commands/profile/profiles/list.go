@@ -19,7 +19,7 @@ func NewCmdList(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "list",
 		ShortHelp: "List existing HCP profiles.",
-		LongHelp:  "List existing HCP profiles.",
+		LongHelp:  "The `hcp profile profiles list` command lists existing HCP profiles.",
 		Examples: []cmd.Example{
 			{
 				Preamble: "To list existing profiles, run:",

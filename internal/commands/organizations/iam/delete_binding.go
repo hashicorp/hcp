@@ -23,7 +23,7 @@ func NewCmdDeleteBinding(ctx *cmd.Context, runF func(*DeleteBindingOpts) error) 
 		Name:      "delete-binding",
 		ShortHelp: "Delete an IAM policy binding for the organization.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		Deletes an IAM policy binding for the organization. A binding consists of a
+		The  {{ template "mdCodeOrBold" "hcp organizations iam delete-binding" }} command deletes an IAM policy binding for the organization. A binding consists of a
 		principal and a role.
 
 		To view the existing role bindings, run {{ template "mdCodeOrBold" "hcp organizations iam read-policy" }}.

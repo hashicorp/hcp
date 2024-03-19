@@ -107,7 +107,7 @@ func NewCmdCreateAWS(ctx *cmd.Context, runF func(*CreateAWSOpts) error) *cmd.Com
 					  * "aws.user_id": The unique identifier of the calling entity.
 					{{ PreserveNewLines }}
 
-					For details on the values of each variable, see the
+					For details on the values of each variable, refer to the
 					{{ Link "AWS documentation" "https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html#API_GetCallerIdentity_ResponseElements" }}.
 					`),
 					Value:    flagvalue.Simple("", &opts.ConditionalAccess),

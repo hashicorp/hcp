@@ -24,7 +24,7 @@ func NewCmdGet(ctx *cmd.Context) *cmd.Command {
 		Name:      "get",
 		ShortHelp: "Get a HCP CLI Property.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
-		{{ template "mdCodeOrBold" "hcp profile get" }} gets the specified property in your active profile.
+		The {{ template "mdCodeOrBold" "hcp profile get" }} command gets the specified property in your active profile.
 
 		To view all currently set properties, run {{ template "mdCodeOrBold" "hcp profile display" }}.
 		`),

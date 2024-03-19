@@ -24,7 +24,7 @@ func NewCmdGroup(ctx *cmd.Context) *cmd.Command {
 		Name:      "group",
 		ShortHelp: "Manage HCP Waypoint Agent groups.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp waypoint agent group" }} commands manage agent groups.
+		The {{ template "mdCodeOrBold" "hcp waypoint agent group" }} command group manages agent groups.
 		`),
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
 			return cmd.RequireOrgAndProject(ctx)
