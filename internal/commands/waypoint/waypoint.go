@@ -2,6 +2,7 @@ package waypoint
 
 import (
 	"github.com/hashicorp/hcp/internal/commands/waypoint/actionconfig"
+	addon "github.com/hashicorp/hcp/internal/commands/waypoint/add-on"
 	"github.com/hashicorp/hcp/internal/commands/waypoint/agent"
 	"github.com/hashicorp/hcp/internal/commands/waypoint/template"
 	"github.com/hashicorp/hcp/internal/commands/waypoint/tfcconfig"
@@ -24,6 +25,7 @@ func NewCmdWaypoint(ctx *cmd.Context) *cmd.Command {
 	cmd.AddChild(actionconfig.NewCmdActionConfig(ctx))
 	cmd.AddChild(agent.NewCmdAgent(ctx))
 	cmd.AddChild(template.NewCmdTemplate(ctx))
+	cmd.AddChild(addon.NewCmdAddOn(ctx))
 
 	return cmd
 }
