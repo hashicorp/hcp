@@ -4,3 +4,4 @@
 
 # Waypoint Owned
 internal/commands/waypoint @hashicorp/cloud-waypoint
+internal/pkg/waypoint @hashicorp/cloud-waypoint
