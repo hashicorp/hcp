@@ -49,9 +49,38 @@ go/mocks: ## Generates Go mock files.
 		mockery; \
     done
 
-.PHONY: test
-test: ## Run the unit tests
+.PHONY: go/test
+go/test: ## Run the unit tests
 	@go test -v -cover ./...
+
+.PHONY: changelog/build
+changelog/build:
+ifeq (, $(shell which changelog-build))
+	@go install github.com/hashicorp/go-changelog/cmd/changelog-build@latest
+endif
+ifeq (, $(LAST_RELEASE_GIT_TAG))
+	@echo "Please set the LAST_RELEASE_GIT_TAG environment variable to generate a changelog section of notes since the last release."
+else
+	changelog-build -last-release ${LAST_RELEASE_GIT_TAG} -entries-dir .changelog/ -changelog-template .changelog/changelog.tmpl -note-template .changelog/release-note.tmpl -this-release $(shell git rev-parse HEAD)
+endif
+
+.PHONY: changelog/new-entry
+changelog/new-entry:
+ifeq (, $(shell which changelog-entry))
+	@go install github.com/hashicorp/go-changelog/cmd/changelog-entry@latest
+endif
+ifeq (, $(CHANGELOG_PR))
+	@echo "Please set the CHANGELOG_PR environment variable to the PR number to associate with the changelog."
+else
+	changelog-entry -dir .changelog -allowed-types-file .changelog/types.txt -pr ${CHANGELOG_PR}
+endif
+
+.PHONY: changelog/check
+changelog/check:
+ifeq (, $(shell which changelog-check))
+	@go install github.com/hashicorp/go-changelog/cmd/changelog-check@latest
+endif
+	@changelog-check
 
 # Docker build and publish variables and targets
 REGISTRY_NAME?=docker.io/hashicorp
