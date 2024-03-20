@@ -22,7 +22,7 @@ func NewCmdUpdate(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 				Preamble: "Create a new HCP Waypoint template:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 $ hcp waypoint templates update -n my-template \
--N "my-new-template" \
+--new-name "my-new-template" \
 -s "My Template Summary" \
 -d "My Template Description" \
 -readme-markdown-template-file "README.tpl" \
@@ -31,9 +31,7 @@ $ hcp waypoint templates update -n my-template \
 -tfc-project-name "my-tfc-project" \
 -tfc-project-id "prj-123456 \
 -l "label1" \
--l "label2" \
--t "key1=value1" \
--t "key2=value2"
+-l "label2" 
 `),
 			},
 		},
@@ -58,7 +56,6 @@ $ hcp waypoint templates update -n my-template \
 				},
 				{
 					Name:         "new-name",
-					Shorthand:    "N",
 					DisplayValue: "NEW_NAME",
 					Description:  "The new name of the template.",
 					Value:        flagvalue.Simple("", &opts.UpdatedName),
@@ -70,7 +67,6 @@ $ hcp waypoint templates update -n my-template \
 					DisplayValue: "SUMMARY",
 					Description:  "The summary of the template.",
 					Value:        flagvalue.Simple("", &opts.Summary),
-					Required:     true,
 				},
 				{
 					Name:         "description",
@@ -111,31 +107,27 @@ $ hcp waypoint templates update -n my-template \
 			optional "HOSTNAME/" can be added at the beginning for
 			a private registry.
 					`),
-					Value:    flagvalue.Simple("", &opts.TerraformNoCodeModuleSource),
-					Required: true,
+					Value: flagvalue.Simple("", &opts.TerraformNoCodeModuleSource),
 				},
 				{
 					Name:         "tfc-no-code-module-version",
 					DisplayValue: "TFC_NO_CODE_MODULE_VERSION",
 					Description:  "The version of the Terraform no-code module.",
 					Value:        flagvalue.Simple("", &opts.TerraformNoCodeModuleVersion),
-					Required:     true,
 				},
 				{
 					Name:         "tfc-project-name",
 					DisplayValue: "TFC_PROJECT_NAME",
 					Description: "The name of the Terraform Cloud project where" +
 						" applications using this template will be created.",
-					Value:    flagvalue.Simple("", &opts.TerraformCloudProjectName),
-					Required: true,
+					Value: flagvalue.Simple("", &opts.TerraformCloudProjectName),
 				},
 				{
 					Name:         "tfc-project-id",
 					DisplayValue: "TFC_PROJECT_ID",
 					Description: "The ID of the Terraform Cloud project where" +
 						" applications using this template will be created.",
-					Value:    flagvalue.Simple("", &opts.TerraformCloudProjectID),
-					Required: true,
+					Value: flagvalue.Simple("", &opts.TerraformCloudProjectID),
 				},
 			},
 		},
