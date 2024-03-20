@@ -39,7 +39,9 @@ func NewCmdUpdate(ctx *cmd.Context) *cmd.Command {
 		Name:      "update",
 		ShortHelp: "Update a action configuration.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp waypoint action-config update" }} command updates a action configuration to be used to launch an action with.
+		The {{ template "mdCodeOrBold" "hcp waypoint action-config update" }}
+		command updates a action configuration to be used to launch an action
+		with.
 		`),
 		RunF: func(c *cmd.Command, args []string) error {
 			return updateActionConfig(c, args, opts)

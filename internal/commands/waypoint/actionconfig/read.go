@@ -26,7 +26,8 @@ func NewCmdRead(ctx *cmd.Context) *cmd.Command {
 		Name:      "read",
 		ShortHelp: "Read more details about an action configurations.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp waypoint action-config read" }} command returns more details about an action configurations.
+		The {{ template "mdCodeOrBold" "hcp waypoint action-config read" }}
+		command returns more details about an action configurations.
 		`),
 		RunF: func(c *cmd.Command, args []string) error {
 			return readActionConfig(c, args, opts)

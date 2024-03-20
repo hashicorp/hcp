@@ -30,7 +30,8 @@ func NewCmdSetPolicy(ctx *cmd.Context, runF func(*SetPolicyOpts) error) *cmd.Com
 		Name:      "set-policy",
 		ShortHelp: "Set the IAM policy for the organization.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp organizations iam set-policy" }} command sets the IAM policy for the organization. Setting the entire policy must be done
+The {{ template "mdCodeOrBold" "hcp organizations iam set-policy" }} command sets
+the IAM policy for the organization. Setting the entire policy must be done
 with great care. If adding or removing a single principal from the policy, prefer
 using {{ template "mdCodeOrBold" "hcp organizations iam add-binding" }} and the related
 {{ template "mdCodeOrBold" "hcp organizations iam delete-binding" }}.

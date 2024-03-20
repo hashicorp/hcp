@@ -23,7 +23,8 @@ func NewCmdList(ctx *cmd.Context) *cmd.Command {
 		Name:      "list",
 		ShortHelp: "List all known action configurations.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp waypoint action-config list" }} command lists all known action configurations from HCP Waypoint.
+		The {{ template "mdCodeOrBold" "hcp waypoint action-config list" }}
+		command lists all known action configurations from HCP Waypoint.
 		`),
 		RunF: func(c *cmd.Command, args []string) error {
 			return listActionConfig(c, args, opts)
