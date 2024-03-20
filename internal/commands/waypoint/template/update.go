@@ -178,14 +178,12 @@ func updateTemplate(opts *TemplateOpts) error {
 		},
 	}
 
-	_, err = opts.WS.WaypointServiceUpdateApplicationTemplate(
-		&waypoint_service.WaypointServiceUpdateApplicationTemplateParams{
-			NamespaceID: ns.ID,
-			Context:     opts.Ctx,
+	_, err = opts.WS.WaypointServiceUpdateApplicationTemplate2(
+		&waypoint_service.WaypointServiceUpdateApplicationTemplate2Params{
+			NamespaceID:                     ns.ID,
+			Context:                         opts.Ctx,
+			ExistingApplicationTemplateName: opts.Name,
 			Body: &models.HashicorpCloudWaypointWaypointServiceUpdateApplicationTemplateBody{
-				ExistingApplicationTemplate: &models.HashicorpCloudWaypointWaypointServiceUpdateApplicationTemplateBodyExistingApplicationTemplate{
-					Name: opts.Name,
-				},
 				ApplicationTemplate: updatedTpl,
 			},
 		}, nil,
