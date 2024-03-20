@@ -32,7 +32,7 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: "Update a group's description.",
+				Preamble: "Update a group's description:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam groups update example-group \
 				  --description="updated description" \
