@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
+	"github.com/pkg/errors"
 )
 
 func NewCmdUpdate(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
@@ -153,7 +154,7 @@ func templateUpdate(opts *TemplateOpts) error {
 	if opts.ReadmeMarkdownTemplateFile != "" {
 		readmeTpl, err = os.ReadFile(opts.ReadmeMarkdownTemplateFile)
 		if err != nil {
-			return fmt.Errorf("failed to read README markdown template file: %w", err)
+			return errors.Wrapf(err, "failed to read file %q", opts.ReadmeMarkdownTemplateFile)
 		}
 	}
 
@@ -185,7 +186,7 @@ func templateUpdate(opts *TemplateOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return fmt.Errorf("failed to update template %q: %w", opts.ID, err)
+		return errors.Wrapf(err, "failed to update template %q", opts.Name)
 	}
 
 	fmt.Fprintf(opts.IO.Err(), "Template %q updated.", opts.ID)
