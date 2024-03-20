@@ -43,7 +43,7 @@ func TestCmdTemplateUpdate(t *testing.T) {
 			},
 			Args: []string{
 				"-n=cli-test",
-				"-N=cli-test-new",
+				"--new-name=cli-test-new",
 				"-s", "A template created using the CLI.",
 				"--tfc-project-id", "prj-abcdefghij",
 				"--tfc-project-name", "test",
