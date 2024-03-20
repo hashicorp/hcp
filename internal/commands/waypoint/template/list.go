@@ -1,12 +1,11 @@
 package template
 
 import (
-	"fmt"
-
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
+	"github.com/pkg/errors"
 )
 
 func NewCmdList(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
@@ -39,7 +38,7 @@ func listTemplates(opts *TemplateOpts) error {
 			Context:     opts.Ctx,
 		}, nil)
 	if err != nil {
-		return fmt.Errorf("error listing templates: %w", err)
+		return errors.Wrapf(err, "error listing templates")
 	}
 
 	templates = append(templates, resp.GetPayload().ApplicationTemplates...)
@@ -52,7 +51,7 @@ func listTemplates(opts *TemplateOpts) error {
 				PaginationNextPageToken: &resp.GetPayload().Pagination.NextPageToken,
 			}, nil)
 		if err != nil {
-			return fmt.Errorf("error listing templates: %w", err)
+			return errors.Wrapf(err, "error listing paginated templates")
 		}
 
 		templates = append(templates, resp.GetPayload().ApplicationTemplates...)
