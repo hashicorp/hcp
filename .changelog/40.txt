@@ -1,0 +1,3 @@
+```release-note:feature
+waypoint: Add `waypoint templates` CLI for managing HCP Waypoint templates.
+```
