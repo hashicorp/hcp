@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
@@ -16,7 +17,9 @@ func NewCmdActivate(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "activate",
 		ShortHelp: "Activates an existing profile.",
-		LongHelp:  "The `hcp profile profiles activate` command activates an existing profile.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+		The {{ template "mdCodeOrBold" "hcp profile profiles activate" }} command activates an existing profile.
+		`),
 		Examples: []cmd.Example{
 			{
 				Preamble: "To active profile my-profile, run:",

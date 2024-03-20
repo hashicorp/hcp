@@ -26,7 +26,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "list",
-		ShortHelp: "List the the members of a group.",
+		ShortHelp: "List the members of a group.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp iam groups members list" }} command lists the members of a group.
 		`),

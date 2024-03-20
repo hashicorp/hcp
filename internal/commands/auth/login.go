@@ -31,7 +31,7 @@ func NewCmdLogin(ctx *cmd.Context) *cmd.Command {
 		Name:      "login",
 		ShortHelp: "Login to HCP.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The  {{ template "mdCodeOrBold" "hcp auth login" }} command lets you login to authenticate to HCP.
+		The {{ template "mdCodeOrBold" "hcp auth login" }} command lets you login to authenticate to HCP.
 
 		If no arguments are provided, authentication occurs for your user principal by initiating a web browser login flow.
 

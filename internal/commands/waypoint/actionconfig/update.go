@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
 
 type UpdateOpts struct {
@@ -37,7 +38,9 @@ func NewCmdUpdate(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "update",
 		ShortHelp: "Update a action configuration.",
-		LongHelp:  "The `hcp waypoint action-config update` command updates a action configuration to be used to launch an action with.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+		The {{ template "mdCodeOrBold" "hcp waypoint action-config update" }} command updates a action configuration to be used to launch an action with.
+		`),
 		RunF: func(c *cmd.Command, args []string) error {
 			return updateActionConfig(c, args, opts)
 		},

@@ -133,7 +133,7 @@ func (f *Formatter) Docf(tmpl string, args ...any) (string, error) {
 //   - mdCodeOrBold: If the output is markdown, it will return the string in a
 //     code stanza. Otherwise, it will return the string in bold.
 //     An example usage is:
-//     {{ template "mdCodeOrBold" "hcp projects iam read-policy --format=json" }}
+//    {{ template "mdCodeOrBold" "hcp projects iam read-policy --format=json" }}
 //
 // After rendering the template following manipulations are made:
 // - The text is dedented. This allows you to use a Go string literal and not

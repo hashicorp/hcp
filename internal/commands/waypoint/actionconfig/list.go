@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
 
 type ListOpts struct {
@@ -21,7 +22,9 @@ func NewCmdList(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "list",
 		ShortHelp: "List all known action configurations.",
-		LongHelp:  "The `hcp waypoint action-config list` command lists all known action configurations from HCP Waypoint.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+		The {{ template "mdCodeOrBold" "hcp waypoint action-config list" }} command lists all known action configurations from HCP Waypoint.
+		`),
 		RunF: func(c *cmd.Command, args []string) error {
 			return listActionConfig(c, args, opts)
 		},
