@@ -100,6 +100,7 @@ $ hcp waypoint templates update -n my-template \
 					Description:  "A tag to apply to the template.",
 					Repeatable:   true,
 					Value:        flagvalue.SimpleMap(nil, &opts.Tags),
+					Hidden:       true,
 				},
 				{
 					Name:         "tfc-no-code-module-source",
