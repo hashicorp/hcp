@@ -1,0 +1,3 @@
+```release-note:feature
+iam groups: Add update group command.
+```
