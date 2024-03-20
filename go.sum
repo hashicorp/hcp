@@ -94,8 +94,8 @@ github.com/hashicorp/go-multierror v1.1.1 h1:H5DkEtf6CXdFp0N0Em5UCwQpXMWke8IA0+l
 github.com/hashicorp/go-multierror v1.1.1/go.mod h1:iw975J/qwKPdAO1clOe2L8331t/9/fmwbPZ6JB6eMoM=
 github.com/hashicorp/hcl/v2 v2.19.1 h1://i05Jqznmb2EXqa39Nsvyan2o5XyMowW5fnCKW5RPI=
 github.com/hashicorp/hcl/v2 v2.19.1/go.mod h1:ThLC89FV4p9MPW804KVbe/cEXoQ8NZEh+JtMeeGErHE=
-github.com/hashicorp/hcp-sdk-go v0.87.1-0.20240319165551-1cfc2eaf58a7 h1:+QcV5/qp7qO/L+xaaX06ZHpX0YzM1A0Ex80yW0hklxw=
-github.com/hashicorp/hcp-sdk-go v0.87.1-0.20240319165551-1cfc2eaf58a7/go.mod h1:vQ4fzdL1AmhIAbCw+4zmFe5Hbpajj3NvRWkJoVuxmAk=
+github.com/hashicorp/hcp-sdk-go v0.89.0 h1:OpN2Yvr0YL/9kEMXpa1fvq5v7d66A4Vc4tilL/fwcwc=
+github.com/hashicorp/hcp-sdk-go v0.89.0/go.mod h1:vQ4fzdL1AmhIAbCw+4zmFe5Hbpajj3NvRWkJoVuxmAk=
 github.com/huandu/xstrings v1.3.1/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
 github.com/huandu/xstrings v1.3.2 h1:L18LIDzqlW6xN2rEkpdV8+oL/IXWJ1APd+vsdYy4Wdw=
 github.com/huandu/xstrings v1.3.2/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
