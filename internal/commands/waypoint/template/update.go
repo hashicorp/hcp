@@ -23,7 +23,6 @@ func NewCmdUpdate(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 				Preamble: "Create a new HCP Waypoint template:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 $ hcp waypoint templates update -n my-template \
---new-name "my-new-template" \
 -s "My Template Summary" \
 -d "My Template Description" \
 -readme-markdown-template-file "README.tpl" \
@@ -60,8 +59,8 @@ $ hcp waypoint templates update -n my-template \
 					DisplayValue: "NEW_NAME",
 					Description:  "The new name of the template.",
 					Value:        flagvalue.Simple("", &opts.UpdatedName),
+					Hidden:       true,
 				},
-
 				{
 					Name:         "summary",
 					Shorthand:    "s",
