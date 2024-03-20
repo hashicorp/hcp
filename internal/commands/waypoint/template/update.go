@@ -38,7 +38,10 @@ $ hcp waypoint templates update -n my-template \
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {
-			return updateTemplate(opts)
+			if opts.testFunc != nil {
+				return opts.testFunc(c, args)
+			}
+			return templateUpdate(opts)
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
 			return cmd.RequireOrgAndProject(ctx)
@@ -139,7 +142,7 @@ $ hcp waypoint templates update -n my-template \
 	return cmd
 }
 
-func updateTemplate(opts *TemplateOpts) error {
+func templateUpdate(opts *TemplateOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
 		return err
