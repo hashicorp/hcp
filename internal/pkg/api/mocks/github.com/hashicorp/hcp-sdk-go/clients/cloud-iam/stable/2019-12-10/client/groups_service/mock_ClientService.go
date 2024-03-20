@@ -688,6 +688,80 @@ func (_c *MockClientService_GroupsServiceUpdateGroup_Call) RunAndReturn(run func
 	return _c
 }
 
+// GroupsServiceUpdateGroup2 provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) GroupsServiceUpdateGroup2(params *groups_service.GroupsServiceUpdateGroup2Params, authInfo runtime.ClientAuthInfoWriter, opts ...groups_service.ClientOption) (*groups_service.GroupsServiceUpdateGroup2OK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GroupsServiceUpdateGroup2")
+	}
+
+	var r0 *groups_service.GroupsServiceUpdateGroup2OK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*groups_service.GroupsServiceUpdateGroup2Params, runtime.ClientAuthInfoWriter, ...groups_service.ClientOption) (*groups_service.GroupsServiceUpdateGroup2OK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*groups_service.GroupsServiceUpdateGroup2Params, runtime.ClientAuthInfoWriter, ...groups_service.ClientOption) *groups_service.GroupsServiceUpdateGroup2OK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*groups_service.GroupsServiceUpdateGroup2OK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*groups_service.GroupsServiceUpdateGroup2Params, runtime.ClientAuthInfoWriter, ...groups_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_GroupsServiceUpdateGroup2_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GroupsServiceUpdateGroup2'
+type MockClientService_GroupsServiceUpdateGroup2_Call struct {
+	*mock.Call
+}
+
+// GroupsServiceUpdateGroup2 is a helper method to define mock.On call
+//   - params *groups_service.GroupsServiceUpdateGroup2Params
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...groups_service.ClientOption
+func (_e *MockClientService_Expecter) GroupsServiceUpdateGroup2(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_GroupsServiceUpdateGroup2_Call {
+	return &MockClientService_GroupsServiceUpdateGroup2_Call{Call: _e.mock.On("GroupsServiceUpdateGroup2",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_GroupsServiceUpdateGroup2_Call) Run(run func(params *groups_service.GroupsServiceUpdateGroup2Params, authInfo runtime.ClientAuthInfoWriter, opts ...groups_service.ClientOption)) *MockClientService_GroupsServiceUpdateGroup2_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]groups_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(groups_service.ClientOption)
+			}
+		}
+		run(args[0].(*groups_service.GroupsServiceUpdateGroup2Params), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_GroupsServiceUpdateGroup2_Call) Return(_a0 *groups_service.GroupsServiceUpdateGroup2OK, _a1 error) *MockClientService_GroupsServiceUpdateGroup2_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_GroupsServiceUpdateGroup2_Call) RunAndReturn(run func(*groups_service.GroupsServiceUpdateGroup2Params, runtime.ClientAuthInfoWriter, ...groups_service.ClientOption) (*groups_service.GroupsServiceUpdateGroup2OK, error)) *MockClientService_GroupsServiceUpdateGroup2_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GroupsServiceUpdateGroupMembers provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) GroupsServiceUpdateGroupMembers(params *groups_service.GroupsServiceUpdateGroupMembersParams, authInfo runtime.ClientAuthInfoWriter, opts ...groups_service.ClientOption) (*groups_service.GroupsServiceUpdateGroupMembersOK, error) {
 	_va := make([]interface{}, len(opts))
