@@ -14,7 +14,7 @@ import (
 func NewCmdUpdate(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "update",
-		ShortHelp: "Update an existing HCP Waypoint template..",
+		ShortHelp: "Update an existing HCP Waypoint template.",
 		LongHelp: "Update an existing HCP Waypoint template. This will update" +
 			" the template with the provided information.",
 		Examples: []cmd.Example{
