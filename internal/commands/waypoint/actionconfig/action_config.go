@@ -10,7 +10,8 @@ func NewCmdActionConfig(ctx *cmd.Context) *cmd.Command {
 		Name:      "action-config",
 		ShortHelp: "Manage action configuration options for HCP Waypoint.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		Manage all action configuration options for HCP Waypoint. An action
+		The {{ template "mdCodeOrBold" "hcp waypoint action-config" }} command
+		group manages all action configuration options for HCP Waypoint. An action
 		configuration is a set of options that define how an action is executed. This
 		includes the action request type, and the action name. The action
 		configuration is used to launch action runs depending on the Request type.

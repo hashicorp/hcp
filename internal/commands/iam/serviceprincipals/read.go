@@ -27,8 +27,9 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 		The {{ template "mdCodeOrBold" "hcp iam service-principals read" }} command reads details about the given
 		service principal.
 
-		To read an organization service principal, pass the service principal's resource name or set the --project
-		flag to "-" and pass its resource name suffix.
+		To read an organization service principal, pass the service principal's 
+		resource name or set the {{ template "mdCodeOrBold" "--project" }}
+		flag to {{ template "mdCodeOrBold" "-" }} and pass its resource name suffix.
 		`),
 		Examples: []cmd.Example{
 			{

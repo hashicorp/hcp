@@ -25,7 +25,9 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		Name:      "delete",
 		ShortHelp: "Delete a project.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		Delete the specified project. The project must be empty before it can be deleted.
+		The {{ template "mdCodeOrBold" "hcp projects delete" }} command deletes
+		the specified project. The project must be empty before it can be
+		deleted.
 		`),
 		Examples: []cmd.Example{
 			{

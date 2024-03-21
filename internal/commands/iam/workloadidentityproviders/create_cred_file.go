@@ -124,7 +124,11 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				  --source-file=/var/run/secrets/tokens/hcp_token \
 				  --source-json-pointer=/access_token \
 				  --output-file=credentials.json
-
+				`),
+			},
+			{
+				Preamble: `Create a credential file that sources the token from a file:`,
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				# Assuming the file only contains the access token:
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/k8s \
@@ -145,13 +149,21 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				  --source-url="https://example-oidc-provider.com/token" \
 				  --source-json-pointer=/access_token \
 				  --output-file=credentials.json
-
-				# Assuming the response only contains the access token:
+				`),
+			},
+			{
+				Preamble: `Create a credential file that sources the token from an URL:`,
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				# Assuming the file only contains the access token:
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/example \
 				  --source-url=https://example-oidc-provider.com/token \
 				  --output-file=credentials.json
-
+				`),
+			},
+			{
+				Preamble: `Create a credential file that sources the token from an URL:`,
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				# To add headers to the request, use the --source-header flag:
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/example \
@@ -174,7 +186,11 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				  --source-env=ACCESS_TOKEN \
 				  --source-json-pointer=/access_token \
 				  --output-file=credentials.json
-
+				`),
+			},
+			{
+				Preamble: `Create a credential file that sources the token from an environment variable:`,
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				# Assuming the environment variable only contains the access token:
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/example \
@@ -231,7 +247,7 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 					{{ PreserveNewLines }}
 					  * The Client ID of the User Assigned Managed Identity (UUID)
 					  * The Application ID URI of the Microsoft Entra ID Application
-					    (api://123-456-678-901).
+					    ({{ template "mdCodeOrBold" "api://123-456-678-901" }}).
 					{{ PreserveNewLines }}
 
 					For more details on the resource parameter, see the
@@ -256,8 +272,8 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 					Set if exchanging an GCP workload identity.
 
 					It is assumed the workload identity provider was created
-					with the issuer URI set to "https://accounts.google.com" and
-					the default allowed audiences.
+					with the issuer URI set to {{ template "mdCodeOrBold" "https://accounts.google.com" }}
+					and the default allowed audiences.
 					`),
 					Value:         flagvalue.Simple(false, &opts.GCP),
 					IsBooleanFlag: true,
@@ -285,12 +301,13 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 					DisplayValue: "/PATH/TO/CREDENTIAL",
 					Description: heredoc.New(ctx.IO).Must(`
 A JSON pointer that indicates how to access the credential from a JSON.
-If used with the "source-url" flag, the pointer is used to extract the
-credential from the JSON response from calling the URL. If used with the
-"source-file" flag, the pointer is used to extract the credential read from
-the JSON file. Similarly, if used with the "source-env" flag, the pointer
-is used to extract the credential from the environment variable whose value
-is a JSON object.
+If used with the {{ template "mdCodeOrBold" "source-url" }} flag, the pointer
+is used to extract the credential from the JSON response from calling the URL.
+If used with the {{ template "mdCodeOrBold" "source-file" }} flag, the pointer
+is used to extract the credential read from the JSON file. Similarly, if used
+with the {{ template "mdCodeOrBold" "source-env" }} flag, the pointer is used to
+extract the credential from the environment variable whose value is a JSON
+object.
 
 As an example, if the JSON payload containing the credential file is:
 
@@ -300,10 +317,11 @@ As an example, if the JSON payload containing the credential file is:
     "access_token": "nested-credentials"
   }
 } {{- end }}
-{{- CodeBlock "credentials" "json" }}
+{{- CodeBlock "credentials" "json hideClipboard" }}
 
-The top level access token can be accessed using the pointer "/access_token" and the
-nested access token can be accessed using the pointer "/nested/access_token".
+You can access the top level access token using the pointer
+{{ template "mdCodeOrBold" "/access_token" }} and the nested access token can be
+accessed using the pointer {{ template "mdCodeOrBold" "/nested/access_token" }}.
 					`),
 					Value: flagvalue.Simple("", &opts.CredentialJSONPointer),
 				},

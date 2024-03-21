@@ -18,7 +18,7 @@ func NewCmdLogout(ctx *cmd.Context) *cmd.Command {
 		Name:      "logout",
 		ShortHelp: "Logout from HCP.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		Log out to remove access to HCP.
+		The {{ template "mdCodeOrBold" "hcp auth logout" }} command logs out to remove access to HCP.
 		`),
 		Examples: []cmd.Example{
 			{

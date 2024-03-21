@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/api/iampolicy"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
@@ -25,7 +26,9 @@ func NewCmdReadPolicy(ctx *cmd.Context, runF func(*ReadPolicyOpts) error) *cmd.C
 	cmd := &cmd.Command{
 		Name:      "read-policy",
 		ShortHelp: "Read the IAM policy for the organization.",
-		LongHelp:  "Read the IAM policy for the organization.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+		The {{ template "mdCodeOrBold" "hcp organizations iam read-policy" }} command reads the IAM policy for the organization.
+		`),
 		Examples: []cmd.Example{
 			{
 				Preamble: "Read the IAM Policy for the organization:",

@@ -33,7 +33,7 @@ func NewCmdRun(ctx *cmd.Context) *cmd.Command {
 		Name:      "run",
 		ShortHelp: "Start the Waypoint Agent.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp waypoint agent run" }} commands executes a local Waypoint Agent.
+		The {{ template "mdCodeOrBold" "hcp waypoint agent run" }} command executes a local Waypoint Agent.
 		`),
 		Flags: cmd.Flags{
 			Local: []*cmd.Flag{

@@ -23,7 +23,9 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "update",
 		ShortHelp: "Update an existing project.",
-		LongHelp:  "Update can be used to update the name or description of an existing project.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+		The {{ template "mdCodeOrBold" "hcp projects update" }} command shows metadata for the project.
+		`),
 		Examples: []cmd.Example{
 			{
 				Preamble: "Update a project's name and description:",

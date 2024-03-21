@@ -15,7 +15,7 @@ func NewCmdHcp(ctx *cmd.Context) *cmd.Command {
 	c := &cmd.Command{
 		Name:      "hcp",
 		ShortHelp: "Interact with HCP.",
-		LongHelp:  "The HCP Command Line Interface is a unified tool to manage your HCP services.",
+		LongHelp:  "The HCP command-line interface (CLI) is a unified tool to manage your HCP services.",
 	}
 
 	//  _   _  ___ _____ _____

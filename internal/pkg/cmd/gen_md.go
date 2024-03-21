@@ -70,7 +70,7 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 
 	buf.WriteString("---\n")
 	buf.WriteString(fmt.Sprintf("page_title: %s\n", name))
-	buf.WriteString(fmt.Sprintf("description: |-\n  %s\n", c.ShortHelp))
+	buf.WriteString(fmt.Sprintf("description: |-\n  The \"%s\" command lets you %s\n", name, (strings.ToLower(c.ShortHelp[:1]) + c.ShortHelp[1:])))
 	buf.WriteString("---\n\n")
 
 	_, err := buf.WriteTo(w)
@@ -79,7 +79,10 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 	}
 
 	buf.WriteString("# " + name + "\n\n")
-	buf.WriteString(fmt.Sprintf("%s\n\n", c.ShortHelp))
+	buf.WriteString(fmt.Sprintf("Command: `%s` \n\n", name))
+
+	// Description
+	buf.WriteString(c.LongHelp + "\n\n")
 
 	// Disable markdown escaping and then re-enable. This is needed because
 	// the flags / args would otherwise generate markdown that will not render
@@ -89,17 +92,11 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 	buf.WriteString(fmt.Sprintf("```shell-session\n$ %s\n```\n\n", c.useLine()))
 	mdIO.SetMD(true)
 
-	// Description
-	if len(c.LongHelp) > 0 {
-		buf.WriteString("## Description\n\n")
-		buf.WriteString(c.LongHelp + "\n\n")
-	}
-
 	// Aliases
 	if len(c.Aliases) > 0 {
 		buf.WriteString("## Aliases\n\n")
 		for a, u := range c.aliasUsages() {
-			buf.WriteString(fmt.Sprintf("%s - `%s`\n", a, u))
+			buf.WriteString(fmt.Sprintf("- `%s`. For example: `%s`\n", a, u))
 		}
 		buf.WriteString("\n")
 	}
@@ -119,7 +116,7 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 		var commands, groups []string
 		for _, c := range c.children {
 			path := strings.ReplaceAll(c.commandPath(), " ", "/")
-			entry := fmt.Sprintf("- [%s](%s) - %s", c.Name, link(path), c.ShortHelp)
+			entry := fmt.Sprintf("- [`%s`](%s) - %s", c.Name, link(path), c.ShortHelp)
 
 			if c.RunF != nil {
 				commands = append(commands, entry)
@@ -128,7 +125,7 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 			}
 		}
 		if len(groups) > 0 {
-			buf.WriteString("## Command Groups\n\n")
+			buf.WriteString("## Command groups\n\n")
 			buf.WriteString(strings.Join(groups, "\n") + "\n\n")
 		}
 
@@ -160,7 +157,7 @@ func genMarkdownPositionalArgs(c *Command, buf *bytes.Buffer) {
 	}
 
 	cs := c.getIO().ColorScheme()
-	buf.WriteString("## Positional Arguments\n\n")
+	buf.WriteString("## Positional arguments\n\n")
 	p := c.Args
 	if p.Preamble != "" {
 		fmt.Fprintln(buf, p.Preamble)
@@ -172,12 +169,12 @@ func genMarkdownPositionalArgs(c *Command, buf *bytes.Buffer) {
 		if a.Repeatable {
 			repeatable = fmt.Sprintf(" [%s ...]", nameUpper)
 		}
-		fmt.Fprintf(buf, "`%s%s`\n\n", nameUpper, repeatable)
+		fmt.Fprintf(buf, "- `%s%s` - ", nameUpper, repeatable)
 
 		if a.Optional {
-			fmt.Fprintln(buf, cs.String("Optional Argument\n").Italic().String())
+			fmt.Fprintln(buf, cs.String("Optional argument\n").Italic().String())
 		}
-		fmt.Fprintln(buf, a.Documentation)
+		fmt.Fprintln(buf, strings.ReplaceAll(a.Documentation, "\n", "\n\t"))
 		fmt.Fprintln(buf)
 	}
 }
@@ -185,7 +182,7 @@ func genMarkdownPositionalArgs(c *Command, buf *bytes.Buffer) {
 func genMarkdownFlags(c *Command, buf *bytes.Buffer) {
 	// If we are the root command, just print global flags.
 	if c.parent == nil && c.RunF == nil {
-		buf.WriteString("## Global Flags\n\n")
+		buf.WriteString("## Global flags\n\n")
 		genMarkdownFlagsetUsage(c.globalFlags(), buf)
 	}
 
@@ -211,11 +208,11 @@ func genMarkdownFlags(c *Command, buf *bytes.Buffer) {
 	for _, set := range flagSets {
 		required, optional := splitRequiredFlags(set.flags)
 		if required.HasFlags() {
-			buf.WriteString(fmt.Sprintf("## Required %sFlags\n\n", set.name))
+			buf.WriteString(fmt.Sprintf("## Required %sflags\n\n", set.name))
 			genMarkdownFlagsetUsage(required, buf)
 
 			if optional.HasFlags() {
-				buf.WriteString(fmt.Sprintf("## Optional %sFlags\n\n", set.name))
+				buf.WriteString(fmt.Sprintf("## Optional %sflags\n\n", set.name))
 				genMarkdownFlagsetUsage(optional, buf)
 			}
 		} else if optional.HasFlags() {
@@ -233,12 +230,12 @@ func genMarkdownFlagsetUsage(flags *pflag.FlagSet, buf *bytes.Buffer) {
 
 		longDisplay := flagString(flag)
 		if flag.Shorthand != "" && flag.ShorthandDeprecated == "" {
-			fmt.Fprintf(buf, "`-%s, %s`\n\n", flag.Shorthand, longDisplay)
+			fmt.Fprintf(buf, "- `-%s, %s` - ", flag.Shorthand, longDisplay)
 		} else {
-			fmt.Fprintf(buf, "`%s`\n\n", longDisplay)
+			fmt.Fprintf(buf, "- `%s` - ", longDisplay)
 		}
 
 		// Add the usage
-		fmt.Fprintf(buf, "%s\n\n", flag.Usage)
+		fmt.Fprintf(buf, "%s\n\n", strings.ReplaceAll(flag.Usage, "\n", "\n\t"))
 	})
 }

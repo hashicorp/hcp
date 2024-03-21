@@ -63,9 +63,12 @@ func NewCmdCreateOIDC(ctx *cmd.Context, runF func(*CreateOIDCOpts) error) *cmd.C
 				`),
 			},
 			{
-				Preamble: `GCP - Allow exchanging a Service Account Identity:`,
+				Preamble: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+					GCP - Allow exchanging a Service Account Identity
+
+					{{ Link "Full List of claims" "https://cloud.google.com/compute/docs/instances/verifying-instance-identity#payload" }}:
+				`),
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap(), heredoc.WithPreserveNewlines()).Must(`
-				# List of claims: https://cloud.google.com/compute/docs/instances/verifying-instance-identity#payload
 				$ hcp iam workload-identity-providers create-oidc gcp-example-service-account \
 				  --service-principal=iam/project/PROJECT/service-principal/example-sp \
 				  --issuer=https://accounts.google.com \
@@ -74,9 +77,12 @@ func NewCmdCreateOIDC(ctx *cmd.Context, runF func(*CreateOIDCOpts) error) *cmd.C
 				`),
 			},
 			{
-				Preamble: `GitLab - Allow exchanging a GitLab:`,
+				Preamble: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+					GitLab - Allow exchanging a GitLab
+
+					{{ Link "Full list of claims" "https://docs.gitlab.com/ee/ci/secrets/id_token_authentication.html#token-payload" }}:
+				`),
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap(), heredoc.WithPreserveNewlines()).Must(`
-				# Full list of claims: https://docs.gitlab.com/ee/ci/secrets/id_token_authentication.html#token-payload
 				$ hcp iam workload-identity-providers create-oidc gcp-example-service-account \
 				  --service-principal=iam/project/PROJECT/service-principal/example-sp \
 				  --issuer=https://gitlab.com \
@@ -117,7 +123,7 @@ func NewCmdCreateOIDC(ctx *cmd.Context, runF func(*CreateOIDCOpts) error) *cmd.C
 					The access token must have an audience that is contained in this set.
 
 					If no audience is set, the default allowed audience will be the resource name of the provider. The format will be:
-					{{ Italic "iam/project/PROJECT_ID/service-principal/SP_NAME/workload-identity-provider/WIP_NAME" }}.
+					{{ template "mdCodeOrBold" "iam/project/PROJECT_ID/service-principal/SP_NAME/workload-identity-provider/WIP_NAME" }}.
 					`),
 					Value:      flagvalue.SimpleSlice(nil, &opts.AllowedAudiences),
 					Repeatable: true,
@@ -131,7 +137,9 @@ func NewCmdCreateOIDC(ctx *cmd.Context, runF func(*CreateOIDCOpts) error) *cmd.C
 					the service principal.
 
 					The conditional_access statement can access any claim from the external identity token using
-					the "jwt_claims.<claim_name>" syntax. As an example, access the subject claim with "jwt_claims.sub".
+					the {{ template "mdCodeOrBold" "jwt_claims.<claim_name>" }} syntax.
+					As an example, access the subject claim with
+					{{ template "mdCodeOrBold" "jwt_claims.sub" }}.
 					`),
 					Value:    flagvalue.Simple("", &opts.ConditionalAccess),
 					Required: true,

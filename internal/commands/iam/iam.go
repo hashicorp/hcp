@@ -13,9 +13,9 @@ import (
 func NewCmdIam(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "iam",
-		ShortHelp: "Identity and access management.",
+		ShortHelp: "Manage identity and access management.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp iam" }} command group allows you to manage HCP identities
+		The {{ template "mdCodeOrBold" "hcp iam" }} command group lets you manage HCP identities
 		including users, groups, and service principals.
 
 		Service principal keys or workload identity providers may also be managed. When accessing

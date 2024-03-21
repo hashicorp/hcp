@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
 
 type DeleteOpts struct {
@@ -23,7 +24,11 @@ func NewCmdDelete(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "delete",
 		ShortHelp: "Delete an existing action configuration.",
-		LongHelp:  "Delete an existing action configuration. This will remove the config completely from HCP Waypoint.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+		The {{ template "mdCodeOrBold" "hcp waypoint action-config delete" }}
+		command deletes an existing action configuration. This will remove the
+		config completely from HCP Waypoint.
+		`),
 		RunF: func(c *cmd.Command, args []string) error {
 			return deleteActionConfig(c, args, opts)
 		},

@@ -24,7 +24,7 @@ func GenNavJSON(c *Command, w io.Writer) error {
 
 	// Create the top level nav item
 	nav := &navItem{
-		Title:  "Command Reference",
+		Title:  "Commands (CLI)",
 		Routes: root.Routes[0].Routes,
 	}
 

@@ -24,14 +24,15 @@ func NewCmdDeleteBinding(ctx *cmd.Context, runF func(*DeleteBindingOpts) error) 
 		Name:      "delete-binding",
 		ShortHelp: "Delete an IAM policy binding for a project.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		Deletes an IAM policy binding for the given project. A binding consists of a
+		The {{ template "mdCodeOrBold" "hcp projects iam delete-binding" }}
+		command deletes an IAM policy binding for the given project. A binding consists of a
 		principal and a role.
 
 		To view the existing role bindings, run {{ template "mdCodeOrBold" "hcp projects iam read-policy" }}.
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Delete a role binding for a principal previously granted role "roles/viewer":`,
+				Preamble: heredoc.New(ctx.IO).Must(`Delete a role binding for a principal previously granted role {{ template "mdCodeOrBold" "roles/viewer" }}:`),
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp projects iam delete-binding \
 				  --project=8647ae06-ca65-467a-b72d-edba1f908fc8 \

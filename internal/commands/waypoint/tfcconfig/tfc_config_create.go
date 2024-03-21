@@ -54,7 +54,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(opts *TFCConfigCreateOpts) error) 
 
                     Team token must be set in order to perform HCP Waypoint commands.
 
-                    See the {{ Link "API tokens documentation" "https://developer.hashicorp.com/terraform/cloud-docs/users-teams-organizations/api-tokens" }} to learn more.
+                    Refer to the {{ Link "API tokens documentation" "https://developer.hashicorp.com/terraform/cloud-docs/users-teams-organizations/api-tokens" }} to learn more.
 
                     HCP Waypoint requires Team level access tokens in order to run correctly.
 

@@ -23,7 +23,7 @@ func NewCmdUnset(ctx *cmd.Context) *cmd.Command {
 		Name:      "unset",
 		ShortHelp: "Unset a HCP CLI Property.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
-		{{ template "mdCodeOrBold" "hcp profile unset" }} unsets the specified property in your active profile.
+		The {{ template "mdCodeOrBold" "hcp profile unset" }} command unsets the specified property in your active profile.
 
 		To view all currently set properties, run {{ template "mdCodeOrBold" "hcp profile display" }}.
 		`),

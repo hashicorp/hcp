@@ -26,8 +26,9 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp iam service-principals keys list" }} command lists a service principal's keys.
 
-		To list keys for an organization service principal, pass the service principal's resource name or set the --project
-		flag to "-" and pass its resource name suffix.
+		To list keys for an organization service principal, pass the service 
+		principal's resource name or set the {{ template "mdCodeOrBold" "--project" }}
+		flag to {{ template "mdCodeOrBold" "-" }} and pass its resource name suffix.
 		`),
 		Examples: []cmd.Example{
 			{

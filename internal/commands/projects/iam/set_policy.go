@@ -29,8 +29,14 @@ func NewCmdSetPolicy(ctx *cmd.Context, runF func(*SetPolicyOpts) error) *cmd.Com
 		Name:      "set-policy",
 		ShortHelp: "Set the IAM policy for a project.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-Sets the IAM policy for a project, given a project ID and a file encoded in
-JSON that contains the IAM policy.
+The {{ template "mdCodeOrBold" "hcp projects iam set-policy" }} command sets
+the IAM policy for the project, given a project ID and a file encoded in
+JSON that contains the IAM policy. If adding or removing a single principal from
+the policy, prefer using {{ template "mdCodeOrBold" "hcp projects iam add-binding" }}
+and the related {{ template "mdCodeOrBold" "hcp projects iam delete-binding" }}.
+
+The policy file is expected to be a file encoded in JSON that
+contains the IAM policy.
 
 The format for the policy JSON file is an object with the following format:
 
