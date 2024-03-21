@@ -10,8 +10,8 @@ func NewCmdAddOn(ctx *cmd.Context) *cmd.Command {
 		Name:      "add-ons",
 		ShortHelp: "Manage HCP Waypoint add-ons and add-on definitions.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-The {{ template "mdCodeOrBold" "hcp waypoint add-ons" }} command lets you manage
-HCP Waypoint add-ons and add-on definitions.
+The {{ template "mdCodeOrBold" "hcp waypoint add-ons" }} command group lets you
+manage HCP Waypoint add-ons and add-on definitions.
 `),
 	}
 
