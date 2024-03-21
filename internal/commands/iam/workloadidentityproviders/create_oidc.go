@@ -63,8 +63,11 @@ func NewCmdCreateOIDC(ctx *cmd.Context, runF func(*CreateOIDCOpts) error) *cmd.C
 				`),
 			},
 			{
-				Preamble: `GCP - Allow exchanging a Service Account Identity 
-				([List of claims](https://cloud.google.com/compute/docs/instances/verifying-instance-identity#payload)):`,
+				Preamble: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+					GCP - Allow exchanging a Service Account Identity
+
+					{{ Link "Full List of claims" "https://cloud.google.com/compute/docs/instances/verifying-instance-identity#payload" }}:
+				`),
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap(), heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam workload-identity-providers create-oidc gcp-example-service-account \
 				  --service-principal=iam/project/PROJECT/service-principal/example-sp \
@@ -74,8 +77,11 @@ func NewCmdCreateOIDC(ctx *cmd.Context, runF func(*CreateOIDCOpts) error) *cmd.C
 				`),
 			},
 			{
-				Preamble: `GitLab - Allow exchanging a GitLab
-				([Full list of claims](https://docs.gitlab.com/ee/ci/secrets/id_token_authentication.html#token-payload)):`,
+				Preamble: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+					GitLab - Allow exchanging a GitLab
+
+					{{ Link "Full list of claims" "https://docs.gitlab.com/ee/ci/secrets/id_token_authentication.html#token-payload" }}:
+				`),
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap(), heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam workload-identity-providers create-oidc gcp-example-service-account \
 				  --service-principal=iam/project/PROJECT/service-principal/example-sp \
@@ -131,8 +137,8 @@ func NewCmdCreateOIDC(ctx *cmd.Context, runF func(*CreateOIDCOpts) error) *cmd.C
 					the service principal.
 
 					The conditional_access statement can access any claim from the external identity token using
-					the {{ template "mdCodeOrBold" "jwt_claims.<claim_name>" }} syntax. 
-					As an example, access the subject claim with 
+					the {{ template "mdCodeOrBold" "jwt_claims.<claim_name>" }} syntax.
+					As an example, access the subject claim with
 					{{ template "mdCodeOrBold" "jwt_claims.sub" }}.
 					`),
 					Value:    flagvalue.Simple("", &opts.ConditionalAccess),

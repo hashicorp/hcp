@@ -272,7 +272,7 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 					Set if exchanging an GCP workload identity.
 
 					It is assumed the workload identity provider was created
-					with the issuer URI set to {{ template "mdCodeOrBold" "https://accounts.google.com" }} 
+					with the issuer URI set to {{ template "mdCodeOrBold" "https://accounts.google.com" }}
 					and the default allowed audiences.
 					`),
 					Value:         flagvalue.Simple(false, &opts.GCP),
@@ -301,12 +301,13 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 					DisplayValue: "/PATH/TO/CREDENTIAL",
 					Description: heredoc.New(ctx.IO).Must(`
 A JSON pointer that indicates how to access the credential from a JSON.
-If used with the {{ template "mdCodeOrBold" "source-url" }} flag, the pointer 
-is used to extract the credential from the JSON response from calling the URL. 
-If used with the {{ template "mdCodeOrBold" "source-file" }} flag, the pointer is used to extract the credential read from the JSON file. Similarly, if used with 
-the {{ template "mdCodeOrBold" "source-env" }} flag, the pointer
-is used to extract the credential from the environment variable whose value
-is a JSON object.
+If used with the {{ template "mdCodeOrBold" "source-url" }} flag, the pointer
+is used to extract the credential from the JSON response from calling the URL.
+If used with the {{ template "mdCodeOrBold" "source-file" }} flag, the pointer
+is used to extract the credential read from the JSON file. Similarly, if used
+with the {{ template "mdCodeOrBold" "source-env" }} flag, the pointer is used to
+extract the credential from the environment variable whose value is a JSON
+object.
 
 As an example, if the JSON payload containing the credential file is:
 
@@ -318,8 +319,9 @@ As an example, if the JSON payload containing the credential file is:
 } {{- end }}
 {{- CodeBlock "credentials" "json hideClipboard" }}
 
-You can access the top level access token using the pointer 
-{{ template "mdCodeOrBold" "/access_token" }} and the nested access token can be accessed using the pointer {{ template "mdCodeOrBold" "/nested/access_token" }}.
+You can access the top level access token using the pointer
+{{ template "mdCodeOrBold" "/access_token" }} and the nested access token can be
+accessed using the pointer {{ template "mdCodeOrBold" "/nested/access_token" }}.
 					`),
 					Value: flagvalue.Simple("", &opts.CredentialJSONPointer),
 				},

@@ -41,7 +41,7 @@ func NewCmdCreateAWS(ctx *cmd.Context, runF func(*CreateAWSOpts) error) *cmd.Com
 
 		{{ PreserveNewLines }}
 			* {{ template "mdCodeOrBold" "aws.arn" }}: The AWS ARN associated with the calling entity.
-		  * {{ template "mdCodeOrBold" "aws.account_id" }}: The AWS account ID number of the account that owns
+			* {{ template "mdCodeOrBold" "aws.account_id" }}: The AWS account ID number of the account that owns
 		    or contains the calling entity.
 			* {{ template "mdCodeOrBold" "aws.user_id" }}: The unique identifier of the calling entity.
 		{{ PreserveNewLines }}
@@ -104,7 +104,7 @@ func NewCmdCreateAWS(ctx *cmd.Context, runF func(*CreateAWSOpts) error) *cmd.Com
 					  * {{ template "mdCodeOrBold" "aws.arn" }}: The AWS ARN associated with the calling entity.
 					  * {{ template "mdCodeOrBold" "aws.account_id" }}: The AWS account ID number of the account that owns
 					    or contains the calling entity.
-						* {{ template "mdCodeOrBold" "aws.user_id" }}: The unique identifier of the calling entity.
+					  * {{ template "mdCodeOrBold" "aws.user_id" }}: The unique identifier of the calling entity.
 					{{ PreserveNewLines }}
 
 					For details on the values of each variable, refer to the
