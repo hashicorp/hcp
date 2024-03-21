@@ -36,7 +36,9 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		scope to limit access to the service principal and to locate the service
 		principal near the resources it will be accessing.
 
-		To create an organization service principal, set the --project flag to "-".
+		To create an organization service principal, set the 
+		{{ template "mdCodeOrBold" "--project" }}
+		flag to {{ template "mdCodeOrBold" "-" }}.
 		`),
 		Examples: []cmd.Example{
 			{

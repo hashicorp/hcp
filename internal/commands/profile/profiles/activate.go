@@ -22,8 +22,10 @@ func NewCmdActivate(ctx *cmd.Context) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: "To active profile my-profile, run:",
-				Command:  "$ hcp profile profiles activate my-profile",
+				Preamble: heredoc.New(ctx.IO).Must(`
+				To active profile {{ template "mdCodeOrBold" "my-profile" }}, run:
+				`),
+				Command: "$ hcp profile profiles activate my-profile",
 			},
 		},
 		Args: cmd.PositionalArguments{

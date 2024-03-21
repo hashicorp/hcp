@@ -96,7 +96,7 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 	if len(c.Aliases) > 0 {
 		buf.WriteString("## Aliases\n\n")
 		for a, u := range c.aliasUsages() {
-			buf.WriteString(fmt.Sprintf("%s - `%s`\n", a, u))
+			buf.WriteString(fmt.Sprintf("- `%s`. For example: `%s`\n", a, u))
 		}
 		buf.WriteString("\n")
 	}
@@ -116,7 +116,7 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 		var commands, groups []string
 		for _, c := range c.children {
 			path := strings.ReplaceAll(c.commandPath(), " ", "/")
-			entry := fmt.Sprintf("- [%s](%s) - %s", c.Name, link(path), c.ShortHelp)
+			entry := fmt.Sprintf("- [`%s`](%s) - %s", c.Name, link(path), c.ShortHelp)
 
 			if c.RunF != nil {
 				commands = append(commands, entry)
@@ -230,7 +230,7 @@ func genMarkdownFlagsetUsage(flags *pflag.FlagSet, buf *bytes.Buffer) {
 
 		longDisplay := flagString(flag)
 		if flag.Shorthand != "" && flag.ShorthandDeprecated == "" {
-			fmt.Fprintf(buf, "- `-%s, %s` -", flag.Shorthand, longDisplay)
+			fmt.Fprintf(buf, "- `-%s, %s` - ", flag.Shorthand, longDisplay)
 		} else {
 			fmt.Fprintf(buf, "- `%s` - ", longDisplay)
 		}

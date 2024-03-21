@@ -10,7 +10,7 @@ func NewCmdAuth(ctx *cmd.Context) *cmd.Command {
 		Name:      "auth",
 		ShortHelp: "Authenticate to HCP.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-			"The {{ template "mdCodeOrBold" "hcp auth" }} command group lets you manage authentication to HCP."
+		The {{ template "mdCodeOrBold" "hcp auth" }} command group lets you manage authentication to HCP.
 		`),
 		Examples: []cmd.Example{
 			{

@@ -25,7 +25,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 		Name:      "read",
 		ShortHelp: "Show metadata for the project.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp products read" }} command shows metadata for the project.
+		The {{ template "mdCodeOrBold" "hcp projects read" }} command shows metadata for the project.
 		`),
 		Examples: []cmd.Example{
 			{

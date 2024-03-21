@@ -10,7 +10,7 @@ func NewCmdUsers(ctx *cmd.Context) *cmd.Command {
 		Name:      "users",
 		ShortHelp: "Manage an organization's users.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp iam users" }} command group allows you to manage
+		The {{ template "mdCodeOrBold" "hcp iam users" }} command group lets you manage
 		the users of an HCP organization.
 		`),
 	}

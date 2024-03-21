@@ -35,7 +35,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		Name:      "create",
 		ShortHelp: "Create a new project.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp products create" }} command creates
+		The {{ template "mdCodeOrBold" "hcp projects create" }} command creates
 		a new project with the given name. The currently authenticated principal
 		will be given role "admin" on the newly created project.
 		`),

@@ -38,8 +38,9 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		to leak into shell history. The HCP CLI allows authenticating via credential files using
 		{{ template "mdCodeOrBold" "hcp auth login --cred-file=PATH" }}. Prefer using credential files if your workflow allows it.
 
-		To create a key for an organization service principal, pass the service principal's resource name or set the --project
-		flag to "-" and pass its resource name suffix.
+		To create a key for an organization service principal, pass the service 
+		principal's resource name or set the {{ template "mdCodeOrBold" "--project" }}
+		flag to {{ template "mdCodeOrBold" "-" }} and pass its resource name suffix.
 		`),
 		Examples: []cmd.Example{
 			{

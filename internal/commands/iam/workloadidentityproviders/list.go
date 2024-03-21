@@ -49,7 +49,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 			Args: []cmd.PositionalArgument{
 				{
 					Name:          "SP_NAME",
-					Documentation: heredoc.New(ctx.IO).Mustf(helper.SPNameArgDoc, "list workload identity providers for."),
+					Documentation: heredoc.New(ctx.IO).Mustf(helper.SPNameArgDoc, "list workload identity providers for"),
 				},
 			},
 		},

@@ -24,8 +24,11 @@ func NewCmdRename(ctx *cmd.Context) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: "To rename profile my-profile to new-profile, run:",
-				Command:  "$ hcp profile profiles rename my-profile --new-name=new-profile",
+				Preamble: heredoc.New(ctx.IO).Must(`
+				To rename profile {{ template "mdCodeOrBold" "my-profile" }} to 
+				{{ template "mdCodeOrBold" "new-profile" }}, run:
+				`),
+				Command: "$ hcp profile profiles rename my-profile --new-name=new-profile",
 			},
 		},
 		Args: cmd.PositionalArguments{
