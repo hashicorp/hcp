@@ -40,6 +40,7 @@ group lets you manage HCP Waypoint add-on definitions.
 	}
 
 	cmd.AddChild(NewCmdAddOnDefinitionCreate(ctx, opts))
+	cmd.AddChild(NewCmdAddOnDefinitionDelete(ctx, opts))
 
 	return cmd
 }
