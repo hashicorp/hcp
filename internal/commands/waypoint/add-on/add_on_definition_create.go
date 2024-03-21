@@ -15,8 +15,11 @@ import (
 func NewCmdAddOnDefinitionCreate(ctx *cmd.Context, opts *AddOnDefinitionOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "create",
-		ShortHelp: "Create a new add-on definition.",
-		LongHelp:  "Create a new add-on definition.",
+		ShortHelp: "Create a new HCP Waypoint add-on definition.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+The {{ template "mdCodeOrBold" "hcp waypoint add-ons definitions create" }}
+command lets you create HCP Waypoint add-on definitions.
+`),
 		Examples: []cmd.Example{
 			{
 				Preamble: "Create a new HCP Waypoint add-on definition:",
@@ -29,7 +32,7 @@ $ hcp waypoint add-ons definitions create -n my-add-on-definition \
   --tfc-no-code-module-version "1.0.2" \
   --tfc-project-name "my-tfc-project" \
   --tfc-project-id "prj-123456" \
-  -l label1
+  -l label1 \
   -l label2
 `),
 			},
