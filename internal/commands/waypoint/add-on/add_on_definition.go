@@ -3,6 +3,7 @@ package addon
 import (
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
 
 type AddOnDefinitionOpts struct {
@@ -32,8 +33,10 @@ func NewCmdAddOnDefinition(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "definitions",
 		ShortHelp: "Manage HCP Waypoint add-on definitions.",
-		LongHelp: "Manage HCP Waypoint add-on definitions. Add-on definitions " +
-			"are reusable configurations for creating add-ons.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+The {{ template "mdCodeOrBold" "hcp waypoint add-ons definitions" }} command
+lets you manage HCP Waypoint add-on definitions.
+`),
 	}
 
 	cmd.AddChild(NewCmdAddOnDefinitionCreate(ctx, opts))

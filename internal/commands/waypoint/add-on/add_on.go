@@ -1,14 +1,18 @@
 package addon
 
-import "github.com/hashicorp/hcp/internal/pkg/cmd"
+import (
+	"github.com/hashicorp/hcp/internal/pkg/cmd"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
+)
 
 func NewCmdAddOn(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "add-ons",
 		ShortHelp: "Manage HCP Waypoint add-ons and add-on definitions.",
-		LongHelp: "Manage HCP Waypoint add-ons. Add-ons are units of infrastructure" +
-			" that can be deployed alongside applications. They can be used to deploy" +
-			" databases, caches, and other infrastructure alongside applications.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+The {{ template "mdCodeOrBold" "hcp waypoint add-ons" }} command lets you manage
+HCP Waypoint add-ons and add-on definitions.
+`),
 	}
 
 	cmd.AddChild(NewCmdAddOnDefinition(ctx))
