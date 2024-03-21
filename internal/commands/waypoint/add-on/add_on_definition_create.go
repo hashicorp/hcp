@@ -79,7 +79,7 @@ $ hcp waypoint add-ons definitions create -n my-add-on-definition \
 					Name:         "label",
 					Shorthand:    "l",
 					DisplayValue: "LABEL",
-					Description:  "A label to apply to the template.",
+					Description:  "A label to apply to the add-on definition.",
 					Repeatable:   true,
 					Value:        flagvalue.SimpleSlice(nil, &opts.Labels),
 				},
