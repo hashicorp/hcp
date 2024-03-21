@@ -112,7 +112,7 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				`),
 			},
 			{
-				Preamble: `Create a credential file that sources the token from a file.`,
+				Preamble: `Create a credential file that sources the token from a file:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				# Assuming the file has the following JSON payload:
 				# {
