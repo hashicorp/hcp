@@ -60,10 +60,9 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: heredoc.New(ctx.IO).Must(`
-				Create a credential file for an AWS workload. If the AWS instance metadata service is using version 1, you must set the 
-				{{ template "mdCodeOrBold" "--imdsv1" }} flag.`),
+				Preamble: `Create a credential file for an AWS workload:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				# Set the --imdsv1 flag if the AWS instance metadata service is using version 1.
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/aws \
 				  --aws \
@@ -71,7 +70,7 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				`),
 			},
 			{
-				Preamble: `Create a credential file for a GCP workload.`,
+				Preamble: `Create a credential file for a GCP workload:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/gcp \
@@ -80,7 +79,7 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				`),
 			},
 			{
-				Preamble: `Create a credential file for an Azure workload using a User Managed Identity.`,
+				Preamble: `Create a credential file for an Azure workload using a User Managed Identity:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/azure \
@@ -90,7 +89,7 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				`),
 			},
 			{
-				Preamble: `Create a credential file for an Azure workload that has multiple User Managed Identities.`,
+				Preamble: `Create a credential file for an Azure workload that has multiple User Managed Identities:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/azure \
@@ -101,12 +100,9 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				`),
 			},
 			{
-				Preamble: heredoc.New(ctx.IO).Must(`
-				Create a credential file for an Azure workload that is using a Managed Identity to authenticate as a Entra ID Application. Generally, 
-				{{ template "mdCodeOrBold" "ENTRA_ID_APP_ID_URL" }} has the form 
-				{{ template "mdCodeOrBold" "api://123-456-678-901" }}.
-				`),
+				Preamble: `Create a credential file for an Azure workload that is using a Managed Identity to authenticate as a Entra ID Application:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				# ENTRA_ID_APP_ID_URL generally has the form "api://123-456-678-901"
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/azure \
 				  --azure \
@@ -116,13 +112,13 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				`),
 			},
 			{
-				Preamble: heredoc.New(ctx.IO).Must(`
-				Create a credential file that sources the token from a file.
-				The following example assumes 
-				{{ template "mdCodeOrBold" "credentials.json" }} has a JSON payload that
-				contains multiple attributes, including an access token.
-				`),
+				Preamble: `Create a credential file that sources the token from a file.`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				# Assuming the file has the following JSON payload:
+				# {
+				#   "access_token": "eyJ0eXAiOiJKV1Qi...",
+				#   ...
+				# }
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/k8s \
 				  --source-file=/var/run/secrets/tokens/hcp_token \
@@ -131,13 +127,9 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				`),
 			},
 			{
-				Preamble: heredoc.New(ctx.IO).Must(`
-				Create a credential file that sources the token from a file.
-				The following example assumes 
-				{{ template "mdCodeOrBold" "credentials.json" }} has a JSON payload that
-				only contains an access token.
-				`),
+				Preamble: `Create a credential file that sources the token from a file:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				# Assuming the file only contains the access token:
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/k8s \
 				  --source-file \
@@ -145,10 +137,13 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				`),
 			},
 			{
-				Preamble: `Create a credential file that sources the token from an URL.
-				The following example assumes the URL returns has a JSON payload that
-				contains multiple attributes, including an access token.`,
+				Preamble: `Create a credential file that sources the token from an URL:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				# Assuming the response has the following JSON payload:
+				# {
+				#   "access_token": "eyJ0eXAiOiJKV1Qi...",
+				#   ...
+				# }
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/example \
 				  --source-url="https://example-oidc-provider.com/token" \
@@ -157,10 +152,9 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				`),
 			},
 			{
-				Preamble: `Create a credential file that sources the token from an URL.
-				The following example assumes the URL returns has a JSON payload that
-				only contains an access token.`,
+				Preamble: `Create a credential file that sources the token from an URL:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				# Assuming the file only contains the access token:
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/example \
 				  --source-url=https://example-oidc-provider.com/token \
@@ -168,11 +162,9 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				`),
 			},
 			{
-				Preamble: heredoc.New(ctx.IO).Must(`
-				Create a credential file that sources the token from an URL.
-				The following example uses {{ template "mdCodeOrBold" "--source-header" }}
-				to add a header to the request.`),
+				Preamble: `Create a credential file that sources the token from an URL:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				# To add headers to the request, use the --source-header flag:
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/example \
 				  --source-url=https://example-oidc-provider.com/token \
@@ -182,9 +174,13 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				`),
 			},
 			{
-				Preamble: `Create a credential file that sources the token from an environment variable. The following example assumes the environment 
-				varible is a JSON payload that contains multiple attributes, including an access token.`,
+				Preamble: `Create a credential file that sources the token from an environment variable:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				# Assuming the environment variable has the following JSON string value:
+				# {
+				#   "access_token": "eyJ0eXAiOiJKV1Qi...",
+				#   ...
+				# }
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/example \
 				  --source-env=ACCESS_TOKEN \
@@ -193,9 +189,9 @@ func NewCmdCreateCredFile(ctx *cmd.Context, runF func(*CreateCredFileOpts) error
 				`),
 			},
 			{
-				Preamble: `Create a credential file that sources the token from an environment variable. The following example assumes the environment 
-				varible is a JSON payload that only contains an access token.`,
+				Preamble: `Create a credential file that sources the token from an environment variable:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				# Assuming the environment variable only contains the access token:
 				$ hcp iam workload-identity-providers create-cred-file \
 				  iam/project/123/service-principal/my-sp/workload-identity-provider/example \
 				  --source-env=ACCESS_TOKEN \
