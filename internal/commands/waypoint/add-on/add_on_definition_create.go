@@ -17,8 +17,22 @@ func NewCmdAddOnDefinitionCreate(ctx *cmd.Context, opts *AddOnDefinitionOpts) *c
 		Name:      "create",
 		ShortHelp: "Create a new add-on definition.",
 		LongHelp:  "Create a new add-on definition.",
-		Examples:  []cmd.Example{
-			// TODO: Add example
+		Examples: []cmd.Example{
+			{
+				Preamble: "Create a new HCP Waypoint add-on definition:",
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+$ hcp waypoint add-ons definitions create -n my-add-on-definition \
+  -s "My Add-on Definition summary." \
+  -d "My Add-on Definition description." \
+  --readme-markdown-template-file "README.tpl" \
+  --tfc-no-code-module-source "app.terraform.io/hashicorp/dir/template" \
+  --tfc-no-code-module-version "1.0.2" \
+  --tfc-project-name "my-tfc-project" \
+  --tfc-project-id "prj-123456" \
+  -l label1
+  -l label2
+`),
+			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {
 			if opts.testFunc != nil {
@@ -118,7 +132,7 @@ func addOnDefinitionCreate(opts *AddOnDefinitionOpts) error {
 	if opts.ReadmeMarkdownTemplateFile != "" {
 		readmeTpl, err = os.ReadFile(opts.ReadmeMarkdownTemplateFile)
 		if err != nil {
-			return fmt.Errorf("failed to read README markdown template file: %w", err)
+			return errors.Wrapf(err, "failed to read README markdown template file %q", opts.ReadmeMarkdownTemplateFile)
 		}
 	}
 
@@ -143,7 +157,7 @@ func addOnDefinitionCreate(opts *AddOnDefinitionOpts) error {
 			Context: opts.Ctx,
 		}, nil)
 	if err != nil {
-		return fmt.Errorf("failed to create add-on definition %q: %w", opts.Name, err)
+		return errors.Wrapf(err, "failed to create add-on definition %q", opts.Name)
 	}
 
 	fmt.Fprintf(opts.IO.Err(), "Add-on definition %q created.", opts.Name)
