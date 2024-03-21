@@ -16,8 +16,10 @@ func NewCmdUpdate(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "update",
 		ShortHelp: "Update an existing HCP Waypoint template.",
-		LongHelp: "Update an existing HCP Waypoint template. This will update" +
-			" the template with the provided information.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+The {{ template "mdCodeOrBold" "hcp waypoint templates update" }} command lets you update
+existing HCP Waypoint templates.
+		`),
 		Examples: []cmd.Example{
 			{
 				Preamble: "Create a new HCP Waypoint template:",
@@ -138,7 +140,7 @@ $ hcp waypoint templates update -n my-template \
 func templateUpdate(opts *TemplateOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "unable to access HCP project")
 	}
 
 	var tags []*models.HashicorpCloudWaypointTag

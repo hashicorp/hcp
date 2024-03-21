@@ -16,8 +16,10 @@ func NewCmdCreate(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "create",
 		ShortHelp: "Create a new HCP Waypoint template.",
-		LongHelp: "Create a new HCP Waypoint template, from which applications " +
-			"can be created.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+The {{ template "mdCodeOrBold" "hcp waypoint templates create" }} command lets you create
+HCP Waypoint templates.
+		`),
 		Examples: []cmd.Example{
 			{
 				Preamble: "Create a new HCP Waypoint template:",
@@ -137,7 +139,7 @@ $ hcp waypoint templates create -n my-template \
 func templateCreate(opts *TemplateOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrapf(err, "Unable to access HCP project")
+		return errors.Wrapf(err, "unable to access HCP project")
 	}
 
 	var tags []*models.HashicorpCloudWaypointTag
@@ -152,7 +154,7 @@ func templateCreate(opts *TemplateOpts) error {
 	if opts.ReadmeMarkdownTemplateFile != "" {
 		readmeTpl, err = os.ReadFile(opts.ReadmeMarkdownTemplateFile)
 		if err != nil {
-			return fmt.Errorf("failed to read README markdown template file: %w", err)
+			return errors.Wrapf(err, "failed to read README markdown template file %q", opts.ReadmeMarkdownTemplateFile)
 		}
 	}
 
@@ -180,7 +182,7 @@ func templateCreate(opts *TemplateOpts) error {
 			Context: opts.Ctx,
 		}, nil)
 	if err != nil {
-		return fmt.Errorf("failed to create template %q: %w", opts.Name, err)
+		return errors.Wrapf(err, "failed to create template %q", opts.Name)
 	}
 
 	fmt.Fprintf(opts.IO.Err(), "Template %q created.", opts.Name)

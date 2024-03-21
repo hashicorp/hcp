@@ -43,8 +43,9 @@ func NewCmdTemplate(ctx *cmd.Context) *cmd.Command {
 		Name:      "templates",
 		ShortHelp: "Manage HCP Waypoint templates.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp waypoint template" }} commands manage templates. A
-		template is a reusable configuration for creating applications.
+The {{ Bold "hcp waypoint templates" }} command group lets you manage
+HCP Waypoint templates. A template is a reusable configuration for creating
+applications.
 		`),
 	}
 

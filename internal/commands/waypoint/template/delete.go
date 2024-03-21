@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/pkg/errors"
 )
 
@@ -13,8 +14,10 @@ func NewCmdDelete(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "delete",
 		ShortHelp: "Delete an existing Waypoint template.",
-		LongHelp: "Delete an existing Waypoint template. This will remove" +
-			" the template completely from HCP Waypoint.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+The {{ template "mdCodeOrBold" "hcp waypoint templates delete" }} command lets you delete
+existing HCP Waypoint templates.
+		`),
 		RunF: func(c *cmd.Command, args []string) error {
 			if opts.testFunc != nil {
 				return opts.testFunc(c, args)
@@ -44,7 +47,7 @@ func NewCmdDelete(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 func templateDelete(opts *TemplateOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrapf(err, "Unable to access HCP project")
+		return errors.Wrapf(err, "unable to access HCP project")
 	}
 
 	_, err = opts.WS.WaypointServiceDeleteApplicationTemplate2(
@@ -55,7 +58,7 @@ func templateDelete(opts *TemplateOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return fmt.Errorf("failed to delete template %q: %w", opts.Name, err)
+		return errors.Wrapf(err, "failed to delete template %q", opts.Name)
 	}
 
 	fmt.Fprintf(opts.IO.Err(), "Template %q deleted.", opts.Name)

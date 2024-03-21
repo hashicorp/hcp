@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/pkg/errors"
 )
 
@@ -12,8 +13,10 @@ func NewCmdRead(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "read",
 		ShortHelp: "Read more details about an HCP Waypoint template.",
-		LongHelp: "Read more details about an HCP Waypoint template. This will display " +
-			"the details of the template.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+The {{ template "mdCodeOrBold" "hcp waypoint templates read" }} command lets you read
+an existing HCP Waypoint template.
+		`),
 		RunF: func(c *cmd.Command, args []string) error {
 			if opts.testFunc != nil {
 				return opts.testFunc(c, args)
@@ -43,7 +46,7 @@ func NewCmdRead(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 func templateRead(opts *TemplateOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrapf(err, "Unable to access HCP project")
+		return errors.Wrapf(err, "unable to access HCP project")
 	}
 
 	resp, err := opts.WS.WaypointServiceGetApplicationTemplate2(
@@ -54,7 +57,7 @@ func templateRead(opts *TemplateOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "Unable to get template")
+		return errors.Wrapf(err, "failed to get template %q", opts.Name)
 	}
 
 	respPayload := resp.GetPayload()
