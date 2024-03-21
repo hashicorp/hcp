@@ -174,7 +174,7 @@ func genMarkdownPositionalArgs(c *Command, buf *bytes.Buffer) {
 		if a.Optional {
 			fmt.Fprintln(buf, cs.String("Optional argument\n").Italic().String())
 		}
-		fmt.Fprintln(buf, a.Documentation)
+		fmt.Fprintln(buf, strings.ReplaceAll(a.Documentation, "\n", "\n\t"))
 		fmt.Fprintln(buf)
 	}
 }
@@ -236,6 +236,6 @@ func genMarkdownFlagsetUsage(flags *pflag.FlagSet, buf *bytes.Buffer) {
 		}
 
 		// Add the usage
-		fmt.Fprintf(buf, "%s\n\n", flag.Usage)
+		fmt.Fprintf(buf, "%s\n\n", strings.ReplaceAll(flag.Usage, "\n", "\n\t"))
 	})
 }
