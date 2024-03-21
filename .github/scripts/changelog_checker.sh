@@ -18,6 +18,9 @@ if [ -z "$changelog_files" ]; then
     exit 1
 fi
 
+# Install the changelog-check command
+go install github.com/hashicorp/go-changelog/cmd/changelog-check@latest
+
 # Validate format with make changelog-check, exit with error if any note has an
 # invalid format
 for file in $changelog_files; do
