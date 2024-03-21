@@ -23,6 +23,9 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0 # by default the checkout action doesn't checkout all branches
+      - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5
+        with:
+          go-version: 'stable'
       - name: Check for changelog entry in diff
         run: ./.github/scripts/changelog_checker.sh
         env:
