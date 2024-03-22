@@ -73,10 +73,5 @@ func addOnDefinitionsList(opts *AddOnDefinitionOpts) error {
 		addOnDefinitions = append(addOnDefinitions, listResp.GetPayload().AddOnDefinitions...)
 	}
 
-	// This is done so that we don't panic on Output.Show if there are no add-on definitions
-	if len(addOnDefinitions) == 0 {
-		return nil
-	}
-
 	return opts.Output.Show(addOnDefinitions, format.Pretty)
 }
