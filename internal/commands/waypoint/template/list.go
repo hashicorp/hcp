@@ -61,7 +61,5 @@ func listTemplates(opts *TemplateOpts) error {
 		templates = append(templates, resp.GetPayload().ApplicationTemplates...)
 	}
 
-	// TODO: Fix panic if len(addOnDefinitions) == 0
-
 	return opts.Output.Show(templates, format.Pretty)
 }
