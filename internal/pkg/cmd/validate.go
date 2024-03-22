@@ -62,6 +62,19 @@ var (
 	// eaxmplePreambleInvalidError is returned when the preamble of the example
 	// is invalid.
 	errExamplePreambleInvalid = fmt.Errorf("preamble must start with a capital letter and end with a colon")
+
+	// errCommandLongHelpPrefixInvalid is returned when the long help prefix is
+	// invalid for a command.
+	errCommandLongHelpPrefixInvalid = func(c *Command) error {
+		template, plaintext := expectedLongHelpPrefix(c)
+
+		got := c.LongHelp
+		if len(got) > 100 {
+			got = got[:100] + "..."
+		}
+
+		return fmt.Errorf("invalid command long help prefix.\n\nWANT: %q\nGOT: %q\nREPLACE WITH: %q\n", plaintext, got, template)
+	}
 )
 
 // Validate validates the command and all of its children.
@@ -146,6 +159,14 @@ func (c *Command) validate() error {
 		validationErr = errors.Join(validationErr, fmt.Errorf("%w; got %q", errShortHelpInvalid, c.ShortHelp))
 	}
 
+	// Validate the long help. Since the LongHelp is rendered, we can't fully
+	// validate that the template is correct. Instead, we validate that the
+	// plaintext output is correct.
+	_, longHelpPrefix := expectedLongHelpPrefix(c)
+	if c.parent != nil && !strings.HasPrefix(strings.TrimSpace(c.LongHelp), longHelpPrefix) {
+		validationErr = errors.Join(validationErr, errCommandLongHelpPrefixInvalid(c))
+	}
+
 	// Validate the additional documentation sections
 	for i, d := range c.AdditionalDocs {
 		if err := d.validate(); err != nil {
@@ -186,6 +207,20 @@ func (c *Command) validate() error {
 	}
 
 	return validationErr
+}
+
+// expectedLongHelpPrefix returns the expected long help prefix for the command
+// that should be present in the template, and the plaintext version to test
+// against.
+func expectedLongHelpPrefix(c *Command) (templated, plaintext string) {
+	group := " group"
+	if c.RunF != nil {
+		group = ""
+	}
+
+	templated = fmt.Sprintf(`The {{ template "mdCodeOrBold" %q }} command%s`, c.commandPath(), group)
+	plaintext = fmt.Sprintf("The %s command%s", c.commandPath(), group)
+	return
 }
 
 // validateIO checks that the io is set on the command or any parent command.

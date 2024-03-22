@@ -14,7 +14,7 @@ func getGoodCommand() *Command {
 		Name:      "parent-cmd",
 		Aliases:   []string{"parent"},
 		ShortHelp: "This is a short help message.",
-		LongHelp:  "This is a long help message.",
+		LongHelp:  `The parent-cmd command group lets you do things.`,
 		Flags: Flags{
 			Persistent: []*Flag{
 				{
@@ -35,7 +35,7 @@ func getGoodCommand() *Command {
 		Name:      "child-cmd",
 		Aliases:   []string{"child"},
 		ShortHelp: "This is a short help message.",
-		LongHelp:  "This is a long help message.",
+		LongHelp:  `The parent-cmd child-cmd command lets you do things.`,
 		Flags: Flags{
 			Local: []*Flag{
 				{
@@ -118,6 +118,25 @@ func TestCommand_Validate(t *testing.T) {
 			error: "both RunF and Children cannot be set",
 		},
 		{
+			name: "command group has bad long help",
+			command: func(c *Command) {
+				// Force a parent since LongHelp verification is disabled for
+				// the root command.
+				c.parent = &Command{
+					Name: "hcp",
+				}
+				c.LongHelp = "Bad prefix"
+			},
+			error: "invalid command long help prefix.\n\nWANT: \"The hcp parent-cmd command group\"\nGOT:",
+		},
+		{
+			name: "command has bad long help",
+			command: func(c *Command) {
+				c.children[0].LongHelp = "Bad prefix"
+			},
+			error: "invalid command long help prefix.\n\nWANT: \"The parent-cmd child-cmd command\"\nGOT:",
+		},
+		{
 			name: "siblings have conflicting names",
 			command: func(c *Command) {
 				child2 := *c.children[0]
@@ -131,6 +150,7 @@ func TestCommand_Validate(t *testing.T) {
 				child2 := *c.children[0]
 				child2.Name = "child-two"
 				child2.Aliases = []string{c.children[0].Name}
+				child2.LongHelp = `The parent-cmd child-two command lets you do things.`
 				c.AddChild(&child2)
 			},
 			error: "child command \"child-two\" has alias \"child-cmd\" already used by a sibling name or alias",
