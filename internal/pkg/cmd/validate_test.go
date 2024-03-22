@@ -414,3 +414,19 @@ func TestCommand_Validate(t *testing.T) {
 		})
 	}
 }
+
+func TestCommand_Validate_MultiError(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	// Get and modify the good command
+	cmd := getGoodCommand()
+	cmd.Name = "ThisIsBad"
+	cmd.Aliases = append(cmd.Aliases, "ThisIsBad")
+	cmd.Flags.Persistent[0].Name = "test_flag"
+
+	err := cmd.Validate()
+	r.ErrorContains(err, "only lower case names with hyphens are allowed")
+	r.ErrorContains(err, "command name cannot be an alias")
+	r.ErrorContains(err, "error validating persistent flag \"test_flag\": only lower case letters, numbers, and hyphens are allowed")
+}
