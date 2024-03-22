@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/pkg/errors"
 )
 
@@ -15,11 +16,25 @@ func NewCmdAddOnDefinitionUpdate(ctx *cmd.Context, opts *AddOnDefinitionOpts) *c
 	cmd := &cmd.Command{
 		Name:      "update",
 		ShortHelp: "Update a HCP Waypoint add-on definition.",
-		LongHelp:  "Update a HCP Waypoint add-on definition.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+The {{ template "mdCodeOrBold" "hcp waypoint add-ons definitions update" }}
+command lets you update an existing HCP Waypoint add-on definition.
+`),
 		Examples: []cmd.Example{
 			{
 				Preamble: "Update a HCP Waypoint add-on definition:",
-				Command:  "hcp waypoint add-ons definitions update -n=cli-test",
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+$ hcp waypoint add-ons definitions update -n=my-add-on-definition \
+  -s "My updated Add-on Definition summary." \
+  -d "My updated Add-on Definition description." \
+  --readme-markdown-template-file "README.tpl" \
+  --tfc-no-code-module-source "app.terraform.io/hashicorp/dir/template" \
+  --tfc-no-code-module-version "1.0.2" \
+  --tfc-project-name "my-tfc-project" \
+  --tfc-project-id "prj-123456" \
+  -l label1 \
+  -l label2
+`),
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {

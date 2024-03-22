@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/pkg/errors"
 )
 
@@ -12,11 +13,16 @@ func NewCmdAddOnDefinitionList(ctx *cmd.Context, opts *AddOnDefinitionOpts) *cmd
 	cmd := &cmd.Command{
 		Name:      "list",
 		ShortHelp: "List all known HCP Waypoint add-on definitions.",
-		LongHelp:  "List all known add-on definitions for HCP Waypoint.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+The {{ template "mdCodeOrBold" "hcp waypoint add-ons definitions list" }}
+command lets you list all existing HCP Waypoint add-on definitions.
+`),
 		Examples: []cmd.Example{
 			{
 				Preamble: "List all known HCP Waypoint add-on definitions:",
-				Command:  "hcp waypoint add-ons definitions list",
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+$ hcp waypoint add-ons definitions list
+`),
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {
