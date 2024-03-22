@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
 
 type ReadOpts struct {
@@ -23,8 +24,11 @@ func NewCmdRead(ctx *cmd.Context) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "read",
-		ShortHelp: "Read more details about an action configuration.",
-		LongHelp:  "Read more details about an action configuration.",
+		ShortHelp: "Read more details about an action configurations.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+		The {{ template "mdCodeOrBold" "hcp waypoint action-config read" }}
+		command returns more details about an action configurations.
+		`),
 		RunF: func(c *cmd.Command, args []string) error {
 			return readActionConfig(c, args, opts)
 		},

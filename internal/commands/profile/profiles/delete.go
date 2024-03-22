@@ -17,7 +17,9 @@ func NewCmdDelete(ctx *cmd.Context) *cmd.Command {
 		Name:      "delete",
 		ShortHelp: "Delete an existing HCP profile.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		Deletes an existing HCP profiles. If the profile is the active profile, it may not be deleted.
+		The {{ template "mdCodeOrBold" "hcp profile profiles delete" }} command
+		deletes an existing HCP profiles. If the profile is the active profile,
+		it may not be deleted.
 
 		To delete the current active profile, first run {{ template "mdCodeOrBold" "hcp profile profiles activate" }}
 		to active a different profile.

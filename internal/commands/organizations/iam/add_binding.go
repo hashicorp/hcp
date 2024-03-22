@@ -26,15 +26,16 @@ func NewCmdAddBinding(ctx *cmd.Context, runF func(*AddBindingOpts) error) *cmd.C
 		Name:      "add-binding",
 		ShortHelp: "Add an IAM policy binding for the organization.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		Add an IAM policy binding for the organization. A binding grants the
-		specified principal the given role on the organization.
+		The {{ template "mdCodeOrBold" "hcp organizations iam add-binding" }}
+		command adds an IAM policy binding for the organization. A binding
+		grants the specified principal the given role on the organization.
 
 		To view the available roles to bind, run
 		{{ template "mdCodeOrBold" "hcp iam roles list" }}.
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Bind a principal to role "roles/viewer":`,
+				Preamble: heredoc.New(ctx.IO).Must(`Bind a principal to role {{ template "mdCodeOrBold" "roles/viewer" }}:`),
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp organizations iam add-binding \
 				  --member=ef938a22-09cf-4be9-b4d0-1f4587f80f53 \

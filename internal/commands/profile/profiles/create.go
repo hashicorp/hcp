@@ -18,7 +18,7 @@ func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
 		Name:      "create",
 		ShortHelp: "Create a new HCP profile.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
-		Creates a new named profile.
+		The {{ template "mdCodeOrBold" "hcp profile profiles create" }} command creates a new named profile.
 
 		Profile names start with a letter and may contain lower case letters a-z,
 		upper case letters A-Z, digits 0-9, and hyphens '-'. The maximum length for

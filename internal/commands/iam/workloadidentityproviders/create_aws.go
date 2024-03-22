@@ -40,10 +40,10 @@ func NewCmdCreateAWS(ctx *cmd.Context, runF func(*CreateAWSOpts) error) *cmd.Com
 		string that is evaluated when exchanging tokens. It has access to the following variables:
 
 		{{ PreserveNewLines }}
-		  * "aws.arn": The AWS ARN associated with the calling entity.
-		  * "aws.account_id": The AWS account ID number of the account that owns
+			* {{ template "mdCodeOrBold" "aws.arn" }}: The AWS ARN associated with the calling entity.
+			* {{ template "mdCodeOrBold" "aws.account_id" }}: The AWS account ID number of the account that owns
 		    or contains the calling entity.
-		  * "aws.user_id": The unique identifier of the calling entity.
+			* {{ template "mdCodeOrBold" "aws.user_id" }}: The unique identifier of the calling entity.
 		{{ PreserveNewLines }}
 
 		An example conditional access statement that restricts access to a specific role is,
@@ -101,13 +101,13 @@ func NewCmdCreateAWS(ctx *cmd.Context, runF func(*CreateAWSOpts) error) *cmd.Com
 					The conditional_access statement can access the following variables:
 
 					{{ PreserveNewLines }}
-					  * "aws.arn": The AWS ARN associated with the calling entity.
-					  * "aws.account_id": The AWS account ID number of the account that owns
+					  * {{ template "mdCodeOrBold" "aws.arn" }}: The AWS ARN associated with the calling entity.
+					  * {{ template "mdCodeOrBold" "aws.account_id" }}: The AWS account ID number of the account that owns
 					    or contains the calling entity.
-					  * "aws.user_id": The unique identifier of the calling entity.
+					  * {{ template "mdCodeOrBold" "aws.user_id" }}: The unique identifier of the calling entity.
 					{{ PreserveNewLines }}
 
-					For details on the values of each variable, see the
+					For details on the values of each variable, refer to the
 					{{ Link "AWS documentation" "https://docs.aws.amazon.com/STS/latest/APIReference/API_GetCallerIdentity.html#API_GetCallerIdentity_ResponseElements" }}.
 					`),
 					Value:    flagvalue.Simple("", &opts.ConditionalAccess),

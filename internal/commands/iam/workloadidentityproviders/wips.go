@@ -28,7 +28,7 @@ func NewCmdWIPs(ctx *cmd.Context) *cmd.Command {
 		ShortHelp: "Manage Workload Identity Providers.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp iam workload-identity-providers" }} command group
-		allows you to create and manage Workload Identity Providers.
+		lets you create and manage Workload Identity Providers.
 
 		Creating a workload identity provider creates a trust relationship
 		between HCP and an external identity provider. Once created, a workload

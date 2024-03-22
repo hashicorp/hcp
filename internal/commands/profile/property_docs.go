@@ -36,13 +36,13 @@ func addCoreProperties(b *availablePropertiesBuilder) {
 	b.AddProperty("core", "no_color", "If True, color will not be used when printing messages in the terminal.")
 	b.AddProperty("core", "verbosity", `
 		Default logging verbosity for {{ template "mdCodeOrBold" "hcp" }} commands. This is the
-		equivalent of using the global --verbosity flag. Supported log levels:
+		equivalent of using the global {{ template "mdCodeOrBold" "--verbosity" }} flag. Supported log levels:
 		{{ template "mdCodeOrBold" "trace" }}, {{ template "mdCodeOrBold" "debug" }},
 		{{ template "mdCodeOrBold" "info" }}, {{ template "mdCodeOrBold" "warn" }}, and
 		{{ template "mdCodeOrBold" "error" }}. `)
 	b.AddProperty("core", "output_format", `
 		Default output format for {{ template "mdCodeOrBold" "hcp" }} commands. This is the
-		equivalent of using the global --format flag. Supported output foramts:
+		equivalent of using the global {{ template "mdCodeOrBold" "--format" }} flag. Supported output formats:
 		{{ template "mdCodeOrBold" "pretty" }}, {{ template "mdCodeOrBold" "table" }},
 		and {{ template "mdCodeOrBold" "json" }}.`)
 }
@@ -144,8 +144,7 @@ func (b availablePropertiesBuilder) buildMD() string {
 		keys := maps.Keys(b.properties[c])
 		slices.Sort(keys)
 		for _, k := range keys {
-			fmt.Fprintln(&buf, indent.String(fmt.Sprintf("* `%s`", cs.String(k)), 4))
-			fmt.Fprintln(&buf, indent.String(fmt.Sprintf("* %s", b.properties[c][k]), 8))
+			fmt.Fprintln(&buf, indent.String(fmt.Sprintf("* `%s` - %s", cs.String(k), b.properties[c][k]), 4))
 			fmt.Fprintln(&buf)
 		}
 	}

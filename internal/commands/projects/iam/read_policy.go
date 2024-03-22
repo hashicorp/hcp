@@ -26,7 +26,9 @@ func NewCmdReadPolicy(ctx *cmd.Context, runF func(*ReadPolicyOpts) error) *cmd.C
 	cmd := &cmd.Command{
 		Name:      "read-policy",
 		ShortHelp: "Read the IAM policy for a project.",
-		LongHelp:  "Read the IAM policy for a project.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+		The {{ template "mdCodeOrBold" "hcp projects iam read-policy" }} command reads the IAM policy for a project.
+		`),
 		Examples: []cmd.Example{
 			{
 				Preamble: "Read the IAM Policy for a project:",

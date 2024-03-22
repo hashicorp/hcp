@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
@@ -19,7 +20,9 @@ func NewCmdList(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "list",
 		ShortHelp: "List existing HCP profiles.",
-		LongHelp:  "List existing HCP profiles.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+		The {{ template "mdCodeOrBold" "hcp hcp profile profiles list" }} command lists existing HCP profiles.
+		`),
 		Examples: []cmd.Example{
 			{
 				Preamble: "To list existing profiles, run:",

@@ -16,7 +16,7 @@ func NewCmdGroupList(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
 		Name:      "list",
 		ShortHelp: "List HCP Waypoint Agent groups.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ Bold "hcp waypoint agent group list" }} command lists groups registered.
+		The {{ template "mdCodeOrBold" "hcp waypoint agent group list" }} command lists groups registered.
 		`),
 		Examples: []cmd.Example{
 			{

@@ -30,7 +30,7 @@ func NewCmdSet(ctx *cmd.Context) *cmd.Command {
 		Name:      "set",
 		ShortHelp: "Set a HCP CLI Property.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
-		{{ template "mdCodeOrBold" "hcp profile set" }} sets the specified property in your
+		The {{ template "mdCodeOrBold" "hcp profile set" }} command sets the specified property in your
 		active profile. A property governs the behavior of a specific aspect of the HCP CLI.
 		This could be setting the organization and project to target, or configuring the default
 		output format across commands.

@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
 
 type CreateOpts struct {
@@ -36,7 +37,11 @@ func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "create",
 		ShortHelp: "Create a new action configuration.",
-		LongHelp:  "Create a new action configuration to be used to launch an action with.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+		The {{ template "mdCodeOrBold" "hcp waypoint action-config create" }}
+		command creates a new action configuration to be used to launch an
+		action with.
+		`),
 		RunF: func(c *cmd.Command, args []string) error {
 			return createActionConfig(c, args, opts)
 		},

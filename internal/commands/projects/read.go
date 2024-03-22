@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/project_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
@@ -23,7 +24,9 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "read",
 		ShortHelp: "Show metadata for the project.",
-		LongHelp:  "Show metadata for the project.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+		The {{ template "mdCodeOrBold" "hcp projects read" }} command shows metadata for the project.
+		`),
 		Examples: []cmd.Example{
 			{
 				Preamble: "Read a project:",
