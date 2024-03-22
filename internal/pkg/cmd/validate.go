@@ -73,7 +73,7 @@ var (
 			got = got[:100] + "..."
 		}
 
-		return fmt.Errorf("invalid command long help prefix.\n\nWANT: %q\nGOT: %q\nREPLACE WITH: %q\n", plaintext, got, template)
+		return fmt.Errorf("invalid command long help prefix.\n\nWANT: %q\nGOT: %q\nREPLACE WITH: %q", plaintext, got, template)
 	}
 )
 
