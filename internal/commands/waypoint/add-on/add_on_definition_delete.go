@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
+	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/pkg/errors"
 )
 
@@ -13,12 +14,16 @@ func NewCmdAddOnDefinitionDelete(ctx *cmd.Context, opts *AddOnDefinitionOpts) *c
 	cmd := &cmd.Command{
 		Name:      "delete",
 		ShortHelp: "Delete an HCP Waypoint add-on definition.",
-		LongHelp: "Delete an HCP Waypoint add-on definition. This will delete the add-on definition" +
-			" with the provided name.",
+		LongHelp: heredoc.New(ctx.IO).Must(`
+The {{ template "mdCodeOrBold" "hcp waypoint add-ons definitions delete" }}
+command lets you delete an existing HCP Waypoint add-on definition.
+`),
 		Examples: []cmd.Example{
 			{
 				Preamble: "Delete an HCP Waypoint add-on definition:",
-				Command:  "hcp waypoint add-ons definitions delete -n my-addon-definition",
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+$ hcp waypoint add-ons definitions delete -n my-addon-definition
+`),
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {

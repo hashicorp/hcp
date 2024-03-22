@@ -17,6 +17,14 @@ func NewCmdAddOnDefinitionRead(ctx *cmd.Context, opts *AddOnDefinitionOpts) *cmd
 The {{ template "mdCodeOrBold" "hcp waypoint add-ons definitions read" }}
 command lets you read an existing HCP Waypoint add-on definition.
 `),
+		Examples: []cmd.Example{
+			{
+				Preamble: "Read an HCP Waypoint add-on definition:",
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+$ hcp waypoint add-ons definitions read -n my-addon-definition
+`),
+			},
+		},
 		RunF: func(c *cmd.Command, args []string) error {
 			if opts.testFunc != nil {
 				return opts.testFunc(c, args)
