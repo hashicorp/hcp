@@ -21,7 +21,7 @@ func NewCmdList(ctx *cmd.Context) *cmd.Command {
 		Name:      "list",
 		ShortHelp: "List existing HCP profiles.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp hcp profile profiles list" }} command lists existing HCP profiles.
+		The {{ template "mdCodeOrBold" "hcp profile profiles list" }} command lists existing HCP profiles.
 		`),
 		Examples: []cmd.Example{
 			{

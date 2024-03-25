@@ -51,7 +51,10 @@ go/mocks: ## Generates Go mock files.
 
 .PHONY: go/test
 go/test: ## Run the unit tests
-	@go test -v -cover ./...
+ifeq (, $(shell which gotestfmt))
+	@go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest
+endif
+	@go test -json -v  ./... 2>&1 | tee /tmp/gotest.log | gotestfmt -hide all
 
 .PHONY: changelog/build
 changelog/build:
