@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,21 +9,42 @@ import (
 	"path/filepath"
 
 	"github.com/hashicorp/hcp-sdk-go/auth"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-iam/stable/2019-12-10/client/iam_service"
 	hcpconf "github.com/hashicorp/hcp-sdk-go/config"
+	"github.com/hashicorp/hcp-sdk-go/httpclient"
 	hcpAuth "github.com/hashicorp/hcp/internal/pkg/auth"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"github.com/hashicorp/hcp/version"
 	"github.com/mitchellh/go-homedir"
 	"github.com/posener/complete"
 )
 
 func NewCmdLogin(ctx *cmd.Context) *cmd.Command {
 	opts := &LoginOpts{
-		IO:            ctx.IO,
-		Profile:       ctx.Profile,
+		Ctx:     ctx.ShutdownCtx,
+		IO:      ctx.IO,
+		Profile: ctx.Profile,
+		GetIAM: func(c hcpconf.HCPConfig) (iam_service.ClientService, error) {
+
+			// Create a new HCP client since the one passed through the
+			// cmd.Context may not be authenticated with the same principal that the
+			// login command will be.
+			hconfig := httpclient.Config{
+				HCPConfig:     c,
+				SourceChannel: version.GetSourceChannel(),
+			}
+
+			hcpClient, err := httpclient.New(hconfig)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create HCP client: %w", err)
+			}
+
+			return iam_service.New(hcpClient, nil), nil
+		},
 		ConfigFn:      hcpconf.NewHCPConfig,
 		CredentialDir: hcpAuth.CredentialsDir,
 	}
@@ -100,10 +122,18 @@ func NewCmdLogin(ctx *cmd.Context) *cmd.Command {
 // NewConfigFunc is the function definition for retrieving a new HCPConfig
 type NewConfigFunc func(opts ...hcpconf.HCPConfigOption) (hcpconf.HCPConfig, error)
 
+// GetIAMClientFunc is the function definition for retrieving an IAM service client
+// from a HCP Config.
+type GetIAMClientFunc func(c hcpconf.HCPConfig) (iam_service.ClientService, error)
+
 type LoginOpts struct {
+	Ctx     context.Context
 	IO      iostreams.IOStreams
 	Profile *profile.Profile
 	Quiet   bool
+
+	// GetIAM retrieves an IAM service client using the passed HCP Config.
+	GetIAM GetIAMClientFunc
 
 	// ConfigFn is used to retrieve a new HCP Config
 	ConfigFn NewConfigFunc
@@ -169,6 +199,41 @@ func loginRun(opts *LoginOpts) error {
 	if storeCredFile {
 		if err := writeCredFile(opts); err != nil {
 			return err
+		}
+	}
+
+	// If there is no organization or project set in the profile, attempt to
+	// default it if the logging in principal is a service principal.
+	if opts.Profile.OrganizationID == "" || opts.Profile.ProjectID == "" {
+		// Get an IAM client using the new hcpConfig
+		iam, err := opts.GetIAM(hcpConfig)
+		if err != nil {
+			return fmt.Errorf("failed to create IAM client: %w", err)
+		}
+
+		// Get the caller identity. If it is a service principal, we can set the
+		// organization and potentially project automatically.
+		callerIdentityParams := iam_service.NewIamServiceGetCallerIdentityParamsWithContext(opts.Ctx)
+		ident, err := iam.IamServiceGetCallerIdentity(callerIdentityParams, nil)
+		if err != nil {
+			return fmt.Errorf("failed to get identity of principal logging in: %w", err)
+		}
+
+		didUpdate := false
+		isSP := ident.Payload != nil && ident.Payload.Principal != nil && ident.Payload.Principal.Service != nil
+		if opts.Profile.OrganizationID == "" && isSP {
+			opts.Profile.OrganizationID = ident.Payload.Principal.Service.OrganizationID
+			didUpdate = true
+		}
+		if opts.Profile.ProjectID == "" && isSP && ident.Payload.Principal.Service.ProjectID != "" {
+			opts.Profile.ProjectID = ident.Payload.Principal.Service.ProjectID
+			didUpdate = true
+		}
+
+		if didUpdate {
+			if err := opts.Profile.Write(); err != nil {
+				return fmt.Errorf("failed to update profile: %w", err)
+			}
 		}
 	}
 

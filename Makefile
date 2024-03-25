@@ -90,13 +90,13 @@ REGISTRY_NAME?=docker.io/hashicorp
 IMAGE_NAME=hcp
 IMAGE_TAG_DEV?=$(REGISTRY_NAME)/$(IMAGE_NAME):latest-$(shell git rev-parse --short HEAD)
 DEV_DOCKER_GOOS ?= linux
-DEV_DOCKER_GOARCH ?= amd64
+DEV_DOCKER_GOARCH ?= arm64
 
-.PHONY: docker-build-dev
+.PHONY: docker/dev
 # Builds from the locally generated binary in ./bin/
-docker-build-dev: export GOOS=$(DEV_DOCKER_GOOS)
-docker-build-dev: export GOARCH=$(DEV_DOCKER_GOARCH)
-docker-build-dev: build
+docker/dev: export GOOS=$(DEV_DOCKER_GOOS)
+docker/dev: export GOARCH=$(DEV_DOCKER_GOARCH)
+docker/dev: go/build
 	docker buildx build \
 		--load \
 		--platform $(DEV_DOCKER_GOOS)/$(DEV_DOCKER_GOARCH) \

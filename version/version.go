@@ -57,3 +57,8 @@ func GetHumanVersion() string {
 func FullVersion() string {
 	return strings.TrimSpace(fullVersion)
 }
+
+// GetSourceChannel returns the source channel for the CLI, including the current version.
+func GetSourceChannel() string {
+	return fmt.Sprintf("hcp-cli/%s", FullVersion())
+}
