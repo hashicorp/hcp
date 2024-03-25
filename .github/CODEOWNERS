@@ -2,6 +2,9 @@
 # will be owned as follows.
 * @dadgar
 
+# All can contribute to the changelog
+.changelog
+
 # Waypoint Owned
 internal/commands/waypoint @hashicorp/cloud-waypoint
 internal/pkg/waypoint @hashicorp/cloud-waypoint
