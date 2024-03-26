@@ -1,0 +1,3 @@
+```release-note:improvement
+auth: If authenticating as a service principal, automatically populate the profile with the organization and project ID. This allows using the CLI without instantiating the profile.
+```
