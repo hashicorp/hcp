@@ -77,7 +77,7 @@ func IsAuthenticated() (bool, error) {
 
 	if tkn, err := hcpCfg.Token(); err != nil {
 		return false, nil
-	} else if !tkn.Expiry.After(time.Now()) {
+	} else if tkn.Expiry.Before(time.Now()) {
 		return false, nil
 	}
 
