@@ -85,6 +85,7 @@ func TestSet(t *testing.T) {
 				ProjectService: nil,
 				Property:       c.Property,
 				Value:          c.Value,
+				isAuthed:       func() (bool, error) { return true, nil },
 			}
 
 			err := setRun(o)
@@ -113,7 +114,7 @@ func TestSet_Project(t *testing.T) {
 		Property:       "project_id",
 	}
 
-	setup := func(quiet, tty bool, projectID string) {
+	setup := func(quiet, tty, authed bool, projectID string) {
 		o.Value = projectID
 		io.SetQuiet(quiet)
 		io.InputTTY = tty
@@ -121,6 +122,7 @@ func TestSet_Project(t *testing.T) {
 		io.Input.Reset()
 		io.Error.Reset()
 		io.Output.Reset()
+		o.isAuthed = func() (bool, error) { return authed, nil }
 	}
 
 	checkProject := func(expected string) {
@@ -129,9 +131,9 @@ func TestSet_Project(t *testing.T) {
 		r.Equal(expected, loadedProfile.ProjectID)
 	}
 
-	// Run with quiet off, TTY's, and return that the user has access to the project
+	// Run with quiet off, TTY's, authenticated, and return that the user has access to the project
 	{
-		setup(false, true, "123")
+		setup(false, true, true, "123")
 		psvc.EXPECT().ProjectServiceGet(mock.MatchedBy(func(getReq *project_service.ProjectServiceGetParams) bool {
 			return getReq != nil && getReq.ID == o.Value
 		}), mock.Anything).Once().Return(nil, nil)
@@ -141,7 +143,7 @@ func TestSet_Project(t *testing.T) {
 
 	// Call again but return permission denied and accept the prompt
 	{
-		setup(false, true, "accept")
+		setup(false, true, true, "accept")
 		psvc.EXPECT().ProjectServiceGet(mock.MatchedBy(func(getReq *project_service.ProjectServiceGetParams) bool {
 			return getReq != nil && getReq.ID == o.Value
 		}), mock.Anything).Once().Return(nil, project_service.NewProjectServiceGetDefault(http.StatusForbidden))
@@ -158,7 +160,7 @@ func TestSet_Project(t *testing.T) {
 
 	// Call again but return permission denied and do not accept the prompt
 	{
-		setup(false, true, "no-accept")
+		setup(false, true, true, "no-accept")
 		psvc.EXPECT().ProjectServiceGet(mock.MatchedBy(func(getReq *project_service.ProjectServiceGetParams) bool {
 			return getReq != nil && getReq.ID == o.Value
 		}), mock.Anything).Once().Return(nil, project_service.NewProjectServiceGetDefault(http.StatusForbidden))
@@ -175,7 +177,7 @@ func TestSet_Project(t *testing.T) {
 
 	// Run again but with quiet
 	{
-		setup(true, true, "789")
+		setup(true, true, true, "789")
 		r.NoError(setRun(o))
 		r.NotContains(io.Error.String(), "Are you sure you wish to set the")
 		checkProject("789")
@@ -183,10 +185,18 @@ func TestSet_Project(t *testing.T) {
 
 	// Run again but with no quiet but no tty
 	{
-		setup(false, false, "012")
+		setup(false, false, true, "012")
 		r.NoError(setRun(o))
 		r.NotContains(io.Error.String(), "Are you sure you wish to set the")
 		checkProject("012")
+	}
+
+	// Run again but unauthenticated
+	{
+		setup(true, true, false, "789")
+		r.NoError(setRun(o))
+		r.NotContains(io.Error.String(), "Are you sure you wish to set the")
+		checkProject("789")
 	}
 }
 
@@ -205,7 +215,7 @@ func TestSet_Organization(t *testing.T) {
 		Property:            "organization_id",
 	}
 
-	setup := func(quiet, tty bool, orgID string) {
+	setup := func(quiet, tty, authed bool, orgID string) {
 		o.Value = orgID
 		io.SetQuiet(quiet)
 		io.InputTTY = tty
@@ -213,6 +223,7 @@ func TestSet_Organization(t *testing.T) {
 		io.Input.Reset()
 		io.Error.Reset()
 		io.Output.Reset()
+		o.isAuthed = func() (bool, error) { return authed, nil }
 	}
 
 	orgResp := func(ids ...string) *organization_service.OrganizationServiceListOK {
@@ -236,9 +247,9 @@ func TestSet_Organization(t *testing.T) {
 		r.Equal(expected, loadedProfile.OrganizationID)
 	}
 
-	// Run with quiet off, TTY's, and return the user is a member of the org
+	// Run with quiet off, TTY's, authenticated, and return the user is a member of the org
 	{
-		setup(false, true, "member")
+		setup(false, true, true, "member")
 		osvc.EXPECT().OrganizationServiceList(mock.Anything, mock.Anything).Once().Return(orgResp("1", "2", "member"), nil)
 		r.NoError(setRun(o))
 		checkOrg("member")
@@ -246,7 +257,7 @@ func TestSet_Organization(t *testing.T) {
 
 	// Not be a member, expect prompting and respond no
 	{
-		setup(false, true, "not-a-member")
+		setup(false, true, true, "not-a-member")
 		osvc.EXPECT().OrganizationServiceList(mock.Anything, mock.Anything).Once().Return(orgResp("1", "2", "123"), nil)
 
 		// Answer yes to prompt
@@ -261,7 +272,7 @@ func TestSet_Organization(t *testing.T) {
 
 	// Not be a member, expect prompting and respond yes
 	{
-		setup(false, true, "not-a-member")
+		setup(false, true, true, "not-a-member")
 		osvc.EXPECT().OrganizationServiceList(mock.Anything, mock.Anything).Once().Return(orgResp("1", "2", "123"), nil)
 
 		// Answer yes to prompt
@@ -276,21 +287,28 @@ func TestSet_Organization(t *testing.T) {
 
 	// Do not be a member; but quiet
 	{
-		setup(true, true, "not-a-member-quiet")
+		setup(true, true, true, "not-a-member-quiet")
 		r.NoError(setRun(o))
 		checkOrg("not-a-member-quiet")
 	}
 
 	// Do not be a member; but no tty
 	{
-		setup(false, false, "not-a-member-no-tty")
+		setup(false, false, true, "not-a-member-no-tty")
+		r.NoError(setRun(o))
+		checkOrg("not-a-member-no-tty")
+	}
+
+	// Do not be a member; but unauthenticated
+	{
+		setup(false, false, false, "not-a-member-no-tty")
 		r.NoError(setRun(o))
 		checkOrg("not-a-member-no-tty")
 	}
 
 	// Return error
 	{
-		setup(false, true, "error")
+		setup(false, true, true, "error")
 		osvc.EXPECT().OrganizationServiceList(mock.Anything, mock.Anything).Once().
 			Return(nil, organization_service.NewOrganizationServiceListDefault(http.StatusInternalServerError))
 
