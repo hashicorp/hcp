@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	hcpconf "github.com/hashicorp/hcp-sdk-go/config"
 	"github.com/mitchellh/go-homedir"
@@ -64,4 +65,21 @@ func GetHCPCredFilePath(credFileDir string) (string, error) {
 	// Build the path to the credential file
 	credFilePath := filepath.Join(dir, CredFileName)
 	return credFilePath, nil
+}
+
+// IsAuthenticated returns if there is a valid token available.
+func IsAuthenticated() (bool, error) {
+	// Create the HCP Config
+	hcpCfg, err := GetHCPConfig(hcpconf.WithoutBrowserLogin())
+	if err != nil {
+		return false, fmt.Errorf("failed to instantiate HCP config to check authentication status: %w", err)
+	}
+
+	if tkn, err := hcpCfg.Token(); err != nil {
+		return false, nil
+	} else if tkn.Expiry.Before(time.Now()) {
+		return false, nil
+	}
+
+	return true, nil
 }

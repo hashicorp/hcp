@@ -29,6 +29,7 @@ func NewCmdList(ctx *cmd.Context) *cmd.Command {
 				Command:  "$ hcp profile profiles list",
 			},
 		},
+		NoAuthRequired: true,
 		RunF: func(c *cmd.Command, args []string) error {
 			l, err := profile.NewLoader()
 			if err != nil {

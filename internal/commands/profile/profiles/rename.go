@@ -25,7 +25,7 @@ func NewCmdRename(ctx *cmd.Context) *cmd.Command {
 		Examples: []cmd.Example{
 			{
 				Preamble: heredoc.New(ctx.IO).Must(`
-				To rename profile {{ template "mdCodeOrBold" "my-profile" }} to 
+				To rename profile {{ template "mdCodeOrBold" "my-profile" }} to
 				{{ template "mdCodeOrBold" "new-profile" }}, run:
 				`),
 				Command: "$ hcp profile profiles rename my-profile --new-name=new-profile",
@@ -51,6 +51,7 @@ func NewCmdRename(ctx *cmd.Context) *cmd.Command {
 				},
 			},
 		},
+		NoAuthRequired: true,
 		RunF: func(c *cmd.Command, args []string) error {
 			opts.ExistingName = args[0]
 			l, err := profile.NewLoader()

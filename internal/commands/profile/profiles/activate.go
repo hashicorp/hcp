@@ -37,6 +37,7 @@ func NewCmdActivate(ctx *cmd.Context) *cmd.Command {
 				},
 			},
 		},
+		NoAuthRequired: true,
 		RunF: func(c *cmd.Command, args []string) error {
 			opts.Name = args[0]
 			l, err := profile.NewLoader()

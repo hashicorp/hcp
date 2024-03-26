@@ -11,6 +11,7 @@ import (
 
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/organization_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/project_service"
+	"github.com/hashicorp/hcp/internal/pkg/auth"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -24,6 +25,7 @@ func NewCmdSet(ctx *cmd.Context) *cmd.Command {
 		Profile:             ctx.Profile,
 		ProjectService:      project_service.New(ctx.HCP, nil),
 		OrganizationService: organization_service.New(ctx.HCP, nil),
+		isAuthed:            auth.IsAuthenticated,
 	}
 
 	cmd := &cmd.Command{
@@ -69,6 +71,7 @@ func NewCmdSet(ctx *cmd.Context) *cmd.Command {
 		AdditionalDocs: []cmd.DocSection{
 			availablePropertiesDoc(ctx.IO),
 		},
+		NoAuthRequired: true,
 		RunF: func(c *cmd.Command, args []string) error {
 			opts.Property = args[0]
 			opts.Value = args[1]
@@ -79,10 +82,14 @@ func NewCmdSet(ctx *cmd.Context) *cmd.Command {
 	return cmd
 }
 
+type isAuthedFn func() (bool, error)
+
 type SetOpts struct {
 	Ctx     context.Context
 	IO      iostreams.IOStreams
 	Profile *profile.Profile
+
+	isAuthed isAuthedFn
 
 	// Resource Manager client
 	ProjectService      project_service.ClientService
@@ -168,7 +175,13 @@ func setRun(opts *SetOpts) error {
 }
 
 func (o *SetOpts) validateProject() (bool, error) {
-	if o.Property != "project_id" || !o.IO.CanPrompt() {
+	// If the CLI is not authenticated, skip validation.
+	isAuthed, err := o.isAuthed()
+	if err != nil {
+		return false, err
+	}
+
+	if o.Property != "project_id" || !o.IO.CanPrompt() || !isAuthed {
 		return true, nil
 	}
 
@@ -178,7 +191,7 @@ func (o *SetOpts) validateProject() (bool, error) {
 		ID:      o.Value,
 		Context: o.Ctx,
 	}
-	_, err := o.ProjectService.ProjectServiceGet(params, nil)
+	_, err = o.ProjectService.ProjectServiceGet(params, nil)
 	if err != nil {
 		var listErr *project_service.ProjectServiceGetDefault
 		if errors.As(err, &listErr) {
@@ -211,7 +224,13 @@ func (o *SetOpts) validateProject() (bool, error) {
 }
 
 func (o *SetOpts) validateOrg() (bool, error) {
-	if o.Property != "organization_id" || !o.IO.CanPrompt() {
+	// If the CLI is not authenticated, skip validation.
+	isAuthed, err := o.isAuthed()
+	if err != nil {
+		return false, err
+	}
+
+	if o.Property != "organization_id" || !o.IO.CanPrompt() || !isAuthed {
 		return true, nil
 	}
 
