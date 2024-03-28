@@ -13,6 +13,8 @@ import (
 )
 
 func TestNewCmdDestroyApplication(t *testing.T) {
+	t.Parallel()
+
 	cases := []struct {
 		Name    string
 		Args    []string
@@ -35,7 +37,10 @@ func TestNewCmdDestroyApplication(t *testing.T) {
 		{
 			Name:    "Happy",
 			Profile: profile.TestProfile,
-			Args:    []string{"-n", "app-name"},
+			Args: []string{
+				"-n",
+				"app-name",
+			},
 			Expect: &ApplicationOpts{
 				Name: "app-name",
 			},

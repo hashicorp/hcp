@@ -13,6 +13,8 @@ import (
 )
 
 func TestNewCmdCreateApplication(t *testing.T) {
+	t.Parallel()
+
 	cases := []struct {
 		Name    string
 		Args    []string
