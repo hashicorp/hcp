@@ -1,9 +1,19 @@
 package application
 
 import (
+	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
+
+type ApplicationOpts struct {
+	opts.WaypointOpts
+
+	ID                string
+	Name              string
+	TemplateName      string
+	ActionConfigNames []string
+}
 
 func NewCmdApplications(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
