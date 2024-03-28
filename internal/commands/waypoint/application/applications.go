@@ -9,13 +9,18 @@ import (
 type ApplicationOpts struct {
 	opts.WaypointOpts
 
-	ID                string
 	Name              string
 	TemplateName      string
 	ActionConfigNames []string
+
+	testFunc func(c *cmd.Command, args []string) error
 }
 
 func NewCmdApplications(ctx *cmd.Context) *cmd.Command {
+	opts := &ApplicationOpts{
+		WaypointOpts: opts.New(ctx),
+	}
+
 	cmd := &cmd.Command{
 		Name:      "applications",
 		ShortHelp: "Manage HCP Waypoint applications.",
@@ -24,6 +29,8 @@ The {{ Bold "hcp waypoint applications" }} command group lets you manage
 HCP Waypoint applications.
 		`),
 	}
+
+	cmd.AddChild(NewCmdCreateApplication(ctx, opts))
 
 	return cmd
 }
