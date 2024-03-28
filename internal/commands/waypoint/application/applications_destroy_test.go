@@ -69,7 +69,7 @@ func TestNewCmdDestroyApplication(t *testing.T) {
 			appOpts.testFunc = func(c *cmd.Command, args []string) error {
 				return nil
 			}
-			cmd := NewCmdDestroyApplication(ctx, &appOpts)
+			cmd := NewCmdApplicationsDestroy(ctx, &appOpts)
 			cmd.SetIO(io)
 
 			cmd.Run(c.Args)

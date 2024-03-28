@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func NewCmdDestroyApplication(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
+func NewCmdApplicationsDestroy(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "destroy",
 		ShortHelp: "Destroy an HCP Waypoint application and its infrastructure.",

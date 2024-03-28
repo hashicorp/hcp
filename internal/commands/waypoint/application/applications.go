@@ -30,10 +30,11 @@ HCP Waypoint applications.
 		`),
 	}
 
-	cmd.AddChild(NewCmdCreateApplication(ctx, opts))
-	cmd.AddChild(NewCmdDestroyApplication(ctx, opts))
-	cmd.AddChild(NewCmdListApplications(ctx, opts))
-	cmd.AddChild(NewCmdReadApplication(ctx, opts))
+	cmd.AddChild(NewCmdApplicationsCreate(ctx, opts))
+	cmd.AddChild(NewCmdApplicationsDestroy(ctx, opts))
+	cmd.AddChild(NewCmdApplicationsList(ctx, opts))
+	cmd.AddChild(NewCmdApplicationsRead(ctx, opts))
+	cmd.AddChild(NewCmdApplicationsUpdate(ctx, opts))
 
 	return cmd
 }

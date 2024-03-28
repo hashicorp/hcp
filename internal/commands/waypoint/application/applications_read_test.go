@@ -69,7 +69,7 @@ func TestNewCmdReadApplication(t *testing.T) {
 			appOpts.testFunc = func(c *cmd.Command, args []string) error {
 				return nil
 			}
-			cmd := NewCmdReadApplication(ctx, &appOpts)
+			cmd := NewCmdApplicationsRead(ctx, &appOpts)
 			cmd.SetIO(io)
 
 			cmd.Run(c.Args)

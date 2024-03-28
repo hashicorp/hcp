@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func NewCmdCreateApplication(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
+func NewCmdApplicationsCreate(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "create",
 		ShortHelp: "Create a new HCP Waypoint application.",

@@ -9,13 +9,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-func NewCmdReadApplication(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
+func NewCmdApplicationsRead(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "read",
 		ShortHelp: "Read an HCP Waypoint application.",
-		LongHelp: heredoc.New(ctx.IO).Must(`,
-			The {{ Bold "hcp waypoint applications read" }}" command lets you read
-			details about an HCP Waypoint application.
+		LongHelp: heredoc.New(ctx.IO).Must(`
+The {{ Bold "hcp waypoint applications read" }} command lets you read
+details about an HCP Waypoint application.
 `),
 		Examples: []cmd.Example{
 			{

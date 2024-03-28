@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func NewCmdListApplications(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
+func NewCmdApplicationsList(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "list",
 		ShortHelp: "List HCP Waypoint applications.",

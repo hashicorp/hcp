@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewCmdCreateApplication(t *testing.T) {
+func TestNewCmdApplicationsUpdate(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
@@ -31,22 +31,26 @@ func TestNewCmdCreateApplication(t *testing.T) {
 		{
 			Name:    "No Name",
 			Profile: profile.TestProfile,
-			Args:    []string{"-t", "template-name"},
+			Args:    []string{},
 			Error:   "The name of the application is required",
-		},
-		{
-			Name:    "No Template Name",
-			Profile: profile.TestProfile,
-			Args:    []string{"-n", "app-name"},
-			Error:   "The name of the template to use for the application is required",
 		},
 		{
 			Name:    "Happy",
 			Profile: profile.TestProfile,
-			Args:    []string{"-n", "app-name", "-t", "template-name"},
+			Args: []string{
+				"-n",
+				"app-name",
+				"--action-config-name",
+				"config-1",
+				"--action-config-name",
+				"config-2",
+			},
 			Expect: &ApplicationOpts{
-				Name:         "app-name",
-				TemplateName: "template-name",
+				Name: "app-name",
+				ActionConfigNames: []string{
+					"config-1",
+					"config-2",
+				},
 			},
 		},
 	}
@@ -64,23 +68,23 @@ func TestNewCmdCreateApplication(t *testing.T) {
 			ctx := &cmd.Context{
 				IO:          io,
 				Profile:     c.Profile(t),
-				Output:      format.New(io),
 				HCP:         &client.Runtime{},
 				ShutdownCtx: context.Background(),
+				Output:      format.New(io),
 			}
 
 			var appOpts ApplicationOpts
 			appOpts.testFunc = func(c *cmd.Command, args []string) error {
 				return nil
 			}
-			cmd := NewCmdApplicationsCreate(ctx, &appOpts)
+			cmd := NewCmdApplicationsUpdate(ctx, &appOpts)
 			cmd.SetIO(io)
 
 			cmd.Run(c.Args)
 
 			if c.Expect != nil {
 				r.Equal(c.Expect.Name, appOpts.Name)
-				r.Equal(c.Expect.TemplateName, appOpts.TemplateName)
+				r.Equal(c.Expect.ActionConfigNames, appOpts.ActionConfigNames)
 			}
 		})
 	}
