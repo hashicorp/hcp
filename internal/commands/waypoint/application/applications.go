@@ -31,6 +31,7 @@ HCP Waypoint applications.
 	}
 
 	cmd.AddChild(NewCmdCreateApplication(ctx, opts))
+	cmd.AddChild(NewCmdDestroyApplication(ctx, opts))
 
 	return cmd
 }
