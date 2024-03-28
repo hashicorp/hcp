@@ -78,7 +78,12 @@ func inferFields[T any](payload T, columns []string) []Field {
 		rv = rv.Elem()
 	}
 
+	var ret []Field
+
 	if rv.Kind() == reflect.Slice {
+		if rv.Len() == 0 {
+			return ret
+		}
 		rv = rv.Index(0)
 
 		for rv.Kind() == reflect.Pointer {
@@ -97,8 +102,6 @@ func inferFields[T any](payload T, columns []string) []Field {
 	}
 
 	st := rv.Type()
-
-	var ret []Field
 
 	all := len(toField) == 0
 

@@ -60,5 +60,6 @@ func listTemplates(opts *TemplateOpts) error {
 
 		templates = append(templates, resp.GetPayload().ApplicationTemplates...)
 	}
+
 	return opts.Output.Show(templates, format.Pretty)
 }

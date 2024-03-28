@@ -1,0 +1,3 @@
+```release-note:feature
+waypoint: Add `hcp waypoint add-ons definitions` CLI for managing HCP Waypoint add-on definitions.
+```
