@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
@@ -23,7 +24,7 @@ an existing HCP Waypoint application.
 			{
 				Preamble: "Update an existing HCP Waypoint application:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint applications update -n my-application -action-config-name my-action-config
+$ hcp waypoint applications update -n my-application --action-config-name my-action-config
 `),
 			},
 		},
@@ -54,6 +55,13 @@ $ hcp waypoint applications update -n my-application -action-config-name my-acti
 					Required:     false,
 					Repeatable:   true,
 				},
+				{
+					Name:         "readme-markdown-file",
+					DisplayValue: "README_MARKDOWN_FILE",
+					Description:  "The path to the README markdown file to be used for the application.",
+					Value:        flagvalue.Simple("", &opts.ReadmeMarkdownFile),
+					Required:     false,
+				},
 			},
 		},
 	}
@@ -67,12 +75,29 @@ func applicationUpdate(opts *ApplicationOpts) error {
 		return errors.Wrap(err, "failed to get namespace")
 	}
 
-	_, err = opts.WS.WaypointServiceUpdateApplication(
-		&waypoint_service.WaypointServiceUpdateApplicationParams{
-			NamespaceID: ns.ID,
-			Context:     opts.Ctx,
+	var acrs []*models.HashicorpCloudWaypointActionCfgRef
+	for _, acn := range opts.ActionConfigNames {
+		acrs = append(acrs, &models.HashicorpCloudWaypointActionCfgRef{
+			Name: acn,
+		})
+	}
+
+	var readme []byte
+	if opts.ReadmeMarkdownFile != "" {
+		readme, err = os.ReadFile(opts.ReadmeMarkdownFile)
+		if err != nil {
+			return errors.Wrapf(err, "failed to read README markdown file %q", opts.ReadmeMarkdownFile)
+		}
+	}
+
+	_, err = opts.WS.WaypointServiceUpdateApplication2(
+		&waypoint_service.WaypointServiceUpdateApplication2Params{
+			NamespaceID:     ns.ID,
+			Context:         opts.Ctx,
+			ApplicationName: opts.Name,
 			Body: &models.HashicorpCloudWaypointWaypointServiceUpdateApplicationBody{
-				Name: opts.Name,
+				ActionCfgRefs:  acrs,
+				ReadmeMarkdown: readme,
 			},
 		}, nil,
 	)

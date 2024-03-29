@@ -44,6 +44,8 @@ func TestNewCmdApplicationsUpdate(t *testing.T) {
 				"config-1",
 				"--action-config-name",
 				"config-2",
+				"--readme-markdown-file",
+				"readme.md",
 			},
 			Expect: &ApplicationOpts{
 				Name: "app-name",
@@ -51,6 +53,7 @@ func TestNewCmdApplicationsUpdate(t *testing.T) {
 					"config-1",
 					"config-2",
 				},
+				ReadmeMarkdownFile: "readme.md",
 			},
 		},
 	}
@@ -85,6 +88,7 @@ func TestNewCmdApplicationsUpdate(t *testing.T) {
 			if c.Expect != nil {
 				r.Equal(c.Expect.Name, appOpts.Name)
 				r.Equal(c.Expect.ActionConfigNames, appOpts.ActionConfigNames)
+				r.Equal(c.Expect.ReadmeMarkdownFile, appOpts.ReadmeMarkdownFile)
 			}
 		})
 	}

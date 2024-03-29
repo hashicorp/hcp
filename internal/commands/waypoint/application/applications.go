@@ -9,9 +9,10 @@ import (
 type ApplicationOpts struct {
 	opts.WaypointOpts
 
-	Name              string
-	TemplateName      string
-	ActionConfigNames []string
+	Name               string
+	TemplateName       string
+	ActionConfigNames  []string
+	ReadmeMarkdownFile string
 
 	testFunc func(c *cmd.Command, args []string) error
 }
