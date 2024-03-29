@@ -2,8 +2,12 @@
 # will be owned as follows.
 * @dadgar
 
-# All can contribute to the changelog
+# Files that all teams can contribute to
 .changelog
+.mockery.yml
+go.mod
+go.sum
+internal/pkg/api/mocks
 
 # Waypoint Owned
 internal/commands/waypoint @hashicorp/cloud-waypoint
