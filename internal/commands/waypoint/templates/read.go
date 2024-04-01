@@ -12,10 +12,10 @@ import (
 func NewCmdRead(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "read",
-		ShortHelp: "Read more details about an HCP Waypoint templates.",
+		ShortHelp: "Read more details about an HCP Waypoint template.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 The {{ template "mdCodeOrBold" "hcp waypoint templates read" }} command lets you read
-an existing HCP Waypoint templates.
+an existing HCP Waypoint template.
 		`),
 		RunF: func(c *cmd.Command, args []string) error {
 			if opts.testFunc != nil {
@@ -32,7 +32,7 @@ an existing HCP Waypoint templates.
 					Name:         "name",
 					Shorthand:    "n",
 					DisplayValue: "NAME",
-					Description:  "The name of the templates.",
+					Description:  "The name of the template.",
 					Value:        flagvalue.Simple("", &opts.Name),
 					Required:     true,
 				},
@@ -57,7 +57,7 @@ func templateRead(opts *TemplateOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get templates %q", opts.Name)
+		return errors.Wrapf(err, "failed to get template %q", opts.Name)
 	}
 
 	respPayload := resp.GetPayload()

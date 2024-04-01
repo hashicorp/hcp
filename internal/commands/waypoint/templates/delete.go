@@ -13,7 +13,7 @@ import (
 func NewCmdDelete(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "delete",
-		ShortHelp: "Delete an existing Waypoint templates.",
+		ShortHelp: "Delete an existing Waypoint template.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 The {{ template "mdCodeOrBold" "hcp waypoint templates delete" }} command lets you delete
 existing HCP Waypoint templates.
@@ -33,7 +33,7 @@ existing HCP Waypoint templates.
 					Name:         "name",
 					Shorthand:    "n",
 					DisplayValue: "NAME",
-					Description:  "The name of the templates to be deleted.",
+					Description:  "The name of the template to be deleted.",
 					Value:        flagvalue.Simple("", &opts.Name),
 					Required:     true,
 				},
@@ -58,7 +58,7 @@ func templateDelete(opts *TemplateOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to delete templates %q", opts.Name)
+		return errors.Wrapf(err, "failed to delete template %q", opts.Name)
 	}
 
 	fmt.Fprintf(opts.IO.Err(), "Template %q deleted.", opts.Name)

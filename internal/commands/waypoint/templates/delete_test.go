@@ -42,10 +42,10 @@ func TestCmdTemplateDelete(t *testing.T) {
 				return profile.TestProfile(t).SetOrgID("123")
 			},
 			Args: []string{
-				"--name=cli-templates",
+				"--name=cli-template",
 			},
 			Expect: &TemplateOpts{
-				Name: "cli-templates",
+				Name: "cli-template",
 			},
 		},
 	}

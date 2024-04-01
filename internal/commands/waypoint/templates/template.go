@@ -11,12 +11,12 @@ type TemplateOpts struct {
 
 	ID string
 
-	// Name is the name of a new templates, or the name of an existing templates.
-	// When used during update operations, it is the name of the templates to be
+	// Name is the name of a new template, or the name of an existing template.
+	// When used during update operations, it is the name of the template to be
 	// updated.
 	Name string
 
-	// UpdatedName is used for updates, and is the new name for the templates.
+	// UpdatedName is used for updates, and is the new name for the template.
 	UpdatedName                string
 	Summary                    string
 	Description                string
@@ -44,7 +44,7 @@ func NewCmdTemplate(ctx *cmd.Context) *cmd.Command {
 		ShortHelp: "Manage HCP Waypoint templates.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 The {{ template "mdCodeOrBold" "hcp waypoint templates" }} command group lets you manage
-HCP Waypoint templates. A templates is a reusable configuration for creating
+HCP Waypoint templates. A template is a reusable configuration for creating
 applications.
 		`),
 	}

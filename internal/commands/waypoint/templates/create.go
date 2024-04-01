@@ -15,20 +15,20 @@ import (
 func NewCmdCreate(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "create",
-		ShortHelp: "Create a new HCP Waypoint templates.",
+		ShortHelp: "Create a new HCP Waypoint template.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 The {{ template "mdCodeOrBold" "hcp waypoint templates create" }} command lets you create
 HCP Waypoint templates.
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: "Create a new HCP Waypoint templates:",
+				Preamble: "Create a new HCP Waypoint template:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint templates create -n my-templates \
+$ hcp waypoint templates create -n my-template \
   -s "My Template Summary" \
   -d "My Template Description" \
-  --readme-markdown-templates-file "README.tpl" \
-  --tfc-no-code-module-source "app.terraform.io/hashicorp/dir/templates" \
+  --readme-markdown-template-file "README.tpl" \
+  --tfc-no-code-module-source "app.terraform.io/hashicorp/dir/template" \
   --tfc-no-code-module-version "1.0.2" \
   --tfc-project-name "my-tfc-project" \
   --tfc-project-id "prj-123456"" \
@@ -52,7 +52,7 @@ $ hcp waypoint templates create -n my-templates \
 					Name:         "name",
 					Shorthand:    "n",
 					DisplayValue: "NAME",
-					Description:  "The name of the templates.",
+					Description:  "The name of the template.",
 					Value:        flagvalue.Simple("", &opts.Name),
 					Required:     true,
 				},
@@ -60,7 +60,7 @@ $ hcp waypoint templates create -n my-templates \
 					Name:         "summary",
 					Shorthand:    "s",
 					DisplayValue: "SUMMARY",
-					Description:  "The summary of the templates.",
+					Description:  "The summary of the template.",
 					Value:        flagvalue.Simple("", &opts.Summary),
 					Required:     true,
 				},
@@ -68,20 +68,20 @@ $ hcp waypoint templates create -n my-templates \
 					Name:         "description",
 					Shorthand:    "d",
 					DisplayValue: "DESCRIPTION",
-					Description:  "The description of the templates.",
+					Description:  "The description of the template.",
 					Value:        flagvalue.Simple("", &opts.Description),
 				},
 				{
-					Name:         "readme-markdown-templates-file",
+					Name:         "readme-markdown-template-file",
 					DisplayValue: "README_MARKDOWN_TEMPLATE_FILE_PATH",
-					Description:  "The file containing the README markdown templates.",
+					Description:  "The file containing the README markdown template.",
 					Value:        flagvalue.Simple("", &opts.ReadmeMarkdownTemplateFile),
 				},
 				{
 					Name:         "label",
 					Shorthand:    "l",
 					DisplayValue: "LABEL",
-					Description:  "A label to apply to the templates.",
+					Description:  "A label to apply to the template.",
 					Repeatable:   true,
 					Value:        flagvalue.SimpleSlice(nil, &opts.Labels),
 				},
@@ -89,7 +89,7 @@ $ hcp waypoint templates create -n my-templates \
 					Name:         "tag",
 					Shorthand:    "t",
 					DisplayValue: "KEY=VALUE",
-					Description:  "A tag to apply to the templates.",
+					Description:  "A tag to apply to the template.",
 					Repeatable:   true,
 					Value:        flagvalue.SimpleMap(nil, &opts.Tags),
 					Hidden:       true,
@@ -117,7 +117,7 @@ $ hcp waypoint templates create -n my-templates \
 					Name:         "tfc-project-name",
 					DisplayValue: "TFC_PROJECT_NAME",
 					Description: "The name of the Terraform Cloud project where" +
-						" applications using this templates will be created.",
+						" applications using this template will be created.",
 					Value:    flagvalue.Simple("", &opts.TerraformCloudProjectName),
 					Required: true,
 				},
@@ -125,7 +125,7 @@ $ hcp waypoint templates create -n my-templates \
 					Name:         "tfc-project-id",
 					DisplayValue: "TFC_PROJECT_ID",
 					Description: "The ID of the Terraform Cloud project where" +
-						" applications using this templates will be created.",
+						" applications using this template will be created.",
 					Value:    flagvalue.Simple("", &opts.TerraformCloudProjectID),
 					Required: true,
 				},
@@ -154,7 +154,7 @@ func templateCreate(opts *TemplateOpts) error {
 	if opts.ReadmeMarkdownTemplateFile != "" {
 		readmeTpl, err = os.ReadFile(opts.ReadmeMarkdownTemplateFile)
 		if err != nil {
-			return errors.Wrapf(err, "failed to read README markdown templates file %q", opts.ReadmeMarkdownTemplateFile)
+			return errors.Wrapf(err, "failed to read README markdown template file %q", opts.ReadmeMarkdownTemplateFile)
 		}
 	}
 
@@ -182,7 +182,7 @@ func templateCreate(opts *TemplateOpts) error {
 			Context: opts.Ctx,
 		}, nil)
 	if err != nil {
-		return errors.Wrapf(err, "failed to create templates %q", opts.Name)
+		return errors.Wrapf(err, "failed to create template %q", opts.Name)
 	}
 
 	fmt.Fprintf(opts.IO.Err(), "Template %q created.", opts.Name)
