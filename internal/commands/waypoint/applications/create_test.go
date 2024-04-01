@@ -32,13 +32,13 @@ func TestNewCmdCreateApplication(t *testing.T) {
 			Name:    "No Name",
 			Profile: profile.TestProfile,
 			Args:    []string{"-t", "templates-name"},
-			Error:   "The name of the applications is required",
+			Error:   "The name of the application is required",
 		},
 		{
 			Name:    "No Template Name",
 			Profile: profile.TestProfile,
 			Args:    []string{"-n", "app-name"},
-			Error:   "The name of the templates to use for the applications is required",
+			Error:   "The name of the templates to use for the application is required",
 		},
 		{
 			Name:    "Happy",

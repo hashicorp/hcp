@@ -15,16 +15,16 @@ import (
 func NewCmdApplicationsUpdate(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "update",
-		ShortHelp: "Update an existing HCP Waypoint applications.",
+		ShortHelp: "Update an existing HCP Waypoint application.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 The {{ template "mdCodeOrBold" "hcp waypoint applications update" }} command lets you update
-an existing HCP Waypoint applications.
+an existing HCP Waypoint application.
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: "Update an existing HCP Waypoint applications:",
+				Preamble: "Update an existing HCP Waypoint application:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint applications update -n my-applications --action-config-name my-action-config
+$ hcp waypoint applications update -n my-application --action-config-name my-action-config
 `),
 			},
 		},
@@ -43,14 +43,14 @@ $ hcp waypoint applications update -n my-applications --action-config-name my-ac
 					Name:         "name",
 					Shorthand:    "n",
 					DisplayValue: "NAME",
-					Description:  "The name of the HCP Waypoint applications to update.",
+					Description:  "The name of the HCP Waypoint application to update.",
 					Value:        flagvalue.Simple("", &opts.Name),
 					Required:     true,
 				},
 				{
 					Name:         "action-config-name",
 					DisplayValue: "ACTION_CONFIG_NAME",
-					Description:  "The name of the action configuration to be added to the applications.",
+					Description:  "The name of the action configuration to be added to the application.",
 					Value:        flagvalue.SimpleSlice(nil, &opts.ActionConfigNames),
 					Required:     false,
 					Repeatable:   true,
@@ -58,7 +58,7 @@ $ hcp waypoint applications update -n my-applications --action-config-name my-ac
 				{
 					Name:         "readme-markdown-file",
 					DisplayValue: "README_MARKDOWN_FILE",
-					Description:  "The path to the README markdown file to be used for the applications.",
+					Description:  "The path to the README markdown file to be used for the application.",
 					Value:        flagvalue.Simple("", &opts.ReadmeMarkdownFile),
 					Required:     false,
 				},
@@ -102,7 +102,7 @@ func applicationUpdate(opts *ApplicationOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to update applications %q", opts.Name)
+		return errors.Wrapf(err, "failed to update application %q", opts.Name)
 	}
 
 	fmt.Fprintf(opts.IO.Err(), "Application %q updated.", opts.Name)

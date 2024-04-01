@@ -27,8 +27,8 @@ command lets you update an existing HCP Waypoint add-on definition.
 $ hcp waypoint add-ons definitions update -n=my-add-on-definition \
   -s "My updated Add-on Definition summary." \
   -d "My updated Add-on Definition description." \
-  --readme-markdown-templates-file "README.tpl" \
-  --tfc-no-code-module-source "app.terraform.io/hashicorp/dir/templates" \
+  --readme-markdown-template-file "README.tpl" \
+  --tfc-no-code-module-source "app.terraform.io/hashicorp/dir/template" \
   --tfc-no-code-module-version "1.0.2" \
   --tfc-project-name "my-tfc-project" \
   --tfc-project-id "prj-123456" \
@@ -71,9 +71,9 @@ $ hcp waypoint add-ons definitions update -n=my-add-on-definition \
 					Value:        flagvalue.Simple("", &opts.Description),
 				},
 				{
-					Name:         "readme-markdown-templates-file",
+					Name:         "readme-markdown-template-file",
 					DisplayValue: "README_MARKDOWN_TEMPLATE_FILE",
-					Description:  "The README markdown templates file.",
+					Description:  "The README markdown template file.",
 					Value:        flagvalue.Simple("", &opts.ReadmeMarkdownTemplateFile),
 				},
 				{
@@ -125,7 +125,7 @@ func addOnDefinitionUpdate(opts *AddOnDefinitionOpts) error {
 	if opts.ReadmeMarkdownTemplateFile != "" {
 		readmeTpl, err = os.ReadFile(opts.ReadmeMarkdownTemplateFile)
 		if err != nil {
-			return errors.Wrapf(err, "failed to read README markdown templates file %q", opts.ReadmeMarkdownTemplateFile)
+			return errors.Wrapf(err, "failed to read README markdown template file %q", opts.ReadmeMarkdownTemplateFile)
 		}
 	}
 

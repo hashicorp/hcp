@@ -12,15 +12,15 @@ import (
 func NewCmdApplicationsRead(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "read",
-		ShortHelp: "Read an HCP Waypoint applications.",
+		ShortHelp: "Read an HCP Waypoint application.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 The {{ template "mdCodeOrBold" "hcp waypoint applications read" }} command lets you read
-details about an HCP Waypoint applications.
+details about an HCP Waypoint application.
 `),
 		Examples: []cmd.Example{
 			{
-				Preamble: "Read an HCP Waypoint applications:",
-				Command:  "$ hcp waypoint applications read -n my-applications",
+				Preamble: "Read an HCP Waypoint application:",
+				Command:  "$ hcp waypoint applications read -n my-application",
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {
@@ -38,7 +38,7 @@ details about an HCP Waypoint applications.
 					Name:         "name",
 					Shorthand:    "n",
 					DisplayValue: "NAME",
-					Description:  "The name of the HCP Waypoint applications.",
+					Description:  "The name of the HCP Waypoint application.",
 					Value:        flagvalue.Simple("", &opts.Name),
 					Required:     true,
 				},
@@ -63,7 +63,7 @@ func applicationRead(opts *ApplicationOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get applications %q", opts.Name)
+		return errors.Wrapf(err, "failed to get application %q", opts.Name)
 	}
 
 	return opts.Output.Show(getResp.GetPayload().Application, format.Pretty)

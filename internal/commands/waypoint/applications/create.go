@@ -14,16 +14,16 @@ import (
 func NewCmdApplicationsCreate(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "create",
-		ShortHelp: "Create a new HCP Waypoint applications.",
+		ShortHelp: "Create a new HCP Waypoint application.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 The {{ template "mdCodeOrBold" "hcp waypoint applications create" }} command lets you create
-a new HCP Waypoint applications.
+a new HCP Waypoint application.
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: "Create a new HCP Waypoint applications:",
+				Preamble: "Create a new HCP Waypoint application:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint applications create -n my-applications -t my-templates
+$ hcp waypoint application create -n my-application -t my-templates
 `),
 			},
 		},
@@ -42,7 +42,7 @@ $ hcp waypoint applications create -n my-applications -t my-templates
 					Name:         "name",
 					Shorthand:    "n",
 					DisplayValue: "NAME",
-					Description:  "The name of the applications.",
+					Description:  "The name of the application.",
 					Value:        flagvalue.Simple("", &opts.Name),
 					Required:     true,
 				},
@@ -50,14 +50,14 @@ $ hcp waypoint applications create -n my-applications -t my-templates
 					Name:         "templates-name",
 					Shorthand:    "t",
 					DisplayValue: "TEMPLATE_NAME",
-					Description:  "The name of the templates to use for the applications.",
+					Description:  "The name of the templates to use for the application.",
 					Value:        flagvalue.Simple("", &opts.TemplateName),
 					Required:     true,
 				},
 				{
 					Name:         "action-config-name",
 					DisplayValue: "ACTION_CONFIG_NAME",
-					Description:  "The name of the action configuration to be added to the applications.",
+					Description:  "The name of the action configuration to be added to the application.",
 					Value:        flagvalue.SimpleSlice(nil, &opts.ActionConfigNames),
 					Required:     false,
 					Repeatable:   true,
@@ -95,7 +95,7 @@ func applicationCreate(opts *ApplicationOpts) error {
 			},
 		}, nil)
 	if err != nil {
-		return errors.Wrapf(err, "failed to create applications %q", opts.Name)
+		return errors.Wrapf(err, "failed to create application %q", opts.Name)
 	}
 
 	fmt.Fprintf(opts.IO.Err(), "Application %q created.", opts.Name)

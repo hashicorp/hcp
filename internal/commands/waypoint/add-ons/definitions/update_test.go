@@ -49,7 +49,7 @@ func TestCmdAddOnDefinitionUpdate(t *testing.T) {
 				"--tfc-no-code-module-version", "0.0.1",
 				"-l", "cli",
 				"-d", "An add-on definition created with the CLI.",
-				"--readme-markdown-templates-file", "readme_test.txt",
+				"--readme-markdown-template-file", "readme_test.txt",
 			},
 			Expect: &AddOnDefinitionOpts{
 				Name:                         "cli-test",

@@ -32,7 +32,7 @@ func TestNewCmdApplicationsUpdate(t *testing.T) {
 			Name:    "No Name",
 			Profile: profile.TestProfile,
 			Args:    []string{},
-			Error:   "The name of the applications is required",
+			Error:   "The name of the application is required",
 		},
 		{
 			Name:    "Happy",

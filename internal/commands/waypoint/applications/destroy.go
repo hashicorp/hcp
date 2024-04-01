@@ -13,16 +13,16 @@ import (
 func NewCmdApplicationsDestroy(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "destroy",
-		ShortHelp: "Destroy an HCP Waypoint applications and its infrastructure.",
+		ShortHelp: "Destroy an HCP Waypoint application and its infrastructure.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 The {{ template "mdCodeOrBold" "hcp waypoint applications destroy" }} command lets you destroy
-an HCP Waypoint applications and its infrastructure.
+an HCP Waypoint application and its infrastructure.
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: "Destroy an HCP Waypoint applications:",
+				Preamble: "Destroy an HCP Waypoint application:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint applications destroy -n my-applications
+$ hcp waypoint applications destroy -n my-application
 `),
 			},
 		},
@@ -41,7 +41,7 @@ $ hcp waypoint applications destroy -n my-applications
 					Name:         "name",
 					Shorthand:    "n",
 					DisplayValue: "NAME",
-					Description:  "The name of the applications to destroy.",
+					Description:  "The name of the application to destroy.",
 					Value:        flagvalue.Simple("", &opts.Name),
 					Required:     true,
 				},
@@ -79,7 +79,7 @@ func applicationDestroy(opts *ApplicationOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to destroy applications %q", opts.Name)
+		return errors.Wrapf(err, "failed to destroy application %q", opts.Name)
 	}
 
 	fmt.Fprintf(opts.IO.Err(), "Application %q destroyed.", opts.Name)
