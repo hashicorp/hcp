@@ -21,6 +21,10 @@ gen/docs: go/build ## Generate the HCP CLI documentation
 	@rm -rf web-docs/*
 	@./bin/gendocs -output-dir web-docs/
 
+.PHONY: gen/releasesapi
+gen/releasesapi: ## Generate the releases API client
+	@./hack/gen_releases_client.sh
+
 .PHONY: go/build
 go/build: ## Build the HCP CLI binary
 	@CGO_ENABLED=0 go build -o bin/ ./...
