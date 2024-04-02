@@ -79,4 +79,35 @@ func TestInferFields(t *testing.T) {
 		{Name: "Created At", ValueFormat: "{{ .CreatedAt }}"},
 	}, inferFields(s6, nil))
 
+	type nested struct {
+		Test string
+		max  int
+	}
+
+	s7 := struct {
+		Metadata nested
+	}{
+		Metadata: nested{
+			Test: "s7",
+			max:  10,
+		},
+	}
+
+	r.Equal([]Field{
+		{Name: "Metadata Test", ValueFormat: "{{ .Metadata.Test }}"},
+	}, inferFields(s7, nil))
+
+	s8 := struct {
+		Metadata *nested
+	}{
+		Metadata: &nested{
+			Test: "s8",
+			max:  10,
+		},
+	}
+
+	r.Equal([]Field{
+		{Name: "Metadata Test", ValueFormat: "{{ .Metadata.Test }}"},
+	}, inferFields(s8, nil))
+
 }
