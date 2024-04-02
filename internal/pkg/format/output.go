@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"slices"
 	"strings"
 	"text/tabwriter"
 	"text/template"
@@ -42,7 +43,8 @@ func NewDisplayer[T any](payload T, defaultFormat Format, fields []Field) Displa
 
 // DisplayFields displays the given fields about the given payload. If no fields are
 // provided, then all fields are displayed. The fields can be specified using
-// either the direct struct field name or the json tag name.
+// the direct struct field name. If specifying a nested nested field, use a dot
+// to separate (SubStruct.FieldA).
 func DisplayFields[T any](payload T, format Format, fields ...string) Displayer {
 	return NewDisplayer[T](payload, format, inferFields(payload, fields))
 }
@@ -102,28 +104,70 @@ func inferFields[T any](payload T, columns []string) []Field {
 	}
 
 	st := rv.Type()
-
 	all := len(toField) == 0
-
 	if !all {
 		ret = make([]Field, len(toField))
 	}
 
-	for i := 0; i < st.NumField(); i++ {
-		f := st.Field(i)
-		if !f.IsExported() {
-			continue
+	// fieldNames takes a slice of strings that represent the nesting of a field
+	// (e.g. ["ClusterInfo", "Name"] indicates Name is a field of the struct
+	// ClusterInfo) and returns the dotted and spaced versions of the parts.
+	// The dotted version is the parts joined by a dot (e.g. "ClusterInfo.Name")
+	// and the spaced version is the parts joined by a space (e.g. "Cluster Info
+	// Name") and each part spaced on camel case words.
+	fieldNames := func(parts []string) (dotted, spaced string) {
+		dotted = strings.Join(parts, ".")
+		for i, part := range parts {
+			if i != 0 {
+				spaced += " "
+			}
+
+			spaced += formatName(part)
+		}
+		return
+	}
+
+	var getFields func(st reflect.Type, namePrefix []string)
+	getFields = func(st reflect.Type, namePrefix []string) {
+		exportedFields := 0
+		for i := 0; i < st.NumField(); i++ {
+			f := st.Field(i)
+			if !f.IsExported() {
+				continue
+			}
+			exportedFields++
+
+			parts := append(slices.Clone(namePrefix), f.Name)
+
+			// If the field is a struct, we need to recurse into it
+			if f.Type.Kind() == reflect.Struct || f.Type.Kind() == reflect.Ptr && f.Type.Elem().Kind() == reflect.Struct {
+				t := f.Type
+				if f.Type.Kind() == reflect.Ptr {
+					t = f.Type.Elem()
+				}
+				getFields(t, parts)
+			} else {
+				dotted, formatted := fieldNames(parts)
+				df := NewField(formatted, fmt.Sprintf("{{ .%s }}", dotted))
+				if all {
+					ret = append(ret, df)
+				} else if idx, ok := toField[dotted]; ok {
+					ret[idx] = df
+				}
+			}
 		}
 
-		df := NewField(formatName(f.Name), fmt.Sprintf("{{ .%s }}", f.Name))
-
-		if all {
-			ret = append(ret, df)
-		} else if idx, ok := toField[f.Name]; ok {
-			ret[idx] = df
+		// Handle the case where the struct has no exported fields such as
+		// time.Time. In this case, we display the struct directly, defering to
+		// any String() method on the struct.
+		if exportedFields == 0 {
+			dotted, formatted := fieldNames(namePrefix)
+			ret = append(ret, NewField(formatted, fmt.Sprintf("{{ .%s}}", dotted)))
 		}
 	}
 
+	// Gather the fields
+	getFields(st, nil)
 	return ret
 }
 
@@ -246,8 +290,8 @@ func (o *Outputter) Display(d Displayer) error {
 
 // Show outputs the given val using the DisplayFields function.
 // If fields are specified, only those fields are shown, otherwise
-// all fields are shown. The json tag of a field is honored and can be used to
-// specified a field.
+// all fields are shown. If specifying a nested nested field, use a dot
+// to separate (SubStruct.FieldA).
 //
 // This is a simplified version of using .Display, which should be used for all more
 // advanced cases that require formatting fields differently.

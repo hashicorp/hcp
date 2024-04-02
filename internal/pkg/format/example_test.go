@@ -14,11 +14,17 @@ func ExampleOutputter() {
 	outputter := format.New(io)
 
 	// Resource is an example resource that we want to display
+	type Metadata struct {
+		Owner     string
+		CreatedAt string
+	}
+
 	type Resource struct {
 		Name        string
 		ID          string
 		Description string
 		Bytes       int
+		Metadata    Metadata
 	}
 
 	// Build our mock resources. Typically this is the response payload from an API
@@ -29,17 +35,29 @@ func ExampleOutputter() {
 			ID:          "123",
 			Description: "world",
 			Bytes:       100,
+			Metadata: Metadata{
+				Owner:     "Bob Builder",
+				CreatedAt: "2021-01-01",
+			},
 		},
 		{
 			Name:        "another",
 			ID:          "456",
 			Description: "example",
 			Bytes:       1024 * 1024,
+			Metadata: Metadata{
+				Owner:     "Jeff Bezos",
+				CreatedAt: "2023-02-04",
+			},
 		},
 	}
 
 	// For displaying a table of the exact values, Show can be used:
 	_ = outputter.Show(payload, format.Table)
+
+	// For displaying a table with a subset of the fields, list the fields as
+	// such:
+	// _ = outputter.Show(payload, format.Table, "Name", "ID", "Metadata.Owner")
 
 	// Since the IO is a test io, manually print it.
 	// We trim the lines to make examples testing pass correctly.
@@ -50,9 +68,9 @@ func ExampleOutputter() {
 	fmt.Println(strings.Join(lines, "\n"))
 
 	// Output:
-	// Name     ID   Description  Bytes
-	// hello    123  world        100
-	// another  456  example      1048576
+	// Name     ID   Description  Bytes    Metadata Owner  Metadata Created At
+	// hello    123  world        100      Bob Builder     2021-01-01
+	// another  456  example      1048576  Jeff Bezos      2023-02-04
 	//
 
 }
