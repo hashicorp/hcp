@@ -89,7 +89,9 @@ func addOnCreate(opts *AddOnOpts) error {
 			},
 		}, nil)
 	if err != nil {
-		return errors.Wrapf(err, "failed to create add-on %q", opts.Name)
+		return errors.Wrapf(err, "%s failed to create add-on %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name)
 	}
 
 	fmt.Fprintf(opts.IO.Err(), "%s Add-on %q created!\n", opts.IO.ColorScheme().SuccessIcon(), opts.Name)

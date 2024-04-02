@@ -65,7 +65,9 @@ func addOnDestroy(opts *AddOnOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrap(err, "failed to destroy add-on")
+		return errors.Wrapf(err, "%s failed to destroy add-on %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name)
 	}
 
 	fmt.Fprintf(opts.IO.Out(), "Add-on %s destroyed\n", opts.Name)
