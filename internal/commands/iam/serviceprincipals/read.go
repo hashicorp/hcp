@@ -39,7 +39,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 				`),
 			},
 			{
-				Preamble: `Read the group using the service principal's resource name:`,
+				Preamble: `Read the service principal using the service principal's resource name:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam service-principals read \
 				  iam/project/example-project/service-principal/example-sp
