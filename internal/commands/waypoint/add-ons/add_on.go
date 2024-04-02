@@ -35,6 +35,7 @@ manage HCP Waypoint add-ons and add-on definitions.
 
 	cmd.AddChild(NewCmdCreate(ctx, opts))
 	cmd.AddChild(NewCmdDestroy(ctx, opts))
+	cmd.AddChild(NewCmdRead(ctx, opts))
 
 	return cmd
 }
