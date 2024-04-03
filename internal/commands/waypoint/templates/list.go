@@ -12,11 +12,19 @@ import (
 func NewCmdList(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "list",
-		ShortHelp: "List all known HCP Waypoint templates.",
+		ShortHelp: "List all HCP Waypoint templates.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 The {{ template "mdCodeOrBold" "hcp waypoint templates list" }} command lets you list
 existing HCP Waypoint templates.
 		`),
+		Examples: []cmd.Example{
+			{
+				Preamble: "List all HCP Waypoint templates:",
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+$ hcp waypoint templates list
+`),
+			},
+		},
 		RunF: func(c *cmd.Command, args []string) error {
 			return listTemplates(opts)
 		},
@@ -31,7 +39,7 @@ existing HCP Waypoint templates.
 func listTemplates(opts *TemplateOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrapf(err, "unable to access HCP project")
+		return err
 	}
 
 	var templates []*models.HashicorpCloudWaypointApplicationTemplate
@@ -42,7 +50,9 @@ func listTemplates(opts *TemplateOpts) error {
 			Context:     opts.Ctx,
 		}, nil)
 	if err != nil {
-		return errors.Wrapf(err, "failed to list templates")
+		return errors.Wrapf(err, "%s failed to list templates",
+			opts.IO.ColorScheme().FailureIcon(),
+		)
 	}
 
 	templates = append(templates, resp.GetPayload().ApplicationTemplates...)
@@ -55,7 +65,9 @@ func listTemplates(opts *TemplateOpts) error {
 				PaginationNextPageToken: &resp.GetPayload().Pagination.NextPageToken,
 			}, nil)
 		if err != nil {
-			return errors.Wrapf(err, "failed to list paginated templates")
+			return errors.Wrapf(err, "%s failed to list paginated templates",
+				opts.IO.ColorScheme().FailureIcon(),
+			)
 		}
 
 		templates = append(templates, resp.GetPayload().ApplicationTemplates...)

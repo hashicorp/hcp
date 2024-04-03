@@ -17,6 +17,14 @@ func NewCmdRead(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 The {{ template "mdCodeOrBold" "hcp waypoint templates read" }} command lets you read
 an existing HCP Waypoint template.
 		`),
+		Examples: []cmd.Example{
+			{
+				Preamble: "Read an HCP Waypoint template:",
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+$ hcp waypoint templates read -n my-template
+`),
+			},
+		},
 		RunF: func(c *cmd.Command, args []string) error {
 			if opts.testFunc != nil {
 				return opts.testFunc(c, args)
@@ -46,7 +54,7 @@ an existing HCP Waypoint template.
 func templateRead(opts *TemplateOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrapf(err, "unable to access HCP project")
+		return err
 	}
 
 	resp, err := opts.WS.WaypointServiceGetApplicationTemplate2(
@@ -57,7 +65,10 @@ func templateRead(opts *TemplateOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get template %q", opts.Name)
+		return errors.Wrapf(err, "%s failed to get template %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name,
+		)
 	}
 
 	respPayload := resp.GetPayload()

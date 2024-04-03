@@ -72,7 +72,7 @@ $ hcp waypoint application create -n my-application -t my-templates
 func applicationCreate(opts *ApplicationOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrap(err, "unable to access HCP project")
+		return err
 	}
 
 	actionConfigs := make([]*models.HashicorpCloudWaypointActionCfgRef, len(opts.ActionConfigNames))
@@ -95,10 +95,16 @@ func applicationCreate(opts *ApplicationOpts) error {
 			},
 		}, nil)
 	if err != nil {
-		return errors.Wrapf(err, "failed to create application %q", opts.Name)
+		return errors.Wrapf(err, "%s failed to create application %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name,
+		)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Application %q created.", opts.Name)
+	fmt.Fprintf(opts.IO.Err(), "%s Application %q created.\n",
+		opts.IO.ColorScheme().SuccessIcon(),
+		opts.Name,
+	)
 
 	return nil
 }

@@ -118,14 +118,17 @@ $ hcp waypoint add-ons definitions update -n=my-add-on-definition \
 func addOnDefinitionUpdate(opts *AddOnDefinitionOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrap(err, "unable to access HCP project")
+		return err
 	}
 
 	var readmeTpl []byte
 	if opts.ReadmeMarkdownTemplateFile != "" {
 		readmeTpl, err = os.ReadFile(opts.ReadmeMarkdownTemplateFile)
 		if err != nil {
-			return errors.Wrapf(err, "failed to read README markdown template file %q", opts.ReadmeMarkdownTemplateFile)
+			return errors.Wrapf(err, "%s failed to read README markdown template file %q",
+				opts.IO.ColorScheme().FailureIcon(),
+				opts.ReadmeMarkdownTemplateFile,
+			)
 		}
 	}
 
@@ -151,10 +154,15 @@ func addOnDefinitionUpdate(opts *AddOnDefinitionOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to update add-on definition %q", opts.Name)
+		return errors.Wrapf(err, "%s failed to update add-on definition %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name,
+		)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Add-on definition %q updated.", opts.Name)
+	fmt.Fprintf(opts.IO.Err(), "%s Add-on definition %q updated.\n",
+		opts.IO.ColorScheme().SuccessIcon(),
+		opts.Name)
 
 	return nil
 }

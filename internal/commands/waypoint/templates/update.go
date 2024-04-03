@@ -140,7 +140,7 @@ $ hcp waypoint templates update -n my-template \
 func templateUpdate(opts *TemplateOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrapf(err, "unable to access HCP project")
+		return err
 	}
 
 	var tags []*models.HashicorpCloudWaypointTag
@@ -155,7 +155,10 @@ func templateUpdate(opts *TemplateOpts) error {
 	if opts.ReadmeMarkdownTemplateFile != "" {
 		readmeTpl, err = os.ReadFile(opts.ReadmeMarkdownTemplateFile)
 		if err != nil {
-			return errors.Wrapf(err, "failed to read file %q", opts.ReadmeMarkdownTemplateFile)
+			return errors.Wrapf(err, "%s failed to read README template file %q",
+				opts.IO.ColorScheme().FailureIcon(),
+				opts.ReadmeMarkdownTemplateFile,
+			)
 		}
 	}
 
@@ -187,10 +190,16 @@ func templateUpdate(opts *TemplateOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to update template %q", opts.Name)
+		return errors.Wrapf(err, "%s failed to update template %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name,
+		)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Template %q updated.", opts.ID)
+	fmt.Fprintf(opts.IO.Err(), "%s Template %q updated.\n",
+		opts.IO.ColorScheme().SuccessIcon(),
+		opts.ID,
+	)
 
 	return nil
 }

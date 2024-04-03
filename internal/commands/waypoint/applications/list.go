@@ -11,7 +11,7 @@ import (
 func NewCmdApplicationsList(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "list",
-		ShortHelp: "List HCP Waypoint applications.",
+		ShortHelp: "List all HCP Waypoint applications.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 			The {{ template "mdCodeOrBold" "hcp waypoint applications list" }} command lists all
 			HCP Waypoint applications.
@@ -30,7 +30,7 @@ func NewCmdApplicationsList(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Comman
 func applicationsList(opts *ApplicationOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrap(err, "unable to access HCP project")
+		return err
 	}
 
 	resp, err := opts.WS.WaypointServiceListApplications(
@@ -40,7 +40,9 @@ func applicationsList(opts *ApplicationOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrap(err, "failed to list applications")
+		return errors.Wrapf(err, "%s failed to list applications",
+			opts.IO.ColorScheme().FailureIcon(),
+		)
 	}
 
 	return opts.Output.Show(resp.GetPayload().Applications, format.Pretty)

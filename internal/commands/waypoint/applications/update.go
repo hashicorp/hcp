@@ -72,7 +72,7 @@ $ hcp waypoint applications update -n my-application --action-config-name my-act
 func applicationUpdate(opts *ApplicationOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrap(err, "failed to get namespace")
+		return err
 	}
 
 	var acrs []*models.HashicorpCloudWaypointActionCfgRef
@@ -86,7 +86,10 @@ func applicationUpdate(opts *ApplicationOpts) error {
 	if opts.ReadmeMarkdownFile != "" {
 		readme, err = os.ReadFile(opts.ReadmeMarkdownFile)
 		if err != nil {
-			return errors.Wrapf(err, "failed to read README markdown file %q", opts.ReadmeMarkdownFile)
+			return errors.Wrapf(err,
+				"%s failed to read README markdown file %q",
+				opts.IO.ColorScheme().FailureIcon(),
+				opts.ReadmeMarkdownFile)
 		}
 	}
 
@@ -102,10 +105,16 @@ func applicationUpdate(opts *ApplicationOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to update application %q", opts.Name)
+		return errors.Wrapf(err, "%s failed to update application %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name,
+		)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Application %q updated.", opts.Name)
+	fmt.Fprintf(opts.IO.Err(), "%s Application %q updated.\n",
+		opts.IO.ColorScheme().SuccessIcon(),
+		opts.Name,
+	)
 
 	return nil
 }

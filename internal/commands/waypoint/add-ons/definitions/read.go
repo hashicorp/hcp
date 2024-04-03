@@ -53,7 +53,7 @@ $ hcp waypoint add-ons definitions read -n my-addon-definition
 func addOnDefinitionRead(opts *AddOnDefinitionOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrap(err, "unable to access HCP project")
+		return err
 	}
 
 	getResp, err := opts.WS.WaypointServiceGetAddOnDefinition2(
@@ -64,7 +64,10 @@ func addOnDefinitionRead(opts *AddOnDefinitionOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get add-on definition %q", opts.Name)
+		return errors.Wrapf(err, "%s failed to get add-on definition %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name,
+		)
 	}
 
 	getRespPayload := getResp.GetPayload()

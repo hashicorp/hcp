@@ -55,7 +55,7 @@ $ hcp waypoint applications destroy -n my-application
 func applicationDestroy(opts *ApplicationOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrap(err, "failed to get namespace")
+		return err
 	}
 
 	if opts.IO.CanPrompt() {
@@ -63,9 +63,10 @@ func applicationDestroy(opts *ApplicationOpts) error {
 			"The HCP Waypoint application will be deleted.\n\n" +
 				"Do you want to continue")
 		if err != nil {
-			return fmt.Errorf("failed to retrieve confirmation: %w", err)
+			return errors.Wrapf(err, "%s failed to prompt for confirmation",
+				opts.IO.ColorScheme().FailureIcon(),
+			)
 		}
-
 		if !ok {
 			return nil
 		}
@@ -79,10 +80,15 @@ func applicationDestroy(opts *ApplicationOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to destroy application %q", opts.Name)
+		return errors.Wrapf(err, "%s failed to destroy application %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name,
+		)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Application %q destroyed.", opts.Name)
+	fmt.Fprintf(opts.IO.Err(), "%s Application %q destroyed.\n",
+		opts.IO.ColorScheme().SuccessIcon(),
+		opts.Name)
 
 	return nil
 }

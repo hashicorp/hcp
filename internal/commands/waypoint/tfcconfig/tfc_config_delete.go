@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"github.com/pkg/errors"
 )
 
 func NewCmdDelete(ctx *cmd.Context, runF func(opts *TFCConfigDeleteOpts) error) *cmd.Command {
@@ -32,7 +33,8 @@ func NewCmdDelete(ctx *cmd.Context, runF func(opts *TFCConfigDeleteOpts) error) 
 			{
 				Preamble: `Delete the saved TFC Config from Waypoint for this HCP Project ID:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp waypoint tfc-config delete example-org`),
+				$ hcp waypoint tfc-config delete example-org
+`),
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {
@@ -52,7 +54,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(opts *TFCConfigDeleteOpts) error) 
 func deleteRun(opts *TFCConfigDeleteOpts) error {
 	nsID, err := GetNamespace(opts.Ctx, opts.WaypointClient, opts.Profile.OrganizationID, opts.Profile.ProjectID)
 	if err != nil {
-		return fmt.Errorf("error getting namespace: %w", err)
+		return err
 	}
 
 	resp, err := opts.WaypointClient.WaypointServiceDeleteTFCConfig(
@@ -62,11 +64,11 @@ func deleteRun(opts *TFCConfigDeleteOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return fmt.Errorf("error deleting TFC config: %w", err)
+		return errors.Wrapf(err, "%s error deleting TFC config", opts.IO.ColorScheme().FailureIcon())
 	}
 
 	if resp.IsSuccess() {
-		fmt.Fprintf(opts.IO.Err(), "%s TFC Config successfully deleted!", opts.IO.ColorScheme().SuccessIcon())
+		fmt.Fprintf(opts.IO.Err(), "%s TFC Config successfully deleted!\n", opts.IO.ColorScheme().SuccessIcon())
 	}
 
 	return nil
