@@ -77,7 +77,7 @@ verbs across commands. Prefer using:
 ### Command PersistentRun Functions
 
 If a command requires that a project or organization ID is set, the following
-PrersistentRun function should be used:
+`PersistentPreRun` function should be used:
 
 ```go
 // Require only the organization to be set
@@ -112,7 +112,7 @@ commands are expected to be used together, this is a good place to mention that.
 Long help should be written in full sentences and should be grammatically
 correct, and it should end with a period.
 
-All LongHelp should use the `heredoc` package to format the help text. The
+All long help should use the `heredoc` package to format the help text. The
 package allows formatting the help text (making text bold, colored, italic, etc)
 and allows for outputting text appropriate for the command line and generated
 markdown documentation. For more detail see the [heredoc
@@ -396,7 +396,7 @@ func good() error {
     ...
 }
 
-// This wil cause the error to be displayed twice.
+// This will cause the error to be displayed twice.
 func bad() error {
     if err := doSomething(); err != nil {
         fmt.Fprintf(opts.IO.Err(), "failed to do the thing: %v\n", err)
