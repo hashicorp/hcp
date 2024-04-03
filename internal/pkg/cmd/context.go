@@ -114,7 +114,7 @@ func ConfigureRootCommand(ctx *Context, cmd *Command) {
 		Autocomplete: complete.PredictSet(formats...),
 	}, &Flag{
 		Name:          "quiet",
-		Description:   "Minimizes output.",
+		Description:   "Minimizes output and disables interactive prompting.",
 		Value:         flagvalue.Simple[bool](false, &ctx.flags.Quiet),
 		IsBooleanFlag: true,
 		global:        true,
