@@ -42,7 +42,7 @@ func ExampleIOStreams_ReadSecret() {
 	// Mock stdin to demonstrate reading from stdin.
 	io.Input.WriteString("pa$$w0rd")
 
-	fmt.Fprintln(io.Out(), "Whats your password?")
+	fmt.Fprintln(io.Err(), "Whats your password?")
 	data, err := io.ReadSecret()
 	if err != nil {
 		panic(err)
@@ -50,6 +50,7 @@ func ExampleIOStreams_ReadSecret() {
 	fmt.Fprintf(io.Out(), "%q is a terrible password now!", string(data))
 
 	// Print the test output
+	fmt.Print(io.Error.String())
 	fmt.Print(io.Output.String())
 
 	// Output:
