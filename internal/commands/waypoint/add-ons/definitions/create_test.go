@@ -1,4 +1,4 @@
-package addon
+package definitions
 
 import (
 	"context"
@@ -12,8 +12,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCmdAddOnDefinitionUpdate(t *testing.T) {
+func TestCmdAddOnDefinitionCreate(t *testing.T) {
 	t.Parallel()
+
 	cases := []struct {
 		Name    string
 		Args    []string
@@ -67,14 +68,13 @@ func TestCmdAddOnDefinitionUpdate(t *testing.T) {
 
 	for _, c := range cases {
 		c := c
-
 		t.Run(c.Name, func(t *testing.T) {
 			t.Parallel()
 
 			r := require.New(t)
 
+			// Create a context.
 			io := iostreams.Test()
-
 			ctx := &cmd.Context{
 				IO:          io,
 				Profile:     c.Profile(t),
@@ -87,23 +87,24 @@ func TestCmdAddOnDefinitionUpdate(t *testing.T) {
 			aodOpts.testFunc = func(c *cmd.Command, args []string) error {
 				return nil
 			}
-			cmd := NewCmdAddOnDefinitionUpdate(ctx, &aodOpts)
+			cmd := NewCmdAddOnDefinitionCreate(ctx, &aodOpts)
 			cmd.SetIO(io)
 
 			cmd.Run(c.Args)
 
 			if c.Expect != nil {
+				r.NotNil(c.Expect)
+
 				r.Equal(c.Expect.Name, aodOpts.Name)
-				r.Equal(c.Expect.Summary, aodOpts.Summary)
 				r.Equal(c.Expect.Description, aodOpts.Description)
+				r.Equal(c.Expect.Summary, aodOpts.Summary)
 				r.Equal(c.Expect.TerraformCloudProjectID, aodOpts.TerraformCloudProjectID)
 				r.Equal(c.Expect.TerraformCloudProjectName, aodOpts.TerraformCloudProjectName)
 				r.Equal(c.Expect.TerraformNoCodeModuleSource, aodOpts.TerraformNoCodeModuleSource)
 				r.Equal(c.Expect.TerraformNoCodeModuleVersion, aodOpts.TerraformNoCodeModuleVersion)
-				r.Equal(c.Expect.Labels, aodOpts.Labels)
 				r.Equal(c.Expect.ReadmeMarkdownTemplateFile, aodOpts.ReadmeMarkdownTemplateFile)
+				r.Equal(c.Expect.Labels, aodOpts.Labels)
 			}
 		})
-
 	}
 }

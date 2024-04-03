@@ -1,4 +1,4 @@
-package addon
+package definitions
 
 import (
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"

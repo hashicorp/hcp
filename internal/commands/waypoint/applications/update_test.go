@@ -1,4 +1,4 @@
-package addon
+package applications
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCmdAddOnDefinitionDelete(t *testing.T) {
+func TestNewCmdApplicationsUpdate(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
@@ -20,7 +20,7 @@ func TestCmdAddOnDefinitionDelete(t *testing.T) {
 		Args    []string
 		Profile func(t *testing.T) *profile.Profile
 		Error   string
-		Expect  *AddOnDefinitionOpts
+		Expect  *ApplicationOpts
 	}{
 		{
 			Name:    "No Org",
@@ -29,55 +29,66 @@ func TestCmdAddOnDefinitionDelete(t *testing.T) {
 			Error:   "Organization ID must be configured",
 		},
 		{
-			Name: "no args",
-			Profile: func(t *testing.T) *profile.Profile {
-				return profile.TestProfile(t).SetOrgID("123")
-			},
-			Args:  []string{},
-			Error: "accepts 1 arg(s), received 0",
+			Name:    "No Name",
+			Profile: profile.TestProfile,
+			Args:    []string{},
+			Error:   "The name of the application is required",
 		},
 		{
-			Name: "happy",
-			Profile: func(t *testing.T) *profile.Profile {
-				return profile.TestProfile(t).SetOrgID("123")
-			},
+			Name:    "Happy",
+			Profile: profile.TestProfile,
 			Args: []string{
-				"-n=cli-test",
+				"-n",
+				"app-name",
+				"--action-config-name",
+				"config-1",
+				"--action-config-name",
+				"config-2",
+				"--readme-markdown-file",
+				"readme.md",
 			},
-			Expect: &AddOnDefinitionOpts{
-				Name: "cli-test",
+			Expect: &ApplicationOpts{
+				Name: "app-name",
+				ActionConfigNames: []string{
+					"config-1",
+					"config-2",
+				},
+				ReadmeMarkdownFile: "readme.md",
 			},
 		},
 	}
 
 	for _, c := range cases {
 		c := c
+
 		t.Run(c.Name, func(t *testing.T) {
 			t.Parallel()
 
 			r := require.New(t)
 
+			// Create a context.
 			io := iostreams.Test()
-
 			ctx := &cmd.Context{
 				IO:          io,
 				Profile:     c.Profile(t),
-				Output:      format.New(io),
 				HCP:         &client.Runtime{},
 				ShutdownCtx: context.Background(),
+				Output:      format.New(io),
 			}
 
-			var aodOpts AddOnDefinitionOpts
-			aodOpts.testFunc = func(c *cmd.Command, args []string) error {
+			var appOpts ApplicationOpts
+			appOpts.testFunc = func(c *cmd.Command, args []string) error {
 				return nil
 			}
-			cmd := NewCmdAddOnDefinitionDelete(ctx, &aodOpts)
+			cmd := NewCmdApplicationsUpdate(ctx, &appOpts)
 			cmd.SetIO(io)
 
 			cmd.Run(c.Args)
 
 			if c.Expect != nil {
-				r.Equal(c.Expect.Name, aodOpts.Name)
+				r.Equal(c.Expect.Name, appOpts.Name)
+				r.Equal(c.Expect.ActionConfigNames, appOpts.ActionConfigNames)
+				r.Equal(c.Expect.ReadmeMarkdownFile, appOpts.ReadmeMarkdownFile)
 			}
 		})
 	}

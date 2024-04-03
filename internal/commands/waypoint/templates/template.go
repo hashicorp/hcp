@@ -1,4 +1,4 @@
-package template
+package templates
 
 import (
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
@@ -43,7 +43,7 @@ func NewCmdTemplate(ctx *cmd.Context) *cmd.Command {
 		Name:      "templates",
 		ShortHelp: "Manage HCP Waypoint templates.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-The {{ Bold "hcp waypoint templates" }} command group lets you manage
+The {{ template "mdCodeOrBold" "hcp waypoint templates" }} command group lets you manage
 HCP Waypoint templates. A template is a reusable configuration for creating
 applications.
 		`),

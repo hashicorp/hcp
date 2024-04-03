@@ -1,4 +1,4 @@
-package addon
+package definitions
 
 import (
 	"context"
@@ -9,9 +9,10 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"github.com/stretchr/testify/require"
 )
 
-func TestNewCmdAddOnDefinitionList(t *testing.T) {
+func TestCmdAddOnDefinitionDelete(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
@@ -27,18 +28,37 @@ func TestNewCmdAddOnDefinitionList(t *testing.T) {
 			Args:    []string{},
 			Error:   "Organization ID must be configured",
 		},
-		// there's no args for the list command right now, but if that changes,
-		// we should add a test case here
+		{
+			Name: "no args",
+			Profile: func(t *testing.T) *profile.Profile {
+				return profile.TestProfile(t).SetOrgID("123")
+			},
+			Args:  []string{},
+			Error: "accepts 1 arg(s), received 0",
+		},
+		{
+			Name: "happy",
+			Profile: func(t *testing.T) *profile.Profile {
+				return profile.TestProfile(t).SetOrgID("123")
+			},
+			Args: []string{
+				"-n=cli-test",
+			},
+			Expect: &AddOnDefinitionOpts{
+				Name: "cli-test",
+			},
+		},
 	}
 
 	for _, c := range cases {
 		c := c
-
 		t.Run(c.Name, func(t *testing.T) {
 			t.Parallel()
 
-			// Create a context.
+			r := require.New(t)
+
 			io := iostreams.Test()
+
 			ctx := &cmd.Context{
 				IO:          io,
 				Profile:     c.Profile(t),
@@ -47,14 +67,18 @@ func TestNewCmdAddOnDefinitionList(t *testing.T) {
 				ShutdownCtx: context.Background(),
 			}
 
-			var tplOpts AddOnDefinitionOpts
-			tplOpts.testFunc = func(c *cmd.Command, args []string) error {
+			var aodOpts AddOnDefinitionOpts
+			aodOpts.testFunc = func(c *cmd.Command, args []string) error {
 				return nil
 			}
-			cmd := NewCmdAddOnDefinitionList(ctx, &tplOpts)
+			cmd := NewCmdAddOnDefinitionDelete(ctx, &aodOpts)
 			cmd.SetIO(io)
 
 			cmd.Run(c.Args)
+
+			if c.Expect != nil {
+				r.Equal(c.Expect.Name, aodOpts.Name)
+			}
 		})
 	}
 }

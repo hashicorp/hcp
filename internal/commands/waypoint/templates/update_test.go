@@ -1,4 +1,4 @@
-package addon
+package templates
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCmdAddOnDefinitionCreate(t *testing.T) {
+func TestCmdTemplateUpdate(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
@@ -20,7 +20,7 @@ func TestCmdAddOnDefinitionCreate(t *testing.T) {
 		Args    []string
 		Profile func(t *testing.T) *profile.Profile
 		Error   string
-		Expect  *AddOnDefinitionOpts
+		Expect  *TemplateOpts
 	}{
 		{
 			Name:    "No Org",
@@ -43,25 +43,29 @@ func TestCmdAddOnDefinitionCreate(t *testing.T) {
 			},
 			Args: []string{
 				"-n=cli-test",
-				"-s", "An add-on definition created using the CLI.",
+				"--new-name=cli-test-new",
+				"-s", "A template created using the CLI.",
 				"--tfc-project-id", "prj-abcdefghij",
 				"--tfc-project-name", "test",
 				"--tfc-no-code-module-source", "private/waypoint/waypoint-nocode-module/null",
 				"--tfc-no-code-module-version", "0.0.1",
 				"-l", "cli",
-				"-d", "An add-on definition created with the CLI.",
+				"-d", "A template created with the CLI.",
+				"-t", "cli=true",
 				"--readme-markdown-template-file", "readme_test.txt",
 			},
-			Expect: &AddOnDefinitionOpts{
+			Expect: &TemplateOpts{
 				Name:                         "cli-test",
-				Summary:                      "An add-on definition created using the CLI.",
-				Description:                  "An add-on definition created with the CLI.",
+				UpdatedName:                  "cli-test-new",
+				Summary:                      "A template created using the CLI.",
+				Description:                  "A template created with the CLI.",
 				TerraformCloudProjectID:      "prj-abcdefghij",
 				TerraformCloudProjectName:    "test",
 				TerraformNoCodeModuleSource:  "private/waypoint/waypoint-nocode-module/null",
 				TerraformNoCodeModuleVersion: "0.0.1",
-				Labels:                       []string{"cli"},
 				ReadmeMarkdownTemplateFile:   "readme_test.txt",
+				Labels:                       []string{"cli"},
+				Tags:                         map[string]string{"cli": "true"},
 			},
 		},
 	}
@@ -83,11 +87,11 @@ func TestCmdAddOnDefinitionCreate(t *testing.T) {
 				ShutdownCtx: context.Background(),
 			}
 
-			var aodOpts AddOnDefinitionOpts
-			aodOpts.testFunc = func(c *cmd.Command, args []string) error {
+			var tplOpts TemplateOpts
+			tplOpts.testFunc = func(c *cmd.Command, args []string) error {
 				return nil
 			}
-			cmd := NewCmdAddOnDefinitionCreate(ctx, &aodOpts)
+			cmd := NewCmdUpdate(ctx, &tplOpts)
 			cmd.SetIO(io)
 
 			cmd.Run(c.Args)
@@ -95,15 +99,17 @@ func TestCmdAddOnDefinitionCreate(t *testing.T) {
 			if c.Expect != nil {
 				r.NotNil(c.Expect)
 
-				r.Equal(c.Expect.Name, aodOpts.Name)
-				r.Equal(c.Expect.Description, aodOpts.Description)
-				r.Equal(c.Expect.Summary, aodOpts.Summary)
-				r.Equal(c.Expect.TerraformCloudProjectID, aodOpts.TerraformCloudProjectID)
-				r.Equal(c.Expect.TerraformCloudProjectName, aodOpts.TerraformCloudProjectName)
-				r.Equal(c.Expect.TerraformNoCodeModuleSource, aodOpts.TerraformNoCodeModuleSource)
-				r.Equal(c.Expect.TerraformNoCodeModuleVersion, aodOpts.TerraformNoCodeModuleVersion)
-				r.Equal(c.Expect.ReadmeMarkdownTemplateFile, aodOpts.ReadmeMarkdownTemplateFile)
-				r.Equal(c.Expect.Labels, aodOpts.Labels)
+				r.Equal(c.Expect.Name, tplOpts.Name)
+				r.Equal(c.Expect.UpdatedName, tplOpts.UpdatedName)
+				r.Equal(c.Expect.Description, tplOpts.Description)
+				r.Equal(c.Expect.Summary, tplOpts.Summary)
+				r.Equal(c.Expect.TerraformCloudProjectID, tplOpts.TerraformCloudProjectID)
+				r.Equal(c.Expect.TerraformCloudProjectName, tplOpts.TerraformCloudProjectName)
+				r.Equal(c.Expect.TerraformNoCodeModuleSource, tplOpts.TerraformNoCodeModuleSource)
+				r.Equal(c.Expect.TerraformNoCodeModuleVersion, tplOpts.TerraformNoCodeModuleVersion)
+				r.Equal(c.Expect.ReadmeMarkdownTemplateFile, tplOpts.ReadmeMarkdownTemplateFile)
+				r.Equal(c.Expect.Labels, tplOpts.Labels)
+				r.Equal(c.Expect.Tags, tplOpts.Tags)
 			}
 		})
 	}

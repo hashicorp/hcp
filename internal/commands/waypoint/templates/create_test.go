@@ -1,4 +1,4 @@
-package template
+package templates
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCmdTemplateUpdate(t *testing.T) {
+func TestCmdTemplateCreate(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
@@ -43,7 +43,6 @@ func TestCmdTemplateUpdate(t *testing.T) {
 			},
 			Args: []string{
 				"-n=cli-test",
-				"--new-name=cli-test-new",
 				"-s", "A template created using the CLI.",
 				"--tfc-project-id", "prj-abcdefghij",
 				"--tfc-project-name", "test",
@@ -56,7 +55,6 @@ func TestCmdTemplateUpdate(t *testing.T) {
 			},
 			Expect: &TemplateOpts{
 				Name:                         "cli-test",
-				UpdatedName:                  "cli-test-new",
 				Summary:                      "A template created using the CLI.",
 				Description:                  "A template created with the CLI.",
 				TerraformCloudProjectID:      "prj-abcdefghij",
@@ -91,7 +89,7 @@ func TestCmdTemplateUpdate(t *testing.T) {
 			tplOpts.testFunc = func(c *cmd.Command, args []string) error {
 				return nil
 			}
-			cmd := NewCmdUpdate(ctx, &tplOpts)
+			cmd := NewCmdCreate(ctx, &tplOpts)
 			cmd.SetIO(io)
 
 			cmd.Run(c.Args)
@@ -100,7 +98,6 @@ func TestCmdTemplateUpdate(t *testing.T) {
 				r.NotNil(c.Expect)
 
 				r.Equal(c.Expect.Name, tplOpts.Name)
-				r.Equal(c.Expect.UpdatedName, tplOpts.UpdatedName)
 				r.Equal(c.Expect.Description, tplOpts.Description)
 				r.Equal(c.Expect.Summary, tplOpts.Summary)
 				r.Equal(c.Expect.TerraformCloudProjectID, tplOpts.TerraformCloudProjectID)

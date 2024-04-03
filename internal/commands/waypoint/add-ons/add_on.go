@@ -1,6 +1,7 @@
-package addon
+package addons
 
 import (
+	"github.com/hashicorp/hcp/internal/commands/waypoint/add-ons/definitions"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
@@ -15,7 +16,7 @@ manage HCP Waypoint add-ons and add-on definitions.
 `),
 	}
 
-	cmd.AddChild(NewCmdAddOnDefinition(ctx))
+	cmd.AddChild(definitions.NewCmdAddOnDefinition(ctx))
 
 	return cmd
 }

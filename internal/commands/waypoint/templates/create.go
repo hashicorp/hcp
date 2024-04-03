@@ -1,4 +1,4 @@
-package addon
+package templates
 
 import (
 	"fmt"
@@ -12,28 +12,28 @@ import (
 	"github.com/pkg/errors"
 )
 
-func NewCmdAddOnDefinitionCreate(ctx *cmd.Context, opts *AddOnDefinitionOpts) *cmd.Command {
+func NewCmdCreate(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "create",
-		ShortHelp: "Create a new HCP Waypoint add-on definition.",
+		ShortHelp: "Create a new HCP Waypoint template.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-The {{ template "mdCodeOrBold" "hcp waypoint add-ons definitions create" }}
-command lets you create HCP Waypoint add-on definitions.
-`),
+The {{ template "mdCodeOrBold" "hcp waypoint templates create" }} command lets you create
+HCP Waypoint templates.
+		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: "Create a new HCP Waypoint add-on definition:",
+				Preamble: "Create a new HCP Waypoint template:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint add-ons definitions create -n my-add-on-definition \
-  -s "My Add-on Definition summary." \
-  -d "My Add-on Definition description." \
+$ hcp waypoint templates create -n my-template \
+  -s "My Template Summary" \
+  -d "My Template Description" \
   --readme-markdown-template-file "README.tpl" \
   --tfc-no-code-module-source "app.terraform.io/hashicorp/dir/template" \
   --tfc-no-code-module-version "1.0.2" \
   --tfc-project-name "my-tfc-project" \
-  --tfc-project-id "prj-123456" \
-  -l label1 \
-  -l label2
+  --tfc-project-id "prj-123456"" \
+  -l "label1" \
+  -l "label2"
 `),
 			},
 		},
@@ -41,7 +41,7 @@ $ hcp waypoint add-ons definitions create -n my-add-on-definition \
 			if opts.testFunc != nil {
 				return opts.testFunc(c, args)
 			}
-			return addOnDefinitionCreate(opts)
+			return templateCreate(opts)
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
 			return cmd.RequireOrgAndProject(ctx)
@@ -52,21 +52,23 @@ $ hcp waypoint add-ons definitions create -n my-add-on-definition \
 					Name:         "name",
 					Shorthand:    "n",
 					DisplayValue: "NAME",
-					Description:  "The name of the add-on definition.",
+					Description:  "The name of the template.",
 					Value:        flagvalue.Simple("", &opts.Name),
+					Required:     true,
 				},
 				{
 					Name:         "summary",
 					Shorthand:    "s",
 					DisplayValue: "SUMMARY",
-					Description:  "The summary of the add-on definition.",
+					Description:  "The summary of the template.",
 					Value:        flagvalue.Simple("", &opts.Summary),
+					Required:     true,
 				},
 				{
 					Name:         "description",
 					Shorthand:    "d",
 					DisplayValue: "DESCRIPTION",
-					Description:  "The description of the add-on definition.",
+					Description:  "The description of the template.",
 					Value:        flagvalue.Simple("", &opts.Description),
 				},
 				{
@@ -79,9 +81,18 @@ $ hcp waypoint add-ons definitions create -n my-add-on-definition \
 					Name:         "label",
 					Shorthand:    "l",
 					DisplayValue: "LABEL",
-					Description:  "A label to apply to the add-on definition.",
+					Description:  "A label to apply to the template.",
 					Repeatable:   true,
 					Value:        flagvalue.SimpleSlice(nil, &opts.Labels),
+				},
+				{
+					Name:         "tag",
+					Shorthand:    "t",
+					DisplayValue: "KEY=VALUE",
+					Description:  "A tag to apply to the template.",
+					Repeatable:   true,
+					Value:        flagvalue.SimpleMap(nil, &opts.Tags),
+					Hidden:       true,
 				},
 				{
 					Name:         "tfc-no-code-module-source",
@@ -106,7 +117,7 @@ $ hcp waypoint add-ons definitions create -n my-add-on-definition \
 					Name:         "tfc-project-name",
 					DisplayValue: "TFC_PROJECT_NAME",
 					Description: "The name of the Terraform Cloud project where" +
-						" applications using this add-on definition will be created.",
+						" applications using this template will be created.",
 					Value:    flagvalue.Simple("", &opts.TerraformCloudProjectName),
 					Required: true,
 				},
@@ -114,7 +125,7 @@ $ hcp waypoint add-ons definitions create -n my-add-on-definition \
 					Name:         "tfc-project-id",
 					DisplayValue: "TFC_PROJECT_ID",
 					Description: "The ID of the Terraform Cloud project where" +
-						" applications using this add-on definition will be created.",
+						" applications using this template will be created.",
 					Value:    flagvalue.Simple("", &opts.TerraformCloudProjectID),
 					Required: true,
 				},
@@ -125,10 +136,18 @@ $ hcp waypoint add-ons definitions create -n my-add-on-definition \
 	return cmd
 }
 
-func addOnDefinitionCreate(opts *AddOnDefinitionOpts) error {
+func templateCreate(opts *TemplateOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrapf(err, "Unable to access HCP project")
+		return errors.Wrapf(err, "unable to access HCP project")
+	}
+
+	var tags []*models.HashicorpCloudWaypointTag
+	for k, v := range opts.Tags {
+		tags = append(tags, &models.HashicorpCloudWaypointTag{
+			Key:   k,
+			Value: v,
+		})
 	}
 
 	var readmeTpl []byte
@@ -139,31 +158,34 @@ func addOnDefinitionCreate(opts *AddOnDefinitionOpts) error {
 		}
 	}
 
-	_, err = opts.WS.WaypointServiceCreateAddOnDefinition(
-		&waypoint_service.WaypointServiceCreateAddOnDefinitionParams{
+	_, err = opts.WS.WaypointServiceCreateApplicationTemplate(
+		&waypoint_service.WaypointServiceCreateApplicationTemplateParams{
 			NamespaceID: ns.ID,
-			Body: &models.HashicorpCloudWaypointWaypointServiceCreateAddOnDefinitionBody{
-				Name:                   opts.Name,
-				Summary:                opts.Summary,
-				Description:            opts.Description,
-				ReadmeMarkdownTemplate: readmeTpl,
-				Labels:                 opts.Labels,
-				TerraformNocodeModule: &models.HashicorpCloudWaypointTerraformNocodeModule{
-					Source:  opts.TerraformNoCodeModuleSource,
-					Version: opts.TerraformNoCodeModuleVersion,
-				},
-				TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointTerraformCloudWorkspaceDetails{
-					Name:      opts.TerraformCloudProjectName,
-					ProjectID: opts.TerraformCloudProjectID,
+			Body: &models.HashicorpCloudWaypointWaypointServiceCreateApplicationTemplateBody{
+				ApplicationTemplate: &models.HashicorpCloudWaypointApplicationTemplate{
+					Name:                   opts.Name,
+					Summary:                opts.Summary,
+					Description:            opts.Description,
+					ReadmeMarkdownTemplate: readmeTpl,
+					Labels:                 opts.Labels,
+					Tags:                   tags,
+					TerraformNocodeModule: &models.HashicorpCloudWaypointTerraformNocodeModule{
+						Source:  opts.TerraformNoCodeModuleSource,
+						Version: opts.TerraformNoCodeModuleVersion,
+					},
+					TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointTerraformCloudWorkspaceDetails{
+						Name:      opts.TerraformCloudProjectName,
+						ProjectID: opts.TerraformCloudProjectID,
+					},
 				},
 			},
 			Context: opts.Ctx,
 		}, nil)
 	if err != nil {
-		return errors.Wrapf(err, "failed to create add-on definition %q", opts.Name)
+		return errors.Wrapf(err, "failed to create template %q", opts.Name)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Add-on definition %q created.", opts.Name)
+	fmt.Fprintf(opts.IO.Err(), "Template %q created.", opts.Name)
 
 	return nil
 }

@@ -1,4 +1,4 @@
-package template
+package templates
 
 import (
 	"context"
@@ -9,9 +9,10 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"github.com/stretchr/testify/require"
 )
 
-func TestCmdTemplateList(t *testing.T) {
+func TestCmdTemplateRead(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
@@ -35,15 +36,26 @@ func TestCmdTemplateList(t *testing.T) {
 			Args:  []string{},
 			Error: "accepts 1 arg(s), received 0",
 		},
-		// there's no args for the list command right now, but if that changes,
-		// we should add a test case here
+		{
+			Name: "happy",
+			Profile: func(t *testing.T) *profile.Profile {
+				return profile.TestProfile(t).SetOrgID("123")
+			},
+			Args: []string{
+				"-n=cli-test",
+			},
+			Expect: &TemplateOpts{
+				Name: "cli-test",
+			},
+		},
 	}
 
 	for _, c := range cases {
 		c := c
-
 		t.Run(c.Name, func(t *testing.T) {
 			t.Parallel()
+
+			r := require.New(t)
 
 			// Create a context.
 			io := iostreams.Test()
@@ -59,11 +71,14 @@ func TestCmdTemplateList(t *testing.T) {
 			tplOpts.testFunc = func(c *cmd.Command, args []string) error {
 				return nil
 			}
-			cmd := NewCmdList(ctx, &tplOpts)
+			cmd := NewCmdRead(ctx, &tplOpts)
 			cmd.SetIO(io)
 
 			cmd.Run(c.Args)
+
+			if c.Expect != nil {
+				r.Equal(c.Expect.Name, tplOpts.Name)
+			}
 		})
 	}
-
 }

@@ -1,4 +1,4 @@
-package template
+package templates
 
 import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"

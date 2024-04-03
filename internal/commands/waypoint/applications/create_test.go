@@ -1,4 +1,4 @@
-package template
+package applications
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCmdTemplateRead(t *testing.T) {
+func TestNewCmdCreateApplication(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
@@ -20,7 +20,7 @@ func TestCmdTemplateRead(t *testing.T) {
 		Args    []string
 		Profile func(t *testing.T) *profile.Profile
 		Error   string
-		Expect  *TemplateOpts
+		Expect  *ApplicationOpts
 	}{
 		{
 			Name:    "No Org",
@@ -29,29 +29,31 @@ func TestCmdTemplateRead(t *testing.T) {
 			Error:   "Organization ID must be configured",
 		},
 		{
-			Name: "no args",
-			Profile: func(t *testing.T) *profile.Profile {
-				return profile.TestProfile(t).SetOrgID("123")
-			},
-			Args:  []string{},
-			Error: "accepts 1 arg(s), received 0",
+			Name:    "No Name",
+			Profile: profile.TestProfile,
+			Args:    []string{"-t", "templates-name"},
+			Error:   "The name of the application is required",
 		},
 		{
-			Name: "happy",
-			Profile: func(t *testing.T) *profile.Profile {
-				return profile.TestProfile(t).SetOrgID("123")
-			},
-			Args: []string{
-				"-n=cli-test",
-			},
-			Expect: &TemplateOpts{
-				Name: "cli-test",
+			Name:    "No Template Name",
+			Profile: profile.TestProfile,
+			Args:    []string{"-n", "app-name"},
+			Error:   "The name of the templates to use for the application is required",
+		},
+		{
+			Name:    "Happy",
+			Profile: profile.TestProfile,
+			Args:    []string{"-n", "app-name", "-t", "templates-name"},
+			Expect: &ApplicationOpts{
+				Name:         "app-name",
+				TemplateName: "templates-name",
 			},
 		},
 	}
 
 	for _, c := range cases {
 		c := c
+
 		t.Run(c.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -67,17 +69,18 @@ func TestCmdTemplateRead(t *testing.T) {
 				ShutdownCtx: context.Background(),
 			}
 
-			var tplOpts TemplateOpts
-			tplOpts.testFunc = func(c *cmd.Command, args []string) error {
+			var appOpts ApplicationOpts
+			appOpts.testFunc = func(c *cmd.Command, args []string) error {
 				return nil
 			}
-			cmd := NewCmdRead(ctx, &tplOpts)
+			cmd := NewCmdApplicationsCreate(ctx, &appOpts)
 			cmd.SetIO(io)
 
 			cmd.Run(c.Args)
 
 			if c.Expect != nil {
-				r.Equal(c.Expect.Name, tplOpts.Name)
+				r.Equal(c.Expect.Name, appOpts.Name)
+				r.Equal(c.Expect.TemplateName, appOpts.TemplateName)
 			}
 		})
 	}

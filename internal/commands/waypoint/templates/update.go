@@ -1,4 +1,4 @@
-package template
+package templates
 
 import (
 	"fmt"
@@ -22,7 +22,7 @@ existing HCP Waypoint templates.
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: "Create a new HCP Waypoint template:",
+				Preamble: "Update an HCP Waypoint template:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 $ hcp waypoint templates update -n my-template \
   -s "My Template Summary" \
