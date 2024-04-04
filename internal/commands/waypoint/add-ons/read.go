@@ -1,4 +1,4 @@
-package applications
+package addons
 
 import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
@@ -9,25 +9,26 @@ import (
 	"github.com/pkg/errors"
 )
 
-func NewCmdApplicationsRead(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
+func NewCmdRead(ctx *cmd.Context, opts *AddOnOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "read",
-		ShortHelp: "Read details about an HCP Waypoint application.",
+		ShortHelp: "Read an HCP Waypoint add-on.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-The {{ template "mdCodeOrBold" "hcp waypoint applications read" }} command lets you read
-details about an HCP Waypoint application.
+The {{ template "mdCodeOrBold" "hcp waypoint add-ons read" }} command lets you read an existing HCP Waypoint add-on.
 `),
 		Examples: []cmd.Example{
 			{
-				Preamble: "Read an HCP Waypoint application:",
-				Command:  "$ hcp waypoint applications read -n=my-application",
+				Preamble: "Read an HCP Waypoint add-on:",
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+$ hcp waypoint add-ons read -n=my-addon
+`),
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {
 			if opts.testFunc != nil {
 				return opts.testFunc(c, args)
 			}
-			return applicationRead(opts)
+			return addOnRead(opts)
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
 			return cmd.RequireOrgAndProject(ctx)
@@ -38,36 +39,37 @@ details about an HCP Waypoint application.
 					Name:         "name",
 					Shorthand:    "n",
 					DisplayValue: "NAME",
-					Description:  "The name of the HCP Waypoint application.",
+					Description:  "The name of the add-on.",
 					Value:        flagvalue.Simple("", &opts.Name),
 					Required:     true,
 				},
 			},
 		},
 	}
-
 	return cmd
 }
 
-func applicationRead(opts *ApplicationOpts) error {
+func addOnRead(opts *AddOnOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
 		return err
 	}
 
-	getResp, err := opts.WS.WaypointServiceGetApplication2(
-		&waypoint_service.WaypointServiceGetApplication2Params{
-			NamespaceID:     ns.ID,
-			Context:         opts.Ctx,
-			ApplicationName: opts.Name,
+	getResp, err := opts.WS.WaypointServiceGetAddOn2(
+		&waypoint_service.WaypointServiceGetAddOn2Params{
+			NamespaceID: ns.ID,
+			Context:     opts.Ctx,
+			AddOnName:   opts.Name,
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "%s failed to get application %q",
+		return errors.Wrapf(err, "%s failed to get add-on %q",
 			opts.IO.ColorScheme().FailureIcon(),
 			opts.Name,
 		)
 	}
 
-	return opts.Output.Show(getResp.GetPayload().Application, format.Pretty)
+	getRespPayload := getResp.GetPayload()
+
+	return opts.Output.Show(getRespPayload.AddOn, format.Pretty)
 }

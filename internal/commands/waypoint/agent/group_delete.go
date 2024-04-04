@@ -33,7 +33,7 @@ func NewCmdGroupDelete(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
 		Examples: []cmd.Example{
 			{
 				Preamble: "Delete a group:",
-				Command:  "$ hcp waypoint agent group delete -n 'prod:us-west-2'",
+				Command:  "$ hcp waypoint agent group delete -n='prod:us-west-2'",
 			},
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {

@@ -21,7 +21,7 @@ command lets you read an existing HCP Waypoint add-on definition.
 			{
 				Preamble: "Read an HCP Waypoint add-on definition:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint add-ons definitions read -n my-addon-definition
+$ hcp waypoint add-ons definitions read -n=my-addon-definition
 `),
 			},
 		},

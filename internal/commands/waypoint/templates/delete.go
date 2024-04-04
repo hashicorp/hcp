@@ -18,6 +18,14 @@ func NewCmdDelete(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
 The {{ template "mdCodeOrBold" "hcp waypoint templates delete" }} command lets you delete
 existing HCP Waypoint templates.
 		`),
+		Examples: []cmd.Example{
+			{
+				Preamble: "Delete an existing HCP Waypoint template:",
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+$ hcp waypoint templates delete -n=my-template
+`),
+			},
+		},
 		RunF: func(c *cmd.Command, args []string) error {
 			if opts.testFunc != nil {
 				return opts.testFunc(c, args)

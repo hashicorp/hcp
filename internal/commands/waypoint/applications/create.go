@@ -23,7 +23,7 @@ a new HCP Waypoint application.
 			{
 				Preamble: "Create a new HCP Waypoint application:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint application create -n my-application -t my-templates
+$ hcp waypoint application create -n=my-application -t=my-template
 `),
 			},
 		},
