@@ -15,8 +15,8 @@ func NewCmdTFCConfig(ctx *cmd.Context) *cmd.Command {
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp waypoint tfc-config" }} command group manages 
 		the set of TFC Configs. New TFC Configs can be created using
-		{{ template "mdCodeOrBold" "hcp waypoint tfc-config set" }} and existing
-		profiles can be viewed using {{ template "mdCodeOrBold" "hcp waypoint tfc-config get" }}.
+		{{ template "mdCodeOrBold" "hcp waypoint tfc-config create" }} and existing
+		profiles can be viewed using {{ template "mdCodeOrBold" "hcp waypoint tfc-config read" }}.
 		`),
 	}
 

@@ -54,7 +54,9 @@ func addOnDefinitionsList(opts *AddOnDefinitionOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrap(err, "failed to list add-on definitions")
+		return errors.Wrapf(err, "%s failed to list add-on definitions",
+			opts.IO.ColorScheme().FailureIcon(),
+		)
 	}
 
 	addOnDefinitions = append(addOnDefinitions, listResp.GetPayload().AddOnDefinitions...)
@@ -67,7 +69,9 @@ func addOnDefinitionsList(opts *AddOnDefinitionOpts) error {
 				PaginationNextPageToken: &listResp.GetPayload().Pagination.NextPageToken,
 			}, nil)
 		if err != nil {
-			return errors.Wrapf(err, "failed to list paginated add-on definitions")
+			return errors.Wrapf(err, "%s failed to list paginated add-on definitions",
+				opts.IO.ColorScheme().FailureIcon(),
+			)
 		}
 
 		addOnDefinitions = append(addOnDefinitions, listResp.GetPayload().AddOnDefinitions...)

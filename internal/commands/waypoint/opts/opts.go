@@ -38,7 +38,9 @@ func (w *WaypointOpts) Namespace() (*models.HashicorpCloudWaypointNamespace, err
 		Context:                w.Ctx,
 	}, nil)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Unable to access HCP project")
+		return nil, errors.Wrapf(err, "%s Unable to access HCP project",
+			w.IO.ColorScheme().FailureIcon(),
+		)
 	}
 
 	return resp.Payload.Namespace, nil

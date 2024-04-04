@@ -12,7 +12,7 @@ import (
 func NewCmdApplicationsRead(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "read",
-		ShortHelp: "Read an HCP Waypoint application.",
+		ShortHelp: "Read details about an HCP Waypoint application.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 The {{ template "mdCodeOrBold" "hcp waypoint applications read" }} command lets you read
 details about an HCP Waypoint application.
@@ -52,7 +52,7 @@ details about an HCP Waypoint application.
 func applicationRead(opts *ApplicationOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrap(err, "failed to get namespace")
+		return err
 	}
 
 	getResp, err := opts.WS.WaypointServiceGetApplication2(
@@ -63,7 +63,10 @@ func applicationRead(opts *ApplicationOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get application %q", opts.Name)
+		return errors.Wrapf(err, "%s failed to get application %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name,
+		)
 	}
 
 	return opts.Output.Show(getResp.GetPayload().Application, format.Pretty)

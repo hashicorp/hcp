@@ -2,7 +2,6 @@ package tfcconfig
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
@@ -11,6 +10,7 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"github.com/pkg/errors"
 )
 
 func NewCmdRead(ctx *cmd.Context, runF func(opts *TFCConfigReadOpts) error) *cmd.Command {
@@ -53,7 +53,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(opts *TFCConfigReadOpts) error) *cmd
 func readRun(opts *TFCConfigReadOpts) error {
 	nsID, err := GetNamespace(opts.Ctx, opts.WaypointClient, opts.Profile.OrganizationID, opts.Profile.ProjectID)
 	if err != nil {
-		return fmt.Errorf("error getting namespace: %w", err)
+		return err
 	}
 	resp, err := opts.WaypointClient.WaypointServiceGetTFCConfig(
 		&waypoint_service.WaypointServiceGetTFCConfigParams{
@@ -62,8 +62,7 @@ func readRun(opts *TFCConfigReadOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return fmt.Errorf("error retrieving TFC config: %w", err)
-
+		return errors.Wrapf(err, "%s failed to get TFC Config", opts.IO.ColorScheme().FailureIcon())
 	}
 	d := newDisplayer(format.Pretty, resp.Payload.TfcConfig)
 	return opts.Output.Display(d)

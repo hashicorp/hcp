@@ -47,7 +47,7 @@ existing HCP Waypoint templates.
 func templateDelete(opts *TemplateOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrapf(err, "unable to access HCP project")
+		return err
 	}
 
 	_, err = opts.WS.WaypointServiceDeleteApplicationTemplate2(
@@ -61,7 +61,10 @@ func templateDelete(opts *TemplateOpts) error {
 		return errors.Wrapf(err, "failed to delete template %q", opts.Name)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Template %q deleted.", opts.Name)
+	fmt.Fprintf(opts.IO.Err(), "%s Template %q deleted.\n",
+		opts.IO.ColorScheme().SuccessIcon(),
+		opts.Name,
+	)
 
 	return nil
 }

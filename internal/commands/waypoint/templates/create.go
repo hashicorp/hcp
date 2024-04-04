@@ -139,7 +139,7 @@ $ hcp waypoint templates create -n my-template \
 func templateCreate(opts *TemplateOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
-		return errors.Wrapf(err, "unable to access HCP project")
+		return err
 	}
 
 	var tags []*models.HashicorpCloudWaypointTag
@@ -154,7 +154,10 @@ func templateCreate(opts *TemplateOpts) error {
 	if opts.ReadmeMarkdownTemplateFile != "" {
 		readmeTpl, err = os.ReadFile(opts.ReadmeMarkdownTemplateFile)
 		if err != nil {
-			return errors.Wrapf(err, "failed to read README markdown template file %q", opts.ReadmeMarkdownTemplateFile)
+			return errors.Wrapf(err, "%s failed to read README markdown template file %q",
+				opts.IO.ColorScheme().FailureIcon(),
+				opts.ReadmeMarkdownTemplateFile,
+			)
 		}
 	}
 
@@ -182,10 +185,18 @@ func templateCreate(opts *TemplateOpts) error {
 			Context: opts.Ctx,
 		}, nil)
 	if err != nil {
-		return errors.Wrapf(err, "failed to create template %q", opts.Name)
+		return errors.Wrapf(
+			err,
+			"%s failed to create template %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name,
+		)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Template %q created.", opts.Name)
+	fmt.Fprintf(opts.IO.Err(), "%s Template %q created.\n",
+		opts.IO.ColorScheme().SuccessIcon(),
+		opts.Name,
+	)
 
 	return nil
 }

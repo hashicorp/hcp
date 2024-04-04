@@ -66,10 +66,16 @@ func addOnDefinitionDelete(opts *AddOnDefinitionOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to delete add-on definition %q", opts.Name)
+		return errors.Wrapf(err, "%s failed to delete add-on definition %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name,
+		)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Add-on definition %q deleted.", opts.Name)
+	fmt.Fprintf(opts.IO.Err(), "%s Add-on definition %q deleted.\n",
+		opts.IO.ColorScheme().SuccessIcon(),
+		opts.Name,
+	)
 
 	return nil
 }

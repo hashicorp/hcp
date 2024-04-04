@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"github.com/pkg/errors"
 )
 
 func NewCmdCreate(ctx *cmd.Context, runF func(opts *TFCConfigCreateOpts) error) *cmd.Command {
@@ -110,11 +111,11 @@ func createRun(opts *TFCConfigCreateOpts) error {
 		}, nil,
 	)
 	if err != nil {
-		return fmt.Errorf("error creating TFC config: %w", err)
+		return errors.Wrapf(err, "%s error creating TFC config", opts.IO.ColorScheme().FailureIcon())
 
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s TFC Config  %q created!\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.TfcConfig.OrganizationName)
+	fmt.Fprintf(opts.IO.Err(), "%s TFC Config %q created!\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.TfcConfig.OrganizationName)
 
 	return nil
 
