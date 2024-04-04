@@ -1,3 +1,6 @@
+// Copyright (c) HashiCorp, Inc.
+// SPDX-License-Identifier: MPL-2.0
+
 // package ld implements levenshtein distance in order to provide suggestions
 // based on similarity.
 package ld
