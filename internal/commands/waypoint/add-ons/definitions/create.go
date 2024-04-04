@@ -24,16 +24,16 @@ command lets you create HCP Waypoint add-on definitions.
 			{
 				Preamble: "Create a new HCP Waypoint add-on definition:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint add-ons definitions create -n my-add-on-definition \
-  -s "My Add-on Definition summary." \
-  -d "My Add-on Definition description." \
-  --readme-markdown-template-file "README.tpl" \
-  --tfc-no-code-module-source "app.terraform.io/hashicorp/dir/template" \
-  --tfc-no-code-module-version "1.0.2" \
-  --tfc-project-name "my-tfc-project" \
-  --tfc-project-id "prj-123456" \
-  -l label1 \
-  -l label2
+$ hcp waypoint add-ons definitions create -n=my-add-on-definition \
+  -s="My Add-on Definition summary." \
+  -d="My Add-on Definition description." \
+  --readme-markdown-template-file="README.tpl" \
+  --tfc-no-code-module-source="app.terraform.io/hashicorp/dir/template" \
+  --tfc-no-code-module-version="1.0.2" \
+  --tfc-project-name="my-tfc-project" \
+  --tfc-project-id="prj-123456" \
+  -l=label1 \
+  -l=label2
 `),
 			},
 		},

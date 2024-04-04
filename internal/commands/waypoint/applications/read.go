@@ -20,7 +20,7 @@ details about an HCP Waypoint application.
 		Examples: []cmd.Example{
 			{
 				Preamble: "Read an HCP Waypoint application:",
-				Command:  "$ hcp waypoint applications read -n my-application",
+				Command:  "$ hcp waypoint applications read -n=my-application",
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {

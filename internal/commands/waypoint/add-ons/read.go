@@ -20,7 +20,7 @@ The {{ template "mdCodeOrBold" "hcp waypoint add-ons read" }} command lets you r
 			{
 				Preamble: "Read an HCP Waypoint add-on:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint add-ons read -n my-addon
+$ hcp waypoint add-ons read -n=my-addon
 `),
 			},
 		},

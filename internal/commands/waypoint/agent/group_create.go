@@ -42,7 +42,7 @@ func NewCmdGroupCreate(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
 		Examples: []cmd.Example{
 			{
 				Preamble: "Create a new group:",
-				Command:  "$ hcp waypoint agent group create -n 'prod:us-west-2' -d 'us west production access'",
+				Command:  "$ hcp waypoint agent group create -n='prod:us-west-2' -d='us west production access'",
 			},
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {

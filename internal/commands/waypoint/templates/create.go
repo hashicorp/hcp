@@ -24,16 +24,16 @@ HCP Waypoint templates.
 			{
 				Preamble: "Create a new HCP Waypoint template:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint templates create -n my-template \
-  -s "My Template Summary" \
-  -d "My Template Description" \
+$ hcp waypoint templates create -n=my-template \
+  -s="My Template Summary" \
+  -d="My Template Description" \
   --readme-markdown-template-file "README.tpl" \
-  --tfc-no-code-module-source "app.terraform.io/hashicorp/dir/template" \
-  --tfc-no-code-module-version "1.0.2" \
-  --tfc-project-name "my-tfc-project" \
-  --tfc-project-id "prj-123456"" \
-  -l "label1" \
-  -l "label2"
+  --tfc-no-code-module-source="app.terraform.io/hashicorp/dir/template" \
+  --tfc-no-code-module-version="1.0.2" \
+  --tfc-project-name="my-tfc-project" \
+  --tfc-project-id="prj-123456"" \
+  -l="label1" \
+  -l="label2"
 `),
 			},
 		},

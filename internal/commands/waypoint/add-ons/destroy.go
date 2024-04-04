@@ -22,7 +22,7 @@ destroy an existing HCP Waypoint add-on.
 			{
 				Preamble: "Destroy an HCP Waypoint add-on:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint add-ons destroy -n my-addon
+$ hcp waypoint add-ons destroy -n=my-addon
 `),
 			},
 		},

@@ -24,7 +24,7 @@ an existing HCP Waypoint application.
 			{
 				Preamble: "Update an existing HCP Waypoint application:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint applications update -n my-application --action-config-name my-action-config
+$ hcp waypoint applications update -n=my-application --action-config-name my-action-config
 `),
 			},
 		},

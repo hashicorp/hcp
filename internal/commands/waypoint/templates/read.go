@@ -21,7 +21,7 @@ an existing HCP Waypoint template.
 			{
 				Preamble: "Read an HCP Waypoint template:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint templates read -n my-template
+$ hcp waypoint templates read -n=my-template
 `),
 			},
 		},

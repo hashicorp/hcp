@@ -22,7 +22,7 @@ an HCP Waypoint application and its infrastructure.
 			{
 				Preamble: "Destroy an HCP Waypoint application:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint applications destroy -n my-application
+$ hcp waypoint applications destroy -n=my-application
 `),
 			},
 		},

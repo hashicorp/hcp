@@ -22,7 +22,7 @@ func NewCmdCreate(ctx *cmd.Context, opts *AddOnOpts) *cmd.Command {
 			{
 				Preamble: "Create a new HCP Waypoint add-on:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint add-ons create -n my-addon -a my-application -d my-addon-definition
+$ hcp waypoint add-ons create -n=my-addon -a=my-application -d=my-addon-definition
 `),
 			},
 		},
@@ -49,14 +49,14 @@ $ hcp waypoint add-ons create -n my-addon -a my-application -d my-addon-definiti
 				},
 				{
 					Name:         "add-on-definition-name",
-					DisplayValue: "ADD_ON_DEFINITION_NAME",
+					DisplayValue: "NAME",
 					Description:  "The name of the add-on definition to use.",
 					Value:        flagvalue.Simple("", &opts.AddOnDefinitionName),
 					Required:     true,
 				},
 				{
 					Name:         "application-name",
-					DisplayValue: "APPLICATION_NAME",
+					DisplayValue: "NAME",
 					Description:  "The name of the application to which the add-on will be added.",
 					Value:        flagvalue.Simple("", &opts.ApplicationName),
 					Required:     true,

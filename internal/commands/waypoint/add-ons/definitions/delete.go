@@ -22,7 +22,7 @@ command lets you delete an existing HCP Waypoint add-on definition.
 			{
 				Preamble: "Delete an HCP Waypoint add-on definition:",
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-$ hcp waypoint add-ons definitions delete -n my-addon-definition
+$ hcp waypoint add-ons definitions delete -n=my-addon-definition
 `),
 			},
 		},
