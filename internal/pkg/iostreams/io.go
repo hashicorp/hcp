@@ -1,3 +1,6 @@
+// Copyright (c) HashiCorp, Inc.
+// SPDX-License-Identifier: MPL-2.0
+
 // Package iostreams provides access to the terminal outputs and inputs in a
 // centralized and mockable fashion. All terminal access should happen using
 // this package.

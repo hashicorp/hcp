@@ -1,3 +1,6 @@
+// Copyright (c) HashiCorp, Inc.
+// SPDX-License-Identifier: MPL-2.0
+
 // package promptio wraps a test IOStream to make it safe to use the input with
 // promptui.
 package promptio

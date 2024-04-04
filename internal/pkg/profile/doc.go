@@ -1,3 +1,6 @@
+// Copyright (c) HashiCorp, Inc.
+// SPDX-License-Identifier: MPL-2.0
+
 // Package profile stores the CLI configuration for the named profile.
 //
 // The profile stores common configuration values such as the organization and
