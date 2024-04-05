@@ -9,10 +9,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
       with:
         go-version: "1.22"
 
@@ -22,7 +22,7 @@ jobs:
         git diff --exit-code -- go.mod go.sum
 
     - name: golangci-lint
-      uses: golangci/golangci-lint-action@v3
+      uses: golangci/golangci-lint-action@3cfe3a4abbb849e10058ce4af15d205b6da42804 # v4.0.0
       with:
         # Require: The version of golangci-lint to use.
         # When `install-mode` is `binary` (default) the value can be v1.2 or v1.2.3 or `latest` to use the latest version.
@@ -34,7 +34,7 @@ jobs:
 
     # Upload the original go test log as an artifact for later review.
     - name: Upload test log
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
       if: always()
       with:
         name: test-log
