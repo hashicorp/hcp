@@ -27,7 +27,7 @@ type QueueOpts struct {
 	ID    string
 	Body  string
 
-	ActionConfigID string
+	ActionRunID string
 }
 
 func NewCmdQueue(ctx *cmd.Context) *cmd.Command {
@@ -59,10 +59,10 @@ func NewCmdQueue(ctx *cmd.Context) *cmd.Command {
 					Value:        flagvalue.Simple("", &opts.Body),
 				},
 				{
-					Name:         "action-config",
+					Name:         "action-run",
 					DisplayValue: "ID",
-					Description:  "Action config to associate operation with.",
-					Value:        flagvalue.Simple("", &opts.ActionConfigID),
+					Description:  "Action run to associate operation with.",
+					Value:        flagvalue.Simple("", &opts.ActionRunID),
 				},
 				{
 					Name:         "group",
@@ -116,10 +116,10 @@ func agentQueue(log hclog.Logger, opts *QueueOpts) error {
 		NamespaceID: ns.ID,
 		Body: &models.HashicorpCloudWaypointWaypointServiceQueueAgentOperationBody{
 			Operation: &models.HashicorpCloudWaypointAgentOperation{
-				ID:             opts.ID,
-				ActionConfigID: opts.ActionConfigID,
-				Body:           body,
-				Group:          opts.Group,
+				ID:          opts.ID,
+				ActionRunID: opts.ActionRunID,
+				Body:        body,
+				Group:       opts.Group,
 			},
 		},
 		Context: ctx,
