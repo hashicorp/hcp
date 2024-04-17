@@ -153,14 +153,14 @@ func runOp(
 		statusCode int
 	)
 
-	if ao.ActionConfigID != "" {
-		log.Info("reporting action run starting", "action-config-id", ao.ActionConfigID)
+	if ao.ActionRunID != "" {
+		log.Info("reporting action run starting", "action-run-id", ao.ActionRunID)
 
 		resp, err := opts.WS.WaypointServiceStartingAction(&waypoint_service.WaypointServiceStartingActionParams{
 			NamespaceID: ns,
 			Body: &models.HashicorpCloudWaypointWaypointServiceStartingActionBody{
-				ActionConfigID: ao.ActionConfigID,
-				GroupName:      ao.Group,
+				ActionRunID: ao.ActionRunID,
+				GroupName:   ao.Group,
 			},
 			Context: ctx,
 		}, nil)

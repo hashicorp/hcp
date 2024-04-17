@@ -71,7 +71,7 @@ func (e *Executor) Execute(ctx context.Context, opInfo *models.HashicorpCloudWay
 
 	hctx.Variables = map[string]cty.Value{
 		"waypoint": cty.ObjectVal(map[string]cty.Value{
-			"config_id": cty.StringVal(opInfo.ActionConfigID),
+			"run_id": cty.StringVal(opInfo.ActionRunID),
 		}),
 		"var": cty.ObjectVal(input),
 	}
