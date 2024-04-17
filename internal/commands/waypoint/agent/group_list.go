@@ -61,5 +61,5 @@ func agentGroupList(log hclog.Logger, opts *GroupOpts) error {
 		return fmt.Errorf("error listing groups: %w", err)
 	}
 
-	return opts.Output.Show(list.Payload.Groups, format.Table, "name", "description")
+	return opts.Output.Show(list.Payload.Groups, format.Table, "Name", "Description")
 }
