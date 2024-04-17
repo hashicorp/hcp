@@ -1,0 +1,3 @@
+```release-note:bug
+waypoint: Fix table output for agent group list command
+```
