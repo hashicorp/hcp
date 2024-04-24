@@ -21,10 +21,17 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"github.com/hashicorp/hcp/internal/pkg/versioncheck"
 	"github.com/hashicorp/hcp/version"
 	"github.com/mitchellh/cli"
 	"github.com/posener/complete"
 	"golang.org/x/oauth2"
+)
+
+const (
+	// versionCheckStatePath is the path to store the result of checking for a new
+	// version.
+	versionCheckStatePath = "~/.config/hcp/version_check_state.json"
 )
 
 func main() {
@@ -53,6 +60,20 @@ func realMain() int {
 	defer func() {
 		if err := io.RestoreConsole(); err != nil {
 			fmt.Fprintf(os.Stderr, "failed to restore console output: %v\n", err)
+		}
+	}()
+
+	// Create the version checker
+	checker, err := versioncheck.New(io, versionCheckStatePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to configure version checker: %v\n", err)
+		return 1
+	}
+
+	// Start checking for a new version as soon as possible
+	go func() {
+		if err := checker.Check(shutdownCtx); err != nil && !errors.Is(err, context.Canceled) {
+			fmt.Fprintf(os.Stderr, "failed to check for new version: %v\n", err)
 		}
 	}()
 
@@ -104,7 +125,6 @@ func realMain() int {
 		Args:                       args,
 		Commands:                   cmdMap,
 		HelpFunc:                   cmd.RootHelpFunc(hcpCmd),
-		Version:                    "0.0.1",
 		Autocomplete:               true,
 		AutocompleteNoDefaultFlags: true,
 		AutocompleteGlobalFlags: map[string]complete.Predictor{
@@ -115,6 +135,11 @@ func realMain() int {
 	status, err := c.Run()
 	if err != nil {
 		fmt.Fprintf(io.Err(), "Error executing hcp: %s\n", err.Error())
+	}
+
+	// Cancel the update check if it hasn't finished already
+	if checker.UpdateToDisplay() && !isAutocomplete() {
+		checker.Display()
 	}
 
 	return status
@@ -192,4 +217,10 @@ func loadProfile(ctx context.Context, iam iam_service.ClientService, tokenSource
 	}
 
 	return p, nil
+}
+
+// isAutocomplete returns true if the CLI is being run in an autocomplete
+// context.
+func isAutocomplete() bool {
+	return os.Getenv("COMP_LINE") != "" && os.Getenv("COMP_POINT") != ""
 }
