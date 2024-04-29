@@ -15,7 +15,9 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/organization_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/project_service"
 	resources "github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
+	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
@@ -30,6 +32,7 @@ func NewCmdInit(ctx *cmd.Context) *cmd.Command {
 		IAMClient:           iam_service.New(ctx.HCP, nil),
 		OrganizationService: organization_service.New(ctx.HCP, nil),
 		ProjectService:      project_service.New(ctx.HCP, nil),
+		SecretsService:      secret_service.New(ctx.HCP, nil),
 	}
 	cmd := &cmd.Command{
 		Name:      "init",
@@ -49,6 +52,16 @@ func NewCmdInit(ctx *cmd.Context) *cmd.Command {
 
 			return opts.run()
 		},
+		Flags: cmd.Flags{
+			Local: []*cmd.Flag{
+				{
+					Name:         "vault-secrets",
+					Description:  "profile name to use with HCP vault secrets service.",
+					DisplayValue: "ALIAS_NAME",
+					Value:        flagvalue.Simple("", &opts.VaultSecretsProfileNameAlias),
+				},
+			},
+		},
 	}
 	return cmd
 }
@@ -62,6 +75,10 @@ type InitOpts struct {
 	IAMClient           iam_service.ClientService
 	OrganizationService organization_service.ClientService
 	ProjectService      project_service.ClientService
+	SecretsService      secret_service.ClientService
+
+	// Flags
+	VaultSecretsProfileNameAlias string
 }
 
 func (i *InitOpts) run() error {
@@ -69,7 +86,71 @@ func (i *InitOpts) run() error {
 		return fmt.Errorf("failed configuring organization and project: %w", err)
 	}
 
+	if err := i.configureVaultSecrets(); err != nil {
+		return fmt.Errorf("failed configuring profile for vault secrets: %v", err)
+	}
+
 	return i.Profile.Write()
+}
+
+func (i *InitOpts) configureVaultSecrets() error {
+	if i.VaultSecretsProfileNameAlias == "" {
+		return nil
+	}
+	i.Profile.Name = i.VaultSecretsProfileNameAlias
+
+	// Retrieve apps associated with org and project ID
+	listAppReq := secret_service.NewListAppsParamsWithContext(i.Ctx)
+	listAppReq.LocationOrganizationID = i.Profile.OrganizationID
+	listAppReq.LocationProjectID = i.Profile.ProjectID
+	listAppResp, err := i.SecretsService.ListApps(listAppReq, nil)
+	if err != nil {
+		return err
+	}
+
+	appCount := len(listAppResp.Payload.Apps)
+
+	if appCount <= 0 {
+		return fmt.Errorf("there are no valid vault secret apps for your principal. Create one by visiting the HCP Portal (https://portal.cloud.hashicorp.com)")
+	}
+
+	appName := listAppResp.Payload.Apps[0].Name
+	if appCount > 1 {
+		prompt := promptui.Select{
+			Label: "Multiple apps found. Please select the one you would like to configure.",
+			Items: listAppResp.Payload.Apps,
+			Templates: &promptui.SelectTemplates{
+				Active:   `> {{ .Name }}`,
+				Inactive: `{{ .Name }}`,
+				Details: `
+----- Apps -----
+{{ "Name:" | faint }}   {{ .Name }}
+`,
+			},
+			HideSelected: true,
+			Stdin:        io.NopCloser(i.IO.In()),
+			Stdout:       iostreams.NopWriteCloser(i.IO.Err()),
+			Searcher: func(term string, index int) bool {
+				term = strings.ToLower(term)
+				name := strings.ToLower(listAppResp.Payload.Apps[index].Name)
+				return strings.Contains(name, term)
+			},
+		}
+
+		i, _, err := prompt.Run()
+		if err != nil {
+			return err
+		}
+
+		appName = listAppResp.Payload.Apps[i].Name
+	}
+
+	cs := i.IO.ColorScheme()
+	fmt.Fprintf(i.IO.Err(), "%s App with name %q selected\n", cs.SuccessIcon(), appName)
+	i.Profile.VaultSecrets = &profile.VaultSecretsConf{
+		AppName: appName,
+	}
+	return nil
 }
 
 func (i *InitOpts) configureOrgAndProject() error {
