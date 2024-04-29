@@ -1,0 +1,3 @@
+```release-note:improvement
+waypoint: change template list format to use a table
+```
