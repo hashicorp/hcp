@@ -76,5 +76,11 @@ func listTemplates(opts *TemplateOpts) error {
 		templates = append(templates, resp.GetPayload().ApplicationTemplates...)
 	}
 
-	return opts.Output.Show(templates, format.Pretty)
+	templateFields := []format.Field{
+		format.NewField("Name", "{{ .Name }}"),
+		format.NewField("ID", "{{ .ID }}"),
+		format.NewField("Summary", "{{ .Summary }}"),
+	}
+
+	return opts.Output.Display(format.NewDisplayer(templates, format.Table, templateFields))
 }
