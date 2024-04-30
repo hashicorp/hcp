@@ -86,19 +86,16 @@ func (i *InitOpts) run() error {
 		return fmt.Errorf("failed configuring organization and project: %w", err)
 	}
 
-	if err := i.configureVaultSecrets(); err != nil {
-		return fmt.Errorf("failed configuring profile for vault secrets: %v", err)
+	if i.VaultSecrets {
+		if err := i.configureVaultSecrets(); err != nil {
+			return fmt.Errorf("failed configuring profile for vault secrets: %v", err)
+		}
 	}
 
 	return i.Profile.Write()
 }
 
 func (i *InitOpts) configureVaultSecrets() error {
-	if !i.VaultSecrets {
-		i.Profile.VaultSecrets = nil
-		return nil
-	}
-
 	// Retrieve apps associated with org and project ID
 	listAppReq := secret_service.NewListAppsParamsWithContext(i.Ctx)
 	listAppReq.LocationOrganizationID = i.Profile.OrganizationID
