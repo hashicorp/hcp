@@ -119,10 +119,14 @@ func createRun(opts *CreateOpts) error {
 
 	fmt.Fprintln(opts.IO.Err())
 	fmt.Fprintln(opts.IO.Err(), heredoc.New(opts.IO).Must(`
-		To initialize the newly created profile, run:
+To initialize the newly created profile, run:
 
-		  {{ Bold "$ hcp profile init" }}
-		`))
+	{{ Bold "$ hcp profile init" }}
+
+To initialize the newly created profile to use with vault-secrets, run:
+
+	{{ Bold "$ hcp profile init --vault-secrets" }}
+`))
 	fmt.Fprintln(opts.IO.Err())
 
 	return nil

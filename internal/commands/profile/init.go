@@ -55,10 +55,10 @@ func NewCmdInit(ctx *cmd.Context) *cmd.Command {
 		Flags: cmd.Flags{
 			Local: []*cmd.Flag{
 				{
-					Name:         "vault-secrets",
-					Description:  "profile name to use with HCP vault secrets service.",
-					DisplayValue: "ALIAS_NAME",
-					Value:        flagvalue.Simple("", &opts.VaultSecretsProfileNameAlias),
+					Name:          "vault-secrets",
+					Description:   "flag to configure current active profile for use with vault-secrets",
+					IsBooleanFlag: true,
+					Value:         flagvalue.Enum([]bool{true, false}, false, &opts.VaultSecrets),
 				},
 			},
 		},
@@ -78,7 +78,7 @@ type InitOpts struct {
 	SecretsService      secret_service.ClientService
 
 	// Flags
-	VaultSecretsProfileNameAlias string
+	VaultSecrets bool
 }
 
 func (i *InitOpts) run() error {
@@ -94,10 +94,10 @@ func (i *InitOpts) run() error {
 }
 
 func (i *InitOpts) configureVaultSecrets() error {
-	if i.VaultSecretsProfileNameAlias == "" {
+	if !i.VaultSecrets {
+		i.Profile.VaultSecrets = nil
 		return nil
 	}
-	i.Profile.Name = i.VaultSecretsProfileNameAlias
 
 	// Retrieve apps associated with org and project ID
 	listAppReq := secret_service.NewListAppsParamsWithContext(i.Ctx)
