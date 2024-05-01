@@ -1,7 +1,7 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package actionconfig
+package actions
 
 import (
 	"errors"
@@ -13,11 +13,10 @@ import (
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
-	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
 
-type UpdateOpts struct {
+type CreateOpts struct {
 	opts.WaypointOpts
 
 	Name        string
@@ -29,8 +28,8 @@ type UpdateOpts struct {
 	RequestHeaders      map[string]string
 }
 
-func NewCmdUpdate(ctx *cmd.Context) *cmd.Command {
-	opts := &UpdateOpts{
+func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
+	opts := &CreateOpts{
 		WaypointOpts: opts.New(ctx),
 		Request: &models.HashicorpCloudWaypointActionConfigRequest{
 			Custom: &models.HashicorpCloudWaypointActionConfigFlavorCustom{},
@@ -39,15 +38,14 @@ func NewCmdUpdate(ctx *cmd.Context) *cmd.Command {
 	}
 
 	cmd := &cmd.Command{
-		Name:      "update",
-		ShortHelp: "Update a action configuration.",
+		Name:      "create",
+		ShortHelp: "Create a new action configuration.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp waypoint action-config update" }}
-		command updates a action configuration to be used to launch an action
-		with.
+		The {{ template "mdCodeOrBold" "hcp waypoint actions create" }} command
+		creates a new action to be used to launch an action with.
 		`),
 		RunF: func(c *cmd.Command, args []string) error {
-			return updateActionConfig(c, args, opts)
+			return createAction(c, args, opts)
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
 			return cmd.RequireOrgAndProject(ctx)
@@ -57,20 +55,19 @@ func NewCmdUpdate(ctx *cmd.Context) *cmd.Command {
 				{
 					Name:        "name",
 					Shorthand:   "n",
-					Description: "The name of the action configuration.",
-					Required:    true, // We need the name so we know what config to update
+					Description: "The name of the action.",
 					Value:       flagvalue.Simple("", &opts.Name),
 				},
 				{
 					Name:        "description",
 					Shorthand:   "d",
-					Description: "The description of the action configuration.",
+					Description: "The description of the action.",
 					Value:       flagvalue.Simple("", &opts.Description),
 				},
 				// Custom Requests
 				{
 					Name:        "url",
-					Description: "The URL of the action configuration.",
+					Description: "The URL of the action.",
 					Value:       flagvalue.Simple("", &opts.Request.Custom.URL),
 				},
 				{
@@ -97,7 +94,7 @@ func NewCmdUpdate(ctx *cmd.Context) *cmd.Command {
 	return cmd
 }
 
-func updateActionConfig(c *cmd.Command, args []string, opts *UpdateOpts) error {
+func createAction(c *cmd.Command, args []string, opts *CreateOpts) error {
 	// Validate Request Type is not set to all options
 	if opts.Request != nil {
 		if opts.Request.Custom != nil && opts.Request.Github != nil {
@@ -128,11 +125,10 @@ func updateActionConfig(c *cmd.Command, args []string, opts *UpdateOpts) error {
 	if err != nil {
 		return err
 	}
-
-	resp, err := opts.WS.WaypointServiceUpdateActionConfig(&waypoint_service.WaypointServiceUpdateActionConfigParams{
+	_, err = opts.WS.WaypointServiceCreateActionConfig(&waypoint_service.WaypointServiceCreateActionConfigParams{
 		NamespaceID: ns.ID,
 		Context:     opts.Ctx,
-		Body: &models.HashicorpCloudWaypointWaypointServiceUpdateActionConfigBody{
+		Body: &models.HashicorpCloudWaypointWaypointServiceCreateActionConfigBody{
 			ActionConfig: &models.HashicorpCloudWaypointActionConfig{
 				Name:        opts.Name,
 				Description: opts.Description,
@@ -142,11 +138,10 @@ func updateActionConfig(c *cmd.Command, args []string, opts *UpdateOpts) error {
 	}, nil)
 
 	if err != nil {
-		return fmt.Errorf("failed to update action config %q: %w", opts.Name, err)
+		return fmt.Errorf("failed to create action %q: %w", opts.Name, err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Action config %q updated.", opts.Name)
+	fmt.Fprintf(opts.IO.Err(), "Action %q created.", opts.Name)
 
-	respPayload := resp.GetPayload()
-	return opts.Output.Show(respPayload.ActionConfig, format.Pretty)
+	return nil
 }
