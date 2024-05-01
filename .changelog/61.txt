@@ -1,0 +1,3 @@
+```release-note:improvement
+waypoint: Rename HCP Waypoint add-on definition, add-on, and action config command groups.
+```
