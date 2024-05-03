@@ -5,7 +5,6 @@ package tfcconfig
 
 import (
 	"context"
-
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -66,6 +65,9 @@ func readRun(opts *TFCConfigReadOpts) error {
 	)
 	if err != nil {
 		return errors.Wrapf(err, "%s failed to get TFC Config", opts.IO.ColorScheme().FailureIcon())
+	}
+	if resp.Payload.TfcConfig == nil {
+		return errors.New("No TFC Config found for this project")
 	}
 	d := newDisplayer(format.Pretty, resp.Payload.TfcConfig)
 	return opts.Output.Display(d)
