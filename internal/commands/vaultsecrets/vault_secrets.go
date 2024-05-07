@@ -4,6 +4,7 @@
 package vaultsecrets
 
 import (
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/apps"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
@@ -19,12 +20,8 @@ func NewCmdVaultSecrets(ctx *cmd.Context) *cmd.Command {
 		Aliases: []string{
 			"vault-secrets-beta",
 		},
-		// Validation rules requires either RunF or Children are set
-		// RunF can be removed when apps and secrets children are added
-		RunF: func(c *cmd.Command, args []string) error {
-			return nil
-		},
 	}
 
+	cmd.AddChild(apps.NewCmdApps(ctx))
 	return cmd
 }
