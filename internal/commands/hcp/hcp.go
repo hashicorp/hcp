@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/hcp/internal/commands/organizations"
 	"github.com/hashicorp/hcp/internal/commands/profile"
 	"github.com/hashicorp/hcp/internal/commands/projects"
+	vaultsecrets "github.com/hashicorp/hcp/internal/commands/vault-secrets"
 	"github.com/hashicorp/hcp/internal/commands/version"
 	"github.com/hashicorp/hcp/internal/commands/waypoint"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -38,6 +39,7 @@ func NewCmdHcp(ctx *cmd.Context) *cmd.Command {
 	c.AddChild(organizations.NewCmdOrganizations(ctx))
 	c.AddChild(iam.NewCmdIam(ctx))
 	c.AddChild(waypoint.NewCmdWaypoint(ctx))
+	c.AddChild(vaultsecrets.NewCmdVaultSecrets(ctx))
 
 	// Configure the command as the root command.
 	cmd.ConfigureRootCommand(ctx, c)
