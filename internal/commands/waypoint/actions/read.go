@@ -1,7 +1,7 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package actionconfig
+package actions
 
 import (
 	"fmt"
@@ -10,30 +10,30 @@ import (
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
+	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
 
-type DeleteOpts struct {
+type ReadOpts struct {
 	opts.WaypointOpts
 
 	Name string
 }
 
-func NewCmdDelete(ctx *cmd.Context) *cmd.Command {
-	opts := &DeleteOpts{
+func NewCmdRead(ctx *cmd.Context) *cmd.Command {
+	opts := &ReadOpts{
 		WaypointOpts: opts.New(ctx),
 	}
 
 	cmd := &cmd.Command{
-		Name:      "delete",
-		ShortHelp: "Delete an existing action configuration.",
+		Name:      "read",
+		ShortHelp: "Read more details about an action.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp waypoint action-config delete" }}
-		command deletes an existing action configuration. This will remove the
-		config completely from HCP Waypoint.
+		The {{ template "mdCodeOrBold" "hcp waypoint actions read" }}
+		command returns more details about an action configurations.
 		`),
 		RunF: func(c *cmd.Command, args []string) error {
-			return deleteActionConfig(c, args, opts)
+			return readAction(c, args, opts)
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
 			return cmd.RequireOrgAndProject(ctx)
@@ -43,7 +43,7 @@ func NewCmdDelete(ctx *cmd.Context) *cmd.Command {
 				{
 					Name:        "name",
 					Shorthand:   "n",
-					Description: "The name of the action configuration to delete.",
+					Description: "The name of the action.",
 					Value:       flagvalue.Simple("", &opts.Name),
 					Required:    true,
 				},
@@ -54,7 +54,7 @@ func NewCmdDelete(ctx *cmd.Context) *cmd.Command {
 	return cmd
 }
 
-func deleteActionConfig(c *cmd.Command, args []string, opts *DeleteOpts) error {
+func readAction(c *cmd.Command, args []string, opts *ReadOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
 		return err
@@ -62,15 +62,16 @@ func deleteActionConfig(c *cmd.Command, args []string, opts *DeleteOpts) error {
 
 	// Make action name a string pointer
 	actionName := &opts.Name
-	_, err = opts.WS.WaypointServiceDeleteActionConfig(&waypoint_service.WaypointServiceDeleteActionConfigParams{
+	resp, err := opts.WS.WaypointServiceGetActionConfig(&waypoint_service.WaypointServiceGetActionConfigParams{
 		NamespaceID: ns.ID,
 		Context:     opts.Ctx,
 		ActionName:  actionName,
 	}, nil)
 	if err != nil {
-		return fmt.Errorf("failed to delete action config %q: %w", opts.Name, err)
+		return fmt.Errorf("error getting action for %q: %w",
+			opts.Name, err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Action config %q deleted.", opts.Name)
-	return nil
+	respPayload := resp.GetPayload()
+	return opts.Output.Show(respPayload.ActionConfig, format.Pretty)
 }

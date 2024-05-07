@@ -1,7 +1,7 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package actionconfig
+package actions
 
 import (
 	"fmt"
@@ -24,13 +24,13 @@ func NewCmdList(ctx *cmd.Context) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "list",
-		ShortHelp: "List all known action configurations.",
+		ShortHelp: "List all known actions.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp waypoint action-config list" }}
-		command lists all known action configurations from HCP Waypoint.
+		The {{ template "mdCodeOrBold" "hcp waypoint actions list" }} command 
+		lists all known actions from HCP Waypoint.
 		`),
 		RunF: func(c *cmd.Command, args []string) error {
-			return listActionConfig(c, args, opts)
+			return listActions(c, args, opts)
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
 			return cmd.RequireOrgAndProject(ctx)
@@ -40,7 +40,7 @@ func NewCmdList(ctx *cmd.Context) *cmd.Command {
 	return cmd
 }
 
-func listActionConfig(c *cmd.Command, args []string, opts *ListOpts) error {
+func listActions(c *cmd.Command, args []string, opts *ListOpts) error {
 	ns, err := opts.Namespace()
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func listActionConfig(c *cmd.Command, args []string, opts *ListOpts) error {
 		Context:     opts.Ctx,
 	}, nil)
 	if err != nil {
-		return fmt.Errorf("error listing action configurations: %w", err)
+		return fmt.Errorf("error listing actions: %w", err)
 	}
 
 	respPayload := resp.GetPayload()

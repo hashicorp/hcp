@@ -1,7 +1,7 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package actionconfig
+package actions
 
 import (
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -10,14 +10,14 @@ import (
 
 func NewCmdActionConfig(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
-		Name:      "action-config",
+		Name:      "actions",
 		ShortHelp: "Manage action configuration options for HCP Waypoint.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp waypoint action-config" }} command
-		group manages all action configuration options for HCP Waypoint. An action
-		configuration is a set of options that define how an action is executed. This
-		includes the action request type, and the action name. The action
-		configuration is used to launch action runs depending on the Request type.
+		The {{ template "mdCodeOrBold" "hcp waypoint actions" }} command group
+		manages all action options for HCP Waypoint. An action is a set of 
+		options that define how an action is executed. This includes the action
+		request type, and the action name. The action is used to launch action 
+		runs depending on the Request type.
 		`),
 	}
 
