@@ -28,7 +28,7 @@ func NewCmdDelete(ctx *cmd.Context) *cmd.Command {
 		Name:      "delete",
 		ShortHelp: "Delete an existing action.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp waypoint action-config delete" }}
+		The {{ template "mdCodeOrBold" "hcp waypoint actions delete" }}
 		command deletes an existing action. This will remove the action 
 		completely from HCP Waypoint.
 		`),
