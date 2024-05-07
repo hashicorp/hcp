@@ -12,7 +12,7 @@ import (
 func NewCmdVaultSecrets(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "vault-secrets",
-		ShortHelp: "Manage Vault Secrets in Beta.",
+		ShortHelp: "Manage Vault Secrets.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets" }} command group lets you manage HCP Vault Secrets
 		resources through the CLI (in Beta). 
