@@ -18,7 +18,7 @@ func NewCmdVaultSecrets(ctx *cmd.Context) *cmd.Command {
 		resources through the CLI (in Beta). 
 		`),
 		Aliases: []string{
-			"vault-secrets-beta",
+			"secrets",
 		},
 	}
 
