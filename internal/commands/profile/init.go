@@ -97,7 +97,7 @@ func (i *InitOpts) run() error {
 
 	if i.VaultSecrets {
 		if err := i.configureVaultSecrets(); err != nil {
-			return fmt.Errorf("failed configuring profile for vault secrets: %v", err)
+			return fmt.Errorf("failed configuring profile for vault secrets: %w", err)
 		}
 	}
 
@@ -131,8 +131,7 @@ func (i *InitOpts) serviceConfigPrompt() error {
 			return fmt.Errorf("prompt failed: %w", err)
 		}
 
-		switch result {
-		case ServiceNameVaultSecrets:
+		if result == ServiceNameVaultSecrets {
 			i.VaultSecrets = true
 		}
 	}
