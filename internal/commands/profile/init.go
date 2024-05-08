@@ -196,6 +196,7 @@ func (i *InitOpts) configureVaultSecrets() error {
 				Details: `
 ----- Apps -----
 {{ "Name:" | faint }}   {{ .Name }}
+{{ "Description" | faint }} {{ .Description }}
 `,
 			},
 			HideSelected: true,
