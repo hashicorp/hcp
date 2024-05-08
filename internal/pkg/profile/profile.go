@@ -81,6 +81,9 @@ type Profile struct {
 		5. Document the properties in internal/commands/profile/property_docs.go
 	*/
 
+	// VaultSecrets stores vault-secrets CLI configuration values
+	VaultSecrets *VaultSecretsConf `hcl:"vault-secrets,block" json:",omitempty"`
+
 	// dir is the directory the profile should write to.
 	dir string
 }
@@ -143,6 +146,10 @@ func (p *Profile) Validate() error {
 func (p *Profile) Clean() {
 	if p.Core.isEmpty() {
 		p.Core = nil
+	}
+
+	if p.VaultSecrets.isEmpty() {
+		p.VaultSecrets = nil
 	}
 }
 
