@@ -166,6 +166,13 @@ func TestInit_OrgAndProject_SP_NoList(t *testing.T) {
 	// Fail the list projects call with permission denied
 	mocks.projectListErr(http.StatusForbidden)
 
+	// Say no to configuring service config
+	_, err := io.Input.WriteRune('n')
+	r.NoError(err)
+
+	_, err = io.Input.WriteRune(promptui.KeyEnter)
+	r.NoError(err)
+
 	r.NoError(opts.run())
 	r.Equal(orgID, opts.Profile.OrganizationID)
 	r.Equal(projID, opts.Profile.ProjectID)
