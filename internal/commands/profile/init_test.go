@@ -375,7 +375,6 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 					selection := rand.Intn(c.NumVaultSecretsApps)
 					selectedVaultSecretsAppName = vaultSecretsApps[selection].Name
 
-					fmt.Println("select app name ", selectedVaultSecretsAppName)
 					// Send a down character and enter
 					for i := 0; i < selection; i++ {
 						_, err := ioPrompt.Input.WriteRune(promptui.KeyNext)
@@ -399,7 +398,6 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 				r.Equal(selectedOrgID, opts.Profile.OrganizationID)
 				r.Equal(selectedProjID, opts.Profile.ProjectID)
 				if opts.Profile.VaultSecrets != nil {
-					fmt.Println(opts.Profile.VaultSecrets.AppName)
 					r.Equal(selectedVaultSecretsAppName, opts.Profile.VaultSecrets.AppName)
 				}
 			}
