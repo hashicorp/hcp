@@ -14,9 +14,13 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/organization_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/project_service"
 	rm_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/models"
+	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	preview_secret_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	mock_iam_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-iam/stable/2019-12-10/client/iam_service"
 	mock_organization_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/organization_service"
 	mock_project_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/project_service"
+	mock_preview_secret_secvice "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 	"github.com/hashicorp/hcp/internal/pkg/testing/promptio"
@@ -29,6 +33,7 @@ type initMocks struct {
 	IAMClient           *mock_iam_service.MockClientService
 	OrganizationService *mock_organization_service.MockClientService
 	ProjectService      *mock_project_service.MockClientService
+	SecretSevice        *mock_preview_secret_secvice.MockClientService
 }
 
 func getInitMocks(t *testing.T, opts *InitOpts) initMocks {
@@ -36,12 +41,14 @@ func getInitMocks(t *testing.T, opts *InitOpts) initMocks {
 		IAMClient:           mock_iam_service.NewMockClientService(t),
 		OrganizationService: mock_organization_service.NewMockClientService(t),
 		ProjectService:      mock_project_service.NewMockClientService(t),
+		SecretSevice:        mock_preview_secret_secvice.NewMockClientService(t),
 	}
 
 	if opts != nil {
 		opts.IAMClient = m.IAMClient
 		opts.OrganizationService = m.OrganizationService
 		opts.ProjectService = m.ProjectService
+		opts.SecretService = m.SecretSevice
 	}
 
 	return m
@@ -121,11 +128,31 @@ func (m *initMocks) orgList(count int) []*rm_models.HashicorpCloudResourcemanage
 	return ok.Payload.Organizations
 }
 
+func (m *initMocks) vaultSecretsAppsList(count int) []*preview_secret_models.Secrets20231128App {
+	ok := preview_secret_service.NewListAppsOK()
+	ok.Payload = &preview_secret_models.Secrets20231128ListAppsResponse{
+		Apps: []*preview_secret_models.Secrets20231128App{},
+	}
+
+	for i := 0; i < count; i++ {
+		ok.Payload.Apps = append(ok.Payload.Apps,
+			&preview_secret_models.Secrets20231128App{
+				Name: fmt.Sprintf("app_name_%d", i),
+			})
+	}
+
+	m.SecretSevice.EXPECT().ListApps(mock.Anything, mock.Anything).Return(ok, nil)
+	return ok.Payload.Apps
+}
+
 func TestInit_OrgAndProject_SP_NoList(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	io := promptio.Wrap(iostreams.Test())
+	io := iostreams.Test()
+	io.ErrorTTY = true
+	io.InputTTY = true
+
 	opts := InitOpts{
 		IO:      io,
 		Profile: profile.TestProfile(t),
@@ -176,9 +203,11 @@ func TestInit_OrgAndProject_SP_List(t *testing.T) {
 func TestInit_OrgAndProject_User(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
-		Name        string
-		NumOrgs     int
-		NumProjects int
+		Name                  string
+		NumOrgs               int
+		NumProjects           int
+		NumVaultSecretsApps   int
+		ConfigureVaultSecrets bool
 
 		Error string
 	}{
@@ -208,6 +237,35 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 			NumOrgs:     10,
 			NumProjects: 10,
 		},
+		{
+			Name:                  "Success: Many org / Many Project / No Vault Secets App/ Do not configure service config",
+			NumOrgs:               10,
+			NumProjects:           10,
+			NumVaultSecretsApps:   0,
+			ConfigureVaultSecrets: false,
+		},
+		{
+			Name:                  "Failed: Many org / Many Project / No Vault Secrets App / Configure Vault Secrets service",
+			NumOrgs:               10,
+			NumProjects:           10,
+			NumVaultSecretsApps:   0,
+			ConfigureVaultSecrets: true,
+			Error:                 "failed configuring profile for vault secrets: there are no valid vault secrets apps for your principal.",
+		},
+		{
+			Name:                  "Success: Many org / Many Project / 1 Vault Secrets App / Configure Vault Secrets service",
+			NumOrgs:               10,
+			NumProjects:           10,
+			NumVaultSecretsApps:   1,
+			ConfigureVaultSecrets: true,
+		},
+		{
+			Name:                  "Success: Many org / Many Project / Many Vault Secrets App / Configure Vault Secrets service",
+			NumOrgs:               10,
+			NumProjects:           10,
+			NumVaultSecretsApps:   100,
+			ConfigureVaultSecrets: true,
+		},
 	}
 
 	for _, c := range cases {
@@ -216,9 +274,13 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 			t.Parallel()
 			r := require.New(t)
 
-			io := promptio.Wrap(iostreams.Test())
+			io := iostreams.Test()
+			io.ErrorTTY = true
+			io.InputTTY = true
+
+			ioPrompt := promptio.Wrap(io)
 			opts := InitOpts{
-				IO:      io,
+				IO:      ioPrompt,
 				Profile: profile.TestProfile(t),
 			}
 			mocks := getInitMocks(t, &opts)
@@ -227,7 +289,7 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 			mocks.callerIdentityUser()
 
 			// Capture the selected IDs
-			selectedOrgID, selectedProjID := "", ""
+			selectedOrgID, selectedProjID, selectedVaultSecretsAppName := "", "", ""
 
 			// Return the expected number of orgs
 			orgs := mocks.orgList(c.NumOrgs)
@@ -239,12 +301,12 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 
 				// Send a down character and enter
 				for i := 0; i < selection; i++ {
-					_, err := io.Input.WriteRune(promptui.KeyNext)
+					_, err := ioPrompt.Input.WriteRune(promptui.KeyNext)
 					r.NoError(err)
 				}
 
 				// Select
-				_, err := io.Input.WriteRune(promptui.KeyEnter)
+				_, err := ioPrompt.Input.WriteRune(promptui.KeyEnter)
 				r.NoError(err)
 
 			} else if c.NumOrgs == 1 {
@@ -264,15 +326,62 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 
 				// Send a down character and enter
 				for i := 0; i < selection; i++ {
-					_, err := io.Input.WriteRune(promptui.KeyNext)
+					_, err := ioPrompt.Input.WriteRune(promptui.KeyNext)
 					r.NoError(err)
 				}
 
 				// Select
-				_, err := io.Input.WriteRune(promptui.KeyEnter)
+				_, err := ioPrompt.Input.WriteRune(promptui.KeyEnter)
 				r.NoError(err)
 			} else if c.NumProjects == 1 {
 				selectedProjID = projects[0].ID
+			}
+
+			if c.ConfigureVaultSecrets {
+				// Say yes to configuring service config
+				_, err := ioPrompt.Input.WriteRune('y')
+				r.NoError(err)
+
+				// Send a down character and enter
+				_, err = ioPrompt.Input.WriteRune(promptui.KeyNext)
+				r.NoError(err)
+
+				// Select Vault-Secrets
+				_, err = ioPrompt.Input.WriteRune(promptui.KeyEnter)
+				r.NoError(err)
+			} else {
+				// Say no to configuring service config
+				_, err := ioPrompt.Input.WriteRune('n')
+				r.NoError(err)
+
+				_, err = ioPrompt.Input.WriteRune(promptui.KeyEnter)
+				r.NoError(err)
+			}
+
+			var vaultSecretsApps []*preview_secret_models.Secrets20231128App
+			if c.ConfigureVaultSecrets {
+				vaultSecretsApps = mocks.vaultSecretsAppsList(c.NumVaultSecretsApps)
+			}
+
+			if c.ConfigureVaultSecrets {
+				if c.NumVaultSecretsApps > 1 {
+					selection := rand.Intn(c.NumVaultSecretsApps)
+					selectedVaultSecretsAppName = vaultSecretsApps[selection].Name
+
+					fmt.Println("select app name ", selectedVaultSecretsAppName)
+					// Send a down character and enter
+					for i := 0; i < selection; i++ {
+						_, err := ioPrompt.Input.WriteRune(promptui.KeyNext)
+						r.NoError(err)
+					}
+
+					// Select
+					_, err := ioPrompt.Input.WriteRune(promptui.KeyEnter)
+					r.NoError(err)
+
+				} else if c.NumVaultSecretsApps == 1 {
+					selectedVaultSecretsAppName = vaultSecretsApps[0].Name
+				}
 			}
 
 			err := opts.run()
@@ -282,6 +391,10 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 				r.NoError(err)
 				r.Equal(selectedOrgID, opts.Profile.OrganizationID)
 				r.Equal(selectedProjID, opts.Profile.ProjectID)
+				if opts.Profile.VaultSecrets != nil {
+					fmt.Println(opts.Profile.VaultSecrets.AppName)
+					r.Equal(selectedVaultSecretsAppName, opts.Profile.VaultSecrets.AppName)
+				}
 			}
 		})
 	}
