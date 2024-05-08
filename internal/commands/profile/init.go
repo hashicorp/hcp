@@ -60,7 +60,7 @@ func NewCmdInit(ctx *cmd.Context) *cmd.Command {
 			Local: []*cmd.Flag{
 				{
 					Name:          "vault-secrets",
-					Description:   "flag to configure current active profile for use with vault-secrets",
+					Description:   "Flag to configure current active profile for use with HCP Vault Secrets.",
 					IsBooleanFlag: true,
 					Value:         flagvalue.Enum([]bool{true, false}, false, &opts.VaultSecrets),
 				},
