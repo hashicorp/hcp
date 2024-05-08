@@ -213,8 +213,6 @@ func (i *InitOpts) configureVaultSecrets() error {
 		if err != nil {
 			return fmt.Errorf("prompt failed: %w", err)
 		}
-
-		fmt.Println("Index is ", i)
 		appName = listAppResp.Payload.Apps[i].Name
 	}
 

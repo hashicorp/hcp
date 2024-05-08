@@ -4,6 +4,8 @@
 package profile
 
 import (
+	"errors"
+
 	"github.com/posener/complete"
 )
 
@@ -24,6 +26,9 @@ func (vsc *VaultSecretsConf) Predict(args complete.Args) []string {
 func (vsc *VaultSecretsConf) Validate() error {
 	if vsc == nil {
 		return nil
+	}
+	if vsc.AppName == "" {
+		return errors.New("app_name must be set")
 	}
 	return nil
 }
