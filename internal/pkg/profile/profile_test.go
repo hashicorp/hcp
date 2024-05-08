@@ -21,6 +21,7 @@ func TestPropertyNames(t *testing.T) {
 	r.Contains(properties, "project_id")
 	r.Contains(properties, "core/no_color")
 	r.Contains(properties, "core/verbosity")
+	r.Contains(properties, "vault-secrets/app_name")
 }
 
 func TestProfile_Validate(t *testing.T) {
