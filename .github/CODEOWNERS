@@ -14,4 +14,4 @@ internal/commands/waypoint @hashicorp/cloud-waypoint
 internal/pkg/waypoint @hashicorp/cloud-waypoint
 
 # Vault Secrets Owned
-internal/commands/vaultsecrets @hashicorp/cloud-vault-secrets
+*vaultsecrets* @hashicorp/cloud-vault-secrets
