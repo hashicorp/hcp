@@ -12,3 +12,6 @@ internal/pkg/api/mocks
 # Waypoint Owned
 internal/commands/waypoint @hashicorp/cloud-waypoint
 internal/pkg/waypoint @hashicorp/cloud-waypoint
+
+# Vault Secrets Owned
+*vaultsecrets* @hashicorp/cloud-vault-secrets
