@@ -166,7 +166,7 @@ func TestInit_OrgAndProject_SP_NoList(t *testing.T) {
 	// Fail the list projects call with permission denied
 	mocks.projectListErr(http.StatusForbidden)
 
-	// Say no to configuring service config
+	// Say no to service config prompt
 	_, err := io.Input.WriteRune('n')
 	r.NoError(err)
 
@@ -182,7 +182,11 @@ func TestInit_OrgAndProject_SP_List(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	io := promptio.Wrap(iostreams.Test())
+	ioTest := iostreams.Test()
+	ioTest.ErrorTTY = true
+	ioTest.InputTTY = true
+
+	io := promptio.Wrap(ioTest)
 	opts := InitOpts{
 		IO:      io,
 		Profile: profile.TestProfile(t),
@@ -199,6 +203,13 @@ func TestInit_OrgAndProject_SP_List(t *testing.T) {
 	// Send a down character and enter
 	_, err := io.Input.WriteRune(promptui.KeyNext)
 	r.NoError(err)
+	_, err = io.Input.WriteRune(promptui.KeyEnter)
+	r.NoError(err)
+
+	// Say no to service config prompt
+	_, err = io.Input.WriteRune('n')
+	r.NoError(err)
+
 	_, err = io.Input.WriteRune(promptui.KeyEnter)
 	r.NoError(err)
 
