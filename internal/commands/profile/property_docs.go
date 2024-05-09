@@ -52,8 +52,6 @@ func addCoreProperties(b *availablePropertiesBuilder) {
 }
 
 func addVaultSecretsProperties(b *availablePropertiesBuilder) {
-	// vault-secrets
-	b.AddProperty("vault-secrets", "no_color", "If True, color will not be used when printing messages in the terminal.")
 	b.AddProperty("vault-secrets", "app_name", `App name under HCP Vault Secrets to operate on by default.`)
 }
 
