@@ -60,9 +60,9 @@ func NewCmdInit(ctx *cmd.Context) *cmd.Command {
 			Local: []*cmd.Flag{
 				{
 					Name:          "vault-secrets",
-					Description:   "Flag to configure current active profile for use with HCP Vault Secrets.",
+					Description:   "Initializes Vault Secrets configuration.",
 					IsBooleanFlag: true,
-					Value:         flagvalue.Enum([]bool{true, false}, false, &opts.VaultSecrets),
+					Value:         flagvalue.Simple(false, &opts.VaultSecrets),
 				},
 			},
 		},
@@ -90,6 +90,7 @@ func (i *InitOpts) run() error {
 		return fmt.Errorf("failed configuring organization and project: %w", err)
 	}
 
+	// If the user hasn't explicitly specified a service to configure, prompt to see if they would like to.
 	err := i.serviceConfigPrompt()
 	if err != nil {
 		return err
@@ -97,13 +98,14 @@ func (i *InitOpts) run() error {
 
 	if i.VaultSecrets {
 		if err := i.configureVaultSecrets(); err != nil {
-			return fmt.Errorf("failed configuring profile for vault secrets: %w", err)
+			return fmt.Errorf("failed configuring profile for Vault Secrets: %w", err)
 		}
 	}
 
 	return i.Profile.Write()
 }
 
+// serviceConfigPrompt prompts the user to configure a service.
 func (i *InitOpts) serviceConfigPrompt() error {
 	if i.VaultSecrets {
 		return nil
@@ -180,9 +182,14 @@ func (i *InitOpts) configureVaultSecrets() error {
 	}
 
 	appCount := len(listAppResp.Payload.Apps)
-
 	if appCount <= 0 {
-		return fmt.Errorf("there are no valid vault secrets apps for your principal. Create one by visiting the HCP Portal (https://portal.cloud.hashicorp.com)")
+		appsCreateDoc := heredoc.New(i.IO, heredoc.WithPreserveNewlines()).Must(`
+No Vault Secrets application found. Create one and set on the active profile by issuing:
+	$ hcp vault-secrets apps create test-app --description="Test app"
+	$ hcp profile set vault-secrets/app_name test-app
+`)
+		fmt.Fprintf(i.IO.Err(), "\n%s\n\n", appsCreateDoc)
+		return nil
 	}
 
 	appName := listAppResp.Payload.Apps[0].Name
