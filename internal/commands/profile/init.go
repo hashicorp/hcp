@@ -91,8 +91,7 @@ func (i *InitOpts) run() error {
 	}
 
 	// If the user hasn't explicitly specified a service to configure, prompt to see if they would like to.
-	err := i.serviceConfigPrompt()
-	if err != nil {
+	if err := i.serviceConfigPrompt(); err != nil {
 		return err
 	}
 
@@ -111,31 +110,29 @@ func (i *InitOpts) serviceConfigPrompt() error {
 		return nil
 	}
 
-	if i.IO.CanPrompt() {
-		ok, err := i.IO.PromptConfirm("\nWould you like to configure any service related config")
-		if err != nil {
-			return fmt.Errorf("failed to retrieve confirmation: %w", err)
-		}
+	ok, err := i.IO.PromptConfirm("\nWould you like to configure any service related config")
+	if err != nil {
+		return fmt.Errorf("failed to retrieve confirmation: %w", err)
+	}
 
-		if !ok {
-			return nil
-		}
+	if !ok {
+		return nil
+	}
 
-		prompt := promptui.Select{
-			Label:  "Please select the service you would like to configure",
-			Items:  []string{ServiceNameVaultSecrets},
-			Stdin:  io.NopCloser(i.IO.In()),
-			Stdout: iostreams.NopWriteCloser(i.IO.Err()),
-		}
+	prompt := promptui.Select{
+		Label:  "Please select the service you would like to configure",
+		Items:  []string{ServiceNameVaultSecrets},
+		Stdin:  io.NopCloser(i.IO.In()),
+		Stdout: iostreams.NopWriteCloser(i.IO.Err()),
+	}
 
-		_, result, err := prompt.Run()
-		if err != nil {
-			return fmt.Errorf("prompt failed: %w", err)
-		}
+	_, result, err := prompt.Run()
+	if err != nil {
+		return fmt.Errorf("service selection prompt failed: %w", err)
+	}
 
-		if result == ServiceNameVaultSecrets {
-			i.VaultSecrets = true
-		}
+	if result == ServiceNameVaultSecrets {
+		i.VaultSecrets = true
 	}
 	return nil
 }
@@ -185,6 +182,7 @@ func (i *InitOpts) configureVaultSecrets() error {
 	if appCount <= 0 {
 		appsCreateDoc := heredoc.New(i.IO, heredoc.WithPreserveNewlines()).Must(`
 No Vault Secrets application found. Create one and set on the active profile by issuing:
+
 	$ hcp vault-secrets apps create test-app --description="Test app"
 	$ hcp profile set vault-secrets/app_name test-app
 `)
