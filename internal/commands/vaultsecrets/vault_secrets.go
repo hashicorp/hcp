@@ -5,6 +5,7 @@ package vaultsecrets
 
 import (
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/apps"
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
@@ -23,5 +24,6 @@ func NewCmdVaultSecrets(ctx *cmd.Context) *cmd.Command {
 	}
 
 	cmd.AddChild(apps.NewCmdApps(ctx))
+	cmd.AddChild(secrets.NewCmdSecrets(ctx))
 	return cmd
 }
