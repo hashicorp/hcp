@@ -252,12 +252,11 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 			ConfigureVaultSecrets: false,
 		},
 		{
-			Name:                  "Failed: Many org / Many Project / No Vault Secrets App / Configure Vault Secrets service",
+			Name:                  "Success: Many org / Many Project / No Vault Secrets App / Configure Vault Secrets service",
 			NumOrgs:               10,
 			NumProjects:           10,
 			NumVaultSecretsApps:   0,
 			ConfigureVaultSecrets: true,
-			Error:                 "failed configuring profile for vault secrets: there are no valid vault secrets apps for your principal.",
 		},
 		{
 			Name:                  "Success: Many org / Many Project / 1 Vault Secrets App / Configure Vault Secrets service",
