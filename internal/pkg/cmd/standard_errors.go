@@ -51,3 +51,30 @@ func RequireOrgAndProject(ctx *Context) error {
 
 	return errors.New(help)
 }
+
+// RequireVaultSecretsAppName requires that the profile has a set organization and project ID along with
+// the Vault Secrets application name.
+func RequireVaultSecretsAppName(ctx *Context, appName string) error {
+	err := RequireOrgAndProject(ctx)
+	if err != nil {
+		return err
+	}
+
+	if ctx.Profile.VaultSecrets != nil && ctx.Profile.VaultSecrets.AppName != "" {
+		return nil
+	}
+
+	cs := ctx.IO.ColorScheme()
+	help := heredoc.Docf(`%v
+
+	Please run %s to interactively set the Vault Secrets application name, or run:
+
+	%v
+	`,
+		cs.String("Vault Secrets application name must be configured before running the command.").Color(cs.Orange()),
+		cs.String("$ hcp profile set vault-secrets/app_name <app_name>").Bold(),
+		cs.String("$ hcp profile init --vault-secrets").Bold(),
+	)
+
+	return errors.New(help)
+}
