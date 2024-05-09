@@ -291,13 +291,13 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 			t.Parallel()
 			r := require.New(t)
 
-			io := iostreams.Test()
-			io.ErrorTTY = true
-			io.InputTTY = true
+			ioTest := iostreams.Test()
+			ioTest.ErrorTTY = true
+			ioTest.InputTTY = true
 
-			ioPrompt := promptio.Wrap(io)
+			io := promptio.Wrap(ioTest)
 			opts := InitOpts{
-				IO:      ioPrompt,
+				IO:      io,
 				Profile: profile.TestProfile(t),
 			}
 			mocks := getInitMocks(t, &opts)
@@ -318,12 +318,12 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 
 				// Send a down character and enter
 				for i := 0; i < selection; i++ {
-					_, err := ioPrompt.Input.WriteRune(promptui.KeyNext)
+					_, err := io.Input.WriteRune(promptui.KeyNext)
 					r.NoError(err)
 				}
 
 				// Select
-				_, err := ioPrompt.Input.WriteRune(promptui.KeyEnter)
+				_, err := io.Input.WriteRune(promptui.KeyEnter)
 				r.NoError(err)
 
 			} else if c.NumOrgs == 1 {
@@ -343,12 +343,12 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 
 				// Send a down character and enter
 				for i := 0; i < selection; i++ {
-					_, err := ioPrompt.Input.WriteRune(promptui.KeyNext)
+					_, err := io.Input.WriteRune(promptui.KeyNext)
 					r.NoError(err)
 				}
 
 				// Select
-				_, err := ioPrompt.Input.WriteRune(promptui.KeyEnter)
+				_, err := io.Input.WriteRune(promptui.KeyEnter)
 				r.NoError(err)
 			} else if c.NumProjects == 1 {
 				selectedProjID = projects[0].ID
@@ -356,22 +356,22 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 
 			if c.ConfigureVaultSecrets {
 				// Say yes to configuring service config
-				_, err := ioPrompt.Input.WriteRune('y')
+				_, err := io.Input.WriteRune('y')
 				r.NoError(err)
 
 				// Send a down character and enter
-				_, err = ioPrompt.Input.WriteRune(promptui.KeyNext)
+				_, err = io.Input.WriteRune(promptui.KeyNext)
 				r.NoError(err)
 
 				// Select Vault-Secrets
-				_, err = ioPrompt.Input.WriteRune(promptui.KeyEnter)
+				_, err = io.Input.WriteRune(promptui.KeyEnter)
 				r.NoError(err)
 			} else {
 				// Say no to configuring service config
-				_, err := ioPrompt.Input.WriteRune('n')
+				_, err := io.Input.WriteRune('n')
 				r.NoError(err)
 
-				_, err = ioPrompt.Input.WriteRune(promptui.KeyEnter)
+				_, err = io.Input.WriteRune(promptui.KeyEnter)
 				r.NoError(err)
 			}
 
@@ -387,12 +387,12 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 
 					// Send a down character and enter
 					for i := 0; i < selection; i++ {
-						_, err := ioPrompt.Input.WriteRune(promptui.KeyNext)
+						_, err := io.Input.WriteRune(promptui.KeyNext)
 						r.NoError(err)
 					}
 
 					// Select
-					_, err := ioPrompt.Input.WriteRune(promptui.KeyEnter)
+					_, err := io.Input.WriteRune(promptui.KeyEnter)
 					r.NoError(err)
 
 				} else if c.NumVaultSecretsApps == 1 {
