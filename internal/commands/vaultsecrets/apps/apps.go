@@ -11,10 +11,10 @@ import (
 func NewCmdApps(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "apps",
-		ShortHelp: "Manage HCP Vault Secrets apps.",
+		ShortHelp: "Manage Vault Secrets apps.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets apps" }} command group lets you
-		manage HCP Vault Secrets applications.
+		manage Vault Secrets applications.
 		`),
 		// Validation rules requires either RunF or Children are set
 		// RunF can be removed when CRUD children are added
