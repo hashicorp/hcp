@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	ServiceNameVaultSecrets = "Vault Secrets"
+	serviceNameVaultSecrets = "Vault Secrets"
 )
 
 func NewCmdInit(ctx *cmd.Context) *cmd.Command {
@@ -121,7 +121,7 @@ func (i *InitOpts) serviceConfigPrompt() error {
 
 	prompt := promptui.Select{
 		Label:  "Please select the service you would like to configure",
-		Items:  []string{ServiceNameVaultSecrets},
+		Items:  []string{serviceNameVaultSecrets},
 		Stdin:  io.NopCloser(i.IO.In()),
 		Stdout: iostreams.NopWriteCloser(i.IO.Err()),
 	}
@@ -131,7 +131,7 @@ func (i *InitOpts) serviceConfigPrompt() error {
 		return fmt.Errorf("service selection prompt failed: %w", err)
 	}
 
-	if result == ServiceNameVaultSecrets {
+	if result == serviceNameVaultSecrets {
 		i.VaultSecrets = true
 	}
 	return nil
