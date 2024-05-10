@@ -271,6 +271,7 @@ func Test_sortRoles(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := sortRolesByID(tt.inputRoles); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Sorting failed.\nExpected:\n")
 				for _, role := range tt.want {
