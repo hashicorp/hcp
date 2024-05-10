@@ -23,5 +23,6 @@ func NewCmdApps(ctx *cmd.Context) *cmd.Command {
 		},
 	}
 
+	cmd.AddChild(NewCmdCreate(ctx, nil))
 	return cmd
 }
