@@ -19,7 +19,7 @@ import (
 	mock_iam_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-iam/stable/2019-12-10/client/iam_service"
 	mock_organization_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/organization_service"
 	mock_project_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/project_service"
-	mock_preview_secret_secvice "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
@@ -33,7 +33,7 @@ type initMocks struct {
 	IAMClient           *mock_iam_service.MockClientService
 	OrganizationService *mock_organization_service.MockClientService
 	ProjectService      *mock_project_service.MockClientService
-	SecretSevice        *mock_preview_secret_secvice.MockClientService
+	SecretSevice        *mock_preview_secret_service.MockClientService
 }
 
 func getInitMocks(t *testing.T, opts *InitOpts) initMocks {
@@ -41,7 +41,7 @@ func getInitMocks(t *testing.T, opts *InitOpts) initMocks {
 		IAMClient:           mock_iam_service.NewMockClientService(t),
 		OrganizationService: mock_organization_service.NewMockClientService(t),
 		ProjectService:      mock_project_service.NewMockClientService(t),
-		SecretSevice:        mock_preview_secret_secvice.NewMockClientService(t),
+		SecretSevice:        mock_preview_secret_service.NewMockClientService(t),
 	}
 
 	if opts != nil {
