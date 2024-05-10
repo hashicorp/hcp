@@ -60,7 +60,7 @@ func RequireVaultSecretsAppName(ctx *Context, appName string) error {
 		return err
 	}
 
-	if ctx.Profile.VaultSecrets != nil && ctx.Profile.VaultSecrets.AppName != "" {
+	if appName != "" || ctx.Profile.VaultSecrets != nil && ctx.Profile.VaultSecrets.AppName != "" {
 		return nil
 	}
 
