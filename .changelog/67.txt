@@ -1,0 +1,3 @@
+```release-note:improvement
+Adds opinionated sorting to the listing of iam roles
+```
