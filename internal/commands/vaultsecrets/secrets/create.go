@@ -85,9 +85,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 				return nil
 			}
 
-			// Check if the secerets file path is absolute
-			// Do not implement any client side checks for the max size of the secret
-			// value and let the server side handle it.
+			// Check if the secerets file path is absolute.
 			if !filepath.IsAbs(opts.SecretFilePath) {
 				return fmt.Errorf("%s absolute data file path must be provided", opts.IO.ColorScheme().FailureIcon())
 			}
