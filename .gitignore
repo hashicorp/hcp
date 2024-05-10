@@ -20,6 +20,9 @@ vendor/
 # Go workspace file
 go.work
 
+# goland IDE
+.idea/
+
 tmp/
 
 # bin/ directory
