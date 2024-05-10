@@ -7,19 +7,21 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"reflect"
 	"testing"
 
 	"github.com/go-openapi/runtime/client"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/organization_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/models"
 	cloud "github.com/hashicorp/hcp-sdk-go/clients/cloud-shared/v1/models"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+
 	mock_organization_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/organization_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 )
 
 func TestNewCmdList(t *testing.T) {
@@ -214,6 +216,69 @@ func TestListRun(t *testing.T) {
 					r.Contains(io.Output.String(), p.ID)
 					r.Contains(io.Output.String(), p.Title)
 					r.Contains(io.Output.String(), p.Description)
+				}
+			}
+		})
+	}
+}
+
+func Test_sortRoles(t *testing.T) {
+	tests := []struct {
+		name       string
+		inputRoles []*models.HashicorpCloudResourcemanagerRole
+		want       []*models.HashicorpCloudResourcemanagerRole
+	}{
+		{
+			name: "simple",
+			inputRoles: []*models.HashicorpCloudResourcemanagerRole{
+				{ID: "roles/zookeeper"},
+				{ID: "roles/cat-wrangler"},
+				{ID: "roles/admin"},
+				{ID: "roles/!not-valid"},
+			},
+			want: []*models.HashicorpCloudResourcemanagerRole{
+				{ID: "roles/!not-valid"},
+				{ID: "roles/admin"},
+				{ID: "roles/cat-wrangler"},
+				{ID: "roles/zookeeper"},
+			},
+		},
+		{
+			name: "grouped",
+			inputRoles: []*models.HashicorpCloudResourcemanagerRole{
+				{ID: "roles/iam.zookeeper"},
+				{ID: "roles/secrets.secret-reader"},
+				{ID: "roles/viewer"},
+				{ID: "roles/contributor"},
+				{ID: "roles/the.future.isUnknown"},
+				{ID: "roles/iam.admin"},
+				{ID: "roles/admin"},
+				{ID: "roles/secrets.app-manager"},
+				{ID: "roles/the.feature.isSafe"},
+			},
+			want: []*models.HashicorpCloudResourcemanagerRole{
+				{ID: "roles/admin"},
+				{ID: "roles/contributor"},
+				{ID: "roles/viewer"},
+				{ID: "roles/iam.admin"},
+				{ID: "roles/iam.zookeeper"},
+				{ID: "roles/secrets.app-manager"},
+				{ID: "roles/secrets.secret-reader"},
+				{ID: "roles/the.feature.isSafe"},
+				{ID: "roles/the.future.isUnknown"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := sortRolesByID(tt.inputRoles); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Sorting failed.\nExpected:\n")
+				for _, role := range tt.want {
+					t.Errorf("%s\n", role.ID)
+				}
+				t.Errorf("Got:\n")
+				for _, role := range got {
+					t.Errorf("%s\n", role.ID)
 				}
 			}
 		})
