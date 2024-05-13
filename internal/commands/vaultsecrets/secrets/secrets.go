@@ -7,9 +7,12 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
+	"github.com/hashicorp/hcp/internal/pkg/vaultsecrets"
 )
 
 var (
+	// appName is the name of the Vault Secrets application. If not specified,
+	// then the value from the active profile will be used.
 	appName string
 )
 
@@ -36,7 +39,7 @@ func NewCmdSecrets(ctx *cmd.Context) *cmd.Command {
 			if appName == "" && ctx.Profile.VaultSecrets != nil {
 				appName = ctx.Profile.VaultSecrets.AppName
 			}
-			return cmd.RequireVaultSecretsAppName(ctx, appName)
+			return vaultsecrets.RequireVaultSecretsAppName(ctx, appName)
 		},
 	}
 
