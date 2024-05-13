@@ -136,19 +136,19 @@ func TestCreateRun(t *testing.T) {
 			AugmentOpts:  func(o *CreateOpts) { o.SecretFilePath = "-" },
 			MockCalled:   true,
 		},
-		// {
-		// 	Name:        "Failed: Max secret versions reached",
-		// 	RespErr:     true,
-		// 	ErrMsg:      "[POST /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secret/kv][429] CreateAppKVSecret default  &{Code:8 Details:[] Message:maximum number of secret versions reached}",
-		// 	AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
-		// 	MockCalled:  true,
-		// },
-		// {
-		// 	Name:        "Success: Created secret",
-		// 	RespErr:     false,
-		// 	AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
-		// 	MockCalled:  true,
-		// },
+		{
+			Name:        "Failed: Max secret versions reached",
+			RespErr:     true,
+			ErrMsg:      "[POST /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secret/kv][429] CreateAppKVSecret default  &{Code:8 Details:[] Message:maximum number of secret versions reached}",
+			AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
+			MockCalled:  true,
+		},
+		{
+			Name:        "Success: Created secret",
+			RespErr:     false,
+			AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
+			MockCalled:  true,
+		},
 	}
 
 	for _, c := range cases {
