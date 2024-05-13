@@ -5,8 +5,10 @@ package iostreams
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/muesli/termenv"
 )
@@ -145,6 +147,10 @@ func (t *Testing) IsErrorTTY() bool {
 
 func (t *Testing) CanPrompt() bool {
 	return !t.quiet && t.IsErrorTTY() && t.IsInputTTY()
+}
+
+func (t *Testing) InStat() (os.FileInfo, error) {
+	return nil, errors.New("unimplemented")
 }
 
 // nopCloser wraps an io.Writer with a Close method
