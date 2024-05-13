@@ -5,8 +5,10 @@ package profile
 
 import (
 	"errors"
+	"slices"
 
 	"github.com/posener/complete"
+	"golang.org/x/exp/maps"
 )
 
 // VaultSecrets is a named set of configuration for the HCP CLI. It captures
@@ -18,6 +20,23 @@ type VaultSecretsConf struct {
 
 // Predict predicts the HCL key names and basic settable values
 func (vsc *VaultSecretsConf) Predict(args complete.Args) []string {
+	properties := map[string][]string{
+		"vault-secrets/app_name": {""},
+	}
+	// If the property has been specified, return possible values.
+	if len(args.All) >= 1 {
+		prediction, ok := properties[args.All[0]]
+		if ok {
+			return prediction
+		}
+	}
+
+	// Predicting the property
+	if len(args.All) == 1 {
+		keys := maps.Keys(properties)
+		slices.Sort(keys)
+		return keys
+	}
 	return nil
 }
 
