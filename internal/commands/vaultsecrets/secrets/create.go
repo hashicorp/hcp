@@ -126,20 +126,17 @@ type CreateOpts struct {
 }
 
 func createRun(opts *CreateOpts) error {
-	if opts.SecretValuePlaintext == "" && opts.IO.CanPrompt() {
+	if opts.SecretValuePlaintext == "" {
 		fmt.Fprintln(opts.IO.Err(), "Please enter the plaintext secret:")
 		data, err := opts.IO.ReadSecret()
 		if err != nil {
 			return fmt.Errorf("failed to read the plaintext secret: %w", err)
 		}
+
 		if len(data) == 0 {
 			return errors.New("secret value cannot be empty")
 		}
 		opts.SecretValuePlaintext = string(data)
-	}
-
-	if opts.SecretValuePlaintext == "" {
-		return errors.New("secret value cannot be empty")
 	}
 
 	req := preview_secret_service.NewCreateAppKVSecretParamsWithContext(opts.Ctx)
