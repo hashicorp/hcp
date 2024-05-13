@@ -53,7 +53,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Create a new application under HCP Vault Secrets:`,
+				Preamble: `Create a new application:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp vault-secrets apps create company-card \
 				  --description "Stores corporate card info."
@@ -108,14 +108,8 @@ func appCreate(opts *CreateOpts) error {
 	}, nil)
 
 	if err != nil {
-		opts.Logger.Info("error creating hvs app", err)
 		return fmt.Errorf("%s failed to create application with name: %s - %s", opts.IO.ColorScheme().FailureIcon(), opts.AppName, err)
 	}
 
-	if opts.Output.GetFormat() == format.Unset {
-		fmt.Fprintf(opts.IO.Err(), "%s Created application with name: %s\n", opts.IO.ColorScheme().SuccessIcon(), opts.AppName)
-		return nil
-	}
-
-	return opts.Output.Display(newDisplayer(true, resp.Payload.App))
+	return opts.Output.Display(newDisplayer(format.Pretty, true, resp.Payload.App))
 }
