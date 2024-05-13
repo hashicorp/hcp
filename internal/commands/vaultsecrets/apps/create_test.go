@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-openapi/runtime/client"
 	"github.com/stretchr/testify/require"
-	
+
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -14,6 +14,8 @@ import (
 )
 
 func TestNewCmdCreate(t *testing.T) {
+	t.Parallel()
+
 	cases := []struct {
 		Name    string
 		Args    []string

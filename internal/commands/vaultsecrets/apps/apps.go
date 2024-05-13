@@ -16,11 +16,6 @@ func NewCmdApps(ctx *cmd.Context) *cmd.Command {
 		The {{ template "mdCodeOrBold" "hcp vault-secrets apps" }} command group lets you
 		manage Vault Secrets applications.
 		`),
-		// Validation rules requires either RunF or Children are set
-		// RunF can be removed when CRUD children are added
-		RunF: func(c *cmd.Command, args []string) error {
-			return nil
-		},
 	}
 
 	cmd.AddChild(NewCmdCreate(ctx, nil))
