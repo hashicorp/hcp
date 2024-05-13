@@ -6,9 +6,12 @@ package roles
 import (
 	"context"
 	"fmt"
+	"sort"
+	"strings"
 
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/organization_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/models"
+
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -76,7 +79,7 @@ func listRun(opts *ListOpts) error {
 		req.PaginationNextPageToken = &next
 	}
 
-	return opts.Output.Display(rolesDisplayer(roles))
+	return opts.Output.Display(rolesDisplayer(sortRolesByID(roles)))
 }
 
 type rolesDisplayer []*models.HashicorpCloudResourcemanagerRole
@@ -99,4 +102,27 @@ func (d rolesDisplayer) FieldTemplates() []format.Field {
 			ValueFormat: "{{ .Description }}",
 		},
 	}
+}
+
+func sortRolesByID(roles []*models.HashicorpCloudResourcemanagerRole) []*models.HashicorpCloudResourcemanagerRole {
+	sort.Slice(roles, func(i, j int) bool {
+		// remove prefix "roles/" from
+		tI := strings.TrimPrefix(roles[i].ID, "roles/")
+		tJ := strings.TrimPrefix(roles[j].ID, "roles/")
+
+		// split role ids by period to group by prefix
+		pI := strings.Split(tI, ".")
+		pJ := strings.Split(tJ, ".")
+
+		// if the roles don't have the same number of prefixes return accordingly
+		if len(pI) < len(pJ) {
+			return true
+		} else if len(pI) > len(pJ) {
+			return false
+		}
+
+		// if both contain equal parts, directly compare
+		return tI < tJ
+	})
+	return roles
 }
