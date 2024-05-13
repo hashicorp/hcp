@@ -7,8 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/go-hclog"
-
 	secretsvcpreview "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	secretsvcstable "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -24,7 +22,6 @@ type CreateOpts struct {
 	Profile *profile.Profile
 	Output  *format.Outputter
 	IO      iostreams.IOStreams
-	Logger  hclog.Logger
 
 	AppName       string
 	Description   string
@@ -81,7 +78,6 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		},
 		RunF: func(c *cmd.Command, args []string) error {
 			opts.AppName = args[0]
-			opts.Logger = c.Logger()
 
 			if runF != nil {
 				return runF(opts)
@@ -108,7 +104,7 @@ func appCreate(opts *CreateOpts) error {
 	}, nil)
 
 	if err != nil {
-		return fmt.Errorf("%s failed to create application with name: %s - %s", opts.IO.ColorScheme().FailureIcon(), opts.AppName, err)
+		return fmt.Errorf("failed to create application: %w", err)
 	}
 
 	return opts.Output.Display(newDisplayer(format.Pretty, true, resp.Payload.App))
