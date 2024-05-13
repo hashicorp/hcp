@@ -1,17 +1,17 @@
 package apps
 
 import (
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 )
 
 type displayer struct {
-	apps          []*models.Secrets20230613App
+	apps          []*models.Secrets20231128App
 	defaultFormat format.Format
 	single        bool
 }
 
-func newDisplayer(defaultFormat format.Format, single bool, apps ...*models.Secrets20230613App) *displayer {
+func newDisplayer(defaultFormat format.Format, single bool, apps ...*models.Secrets20231128App) *displayer {
 	return &displayer{
 		apps:          apps,
 		defaultFormat: defaultFormat,
