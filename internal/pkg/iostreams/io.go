@@ -34,6 +34,9 @@ type IOStreams interface {
 	// Out returns an io.Writer for outputting non-error output
 	Out() io.Writer
 
+	// InStat returns the os.FileInfo for the input stream
+	InStat() (os.FileInfo, error)
+
 	// Err returns an io.Writer for outputting error output
 	Err() io.Writer
 
@@ -135,6 +138,10 @@ func (s *system) Err() io.Writer {
 	}
 
 	return s.err
+}
+
+func (s *system) InStat() (os.FileInfo, error) {
+	return s.in.Stat()
 }
 
 func (s *system) SetQuiet(quiet bool) {
