@@ -2,11 +2,16 @@ package apps
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/go-openapi/runtime/client"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	preview_secret_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -101,6 +106,79 @@ func TestNewCmdCreate(t *testing.T) {
 			r.NotNil(createOpts)
 			r.Equal(c.Expect.AppName, createOpts.AppName)
 			r.Equal(c.Expect.Description, createOpts.Description)
+		})
+	}
+}
+
+func TestAppCreate(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		Name           string
+		AppName        string
+		AppDescription string
+		Error          string
+	}{
+		{
+			Name:  "Missing app name",
+			Error: "failed to create application",
+		},
+		{
+			Name:           "Good",
+			AppName:        "company-card",
+			AppDescription: "Stores corporate card info.",
+		},
+	}
+
+	for _, c := range cases {
+		c := c
+		t.Run(c.Name, func(t *testing.T) {
+			t.Parallel()
+			r := require.New(t)
+
+			io := iostreams.Test()
+			vs := mock_preview_secret_service.NewMockClientService(t)
+
+			opts := &CreateOpts{
+				Ctx:           context.Background(),
+				Profile:       profile.TestProfile(t).SetOrgID("123").SetProjectID("abc"),
+				IO:            io,
+				PreviewClient: vs,
+				Output:        format.New(io),
+				AppName:       c.AppName,
+				Description:   c.AppDescription,
+			}
+
+			if c.Error != "" {
+				vs.EXPECT().CreateApp(mock.Anything, mock.Anything).Return(nil, errors.New("missing app name")).Once()
+			} else {
+				vs.EXPECT().CreateApp(&preview_secret_service.CreateAppParams{
+					Context:        opts.Ctx,
+					OrganizationID: "123",
+					ProjectID:      "abc",
+					Body: preview_secret_service.CreateAppBody{
+						Name:        opts.AppName,
+						Description: opts.Description,
+					},
+				}, nil).Return(&preview_secret_service.CreateAppOK{
+					Payload: &preview_secret_models.Secrets20231128CreateAppResponse{
+						App: &preview_secret_models.Secrets20231128App{
+							Name:        opts.AppName,
+							Description: opts.Description,
+						},
+					},
+				}, nil).Once()
+			}
+
+			// Run the command
+			err := appCreate(opts)
+			if c.Error != "" {
+				r.ErrorContains(err, c.Error)
+				return
+			}
+
+			r.NoError(err)
+			r.Contains(io.Output.String(), "App Name:    company-card\nDescription: Stores corporate card info.\n")
 		})
 	}
 }
