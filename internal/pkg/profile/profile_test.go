@@ -97,14 +97,14 @@ func TestProfile_Predict(t *testing.T) {
 			Args: complete.Args{
 				All: []string{""},
 			},
-			Expected: []string{"organization_id", "project_id", "core/"},
+			Expected: []string{"organization_id", "project_id", "core/", "vault-secrets"},
 		},
 		{
 			Name: "specific field",
 			Args: complete.Args{
 				All: []string{"org"},
 			},
-			Expected: []string{"organization_id", "project_id", "core/"},
+			Expected: []string{"organization_id", "project_id", "core/", "vault-secrets"},
 		},
 		{
 			Name: "core",
