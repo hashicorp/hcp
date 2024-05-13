@@ -6,19 +6,21 @@ import (
 )
 
 type displayer struct {
-	apps   []*models.Secrets20230613App
-	single bool
+	apps          []*models.Secrets20230613App
+	defaultFormat format.Format
+	single        bool
 }
 
-func newDisplayer(single bool, apps ...*models.Secrets20230613App) *displayer {
+func newDisplayer(defaultFormat format.Format, single bool, apps ...*models.Secrets20230613App) *displayer {
 	return &displayer{
-		apps:   apps,
-		single: single,
+		apps:          apps,
+		defaultFormat: defaultFormat,
+		single:        single,
 	}
 }
 
 func (d *displayer) DefaultFormat() format.Format {
-	return format.Table
+	return d.defaultFormat
 }
 
 func (d *displayer) Payload() any {
