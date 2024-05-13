@@ -6,15 +6,17 @@ package secrets
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
+	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	preview_secret_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+	_ "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
 	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-
-	// preview_secret_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	_ "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	_ "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
+	"github.com/manifoldco/promptui"
 
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -108,26 +110,42 @@ func TestCreateRun(t *testing.T) {
 		}
 		return tp
 	}
+	testSecretValue := "my super secret value"
 
 	cases := []struct {
-		Name         string
-		RespErr      bool
-		EnablePrompt bool
-		ErrMsg       string
-		MockCalled   bool
-		AugmentOpts  func(*CreateOpts)
+		Name             string
+		RespErr          bool
+		EnablePrompt     bool
+		EmptySecretValue bool
+		ErrMsg           string
+		MockCalled       bool
+		AugmentOpts      func(*CreateOpts)
 	}{
 		{
-			Name:    "Failed: Secret Value cannot be empty",
-			RespErr: true,
-			ErrMsg:  "secret value cannot be empty",
+			Name:             "Failed: Secret Value cannot be empty",
+			EnablePrompt:     true,
+			EmptySecretValue: true,
+			RespErr:          true,
+			ErrMsg:           "secret value cannot be empty",
 		},
 		{
 			Name:        "Failed: Max secret versions reached",
 			RespErr:     true,
 			ErrMsg:      "[POST /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secret/kv][429] CreateAppKVSecret default  &{Code:8 Details:[] Message:maximum number of secret versions reached}",
-			AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = "test_secret" },
+			AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
 			MockCalled:  true,
+		},
+		{
+			Name:        "Success: Created secret",
+			RespErr:     false,
+			AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
+			MockCalled:  true,
+		},
+		{
+			Name:         "Success: Created secret via prompt",
+			EnablePrompt: true,
+			RespErr:      false,
+			MockCalled:   true,
 		},
 	}
 
@@ -138,11 +156,22 @@ func TestCreateRun(t *testing.T) {
 			r := require.New(t)
 
 			io := iostreams.Test()
+			if c.EnablePrompt {
+				io.InputTTY = true
+				io.ErrorTTY = true
+
+				if !c.EmptySecretValue {
+					_, err := io.Input.WriteString(testSecretValue)
+					r.NoError(err)
+				}
+				_, err := io.Input.WriteRune(promptui.KeyEnter)
+				r.NoError(err)
+			}
 			vs := mock_preview_secret_service.NewMockClientService(t)
 
 			opts := &CreateOpts{
 				Ctx:           context.Background(),
-				IO:            iostreams.Test(),
+				IO:            io,
 				Profile:       testProfile(t),
 				Output:        format.New(io),
 				PreviewClient: vs,
@@ -155,8 +184,35 @@ func TestCreateRun(t *testing.T) {
 				c.AugmentOpts(opts)
 			}
 
+			dt := strfmt.NewDateTime()
 			if c.MockCalled {
-				vs.EXPECT().CreateAppKVSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+				if c.RespErr {
+					vs.EXPECT().CreateAppKVSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+				} else {
+					vs.EXPECT().CreateAppKVSecret(&preview_secret_service.CreateAppKVSecretParams{
+						OrganizationID: testProfile(t).OrganizationID,
+						ProjectID:      testProfile(t).ProjectID,
+						AppName:        testProfile(t).VaultSecrets.AppName,
+						Body: preview_secret_service.CreateAppKVSecretBody{
+							Name:  opts.SecretName,
+							Value: testSecretValue,
+						},
+						Context: opts.Ctx,
+					}, mock.Anything).Return(&preview_secret_service.CreateAppKVSecretOK{
+						Payload: &preview_secret_models.Secrets20231128CreateAppKVSecretResponse{
+							Secret: &preview_secret_models.Secrets20231128Secret{
+								Name:      opts.SecretName,
+								CreatedAt: dt,
+								StaticVersion: &preview_secret_models.Secrets20231128SecretStaticVersion{
+									Version:   2,
+									CreatedAt: dt,
+								},
+								Type:          "kv",
+								LatestVersion: 2,
+							},
+						},
+					}, nil).Once()
+				}
 			}
 
 			// Run the command
@@ -167,10 +223,7 @@ func TestCreateRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			// r.Contains(io.Output.String(), c.GroupName)
-			// r.Contains(io.Output.String(), rn)
-			// r.Contains(io.Output.String(), c.Description)
-			// r.Contains(io.Output.String(), fmt.Sprintf("%d", len(c.Members)))
+			r.Equal(io.Output.String(), fmt.Sprintf("%s\n", "App Name     Latest Version  Created At                \ntest_secret  2               1970-01-01T00:00:00.000Z  "))
 		})
 	}
 }
