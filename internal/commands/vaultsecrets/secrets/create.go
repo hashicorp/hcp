@@ -4,6 +4,7 @@
 package secrets
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
@@ -74,10 +75,26 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		RunF: func(c *cmd.Command, args []string) error {
 			opts.AppName = appName
 			opts.SecretName = args[0]
+
 			if runF != nil {
 				return runF(opts)
 			}
 			return createRun(opts)
+		},
+		PersistentPreRun: func(c *cmd.Command, args []string) error {
+			// Check if there's input piped to the command
+			fi, err := opts.IO.InStat()
+			if err != nil {
+				c.Logger().Debug("failed to read whether input is piped or not", "error", err)
+				return nil
+			}
+			if fi.Mode()&os.ModeCharDevice == 0 {
+				scanner := bufio.NewScanner(opts.IO.In())
+				for scanner.Scan() {
+					opts.SecretFilePath = scanner.Text()
+				}
+			}
+			return nil
 		},
 	}
 
@@ -124,7 +141,6 @@ func readPlainTextSecret(opts *CreateOpts) error {
 	if opts.SecretValuePlaintext != "" {
 		return nil
 	}
-
 	if opts.SecretFilePath == "" && opts.SecretValuePlaintext == "" {
 		fmt.Fprintln(opts.IO.Err(), "Please enter the plaintext secret:")
 		data, err := opts.IO.ReadSecret()
