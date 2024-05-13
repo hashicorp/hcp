@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
@@ -43,13 +44,19 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 			{
 				Preamble: `Create new secret in Vault Secrets application on active profile:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp vault-secrets secrets create secret-1 --data-file=/tmp/secrets1.txt
+				$ hcp vault-secrets secrets create secret_1 --data-file=tmp/secrets1.txt
+				`),
+			},
+			{
+				Preamble: `Create new secret in Vault Secrets application on active profile with pipe:`,
+				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
+				$ echo "my super secret" | hcp vault-secrets secrets create secret_2 --data-file=-
 				`),
 			},
 			{
 				Preamble: `Create secret in different Vault Secrets application, not active profile:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
-				$ hcp vault-secrets secrets create secret-2 --app-name test-app --secret_file=/tmp/secrets2.txt
+				$ hcp vault-secrets secrets create secret_3 --app-name test-app --secret_file=/tmp/secrets2.txt
 				`),
 			},
 		},
@@ -131,16 +138,15 @@ func readPlainTextSecret(opts *CreateOpts) error {
 	}
 
 	if opts.SecretFilePath == "-" {
-		var plaintextSecretByte []byte
-		_, err := opts.IO.In().Read(plaintextSecretByte)
+		plaintextSecretBytes, err := io.ReadAll(opts.IO.In())
 		if err != nil {
 			return fmt.Errorf("failed to read the plaintext secret: %w", err)
 		}
 
-		if len(plaintextSecretByte) == 0 {
+		if len(plaintextSecretBytes) == 0 {
 			return errors.New("secret value cannot be empty")
 		}
-		opts.SecretValuePlaintext = string(plaintextSecretByte)
+		opts.SecretValuePlaintext = string(plaintextSecretBytes)
 		return nil
 	}
 

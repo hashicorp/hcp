@@ -16,7 +16,6 @@ import (
 	_ "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
 	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	"github.com/manifoldco/promptui"
 
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -115,18 +114,29 @@ func TestCreateRun(t *testing.T) {
 	cases := []struct {
 		Name             string
 		RespErr          bool
-		EnablePrompt     bool
+		ReadViaStdin     bool
 		EmptySecretValue bool
 		ErrMsg           string
 		MockCalled       bool
 		AugmentOpts      func(*CreateOpts)
 	}{
 		{
-			Name:             "Failed: Secret Value cannot be empty",
-			EnablePrompt:     true,
+			Name:   "Failed: Read via stdin as hypen not supplied for --data-file flag",
+			ErrMsg: "data file path is required",
+		},
+		{
+			Name:             "Failed: Read empty secret value via stdin",
 			EmptySecretValue: true,
+			ReadViaStdin:     true,
 			RespErr:          true,
+			AugmentOpts:      func(o *CreateOpts) { o.SecretFilePath = "-" },
 			ErrMsg:           "secret value cannot be empty",
+		},
+		{
+			Name:         "Success: Create secret via stdin",
+			ReadViaStdin: true,
+			AugmentOpts:  func(o *CreateOpts) { o.SecretFilePath = "-" },
+			MockCalled:   true,
 		},
 		{
 			Name:        "Failed: Max secret versions reached",
@@ -141,12 +151,6 @@ func TestCreateRun(t *testing.T) {
 			AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
 			MockCalled:  true,
 		},
-		{
-			Name:         "Success: Created secret via prompt",
-			EnablePrompt: true,
-			RespErr:      false,
-			MockCalled:   true,
-		},
 	}
 
 	for _, c := range cases {
@@ -156,7 +160,7 @@ func TestCreateRun(t *testing.T) {
 			r := require.New(t)
 
 			io := iostreams.Test()
-			if c.EnablePrompt {
+			if c.ReadViaStdin {
 				io.InputTTY = true
 				io.ErrorTTY = true
 
@@ -164,8 +168,6 @@ func TestCreateRun(t *testing.T) {
 					_, err := io.Input.WriteString(testSecretValue)
 					r.NoError(err)
 				}
-				_, err := io.Input.WriteRune(promptui.KeyEnter)
-				r.NoError(err)
 			}
 			vs := mock_preview_secret_service.NewMockClientService(t)
 
