@@ -111,17 +111,17 @@ func createRun(opts *CreateOpts) error {
 		return err
 	}
 
-	req := preview_secret_service.NewCreateAppKVSecretParamsWithContext(opts.Ctx)
-	req.OrganizationID = opts.Profile.OrganizationID
-	req.ProjectID = opts.Profile.ProjectID
+	req := secret_service.NewCreateAppKVSecretParamsWithContext(opts.Ctx)
+	req.LocationOrganizationID = opts.Profile.OrganizationID
+	req.LocationProjectID = opts.Profile.ProjectID
 	req.AppName = opts.AppName
 
-	req.Body = preview_secret_service.CreateAppKVSecretBody{
+	req.Body = secret_service.CreateAppKVSecretBody{
 		Name:  opts.SecretName,
 		Value: opts.SecretValuePlaintext,
 	}
 
-	resp, err := opts.PreviewClient.CreateAppKVSecret(req, nil)
+	resp, err := opts.Client.CreateAppKVSecret(req, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create secret with name: %s - %w", opts.SecretName, err)
 	}
