@@ -66,8 +66,8 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 			Local: []*cmd.Flag{
 				{
 					Name:         "data-file",
-					DisplayValue: "SECRET_DATA_FILE_PATH",
-					Description:  "Absolute path to the secrets file.",
+					DisplayValue: "DATA_FILE_PATH",
+					Description:  "Absolute path to the secrets data file.",
 					Value:        flagvalue.Simple("", &opts.SecretFilePath),
 				},
 			},
