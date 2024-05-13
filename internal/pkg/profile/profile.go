@@ -103,7 +103,7 @@ func (p *Profile) Predict(args complete.Args) []string {
 
 	// predicting the property
 	if len(args.All) == 1 {
-		return []string{"organization_id", "project_id", "core/"}
+		return []string{"organization_id", "project_id", "core/", "vault-secrets"}
 	}
 
 	return nil
