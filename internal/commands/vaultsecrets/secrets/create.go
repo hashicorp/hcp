@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
@@ -80,32 +79,6 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 			}
 			return createRun(opts)
 		},
-		PersistentPreRun: func(c *cmd.Command, args []string) error {
-			if opts.SecretFilePath == "" {
-				return nil
-			}
-
-			// Check if the secerets file path is absolute.
-			if !filepath.IsAbs(opts.SecretFilePath) {
-				return fmt.Errorf("%s absolute data file path must be provided", opts.IO.ColorScheme().FailureIcon())
-			}
-
-			fileInfo, err := os.Stat(opts.SecretFilePath)
-			if err != nil {
-				return fmt.Errorf("%s failed to get data file info: %w", opts.IO.ColorScheme().FailureIcon(), err)
-			}
-
-			if fileInfo.Size() == 0 {
-				return fmt.Errorf("%s data file cannot be empty", opts.IO.ColorScheme().FailureIcon())
-			}
-
-			data, err := os.ReadFile(opts.SecretFilePath)
-			if err != nil {
-				return fmt.Errorf("%s unable to read the data file: %w", opts.IO.ColorScheme().FailureIcon(), err)
-			}
-			opts.SecretValuePlaintext = string(data)
-			return nil
-		},
 	}
 
 	return cmd
@@ -126,17 +99,8 @@ type CreateOpts struct {
 }
 
 func createRun(opts *CreateOpts) error {
-	if opts.SecretValuePlaintext == "" {
-		fmt.Fprintln(opts.IO.Err(), "Please enter the plaintext secret:")
-		data, err := opts.IO.ReadSecret()
-		if err != nil {
-			return fmt.Errorf("failed to read the plaintext secret: %w", err)
-		}
-
-		if len(data) == 0 {
-			return errors.New("secret value cannot be empty")
-		}
-		opts.SecretValuePlaintext = string(data)
+	if err := readPlainTextSecret(opts); err != nil {
+		return err
 	}
 
 	req := preview_secret_service.NewCreateAppKVSecretParamsWithContext(opts.Ctx)
@@ -154,4 +118,40 @@ func createRun(opts *CreateOpts) error {
 		return fmt.Errorf("failed to create secret with name: %s - %w", opts.SecretName, err)
 	}
 	return opts.Output.Display(newDisplayer(true, resp.Payload.Secret))
+}
+
+func readPlainTextSecret(opts *CreateOpts) error {
+	if opts.SecretValuePlaintext != "" {
+		return nil
+	}
+
+	if opts.SecretFilePath == "" && opts.SecretValuePlaintext == "" {
+		fmt.Fprintln(opts.IO.Err(), "Please enter the plaintext secret:")
+		data, err := opts.IO.ReadSecret()
+		if err != nil {
+			return fmt.Errorf("failed to read the plaintext secret: %w", err)
+		}
+
+		if len(data) == 0 {
+			return errors.New("secret value cannot be empty")
+		}
+		opts.SecretValuePlaintext = string(data)
+		return nil
+	}
+
+	fileInfo, err := os.Stat(opts.SecretFilePath)
+	if err != nil {
+		return fmt.Errorf("%s failed to get data file info: %w", opts.IO.ColorScheme().FailureIcon(), err)
+	}
+
+	if fileInfo.Size() == 0 {
+		return fmt.Errorf("%s data file cannot be empty", opts.IO.ColorScheme().FailureIcon())
+	}
+
+	data, err := os.ReadFile(opts.SecretFilePath)
+	if err != nil {
+		return fmt.Errorf("%s unable to read the data file: %w", opts.IO.ColorScheme().FailureIcon(), err)
+	}
+	opts.SecretValuePlaintext = string(data)
+	return nil
 }
