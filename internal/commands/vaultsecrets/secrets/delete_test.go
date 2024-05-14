@@ -117,7 +117,7 @@ func TestDeleteRun(t *testing.T) {
 			ErrMsg:  "[DELETE /secrets/2023-06-13/organizations/{location.organization_id}/projects/{location.project_id}/apps/{app_name}/secrets/{secret_name}][404]DeleteAppSecret default  &{Code:5 Details:[] Message:secret not found}",
 		},
 		{
-			Name:    "Success: Created secret",
+			Name:    "Success: Delete secret",
 			RespErr: false,
 		},
 	}
@@ -161,7 +161,7 @@ func TestDeleteRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Equal(io.Error.String(), fmt.Sprintf("✓ Successfully deleted secret with name: %q", opts.SecretName))
+			r.Equal(io.Error.String(), fmt.Sprintf("✓ Successfully deleted secret with name: %q\n", opts.SecretName))
 		})
 	}
 }
