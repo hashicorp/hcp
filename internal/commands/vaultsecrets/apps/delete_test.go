@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
 	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -19,7 +18,7 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
 
-func TestNewCmdCreate(t *testing.T) {
+func TestNewCmdDelete(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
@@ -27,7 +26,7 @@ func TestNewCmdCreate(t *testing.T) {
 		Args    []string
 		Profile func(t *testing.T) *profile.Profile
 		Error   string
-		Expect  *CreateOpts
+		Expect  *DeleteOpts
 	}{
 		{
 			Name: "Good",
@@ -35,19 +34,8 @@ func TestNewCmdCreate(t *testing.T) {
 				return profile.TestProfile(t).SetOrgID("123").SetProjectID("abc")
 			},
 			Args: []string{"company-card"},
-			Expect: &CreateOpts{
+			Expect: &DeleteOpts{
 				AppName: "company-card",
-			},
-		},
-		{
-			Name: "Good with description",
-			Profile: func(t *testing.T) *profile.Profile {
-				return profile.TestProfile(t).SetOrgID("123").SetProjectID("abc")
-			},
-			Args: []string{"company-card", "--description", "Stores corporate card info."},
-			Expect: &CreateOpts{
-				AppName:     "company-card",
-				Description: "Stores corporate card info.",
 			},
 		},
 		{
@@ -83,14 +71,14 @@ func TestNewCmdCreate(t *testing.T) {
 				Output:      format.New(io),
 			}
 
-			var createOpts *CreateOpts
-			createCmd := NewCmdCreate(ctx, func(o *CreateOpts) error {
-				createOpts = o
+			var deleteOpts *DeleteOpts
+			deleteCmd := NewCmdDelete(ctx, func(o *DeleteOpts) error {
+				deleteOpts = o
 				return nil
 			})
-			createCmd.SetIO(io)
+			deleteCmd.SetIO(io)
 
-			code := createCmd.Run(c.Args)
+			code := deleteCmd.Run(c.Args)
 			if c.Error != "" {
 				r.NotZero(code)
 				r.Contains(io.Error.String(), c.Error)
@@ -98,30 +86,27 @@ func TestNewCmdCreate(t *testing.T) {
 			}
 
 			r.Zero(code, io.Error.String())
-			r.NotNil(createOpts)
-			r.Equal(c.Expect.AppName, createOpts.AppName)
-			r.Equal(c.Expect.Description, createOpts.Description)
+			r.NotNil(deleteOpts)
+			r.Equal(c.Expect.AppName, deleteOpts.AppName)
 		})
 	}
 }
 
-func TestCreateRun(t *testing.T) {
+func TestDeleteRun(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
-		Name           string
-		AppName        string
-		AppDescription string
-		Error          string
+		Name    string
+		ErrMsg  string
+		AppName string
 	}{
 		{
-			Name:  "Missing app name",
-			Error: "failed to create application",
+			Name:   "Failed: App not found",
+			ErrMsg: "[DELETE /secrets/2023-06-13/organizations/{location.organization_id}/projects/{location.project_id}/apps/{name}][403] DeleteApp",
 		},
 		{
-			Name:           "Good",
-			AppName:        "company-card",
-			AppDescription: "Stores corporate card info.",
+			Name:    "Success: Delete app",
+			AppName: "company-card",
 		},
 	}
 
@@ -134,46 +119,35 @@ func TestCreateRun(t *testing.T) {
 			io := iostreams.Test()
 			vs := mock_secret_service.NewMockClientService(t)
 
-			opts := &CreateOpts{
-				Ctx:         context.Background(),
-				Profile:     profile.TestProfile(t).SetOrgID("123").SetProjectID("abc"),
-				IO:          io,
-				Client:      vs,
-				Output:      format.New(io),
-				AppName:     c.AppName,
-				Description: c.AppDescription,
+			opts := &DeleteOpts{
+				Ctx:     context.Background(),
+				Profile: profile.TestProfile(t).SetOrgID("123").SetProjectID("abc"),
+				IO:      io,
+				Client:  vs,
+				Output:  format.New(io),
+				AppName: c.AppName,
 			}
 
-			if c.Error != "" {
-				vs.EXPECT().CreateApp(mock.Anything, mock.Anything).Return(nil, errors.New("missing app name")).Once()
+			if c.ErrMsg != "" {
+				vs.EXPECT().DeleteApp(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 			} else {
-				vs.EXPECT().CreateApp(&secret_service.CreateAppParams{
-					Context:                opts.Ctx,
+				vs.EXPECT().DeleteApp(&secret_service.DeleteAppParams{
 					LocationOrganizationID: "123",
 					LocationProjectID:      "abc",
-					Body: secret_service.CreateAppBody{
-						Name:        opts.AppName,
-						Description: opts.Description,
-					},
-				}, nil).Return(&secret_service.CreateAppOK{
-					Payload: &models.Secrets20230613CreateAppResponse{
-						App: &models.Secrets20230613App{
-							Name:        opts.AppName,
-							Description: opts.Description,
-						},
-					},
-				}, nil).Once()
+					Name:                   opts.AppName,
+					Context:                opts.Ctx,
+				}, nil).Return(&secret_service.DeleteAppOK{}, nil).Once()
 			}
 
 			// Run the command
-			err := createRun(opts)
-			if c.Error != "" {
-				r.ErrorContains(err, c.Error)
+			err := deleteRun(opts)
+			if c.ErrMsg != "" {
+				r.Contains(err.Error(), c.ErrMsg)
 				return
 			}
 
 			r.NoError(err)
-			r.Equal(io.Error.String(), fmt.Sprintf("✓ Successfully created application with name %q\n", opts.AppName))
+			r.Equal(io.Error.String(), fmt.Sprintf("✓ Successfully deleted application with name %q\n", opts.AppName))
 		})
 	}
 }
