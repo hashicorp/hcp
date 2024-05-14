@@ -178,7 +178,7 @@ func TestAppCreate(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Contains(io.Output.String(), "App Name:    company-card\nDescription: Stores corporate card info.\n")
+			r.Equal(io.Error.String(), "✓ Successfully created application with name company-card\n")
 		})
 	}
 }

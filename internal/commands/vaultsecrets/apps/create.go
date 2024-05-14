@@ -7,8 +7,8 @@ import (
 	"context"
 	"fmt"
 
-	secretsvcpreview "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	secretsvc "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -25,8 +25,8 @@ type CreateOpts struct {
 
 	AppName       string
 	Description   string
-	Client        secretsvc.ClientService
-	PreviewClient secretsvcpreview.ClientService
+	Client        secret_service.ClientService
+	PreviewClient preview_secret_service.ClientService
 }
 
 func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
@@ -35,8 +35,8 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		Profile:       ctx.Profile,
 		Output:        ctx.Output,
 		IO:            ctx.IO,
-		Client:        secretsvc.New(ctx.HCP, nil),
-		PreviewClient: secretsvcpreview.New(ctx.HCP, nil),
+		Client:        secret_service.New(ctx.HCP, nil),
+		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -93,11 +93,11 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 }
 
 func appCreate(opts *CreateOpts) error {
-	resp, err := opts.Client.CreateApp(&secretsvc.CreateAppParams{
+	resp, err := opts.Client.CreateApp(&secret_service.CreateAppParams{
 		Context:                opts.Ctx,
 		LocationProjectID:      opts.Profile.ProjectID,
 		LocationOrganizationID: opts.Profile.OrganizationID,
-		Body: secretsvc.CreateAppBody{
+		Body: secret_service.CreateAppBody{
 			Name:        opts.AppName,
 			Description: opts.Description,
 		},
@@ -108,7 +108,7 @@ func appCreate(opts *CreateOpts) error {
 	}
 
 	if opts.Output.GetFormat() == format.Unset {
-		fmt.Fprintf(opts.IO.Err(), "%s Created application with name: %s\n", opts.IO.ColorScheme().SuccessIcon(), opts.AppName)
+		fmt.Fprintf(opts.IO.Err(), "%s Successfully created application with name %s\n", opts.IO.ColorScheme().SuccessIcon(), opts.AppName)
 		return nil
 	}
 
