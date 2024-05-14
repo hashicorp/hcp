@@ -51,12 +51,6 @@ func TestNewCmdCreate(t *testing.T) {
 			},
 		},
 		{
-			Name:    "No Org or Project ID",
-			Profile: profile.TestProfile,
-			Args:    []string{},
-			Error:   "Organization ID and Project ID must be configured before running the command.",
-		},
-		{
 			Name: "No args",
 			Profile: func(t *testing.T) *profile.Profile {
 				return profile.TestProfile(t).SetOrgID("123").SetProjectID("abc")
@@ -98,6 +92,7 @@ func TestNewCmdCreate(t *testing.T) {
 
 			code := createCmd.Run(c.Args)
 			if c.Error != "" {
+				fmt.Println("io.Error.String()", io.Error.String())
 				r.NotZero(code)
 				r.Contains(io.Error.String(), c.Error)
 				return

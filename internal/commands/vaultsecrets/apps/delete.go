@@ -64,9 +64,6 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 			}
 			return deleteRun(opts)
 		},
-		PersistentPreRun: func(c *cmd.Command, args []string) error {
-			return cmd.RequireOrgAndProject(ctx)
-		},
 	}
 
 	return cmd
