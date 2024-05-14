@@ -3,6 +3,7 @@ package apps
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/go-openapi/runtime/client"
@@ -171,14 +172,14 @@ func TestAppCreate(t *testing.T) {
 			}
 
 			// Run the command
-			err := appCreate(opts)
+			err := createRun(opts)
 			if c.Error != "" {
 				r.ErrorContains(err, c.Error)
 				return
 			}
 
 			r.NoError(err)
-			r.Equal(io.Error.String(), "✓ Successfully created application with name company-card\n")
+			r.Equal(io.Error.String(), fmt.Sprintf("✓ Successfully created application with name %q\n", opts.AppName))
 		})
 	}
 }
