@@ -84,9 +84,6 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 			}
 			return createRun(opts)
 		},
-		PersistentPreRun: func(c *cmd.Command, args []string) error {
-			return cmd.RequireOrgAndProject(ctx)
-		},
 	}
 
 	return cmd

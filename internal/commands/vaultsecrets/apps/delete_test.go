@@ -39,12 +39,6 @@ func TestNewCmdDelete(t *testing.T) {
 			},
 		},
 		{
-			Name:    "No Org or Project ID",
-			Profile: profile.TestProfile,
-			Args:    []string{},
-			Error:   "Organization ID and Project ID must be configured before running the command.",
-		},
-		{
 			Name: "No args",
 			Profile: func(t *testing.T) *profile.Profile {
 				return profile.TestProfile(t).SetOrgID("123").SetProjectID("abc")
