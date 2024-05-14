@@ -34,3 +34,4 @@ packages:
       outpkg: "mock_{{.PackageName}}"
       all: true
       recursive: true
+
