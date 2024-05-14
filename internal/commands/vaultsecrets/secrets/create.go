@@ -125,6 +125,12 @@ func createRun(opts *CreateOpts) error {
 	if err != nil {
 		return fmt.Errorf("failed to create secret with name: %q - %w", opts.SecretName, err)
 	}
+
+	if opts.Output.GetFormat() == format.Unset {
+		fmt.Fprintf(opts.IO.Err(), "%s Successfully created secret with name: %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.AppName)
+		return nil
+	}
+
 	return opts.Output.Display(newDisplayer(true, resp.Payload.Secret))
 }
 
