@@ -31,7 +31,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		Name:      "delete",
 		ShortHelp: "Delete a static secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets delete" }} command deletes a static secret under an Vault Secrets App.`),
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets delete" }} command deletes a static secret under an Vault Secrets application.`),
 		Examples: []cmd.Example{
 			{
 				Preamble: `Delete a secret from Vault Secrets application on active profile:`,
