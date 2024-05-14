@@ -40,9 +40,9 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 				`),
 			},
 			{
-				Preamble: `Delete secret from different Vault Secrets application, not active profile:`,
+				Preamble: `Delete a secret from specified Vault Secrets application:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
-				$ hcp vault-secrets secrets create secret_2 --app-name test-app
+				$ hcp vault-secrets secrets delete secret_2 --app-name test-app
 				`),
 			},
 		},
