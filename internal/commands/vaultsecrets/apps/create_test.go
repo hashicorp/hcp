@@ -111,7 +111,7 @@ func TestNewCmdCreate(t *testing.T) {
 	}
 }
 
-func TestAppCreate(t *testing.T) {
+func TestCreateRun(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
