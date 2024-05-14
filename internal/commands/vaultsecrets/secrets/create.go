@@ -127,7 +127,7 @@ func createRun(opts *CreateOpts) error {
 	}
 
 	if opts.Output.GetFormat() == format.Unset {
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully created secret with name: %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.AppName)
+		fmt.Fprintf(opts.IO.Err(), "%s Successfully created secret with name: %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
 		return nil
 	}
 

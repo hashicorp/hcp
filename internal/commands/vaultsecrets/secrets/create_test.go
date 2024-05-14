@@ -221,7 +221,7 @@ func TestCreateRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Equal(io.Output.String(), fmt.Sprintf("%s\n", "Secret Name  Latest Version  Created At                \ntest_secret  2               1970-01-01T00:00:00.000Z  "))
+			r.Equal(io.Error.String(), fmt.Sprintf("✓ Successfully created secret with name: %q\n", opts.SecretName))
 		})
 	}
 }
