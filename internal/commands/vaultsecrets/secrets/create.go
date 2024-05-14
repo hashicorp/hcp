@@ -42,19 +42,19 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Create new secret in Vault Secrets application on active profile:`,
+				Preamble: `Create a new secret in Vault Secrets application on active profile:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp vault-secrets secrets create secret_1 --data-file=tmp/secrets1.txt
 				`),
 			},
 			{
-				Preamble: `Create new secret in Vault Secrets application on active profile with pipe:`,
+				Preamble: `Create a new secret in Vault Secrets application by piping the plaintext secret from a command output:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
 				$ echo "my super secret" | hcp vault-secrets secrets create secret_2 --data-file=-
 				`),
 			},
 			{
-				Preamble: `Create secret in different Vault Secrets application, not active profile:`,
+				Preamble: `Create a new secret in the specified Vault Secrets application:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
 				$ hcp vault-secrets secrets create secret_3 --app-name test-app --secret_file=/tmp/secrets2.txt
 				`),
@@ -123,11 +123,11 @@ func createRun(opts *CreateOpts) error {
 
 	resp, err := opts.Client.CreateAppKVSecret(req, nil)
 	if err != nil {
-		return fmt.Errorf("failed to create secret with name: %q - %w", opts.SecretName, err)
+		return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 	}
 
 	if opts.Output.GetFormat() == format.Unset {
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully created secret with name: %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
+		fmt.Fprintf(opts.IO.Err(), "%s Successfully created secret with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
 		return nil
 	}
 
