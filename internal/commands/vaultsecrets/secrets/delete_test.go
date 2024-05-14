@@ -129,7 +129,7 @@ func TestDeleteRun(t *testing.T) {
 			r := require.New(t)
 
 			io := iostreams.Test()
-			io.OutputTTY = true
+			io.ErrorTTY = true
 			vs := mock_secret_service.NewMockClientService(t)
 			opts := &DeleteOpts{
 				Ctx:        context.Background(),
@@ -161,7 +161,7 @@ func TestDeleteRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Equal(io.Output.String(), fmt.Sprintf("✓ Successfully deleted secret with name: %q\n", opts.SecretName))
+			r.Equal(io.Error.String(), fmt.Sprintf("✓ Successfully deleted secret with name: %q\n", opts.SecretName))
 		})
 	}
 }
