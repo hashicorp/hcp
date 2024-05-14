@@ -92,6 +92,6 @@ func deleteRun(opts *DeleteOpts) error {
 		return fmt.Errorf("failed to delete secret with name: %q - %w", opts.SecretName, err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Successfully deleted secret with name: %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
+	fmt.Fprintf(opts.IO.Out(), "%s Successfully deleted secret with name: %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
 	return nil
 }
