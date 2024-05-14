@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	preview_secret_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -137,32 +137,32 @@ func TestAppCreate(t *testing.T) {
 			r := require.New(t)
 
 			io := iostreams.Test()
-			vs := mock_preview_secret_service.NewMockClientService(t)
+			vs := mock_secret_service.NewMockClientService(t)
 
 			opts := &CreateOpts{
-				Ctx:           context.Background(),
-				Profile:       profile.TestProfile(t).SetOrgID("123").SetProjectID("abc"),
-				IO:            io,
-				PreviewClient: vs,
-				Output:        format.New(io),
-				AppName:       c.AppName,
-				Description:   c.AppDescription,
+				Ctx:         context.Background(),
+				Profile:     profile.TestProfile(t).SetOrgID("123").SetProjectID("abc"),
+				IO:          io,
+				Client:      vs,
+				Output:      format.New(io),
+				AppName:     c.AppName,
+				Description: c.AppDescription,
 			}
 
 			if c.Error != "" {
 				vs.EXPECT().CreateApp(mock.Anything, mock.Anything).Return(nil, errors.New("missing app name")).Once()
 			} else {
-				vs.EXPECT().CreateApp(&preview_secret_service.CreateAppParams{
-					Context:        opts.Ctx,
-					OrganizationID: "123",
-					ProjectID:      "abc",
-					Body: preview_secret_service.CreateAppBody{
+				vs.EXPECT().CreateApp(&secret_service.CreateAppParams{
+					Context:                opts.Ctx,
+					LocationOrganizationID: "123",
+					LocationProjectID:      "abc",
+					Body: secret_service.CreateAppBody{
 						Name:        opts.AppName,
 						Description: opts.Description,
 					},
-				}, nil).Return(&preview_secret_service.CreateAppOK{
-					Payload: &preview_secret_models.Secrets20231128CreateAppResponse{
-						App: &preview_secret_models.Secrets20231128App{
+				}, nil).Return(&secret_service.CreateAppOK{
+					Payload: &models.Secrets20230613CreateAppResponse{
+						App: &models.Secrets20230613App{
 							Name:        opts.AppName,
 							Description: opts.Description,
 						},
