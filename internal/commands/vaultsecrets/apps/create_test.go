@@ -92,7 +92,6 @@ func TestNewCmdCreate(t *testing.T) {
 
 			code := createCmd.Run(c.Args)
 			if c.Error != "" {
-				fmt.Println("io.Error.String()", io.Error.String())
 				r.NotZero(code)
 				r.Contains(io.Error.String(), c.Error)
 				return
