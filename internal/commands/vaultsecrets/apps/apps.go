@@ -16,6 +16,9 @@ func NewCmdApps(ctx *cmd.Context) *cmd.Command {
 		The {{ template "mdCodeOrBold" "hcp vault-secrets apps" }} command group lets you
 		manage Vault Secrets applications.
 		`),
+		PersistentPreRun: func(c *cmd.Command, args []string) error {
+			return cmd.RequireOrgAndProject(ctx)
+		},
 	}
 
 	cmd.AddChild(NewCmdCreate(ctx, nil))
