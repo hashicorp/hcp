@@ -112,9 +112,9 @@ func TestDeleteRun(t *testing.T) {
 		ErrMsg  string
 	}{
 		{
-			Name:    "Failed: Secret not there",
+			Name:    "Failed: Secret not found",
 			RespErr: true,
-			ErrMsg:  "failed to delete secret with name: \"test_secret\"",
+			ErrMsg:  "[DELETE /secrets/2023-06-13/organizations/{location.organization_id}/projects/{location.project_id}/apps/{app_name}/secrets/{secret_name}][404]DeleteAppSecret default  &{Code:5 Details:[] Message:secret not found}",
 		},
 		{
 			Name:    "Success: Created secret",
