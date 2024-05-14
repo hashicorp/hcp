@@ -35,7 +35,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		Name:      "create",
 		ShortHelp: "Create a new static secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create" }} command creates a new static secret under an Vault Secrets App.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create" }} command creates a new static secret under an Vault Secrets application.
 
 		Once the secret is created, it can be read using
 		{{ template "mdCodeOrBold" "hcp vault-secrets secrets read" }} subcommand.
