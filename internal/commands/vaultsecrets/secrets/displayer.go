@@ -39,7 +39,7 @@ func (d *displayer) Payload() any {
 func (d *displayer) FieldTemplates() []format.Field {
 	return []format.Field{
 		{
-			Name:        "App Name",
+			Name:        "Secret Name",
 			ValueFormat: "{{ .Name }}",
 		},
 		{
