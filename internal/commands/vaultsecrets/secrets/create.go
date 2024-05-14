@@ -123,7 +123,7 @@ func createRun(opts *CreateOpts) error {
 
 	resp, err := opts.Client.CreateAppKVSecret(req, nil)
 	if err != nil {
-		return fmt.Errorf("failed to create secret with name: %s - %q", opts.SecretName, err)
+		return fmt.Errorf("failed to create secret with name: %q - %w", opts.SecretName, err)
 	}
 	return opts.Output.Display(newDisplayer(true, resp.Payload.Secret))
 }
