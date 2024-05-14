@@ -28,10 +28,10 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 	}
 
 	cmd := &cmd.Command{
-		Name:      "create",
+		Name:      "delete",
 		ShortHelp: "Delete a static secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create" }} command deletes a static secret under an Vault Secrets App.`),
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets delete" }} command deletes a static secret under an Vault Secrets App.`),
 		Examples: []cmd.Example{
 			{
 				Preamble: `Delete a secret from Vault Secrets application on active profile:`,
@@ -87,9 +87,11 @@ func deleteRun(opts *DeleteOpts) error {
 	req.AppName = opts.AppName
 	req.SecretName = opts.SecretName
 
-	resp, err := opts.Client.DeleteAppSecret(req, nil)
+	_, err := opts.Client.DeleteAppSecret(req, nil)
 	if err != nil {
-		return fmt.Errorf("failed to create secret with name: %q - %w", opts.SecretName, err)
+		return fmt.Errorf("failed to delete secret with name: %q - %w", opts.SecretName, err)
 	}
-	return opts.Output.Display(newDisplayer(true, resp.Payload))
+
+	fmt.Fprintf(opts.IO.Err(), "%s Successfully deleted secret with name: %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
+	return nil
 }
