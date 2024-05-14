@@ -73,7 +73,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 				{
 					Name:         "data-file",
 					DisplayValue: "DATA_FILE_PATH",
-					Description:  "Absolute path to the secrets data file.",
+					Description:  "File path to read secret data from. Set this to '-' to read the secret data from stdin.",
 					Value:        flagvalue.Simple("", &opts.SecretFilePath),
 				},
 			},
@@ -123,12 +123,14 @@ func createRun(opts *CreateOpts) error {
 
 	resp, err := opts.Client.CreateAppKVSecret(req, nil)
 	if err != nil {
-		return fmt.Errorf("failed to create secret with name: %s - %w", opts.SecretName, err)
+		return fmt.Errorf("failed to create secret with name: %s - %q", opts.SecretName, err)
 	}
 	return opts.Output.Display(newDisplayer(true, resp.Payload.Secret))
 }
 
 func readPlainTextSecret(opts *CreateOpts) error {
+	// If the secret value is provided, then we don't need to read it from the file
+	// this is used for making testing easier without needing to create a file
 	if opts.SecretValuePlaintext != "" {
 		return nil
 	}
@@ -152,16 +154,16 @@ func readPlainTextSecret(opts *CreateOpts) error {
 
 	fileInfo, err := os.Stat(opts.SecretFilePath)
 	if err != nil {
-		return fmt.Errorf("%s failed to get data file info: %w", opts.IO.ColorScheme().FailureIcon(), err)
+		return fmt.Errorf("failed to get data file info: %w", err)
 	}
 
 	if fileInfo.Size() == 0 {
-		return fmt.Errorf("%s data file cannot be empty", opts.IO.ColorScheme().FailureIcon())
+		return errors.New("data file cannot be empty")
 	}
 
 	data, err := os.ReadFile(opts.SecretFilePath)
 	if err != nil {
-		return fmt.Errorf("%s unable to read the data file: %w", opts.IO.ColorScheme().FailureIcon(), err)
+		return fmt.Errorf("unable to read the data file: %w", err)
 	}
 	opts.SecretValuePlaintext = string(data)
 	return nil
