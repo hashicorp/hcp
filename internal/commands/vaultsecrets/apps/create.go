@@ -41,7 +41,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "create",
-		ShortHelp: "Create a new HCP Vault Secrets application.",
+		ShortHelp: "Create a new Vault Secrets application.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets apps create" }} command creates a new Vault Secrets application.
 
@@ -82,7 +82,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 			if runF != nil {
 				return runF(opts)
 			}
-			return appCreate(opts)
+			return createRun(opts)
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
 			return cmd.RequireOrgAndProject(ctx)
@@ -92,7 +92,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 	return cmd
 }
 
-func appCreate(opts *CreateOpts) error {
+func createRun(opts *CreateOpts) error {
 	resp, err := opts.Client.CreateApp(&secret_service.CreateAppParams{
 		Context:                opts.Ctx,
 		LocationProjectID:      opts.Profile.ProjectID,
@@ -108,7 +108,7 @@ func appCreate(opts *CreateOpts) error {
 	}
 
 	if opts.Output.GetFormat() == format.Unset {
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully created application with name %s\n", opts.IO.ColorScheme().SuccessIcon(), opts.AppName)
+		fmt.Fprintf(opts.IO.Err(), "%s Successfully created application with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.AppName)
 		return nil
 	}
 
