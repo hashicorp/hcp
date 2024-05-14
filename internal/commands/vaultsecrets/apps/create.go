@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	secretsvcpreview "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	secretsvcstable "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	secretsvc "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -25,7 +25,7 @@ type CreateOpts struct {
 
 	AppName       string
 	Description   string
-	StableClient  secretsvcstable.ClientService
+	Client        secretsvc.ClientService
 	PreviewClient secretsvcpreview.ClientService
 }
 
@@ -35,7 +35,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		Profile:       ctx.Profile,
 		Output:        ctx.Output,
 		IO:            ctx.IO,
-		StableClient:  secretsvcstable.New(ctx.HCP, nil),
+		Client:        secretsvc.New(ctx.HCP, nil),
 		PreviewClient: secretsvcpreview.New(ctx.HCP, nil),
 	}
 
@@ -93,11 +93,11 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 }
 
 func appCreate(opts *CreateOpts) error {
-	resp, err := opts.PreviewClient.CreateApp(&secretsvcpreview.CreateAppParams{
-		Context:        opts.Ctx,
-		ProjectID:      opts.Profile.ProjectID,
-		OrganizationID: opts.Profile.OrganizationID,
-		Body: secretsvcpreview.CreateAppBody{
+	resp, err := opts.Client.CreateApp(&secretsvc.CreateAppParams{
+		Context:                opts.Ctx,
+		LocationProjectID:      opts.Profile.ProjectID,
+		LocationOrganizationID: opts.Profile.OrganizationID,
+		Body: secretsvc.CreateAppBody{
 			Name:        opts.AppName,
 			Description: opts.Description,
 		},
@@ -107,5 +107,10 @@ func appCreate(opts *CreateOpts) error {
 		return fmt.Errorf("failed to create application: %w", err)
 	}
 
-	return opts.Output.Display(newDisplayer(format.Pretty, true, resp.Payload.App))
+	if opts.Output.GetFormat() == format.Unset {
+		fmt.Fprintf(opts.IO.Err(), "%s Created application with name: %s\n", opts.IO.ColorScheme().SuccessIcon(), opts.AppName)
+		return nil
+	}
+
+	return opts.Output.Display(newDisplayer(true, resp.Payload.App))
 }
