@@ -47,7 +47,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 			{
 				Preamble: `List all secrets under the specified Vault Secrets application:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
-				$ hcp vault-secrets secrets list --app-name test-app
+				$ hcp vault-secrets secrets list --app test-app
 				`),
 			},
 		},
