@@ -3,6 +3,7 @@ package apps
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/go-openapi/runtime/client"
@@ -155,7 +156,7 @@ func TestReadRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Contains(io.Output.String(), "App Name:    company-card")
+			r.Contains(io.Output.String(), fmt.Sprintf("App Name:    %s", opts.AppName))
 		})
 	}
 }
