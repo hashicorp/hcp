@@ -25,22 +25,14 @@ func RequireVaultSecretsAppName(ctx *cmd.Context, appName string) error {
 	cs := ctx.IO.ColorScheme()
 	help := heredoc.Docf(`%v
 
-	To set the Vault Secrets application name interactively, run:
+	Set the app name using the --app flag or set the app name on your active profile one of the following commands:
 
 	%v
-
-	Alternatively, you can set the Vault Secrets application name on the active pofile using the command:
-
-	%v
-
-	If you prefer specifying the Vault Secrets application name directly via the command line, use:
-
 	%v
 	`,
-		cs.String("Vault Secrets application name must be configured before running the command.").Color(cs.Orange()),
+		cs.String("Vault Secrets application name must set.").Color(cs.Orange()),
 		cs.String("$ hcp profile set vault-secrets/app <app_name>").Bold(),
 		cs.String("$ hcp profile init --vault-secrets").Bold(),
-		cs.String("$ hcp vault-secrets secrets --app <app_name> <sub-cmd>").Bold(),
 	)
 
 	return errors.New(help)
