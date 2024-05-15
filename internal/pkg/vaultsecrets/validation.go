@@ -28,8 +28,7 @@ func RequireVaultSecretsAppName(ctx *cmd.Context, appName string) error {
 	Set the app name using the --app flag or set the app name on your active profile one of the following commands:
 
 	%v
-	%v
-	`,
+	%v`,
 		cs.String("Vault Secrets application name must set.").Color(cs.Orange()),
 		cs.String("$ hcp profile set vault-secrets/app <app_name>").Bold(),
 		cs.String("$ hcp profile init --vault-secrets").Bold(),
