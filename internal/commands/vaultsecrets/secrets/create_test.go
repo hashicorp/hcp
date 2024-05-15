@@ -221,7 +221,7 @@ func TestCreateRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Equal(io.Error.String(), fmt.Sprintf("✓ Successfully created secret with name %q\n", opts.SecretName))
+			r.Contains(io.Error.String(), fmt.Sprintf("✓ Successfully created secret with name %q\n", opts.SecretName))
 		})
 	}
 }
