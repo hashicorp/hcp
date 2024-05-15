@@ -80,8 +80,6 @@ func listRun(opts *ListOpts) error {
 	req.OrganizationID = opts.Profile.OrganizationID
 	req.ProjectID = opts.Profile.ProjectID
 	req.AppName = opts.AppName
-	pageSize := int64(1)
-	req.PaginationPageSize = &pageSize
 
 	var secrets []*models.Secrets20231128Secret
 	listResp, err := opts.PreviewClient.ListAppSecrets(req, nil)
@@ -89,7 +87,8 @@ func listRun(opts *ListOpts) error {
 		return fmt.Errorf("failed to list secrets: %w", err)
 	}
 	secrets = append(secrets, listResp.Payload.Secrets...)
-	for listResp.GetPayload().Pagination.NextPageToken != "" {
+
+	for listResp.GetPayload().Pagination != nil && listResp.GetPayload().Pagination.NextPageToken != "" {
 		req.PaginationNextPageToken = &listResp.Payload.Pagination.NextPageToken
 		listResp, err = opts.PreviewClient.ListAppSecrets(req, nil)
 		if err != nil {
