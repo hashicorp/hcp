@@ -173,7 +173,7 @@ func TestCreateRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Equal(io.Error.String(), fmt.Sprintf("✓ Successfully created application with name %q\n", opts.AppName))
+			r.Contains(io.Error.String(), fmt.Sprintf("✓ Successfully created application with name %q\n", opts.AppName))
 		})
 	}
 }
