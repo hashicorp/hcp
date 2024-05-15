@@ -15,13 +15,13 @@ import (
 // vault secrets related configuration values such as app name.
 type VaultSecretsConf struct {
 	// AppName stores the app name against which the requests will be made.
-	AppName string `hcl:"app_name"`
+	AppName string `hcl:"app"`
 }
 
 // Predict predicts the HCL key names and basic settable values
 func (vsc *VaultSecretsConf) Predict(args complete.Args) []string {
 	properties := map[string][]string{
-		"vault-secrets/app_name": {""},
+		"vault-secrets/app": {""},
 	}
 	// If the property has been specified, return possible values.
 	if len(args.All) >= 1 {
@@ -47,7 +47,7 @@ func (vsc *VaultSecretsConf) Validate() error {
 		return nil
 	}
 	if vsc.AppName == "" {
-		return errors.New("app_name must be set")
+		return errors.New("app must be set")
 	}
 	return nil
 }
