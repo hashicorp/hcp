@@ -21,7 +21,7 @@ func TestPropertyNames(t *testing.T) {
 	r.Contains(properties, "project_id")
 	r.Contains(properties, "core/no_color")
 	r.Contains(properties, "core/verbosity")
-	r.Contains(properties, "vault-secrets/app_name")
+	r.Contains(properties, "vault-secrets/app")
 }
 
 func TestProfile_Validate(t *testing.T) {
@@ -125,7 +125,7 @@ func TestProfile_Predict(t *testing.T) {
 			Args: complete.Args{
 				All: []string{"vault-secrets/"},
 			},
-			Expected: []string{"vault-secrets/app_name"},
+			Expected: []string{"vault-secrets/app"},
 		},
 	}
 

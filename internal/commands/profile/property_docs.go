@@ -52,7 +52,7 @@ func addCoreProperties(b *availablePropertiesBuilder) {
 }
 
 func addVaultSecretsProperties(b *availablePropertiesBuilder) {
-	b.AddProperty("vault-secrets", "app_name", `App name under HCP Vault Secrets to operate on by default.`)
+	b.AddProperty("vault-secrets", "app", `HCP Vault Secrets application name to operate on by default.`)
 }
 
 type availablePropertiesBuilder struct {

@@ -25,7 +25,7 @@ func TestVaultSecretsConf_Validate(t *testing.T) {
 		{
 			Name:    "empty",
 			Profile: &VaultSecretsConf{},
-			Error:   "name must be set",
+			Error:   "app must be set",
 		},
 	}
 

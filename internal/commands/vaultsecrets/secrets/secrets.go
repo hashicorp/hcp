@@ -27,7 +27,7 @@ func NewCmdSecrets(ctx *cmd.Context) *cmd.Command {
 		Flags: cmd.Flags{
 			Persistent: []*cmd.Flag{
 				{
-					Name:         "app-name",
+					Name:         "app",
 					DisplayValue: "NAME",
 					Description:  "The name of the Vault Secrets application. If not specified, the value from the active profile will be used.",
 					Shorthand:    "a",
