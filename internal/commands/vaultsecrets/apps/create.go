@@ -44,9 +44,6 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		ShortHelp: "Create a new Vault Secrets application.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets apps create" }} command creates a new Vault Secrets application.
-
-		Once an application is created, secrets lifecycle can be managed using the
-		{{ template "mdCodeOrBold" "hcp vault-secrets secrets" }} command group.
 		`),
 		Examples: []cmd.Example{
 			{
@@ -106,6 +103,13 @@ func createRun(opts *CreateOpts) error {
 
 	if opts.Output.GetFormat() == format.Unset {
 		fmt.Fprintf(opts.IO.Err(), "%s Successfully created application with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.AppName)
+
+		command := fmt.Sprintf(`$ hcp vault-secrets secrets create <secret name> --app %s --data-file <path to secret>`, opts.AppName)
+
+		fmt.Fprintln(opts.IO.Err())
+		fmt.Fprintf(opts.IO.Err(), `To create a secret in the app, run:
+  %s`, opts.IO.ColorScheme().String(command).Bold())
+		fmt.Fprintln(opts.IO.Err())
 		return nil
 	}
 
