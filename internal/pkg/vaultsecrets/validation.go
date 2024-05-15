@@ -29,7 +29,7 @@ func RequireVaultSecretsAppName(ctx *cmd.Context, appName string) error {
 
 	%v
 
-	Alternatively, you can set the Vault Secrets applicaton name on the active pofile using the command:
+	Alternatively, you can set the Vault Secrets application name on the active pofile using the command:
 
 	%v
 
