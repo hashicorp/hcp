@@ -36,9 +36,6 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		ShortHelp: "Create a new static secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create" }} command creates a new static secret under an Vault Secrets application.
-
-		Once the secret is created, it can be read using
-		{{ template "mdCodeOrBold" "hcp vault-secrets secrets read" }} subcommand.
 		`),
 		Examples: []cmd.Example{
 			{
@@ -128,6 +125,13 @@ func createRun(opts *CreateOpts) error {
 
 	if opts.Output.GetFormat() == format.Unset {
 		fmt.Fprintf(opts.IO.Err(), "%s Successfully created secret with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
+
+		command := fmt.Sprintf(`$ hcp vault-secrets secrets read %s --app %s`, opts.SecretName, req.AppName)
+
+		fmt.Fprintln(opts.IO.Err())
+		fmt.Fprintf(opts.IO.Err(), `To read your secret, run:
+  %s`, opts.IO.ColorScheme().String(command).Bold())
+		fmt.Fprintln(opts.IO.Err())
 		return nil
 	}
 
