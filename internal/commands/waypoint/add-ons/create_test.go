@@ -46,7 +46,7 @@ func TestNewCmdCreate(t *testing.T) {
 			},
 			Args: []string{
 				"-n=cli-test",
-				"--application-name=testApp",
+				"--app=testApp",
 				"--add-on-definition-name=testAddOnDefinition",
 			},
 			Expect: &AddOnOpts{
