@@ -22,7 +22,7 @@ func TestNewCmdList(t *testing.T) {
 	testProfile := func(t *testing.T) *profile.Profile {
 		tp := profile.TestProfile(t).SetOrgID("123").SetProjectID("456")
 		tp.VaultSecrets = &profile.VaultSecretsConf{
-			AppName: "test-app-name",
+			AppName: "test-app",
 		}
 		return tp
 	}
@@ -35,15 +35,8 @@ func TestNewCmdList(t *testing.T) {
 		Expect  *ListOpts
 	}{
 		{
-			Name:    "Failed: No secret name arg specified",
+			Name:    "Good: List succeeded",
 			Profile: testProfile,
-			Args:    []string{},
-			Error:   "ERROR: accepts 1 arg(s), received 0",
-		},
-		{
-			Name:    "Good: Secret name arg specified",
-			Profile: testProfile,
-			Args:    []string{"test"},
 			Expect: &ListOpts{
 				AppName: testProfile(t).VaultSecrets.AppName,
 			},
