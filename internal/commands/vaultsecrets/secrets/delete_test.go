@@ -73,14 +73,14 @@ func TestNewCmdDelete(t *testing.T) {
 			}
 
 			var gotOpts *DeleteOpts
-			createCmd := NewCmdDelete(ctx, func(o *DeleteOpts) error {
+			deleteCmd := NewCmdDelete(ctx, func(o *DeleteOpts) error {
 				gotOpts = o
 				gotOpts.AppName = c.Profile(t).VaultSecrets.AppName
 				return nil
 			})
-			createCmd.SetIO(io)
+			deleteCmd.SetIO(io)
 
-			code := createCmd.Run(c.Args)
+			code := deleteCmd.Run(c.Args)
 			if c.Error != "" {
 				r.NotZero(code)
 				r.Contains(io.Error.String(), c.Error)
