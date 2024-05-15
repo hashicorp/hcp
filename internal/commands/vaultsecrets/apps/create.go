@@ -104,7 +104,7 @@ func createRun(opts *CreateOpts) error {
 	if opts.Output.GetFormat() == format.Unset {
 		fmt.Fprintf(opts.IO.Err(), "%s Successfully created application with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.AppName)
 
-		command := fmt.Sprintf(`$ hcp vault-secrets secrets create <secret name> --app %s --data-file <path to secret>`, opts.AppName)
+		command := "$ hcp vault-secrets secrets create <secret name> --data-file <path to secret>"
 
 		fmt.Fprintln(opts.IO.Err())
 		fmt.Fprintf(opts.IO.Err(), `To create a secret in the app, run:

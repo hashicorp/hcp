@@ -126,7 +126,7 @@ func createRun(opts *CreateOpts) error {
 	if opts.Output.GetFormat() == format.Unset {
 		fmt.Fprintf(opts.IO.Err(), "%s Successfully created secret with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
 
-		command := fmt.Sprintf(`$ hcp vault-secrets secrets read %s --app %s`, opts.SecretName, req.AppName)
+		command := fmt.Sprintf(`$ hcp vault-secrets secrets read %s`, opts.SecretName)
 
 		fmt.Fprintln(opts.IO.Err())
 		fmt.Fprintf(opts.IO.Err(), `To read your secret, run:
