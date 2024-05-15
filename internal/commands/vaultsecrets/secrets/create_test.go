@@ -29,7 +29,7 @@ func TestNewCmdCreate(t *testing.T) {
 	testProfile := func(t *testing.T) *profile.Profile {
 		tp := profile.TestProfile(t).SetOrgID("123").SetProjectID("456")
 		tp.VaultSecrets = &profile.VaultSecretsConf{
-			AppName: "test-app-name",
+			AppName: "test-app",
 		}
 		return tp
 	}
@@ -77,7 +77,7 @@ func TestNewCmdCreate(t *testing.T) {
 			var gotOpts *CreateOpts
 			createCmd := NewCmdCreate(ctx, func(o *CreateOpts) error {
 				gotOpts = o
-				gotOpts.AppName = "test-app-name"
+				gotOpts.AppName = "test-app"
 				return nil
 			})
 			createCmd.SetIO(io)
@@ -103,7 +103,7 @@ func TestCreateRun(t *testing.T) {
 	testProfile := func(t *testing.T) *profile.Profile {
 		tp := profile.TestProfile(t).SetOrgID("123").SetProjectID("456")
 		tp.VaultSecrets = &profile.VaultSecretsConf{
-			AppName: "test-app-name",
+			AppName: "test-app",
 		}
 		return tp
 	}

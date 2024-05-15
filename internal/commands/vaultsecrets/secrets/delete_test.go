@@ -27,7 +27,7 @@ func TestNewCmdDelete(t *testing.T) {
 	testProfile := func(t *testing.T) *profile.Profile {
 		tp := profile.TestProfile(t).SetOrgID("123").SetProjectID("456")
 		tp.VaultSecrets = &profile.VaultSecretsConf{
-			AppName: "test-app-name",
+			AppName: "test-app",
 		}
 		return tp
 	}
@@ -101,7 +101,7 @@ func TestDeleteRun(t *testing.T) {
 	testProfile := func(t *testing.T) *profile.Profile {
 		tp := profile.TestProfile(t).SetOrgID("123").SetProjectID("456")
 		tp.VaultSecrets = &profile.VaultSecretsConf{
-			AppName: "test-app-name",
+			AppName: "test-app",
 		}
 		return tp
 	}

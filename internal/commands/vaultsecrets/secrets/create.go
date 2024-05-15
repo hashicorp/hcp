@@ -56,7 +56,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 			{
 				Preamble: `Create a new secret in the specified Vault Secrets application:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
-				$ hcp vault-secrets secrets create secret_3 --app-name test-app --secret_file=/tmp/secrets2.txt
+				$ hcp vault-secrets secrets create secret_3 --app test-app --secret_file=/tmp/secrets2.txt
 				`),
 			},
 		},
