@@ -89,7 +89,6 @@ func TestNewCmdRead(t *testing.T) {
 			r.Zero(code, io.Error.String())
 			r.NotNil(readOpts)
 			r.Equal(c.Expect.AppName, readOpts.AppName)
-			r.Equal(c.Expect.Description, readOpts.Description)
 		})
 	}
 }
@@ -141,8 +140,7 @@ func TestReadRun(t *testing.T) {
 				}, nil).Return(&secret_service.GetAppOK{
 					Payload: &models.Secrets20230613GetAppResponse{
 						App: &models.Secrets20230613App{
-							Name:        opts.AppName,
-							Description: opts.Description,
+							Name: opts.AppName,
 						},
 					},
 				}, nil).Once()
@@ -156,7 +154,7 @@ func TestReadRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Contains(io.Output.String(), fmt.Sprintf("App Name:    %s", opts.AppName))
+			r.Contains(io.Output.String(), fmt.Sprintf("App Name      Description  \n%s", opts.AppName))
 		})
 	}
 }

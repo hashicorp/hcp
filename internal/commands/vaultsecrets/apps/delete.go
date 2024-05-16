@@ -54,7 +54,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		Args: cmd.PositionalArguments{
 			Args: []cmd.PositionalArgument{
 				{
-					Name:          "APP_NAME",
+					Name:          "NAME",
 					Documentation: "The name of the app to delete.",
 				},
 			},
