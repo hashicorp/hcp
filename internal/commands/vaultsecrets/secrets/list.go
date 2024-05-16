@@ -30,16 +30,16 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "list",
-		ShortHelp: "List all secrets.",
+		ShortHelp: "List an application's secrets.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets list" }} command list all secrets under an Vault Secrets application.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets list" }} command list all secrets under a Vault Secrets application.
 
 		Individual secrets can be read using
 		{{ template "mdCodeOrBold" "hcp vault-secrets secrets read" }} subcommand.
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `List all secrets under Vault Secrets application on profile:`,
+				Preamble: `List all secrets under the Vault Secrets application on active profile:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp vault-secrets secrets list
 				`),
