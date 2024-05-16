@@ -15,7 +15,7 @@ import (
 	"github.com/go-openapi/strfmt"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	preview_secret_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -144,9 +144,9 @@ func TestListRun(t *testing.T) {
 					AppName:        testProfile(t).VaultSecrets.AppName,
 					Context:        opts.Ctx,
 				}, mock.Anything).Return(&preview_secret_service.ListAppSecretsOK{
-					Payload: &preview_secret_models.Secrets20231128ListAppSecretsResponse{
+					Payload: &preview_models.Secrets20231128ListAppSecretsResponse{
 						Secrets: getMockSecrets(0, 10),
-						Pagination: &preview_secret_models.CommonPaginationResponse{
+						Pagination: &preview_models.CommonPaginationResponse{
 							NextPageToken: paginationNextPageToken,
 						},
 					},
@@ -159,7 +159,7 @@ func TestListRun(t *testing.T) {
 					Context:                 opts.Ctx,
 					PaginationNextPageToken: &paginationNextPageToken,
 				}, mock.Anything).Return(&preview_secret_service.ListAppSecretsOK{
-					Payload: &preview_secret_models.Secrets20231128ListAppSecretsResponse{
+					Payload: &preview_models.Secrets20231128ListAppSecretsResponse{
 						Secrets: getMockSecrets(10, 5),
 					},
 				}, nil).Once()
@@ -178,10 +178,10 @@ func TestListRun(t *testing.T) {
 	}
 }
 
-func getMockSecrets(start, limit int) []*preview_secret_models.Secrets20231128Secret {
-	var secrets []*preview_secret_models.Secrets20231128Secret
+func getMockSecrets(start, limit int) []*preview_models.Secrets20231128Secret {
+	var secrets []*preview_models.Secrets20231128Secret
 	for i := start; i < (start + limit); i++ {
-		secrets = append(secrets, &preview_secret_models.Secrets20231128Secret{
+		secrets = append(secrets, &preview_models.Secrets20231128Secret{
 			Name:          fmt.Sprint("test_secret_", i),
 			LatestVersion: int64(rand.Intn(5)),
 			CreatedAt:     strfmt.DateTime(time.Now()),
