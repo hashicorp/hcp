@@ -60,7 +60,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		Args: cmd.PositionalArguments{
 			Args: []cmd.PositionalArgument{
 				{
-					Name:          "SECRET_NAME",
+					Name:          "NAME",
 					Documentation: "The name of the secret to create.",
 				},
 			},
@@ -135,7 +135,7 @@ func createRun(opts *CreateOpts) error {
 		return nil
 	}
 
-	return opts.Output.Display(newDisplayer(true, resp.Payload.Secret))
+	return opts.Output.Display(newDisplayer(true).Secrets(resp.Payload.Secret))
 }
 
 func readPlainTextSecret(opts *CreateOpts) error {
