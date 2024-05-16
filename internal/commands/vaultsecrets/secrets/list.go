@@ -30,16 +30,16 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "list",
-		ShortHelp: "List all active secrets.",
+		ShortHelp: "List all secrets.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets list" }} command list all active secrets under an Vault Secrets application.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets list" }} command list all secrets under an Vault Secrets application.
 
-		Once the secrets are listed, it can be read using
+		Individual secrets can be read using
 		{{ template "mdCodeOrBold" "hcp vault-secrets secrets read" }} subcommand.
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `List all secrets under Vault Secrets application on active profile:`,
+				Preamble: `List all secrets under Vault Secrets application on profile:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp vault-secrets secrets list
 				`),
@@ -82,19 +82,19 @@ func listRun(opts *ListOpts) error {
 	req.AppName = opts.AppName
 
 	var secrets []*models.Secrets20231128Secret
-	listResp, err := opts.PreviewClient.ListAppSecrets(req, nil)
-	if err != nil {
-		return fmt.Errorf("failed to list secrets: %w", err)
-	}
-	secrets = append(secrets, listResp.Payload.Secrets...)
-
-	for listResp.GetPayload().Pagination != nil && listResp.GetPayload().Pagination.NextPageToken != "" {
-		req.PaginationNextPageToken = &listResp.Payload.Pagination.NextPageToken
-		listResp, err = opts.PreviewClient.ListAppSecrets(req, nil)
+	for {
+		resp, err := opts.PreviewClient.ListAppSecrets(req, nil)
 		if err != nil {
-			return fmt.Errorf("failed to list paginated secrets: %w", err)
+			return fmt.Errorf("failed to list secrets: %w", err)
 		}
-		secrets = append(secrets, listResp.GetPayload().Secrets...)
+
+		secrets = append(secrets, resp.Payload.Secrets...)
+		if resp.Payload.Pagination == nil || resp.Payload.Pagination.NextPageToken == "" {
+			break
+		}
+
+		next := resp.Payload.Pagination.NextPageToken
+		req.PaginationNextPageToken = &next
 	}
 	return opts.Output.Display(newDisplayerPreview(false, secrets...))
 }
