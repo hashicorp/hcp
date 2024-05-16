@@ -18,7 +18,7 @@ func newDisplayer(single bool, apps ...*models.Secrets20230613App) *displayer {
 }
 
 func (d *displayer) DefaultFormat() format.Format {
-	return format.Pretty
+	return format.Table
 }
 
 func (d *displayer) Payload() any {
