@@ -29,11 +29,12 @@ make go/lint
 
 ### Mocks
 
-To add a new mock, edit `.mockgen.yml` and add the package you want mocked. To
+To add a new mock, edit `.mockery.yaml` and add the package you want mocked. To
 regenerate the mocks, either after adding a new mock package or after updating
 the dependencies, run:
 
 ```sh
+# mockery version >= v2.38.0
 make go/mocks
 ```
 

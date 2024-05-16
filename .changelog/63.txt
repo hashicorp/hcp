@@ -1,3 +1,0 @@
-```release-note:improvement
-A better error message is now returned if a user attempts to read a Waypoint TFC Config when one has not been set
-```

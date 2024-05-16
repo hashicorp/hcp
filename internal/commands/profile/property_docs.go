@@ -27,6 +27,7 @@ func availablePropertiesDoc(io iostreams.IOStreams) cmd.DocSection {
 func availableProperties(io iostreams.IOStreams) *availablePropertiesBuilder {
 	b := newAvailablePropertiesBuilder(io)
 	addCoreProperties(b)
+	addVaultSecretsProperties(b)
 	return b
 }
 
@@ -48,6 +49,10 @@ func addCoreProperties(b *availablePropertiesBuilder) {
 		equivalent of using the global {{ template "mdCodeOrBold" "--format" }} flag. Supported output formats:
 		{{ template "mdCodeOrBold" "pretty" }}, {{ template "mdCodeOrBold" "table" }},
 		and {{ template "mdCodeOrBold" "json" }}.`)
+}
+
+func addVaultSecretsProperties(b *availablePropertiesBuilder) {
+	b.AddProperty("vault-secrets", "app_name", `App name under HCP Vault Secrets to operate on by default.`)
 }
 
 type availablePropertiesBuilder struct {

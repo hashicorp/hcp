@@ -15,11 +15,17 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/organization_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/project_service"
 	resources "github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/models"
+	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
+	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 	"github.com/manifoldco/promptui"
+)
+
+const (
+	serviceNameVaultSecrets = "Vault Secrets"
 )
 
 func NewCmdInit(ctx *cmd.Context) *cmd.Command {
@@ -30,6 +36,7 @@ func NewCmdInit(ctx *cmd.Context) *cmd.Command {
 		IAMClient:           iam_service.New(ctx.HCP, nil),
 		OrganizationService: organization_service.New(ctx.HCP, nil),
 		ProjectService:      project_service.New(ctx.HCP, nil),
+		SecretService:       preview_secret_service.New(ctx.HCP, nil),
 	}
 	cmd := &cmd.Command{
 		Name:      "init",
@@ -49,6 +56,16 @@ func NewCmdInit(ctx *cmd.Context) *cmd.Command {
 
 			return opts.run()
 		},
+		Flags: cmd.Flags{
+			Local: []*cmd.Flag{
+				{
+					Name:          "vault-secrets",
+					Description:   "Initializes Vault Secrets configuration.",
+					IsBooleanFlag: true,
+					Value:         flagvalue.Simple(false, &opts.VaultSecrets),
+				},
+			},
+		},
 	}
 	return cmd
 }
@@ -62,6 +79,10 @@ type InitOpts struct {
 	IAMClient           iam_service.ClientService
 	OrganizationService organization_service.ClientService
 	ProjectService      project_service.ClientService
+	SecretService       preview_secret_service.ClientService
+
+	// Flags
+	VaultSecrets bool
 }
 
 func (i *InitOpts) run() error {
@@ -69,7 +90,51 @@ func (i *InitOpts) run() error {
 		return fmt.Errorf("failed configuring organization and project: %w", err)
 	}
 
+	// If the user hasn't explicitly specified a service to configure, prompt to see if they would like to.
+	if err := i.serviceConfigPrompt(); err != nil {
+		return err
+	}
+
+	if i.VaultSecrets {
+		if err := i.configureVaultSecrets(); err != nil {
+			return fmt.Errorf("failed configuring profile for Vault Secrets: %w", err)
+		}
+	}
+
 	return i.Profile.Write()
+}
+
+// serviceConfigPrompt prompts the user to configure a service.
+func (i *InitOpts) serviceConfigPrompt() error {
+	if i.VaultSecrets {
+		return nil
+	}
+
+	ok, err := i.IO.PromptConfirm("\nWould you like to configure any service related config")
+	if err != nil {
+		return fmt.Errorf("failed to retrieve confirmation: %w", err)
+	}
+
+	if !ok {
+		return nil
+	}
+
+	prompt := promptui.Select{
+		Label:  "Please select the service you would like to configure",
+		Items:  []string{serviceNameVaultSecrets},
+		Stdin:  io.NopCloser(i.IO.In()),
+		Stdout: iostreams.NopWriteCloser(i.IO.Err()),
+	}
+
+	_, result, err := prompt.Run()
+	if err != nil {
+		return fmt.Errorf("service selection prompt failed: %w", err)
+	}
+
+	if result == serviceNameVaultSecrets {
+		i.VaultSecrets = true
+	}
+	return nil
 }
 
 func (i *InitOpts) configureOrgAndProject() error {
@@ -100,6 +165,68 @@ func (i *InitOpts) configureOrgAndProject() error {
 
 	i.Profile.ProjectID = projectID
 
+	return nil
+}
+
+func (i *InitOpts) configureVaultSecrets() error {
+	// Retrieve apps associated with org and project ID
+	listAppReq := preview_secret_service.NewListAppsParamsWithContext(i.Ctx)
+	listAppReq.OrganizationID = i.Profile.OrganizationID
+	listAppReq.ProjectID = i.Profile.ProjectID
+	listAppResp, err := i.SecretService.ListApps(listAppReq, nil)
+	if err != nil {
+		return err
+	}
+
+	appCount := len(listAppResp.Payload.Apps)
+	if appCount <= 0 {
+		appsCreateDoc := heredoc.New(i.IO, heredoc.WithPreserveNewlines()).Must(`
+No Vault Secrets application found. Create one and set on the active profile by issuing:
+
+	$ hcp vault-secrets apps create test-app --description="Test app"
+	$ hcp profile set vault-secrets/app_name test-app
+`)
+		fmt.Fprintf(i.IO.Err(), "\n%s\n\n", appsCreateDoc)
+		return nil
+	}
+
+	appName := listAppResp.Payload.Apps[0].Name
+	if appCount > 1 {
+		prompt := promptui.Select{
+			Label: "Multiple apps found. Please select the one you would like to configure.",
+			Items: listAppResp.Payload.Apps,
+			Templates: &promptui.SelectTemplates{
+				Active:   `> {{ .Name }}`,
+				Inactive: `{{ .Name }}`,
+				Details: `
+----- Apps -----
+{{ "Name:" | faint }}   {{ .Name }}
+{{ "Description" | faint }} {{ .Description }}
+`,
+			},
+			HideSelected: true,
+			Size:         15,
+			Stdin:        io.NopCloser(i.IO.In()),
+			Stdout:       iostreams.NopWriteCloser(i.IO.Err()),
+			Searcher: func(term string, index int) bool {
+				term = strings.ToLower(term)
+				name := strings.ToLower(listAppResp.Payload.Apps[index].Name)
+				return strings.Contains(name, term)
+			},
+		}
+
+		i, _, err := prompt.Run()
+		if err != nil {
+			return fmt.Errorf("prompt failed: %w", err)
+		}
+		appName = listAppResp.Payload.Apps[i].Name
+	}
+
+	cs := i.IO.ColorScheme()
+	fmt.Fprintf(i.IO.Err(), "%s App with name %q selected\n", cs.SuccessIcon(), appName)
+	i.Profile.VaultSecrets = &profile.VaultSecretsConf{
+		AppName: appName,
+	}
 	return nil
 }
 
