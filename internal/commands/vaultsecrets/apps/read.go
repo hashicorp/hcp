@@ -23,7 +23,6 @@ type ReadOpts struct {
 	IO      iostreams.IOStreams
 
 	AppName       string
-	Description   string
 	Client        secret_service.ClientService
 	PreviewClient preview_secret_service.ClientService
 }
@@ -55,7 +54,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 		Args: cmd.PositionalArguments{
 			Args: []cmd.PositionalArgument{
 				{
-					Name:          "APP_NAME",
+					Name:          "NAME",
 					Documentation: "The name of the app to read.",
 				},
 			},

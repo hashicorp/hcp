@@ -57,7 +57,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		Args: cmd.PositionalArguments{
 			Args: []cmd.PositionalArgument{
 				{
-					Name:          "APP_NAME",
+					Name:          "NAME",
 					Documentation: "The name of the app to create.",
 				},
 			},
