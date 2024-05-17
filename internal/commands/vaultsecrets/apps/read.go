@@ -9,6 +9,7 @@ import (
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/apps/helper"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -58,6 +59,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 					Documentation: "The name of the app to read.",
 				},
 			},
+			Autocomplete: helper.PredictAppName(ctx, ctx.Profile.OrganizationID, ctx.Profile.ProjectID, opts.PreviewClient),
 		},
 		RunF: func(c *cmd.Command, args []string) error {
 			opts.AppName = args[0]
