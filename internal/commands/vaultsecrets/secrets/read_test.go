@@ -215,7 +215,11 @@ func TestReadRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Contains(io.Output.String(), "Secret Name  Latest Version  Created At")
+			if c.OpenSecret {
+				r.Contains(io.Output.String(), "Value:          my super secret value")
+			} else {
+				r.Contains(io.Output.String(), "Secret Name:")
+			}
 		})
 	}
 }
