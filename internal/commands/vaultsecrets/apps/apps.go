@@ -24,5 +24,6 @@ func NewCmdApps(ctx *cmd.Context) *cmd.Command {
 	cmd.AddChild(NewCmdCreate(ctx, nil))
 	cmd.AddChild(NewCmdDelete(ctx, nil))
 	cmd.AddChild(NewCmdRead(ctx, nil))
+	cmd.AddChild(NewCmdList(ctx, nil))
 	return cmd
 }
