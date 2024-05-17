@@ -59,6 +59,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 			Local: []*cmd.Flag{
 				{
 					Name:          "plaintext",
+					Shorthand:     "p",
 					Description:   "Display the secret's value in plaintext.",
 					Value:         flagvalue.Simple(false, &opts.OpenSecret),
 					IsBooleanFlag: true,
@@ -111,12 +112,6 @@ func readRun(opts *ReadOpts) error {
 }
 
 func runOpenAppSecret(opts *ReadOpts) error {
-	// Table format doesn't handle large secret values well. So until that is fixed,
-	// we should not allow table format for this command.
-	if opts.Output.GetFormat() == format.Table {
-		return fmt.Errorf("table format is not supported for this command")
-	}
-
 	req := secret_service.NewOpenAppSecretParamsWithContext(opts.Ctx)
 	req.LocationOrganizationID = opts.Profile.OrganizationID
 	req.LocationProjectID = opts.Profile.ProjectID
@@ -128,16 +123,11 @@ func runOpenAppSecret(opts *ReadOpts) error {
 		return fmt.Errorf("failed to read the secret %q: %w", opts.SecretName, err)
 	}
 
-	if opts.Output.GetFormat() == format.Unset {
-		fmt.Fprintf(opts.IO.Err(), resp.Payload.Secret.Version.Value)
-		return nil
-	}
-
-	d := newDisplayer(true).OpenAppSecrets(resp.Payload.Secret)
+	d := newDisplayer(true).OpenAppSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty)
 	d.AddFields([]format.Field{
 		{
 			Name:        "Value",
-			ValueFormat: "{{.Version.Value}}",
+			ValueFormat: "{{ .Version.Value }}",
 		},
 	})
 
