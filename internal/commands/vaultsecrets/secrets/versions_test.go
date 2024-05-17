@@ -193,7 +193,7 @@ func TestVersionsRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.NotNil(io.Error.String())
+			r.Contains(io.Output.String(), "Version  Created At                     Created By ")
 		})
 	}
 }
