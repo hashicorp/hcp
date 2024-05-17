@@ -163,16 +163,14 @@ func (s *system) ReadSecret() ([]byte, error) {
 		return nil, fmt.Errorf("prompting is disabled")
 	}
 
-    go func() {
-        select {
-        case <-s.ctx.Done():
-            fmt.Fprintf(s.Err(), "\n%v\n", context.Cause(s.ctx))
+	go func() {
+		<-s.ctx.Done()
+		fmt.Fprintf(s.Err(), "\n%v\n", context.Cause(s.ctx))
 
-            os.Exit(1)
-        }
-    }()
+		os.Exit(1)
+	}()
 
-    return term.ReadPassword(int(s.in.Fd()))
+	return term.ReadPassword(int(s.in.Fd()))
 }
 
 func (s *system) PromptConfirm(prompt string) (confirmed bool, err error) {
