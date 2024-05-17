@@ -18,6 +18,7 @@ func NewCmdSecrets(ctx *cmd.Context) *cmd.Command {
 		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets" }} command group lets you
 		manage Vault Secrets application secrets.
 		`),
+		Aliases: []string{"s"},
 		Flags: cmd.Flags{
 			Persistent: []*cmd.Flag{
 				{
