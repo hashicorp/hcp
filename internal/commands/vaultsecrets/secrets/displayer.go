@@ -103,22 +103,6 @@ func (d *displayer) openAppSecretsFieldTemplate() []format.Field {
 	return fields
 }
 
-func (displayer) previewStaticSecretVersionsFieldTemplate() []format.Field {
-	return []format.Field{
-		{
-			Name:        "Version",
-			ValueFormat: "{{ .Version }}",
-		},
-		{
-			Name:        "Created At",
-			ValueFormat: "{{ .CreatedAt }}",
-		},
-		{
-			Name:        "Created By",
-			ValueFormat: "{{ .CreatedBy.Email }}",
-		},
-	}
-}
 func (d *displayer) secretsPayload() any {
 	if d.single {
 		if len(d.secrets) != 1 {
