@@ -1,7 +1,7 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package secrets
+package versions
 
 import (
 	"context"
@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewCmdVersions(t *testing.T) {
+func TestNewCmdList(t *testing.T) {
 	t.Parallel()
 
 	testSecretName := "test_secret"
@@ -42,7 +42,7 @@ func TestNewCmdVersions(t *testing.T) {
 		Args    []string
 		Profile func(t *testing.T) *profile.Profile
 		Error   string
-		Expect  *VersionsOpts
+		Expect  *ListOpts
 	}{
 		{
 			Name:    "No many args",
@@ -60,7 +60,7 @@ func TestNewCmdVersions(t *testing.T) {
 			Name:    "Good",
 			Profile: testProfile,
 			Args:    []string{"foo"},
-			Expect: &VersionsOpts{
+			Expect: &ListOpts{
 				AppName:    testProfile(t).VaultSecrets.AppName,
 				SecretName: testSecretName,
 			},
@@ -83,8 +83,8 @@ func TestNewCmdVersions(t *testing.T) {
 				ShutdownCtx: context.Background(),
 			}
 
-			var gotOpts *VersionsOpts
-			versionsCmd := NewCmdVersions(ctx, func(o *VersionsOpts) error {
+			var gotOpts *ListOpts
+			versionsCmd := NewCmdList(ctx, func(o *ListOpts) error {
 				gotOpts = o
 				gotOpts.AppName = c.Profile(t).VaultSecrets.AppName
 				gotOpts.SecretName = testSecretName
@@ -106,7 +106,7 @@ func TestNewCmdVersions(t *testing.T) {
 	}
 }
 
-func TestVersionsRun(t *testing.T) {
+func TestListRun(t *testing.T) {
 	t.Parallel()
 
 	testSecretName := "test_secret"
@@ -129,7 +129,7 @@ func TestVersionsRun(t *testing.T) {
 			ErrMsg:  "[GET] /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secrets/{secret_name}/versions][404] ListAppSecretVersions default  &{Code:5 Details:[] Message:secret not found}",
 		},
 		{
-			Name: "Success: Paginated Versions call",
+			Name: "Success: Paginated List call",
 		},
 	}
 
@@ -142,7 +142,7 @@ func TestVersionsRun(t *testing.T) {
 			io := iostreams.Test()
 			io.ErrorTTY = true
 			vs := mock_preview_secret_service.NewMockClientService(t)
-			opts := &VersionsOpts{
+			opts := &ListOpts{
 				Ctx:           context.Background(),
 				IO:            io,
 				Profile:       testProfile(t),
@@ -164,7 +164,7 @@ func TestVersionsRun(t *testing.T) {
 					Context:        opts.Ctx,
 				}, mock.Anything).Return(&preview_secret_service.ListAppSecretVersionsOK{
 					Payload: &preview_models.Secrets20231128ListAppSecretVersionsResponse{
-						StaticVersions: getMockSecretVersions(0, 10),
+						StaticVersions: getMockSecretList(0, 10),
 						Pagination: &preview_models.CommonPaginationResponse{
 							NextPageToken: paginationNextPageToken,
 						},
@@ -180,7 +180,7 @@ func TestVersionsRun(t *testing.T) {
 					PaginationNextPageToken: &paginationNextPageToken,
 				}, mock.Anything).Return(&preview_secret_service.ListAppSecretVersionsOK{
 					Payload: &preview_models.Secrets20231128ListAppSecretVersionsResponse{
-						StaticVersions: getMockSecretVersions(10, 5),
+						StaticVersions: getMockSecretList(10, 5),
 					},
 				}, nil).Once()
 			}
@@ -198,7 +198,7 @@ func TestVersionsRun(t *testing.T) {
 	}
 }
 
-func getMockSecretVersions(start, limit int) *preview_models.Secrets20231128SecretStaticVersionList {
+func getMockSecretList(start, limit int) *preview_models.Secrets20231128SecretStaticVersionList {
 	var secrets []*preview_models.Secrets20231128SecretStaticVersion
 	for i := start; i < (start + limit); i++ {
 		secrets = append(secrets, &preview_models.Secrets20231128SecretStaticVersion{

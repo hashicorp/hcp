@@ -10,13 +10,12 @@ import (
 )
 
 type displayer struct {
-	secrets                    []*models.Secrets20230613Secret
-	previewSecrets             []*preview_models.Secrets20231128Secret
-	openAppSecrets             []*models.Secrets20230613OpenSecret
-	previewStaticSecretVerions []*preview_models.Secrets20231128SecretStaticVersion
-	single                     bool
-	fields                     []format.Field
-	format                     format.Format
+	secrets        []*models.Secrets20230613Secret
+	previewSecrets []*preview_models.Secrets20231128Secret
+	openAppSecrets []*models.Secrets20230613OpenSecret
+	single         bool
+	fields         []format.Field
+	format         format.Format
 }
 
 func newDisplayer(single bool) *displayer {
@@ -38,11 +37,6 @@ func (d *displayer) PreviewSecrets(secrets ...*preview_models.Secrets20231128Sec
 
 func (d *displayer) OpenAppSecrets(secrets ...*models.Secrets20230613OpenSecret) *displayer {
 	d.openAppSecrets = secrets
-	return d
-}
-
-func (d *displayer) StaticVersions(secrets ...*preview_models.Secrets20231128SecretStaticVersion) *displayer {
-	d.previewStaticSecretVerions = secrets
 	return d
 }
 
@@ -69,10 +63,6 @@ func (d *displayer) Payload() any {
 		return d.openAppSecretsPayload()
 	}
 
-	if d.previewStaticSecretVerions != nil {
-		return d.previewStaticSecretVerionsPayload()
-	}
-
 	if d.secrets == nil {
 		return nil
 	}
@@ -82,10 +72,6 @@ func (d *displayer) Payload() any {
 func (d *displayer) FieldTemplates() []format.Field {
 	if d.openAppSecrets != nil {
 		return d.openAppSecretsFieldTemplate()
-	}
-
-	if d.previewStaticSecretVerions != nil {
-		return d.previewStaticSecretVerionsFieldTemplate()
 	}
 
 	return d.secretsFieldTemplate()
@@ -117,7 +103,7 @@ func (d *displayer) openAppSecretsFieldTemplate() []format.Field {
 	return fields
 }
 
-func (displayer) previewStaticSecretVerionsFieldTemplate() []format.Field {
+func (displayer) previewStaticSecretVersionsFieldTemplate() []format.Field {
 	return []format.Field{
 		{
 			Name:        "Version",
@@ -161,14 +147,4 @@ func (d *displayer) openAppSecretsPayload() any {
 		return d.openAppSecrets[0]
 	}
 	return d.openAppSecrets
-}
-
-func (d *displayer) previewStaticSecretVerionsPayload() any {
-	if d.single {
-		if len(d.previewStaticSecretVerions) != 1 {
-			return nil
-		}
-		return d.previewStaticSecretVerions[0]
-	}
-	return d.previewStaticSecretVerions
 }

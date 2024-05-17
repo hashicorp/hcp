@@ -12,7 +12,7 @@ import (
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-
+	appname "github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/helper"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -76,7 +76,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {
-			opts.AppName = appName
+			opts.AppName = appname.Get()
 			opts.SecretName = args[0]
 
 			if runF != nil {
