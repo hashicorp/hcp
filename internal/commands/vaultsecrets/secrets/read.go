@@ -123,7 +123,7 @@ func runOpenAppSecret(opts *ReadOpts) error {
 		return fmt.Errorf("failed to read the secret %q: %w", opts.SecretName, err)
 	}
 
-	d := newDisplayer(true).OpenAppSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty)
+	d := newDisplayer(true).OpenAppSecrets(resp.Payload.Secret)
 	d.AddFields([]format.Field{
 		{
 			Name:        "Value",
