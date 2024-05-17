@@ -4,16 +4,10 @@
 package secrets
 
 import (
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/helper"
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/versions"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
-	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
-	"github.com/hashicorp/hcp/internal/pkg/vaultsecrets"
-)
-
-var (
-	// appName is the name of the Vault Secrets application. If not specified,
-	// then the value from the active profile will be used.
-	appName string
 )
 
 func NewCmdSecrets(ctx *cmd.Context) *cmd.Command {
@@ -31,15 +25,13 @@ func NewCmdSecrets(ctx *cmd.Context) *cmd.Command {
 					DisplayValue: "NAME",
 					Description:  "The name of the Vault Secrets application. If not specified, the value from the active profile will be used.",
 					Shorthand:    "a",
-					Value:        flagvalue.Simple("", &appName),
+					Value:        helper.AppNameFlag(),
 				},
 			},
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
-			if appName == "" && ctx.Profile.VaultSecrets != nil {
-				appName = ctx.Profile.VaultSecrets.AppName
-			}
-			return vaultsecrets.RequireVaultSecretsAppName(ctx, appName)
+
+			return helper.RequireVaultSecretsAppName(ctx)
 		},
 	}
 
@@ -47,6 +39,7 @@ func NewCmdSecrets(ctx *cmd.Context) *cmd.Command {
 	cmd.AddChild(NewCmdRead(ctx, nil))
 	cmd.AddChild(NewCmdDelete(ctx, nil))
 	cmd.AddChild(NewCmdList(ctx, nil))
-	cmd.AddChild(NewCmdVersions(ctx, nil))
+
+	cmd.AddChild(versions.NewCmdVersions(ctx))
 	return cmd
 }
