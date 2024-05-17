@@ -101,17 +101,17 @@ func createRun(opts *CreateOpts) error {
 		return fmt.Errorf("failed to create application: %w", err)
 	}
 
-	if opts.Output.GetFormat() == format.Unset {
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully created application with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.AppName)
-
-		command := fmt.Sprintf(`$ hcp vault-secrets secrets create <secret name> --app %s --data-file <path to secret>`, opts.AppName)
-
-		fmt.Fprintln(opts.IO.Err())
-		fmt.Fprintf(opts.IO.Err(), `To create a secret in the app, run:
-  %s`, opts.IO.ColorScheme().String(command).Bold())
-		fmt.Fprintln(opts.IO.Err())
-		return nil
+	if err := opts.Output.Display(newDisplayer(true, resp.Payload.App)); err != nil {
+		return err
 	}
 
-	return opts.Output.Display(newDisplayer(true, resp.Payload.App))
+	command := fmt.Sprintf(`$ hcp vault-secrets secrets create <secret name> --app %s --data-file <path to secret>`, opts.AppName)
+
+	fmt.Fprintln(opts.IO.Err())
+	fmt.Fprintf(opts.IO.Err(), "%s Successfully created application with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.AppName)
+	fmt.Fprintln(opts.IO.Err())
+	fmt.Fprintf(opts.IO.Err(), `To create a secret in the app, run:
+  %s`, opts.IO.ColorScheme().String(command).Bold())
+	fmt.Fprintln(opts.IO.Err())
+	return nil
 }
