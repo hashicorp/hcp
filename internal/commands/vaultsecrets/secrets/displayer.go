@@ -4,14 +4,14 @@
 package secrets
 
 import (
-	preview_secret_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
+	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 )
 
 type displayer struct {
 	secrets        []*models.Secrets20230613Secret
-	previewSecrets []*preview_secret_models.Secrets20231128Secret
+	previewSecrets []*preview_models.Secrets20231128Secret
 	openAppSecrets []*models.Secrets20230613OpenSecret
 	single         bool
 	fields         []format.Field
@@ -30,7 +30,7 @@ func (d *displayer) Secrets(secrets ...*models.Secrets20230613Secret) *displayer
 	return d
 }
 
-func (d *displayer) PreviewSecrets(secrets ...*preview_secret_models.Secrets20231128Secret) *displayer {
+func (d *displayer) PreviewSecrets(secrets ...*preview_models.Secrets20231128Secret) *displayer {
 	d.previewSecrets = secrets
 	return d
 }
