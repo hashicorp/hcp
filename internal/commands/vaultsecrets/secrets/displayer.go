@@ -15,11 +15,13 @@ type displayer struct {
 	openAppSecrets []*models.Secrets20230613OpenSecret
 	single         bool
 	fields         []format.Field
+	format         format.Format
 }
 
 func newDisplayer(single bool) *displayer {
 	return &displayer{
 		single: single,
+		format: format.Table,
 	}
 }
 
@@ -43,8 +45,13 @@ func (d *displayer) AddFields(fields []format.Field) []format.Field {
 	return d.fields
 }
 
+func (d *displayer) SetDefaultFormat(f format.Format) *displayer {
+	d.format = f
+	return d
+}
+
 func (d *displayer) DefaultFormat() format.Format {
-	return format.Table
+	return d.format
 }
 
 func (d *displayer) Payload() any {

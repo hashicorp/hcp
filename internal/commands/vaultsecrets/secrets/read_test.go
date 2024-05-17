@@ -122,15 +122,8 @@ func TestReadRun(t *testing.T) {
 		RespErr    bool
 		OpenSecret bool
 		ErrMsg     string
-		Format     format.Format
 		MockCalled bool
 	}{
-		{
-			Name:       "Failed: Read plaintext secret as table format specified",
-			OpenSecret: true,
-			ErrMsg:     "table format is not supported for this command",
-			Format:     format.Table,
-		},
 		{
 			Name:       "Failed: Secret not found",
 			RespErr:    true,
@@ -169,7 +162,6 @@ func TestReadRun(t *testing.T) {
 				SecretName: testSecretName,
 				OpenSecret: c.OpenSecret,
 			}
-			opts.Output.SetFormat(c.Format)
 
 			if c.MockCalled {
 				if c.RespErr {
@@ -224,7 +216,7 @@ func TestReadRun(t *testing.T) {
 
 			r.NoError(err)
 			if c.OpenSecret {
-				r.Equal(io.Error.String(), "my super secret value")
+				r.Contains(io.Output.String(), "Value:          my super secret value")
 			} else {
 				r.Contains(io.Output.String(), "Secret Name  Latest Version  Created At")
 			}
