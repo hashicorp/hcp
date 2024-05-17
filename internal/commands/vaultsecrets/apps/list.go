@@ -5,6 +5,8 @@ package apps
 
 import (
 	"context"
+	"fmt"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
@@ -37,7 +39,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "list",
-		ShortHelp: "List applications.",
+		ShortHelp: "List Vault Secrets applications.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets apps list" }} command list all Vault Secrets applications.
 		`),
@@ -56,4 +58,31 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 			return listRun(opts)
 		},
 	}
+	return cmd
+}
+
+func listRun(opts *ListOpts) error {
+	params := &preview_secret_service.ListAppsParams{
+		Context:        opts.Ctx,
+		ProjectID:      opts.Profile.ProjectID,
+		OrganizationID: opts.Profile.OrganizationID,
+	}
+
+	var apps []*models.Secrets20231128App
+	for {
+		resp, err := opts.PreviewClient.ListApps(params, nil)
+
+		if err != nil {
+			return fmt.Errorf("failed to list apps: %w", err)
+		}
+
+		apps = append(apps, resp.Payload.Apps...)
+		if resp.Payload.Pagination == nil || resp.Payload.Pagination.NextPageToken == "" {
+			break
+		}
+
+		next := resp.Payload.Pagination.NextPageToken
+		params.PaginationNextPageToken = &next
+	}
+	return opts.Output.Display(newDisplayerPreview(false, apps...))
 }
