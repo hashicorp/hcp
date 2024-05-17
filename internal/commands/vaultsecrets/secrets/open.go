@@ -57,7 +57,7 @@ func NewCmdOpen(ctx *cmd.Context, runF func(*OpenOpts) error) *cmd.Command {
 					Name:         "out-file",
 					DisplayValue: "OUTPUT_FILE_PATH",
 					Shorthand:    "o",
-					Description:  "File path where the secret values should be written.",
+					Description:  "File path where the secret value should be written.",
 					Value:        flagvalue.Simple("", &opts.OutputFilePath),
 				},
 			},
