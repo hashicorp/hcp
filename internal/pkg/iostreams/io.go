@@ -12,7 +12,9 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	"github.com/muesli/termenv"
 	"golang.org/x/term"
@@ -156,14 +158,46 @@ func (s *system) ReadSecret() ([]byte, error) {
 		return nil, fmt.Errorf("prompting is disabled")
 	}
 
-	go func() {
-		<-s.ctx.Done()
-		fmt.Fprintf(s.Err(), "\n%v\n", context.Cause(s.ctx))
+	fd := int(s.in.Fd())
 
-		os.Exit(1)
+	// Store and restore the terminal status on interruptions to
+	// avoid that the terminal remains in the password state
+	// This is necessary as for https://github.com/golang/go/issues/31180
+	oldState, err := term.GetState(fd)
+	if err != nil {
+		return make([]byte, 0), err
+	}
+
+	type Buffer struct {
+		Buffer []byte
+		Error  error
+	}
+	errorChannel := make(chan Buffer, 1)
+
+	// SIGINT and SIGTERM restore the terminal, otherwise the no-echo mode would remain intact
+	interruptChannel := make(chan os.Signal, 1)
+	signal.Notify(interruptChannel, syscall.SIGINT, syscall.SIGTERM)
+	defer func() {
+		signal.Stop(interruptChannel)
+		close(interruptChannel)
+	}()
+	go func() {
+		for range interruptChannel {
+			if oldState != nil {
+				_ = term.Restore(fd, oldState)
+			}
+			errorChannel <- Buffer{Buffer: make([]byte, 0), Error: ErrInterrupt}
+		}
 	}()
 
-	return term.ReadPassword(int(s.in.Fd()))
+	go func() {
+		buf, err := term.ReadPassword(fd)
+		errorChannel <- Buffer{Buffer: buf, Error: err}
+	}()
+
+	buf := <-errorChannel
+
+	return buf.Buffer, buf.Error
 }
 
 func (s *system) PromptConfirm(prompt string) (confirmed bool, err error) {
