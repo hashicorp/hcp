@@ -32,10 +32,7 @@ func NewCmdVersions(ctx *cmd.Context, runF func(*VersionsOpts) error) *cmd.Comma
 		Name:      "versions",
 		ShortHelp: "List an application's secret versions.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets versions" }} command versions all secrets under a Vault Secrets application.
-
-		Individual secrets can be read using
-		{{ template "mdCodeOrBold" "hcp vault-secrets secrets read" }} subcommand.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets versions" }} command lists all versions for a secret under a Vault Secrets application.
 		`),
 		Args: cmd.PositionalArguments{
 			Args: []cmd.PositionalArgument{
