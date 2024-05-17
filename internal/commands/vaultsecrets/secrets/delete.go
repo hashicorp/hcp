@@ -49,7 +49,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 		Args: cmd.PositionalArguments{
 			Args: []cmd.PositionalArgument{
 				{
-					Name:          "SECRET_NAME",
+					Name:          "NAME",
 					Documentation: "The name of the secret to create.",
 				},
 			},

@@ -12,53 +12,65 @@ import (
 type displayer struct {
 	secrets        []*models.Secrets20230613Secret
 	previewSecrets []*preview_models.Secrets20231128Secret
+	openAppSecrets []*models.Secrets20230613OpenSecret
 	single         bool
+	fields         []format.Field
+	format         format.Format
 }
 
-func newDisplayer(single bool, secrets ...*models.Secrets20230613Secret) *displayer {
+func newDisplayer(single bool) *displayer {
 	return &displayer{
-		secrets: secrets,
-		single:  single,
+		single: single,
+		format: format.Table,
 	}
 }
 
-func newDisplayerPreview(single bool, secrets ...*preview_models.Secrets20231128Secret) *displayer {
-	return &displayer{
-		previewSecrets: secrets,
-		single:         single,
-	}
+func (d *displayer) Secrets(secrets ...*models.Secrets20230613Secret) *displayer {
+	d.secrets = secrets
+	return d
+}
+
+func (d *displayer) PreviewSecrets(secrets ...*preview_models.Secrets20231128Secret) *displayer {
+	d.previewSecrets = secrets
+	return d
+}
+
+func (d *displayer) OpenAppSecrets(secrets ...*models.Secrets20230613OpenSecret) *displayer {
+	d.openAppSecrets = secrets
+	return d
+}
+
+func (d *displayer) AddFields(fields []format.Field) []format.Field {
+	d.fields = append(d.fields, fields...)
+	return d.fields
+}
+
+func (d *displayer) SetDefaultFormat(f format.Format) *displayer {
+	d.format = f
+	return d
 }
 
 func (d *displayer) DefaultFormat() format.Format {
-	return format.Table
+	return d.format
 }
 
 func (d *displayer) Payload() any {
 	if d.previewSecrets != nil {
-		if d.single {
-			if len(d.previewSecrets) != 1 {
-				return nil
-			}
-
-			return d.previewSecrets[0]
-		}
-
-		return d.previewSecrets
+		return d.previewSecretsPayload()
 	}
 
-	if d.single {
-		if len(d.secrets) != 1 {
-			return nil
-		}
-
-		return d.secrets[0]
+	if d.openAppSecrets != nil {
+		return d.openAppSecretsPayload()
 	}
 
-	return d.secrets
+	if d.secrets == nil {
+		return nil
+	}
+	return d.secretsPayload()
 }
 
 func (d *displayer) FieldTemplates() []format.Field {
-	return []format.Field{
+	fields := []format.Field{
 		{
 			Name:        "Secret Name",
 			ValueFormat: "{{ .Name }}",
@@ -72,4 +84,36 @@ func (d *displayer) FieldTemplates() []format.Field {
 			ValueFormat: "{{ .CreatedAt }}",
 		},
 	}
+	fields = append(fields, d.fields...)
+	return fields
+}
+
+func (d *displayer) secretsPayload() any {
+	if d.single {
+		if len(d.secrets) != 1 {
+			return nil
+		}
+		return d.secrets[0]
+	}
+	return d.secrets
+}
+
+func (d *displayer) previewSecretsPayload() any {
+	if d.single {
+		if len(d.previewSecrets) != 1 {
+			return nil
+		}
+		return d.previewSecrets[0]
+	}
+	return d.previewSecrets
+}
+
+func (d *displayer) openAppSecretsPayload() any {
+	if d.single {
+		if len(d.openAppSecrets) != 1 {
+			return nil
+		}
+		return d.openAppSecrets[0]
+	}
+	return d.openAppSecrets
 }

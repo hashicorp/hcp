@@ -60,7 +60,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		Args: cmd.PositionalArguments{
 			Args: []cmd.PositionalArgument{
 				{
-					Name:          "SECRET_NAME",
+					Name:          "NAME",
 					Documentation: "The name of the secret to create.",
 				},
 			},
@@ -123,19 +123,18 @@ func createRun(opts *CreateOpts) error {
 		return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 	}
 
-	if opts.Output.GetFormat() == format.Unset {
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully created secret with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
-
-		command := fmt.Sprintf(`$ hcp vault-secrets secrets read %s --app %s`, opts.SecretName, req.AppName)
-
-		fmt.Fprintln(opts.IO.Err())
-		fmt.Fprintf(opts.IO.Err(), `To read your secret, run:
-  %s`, opts.IO.ColorScheme().String(command).Bold())
-		fmt.Fprintln(opts.IO.Err())
-		return nil
+	if err := opts.Output.Display(newDisplayer(true).Secrets(resp.Payload.Secret)); err != nil {
+		return err
 	}
 
-	return opts.Output.Display(newDisplayer(true, resp.Payload.Secret))
+	command := fmt.Sprintf(`$ hcp vault-secrets secrets read %s --app %s`, opts.SecretName, req.AppName)
+	fmt.Fprintln(opts.IO.Err())
+	fmt.Fprintf(opts.IO.Err(), "%s Successfully created secret with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
+	fmt.Fprintln(opts.IO.Err())
+	fmt.Fprintf(opts.IO.Err(), `To read your secret, run:
+  %s`, opts.IO.ColorScheme().String(command).Bold())
+	fmt.Fprintln(opts.IO.Err())
+	return nil
 }
 
 func readPlainTextSecret(opts *CreateOpts) error {
