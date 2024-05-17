@@ -9,6 +9,7 @@ package iostreams
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -19,6 +20,8 @@ import (
 	"github.com/muesli/termenv"
 	"golang.org/x/term"
 )
+
+var ErrInterrupt = errors.New("interrupted")
 
 // IOStreams is an interface for interacting with IO and general terminal
 // output. Commands should not directly interact with os.Stdout/Stderr/Stdin but
