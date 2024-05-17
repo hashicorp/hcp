@@ -34,7 +34,7 @@ func main() {
 func realMain() int {
 	args := os.Args[1:]
 
-	// Listen for interupts
+	// Listen for interrupts
 	shutdownCtx, shutdown := context.WithCancelCause(context.Background())
 	defer shutdown(nil)
 	go func() {
