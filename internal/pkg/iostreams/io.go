@@ -157,12 +157,10 @@ func (s *system) ReadSecret() ([]byte, error) {
 	}
 
 	go func() {
-		select {
-		case <-s.ctx.Done():
-			fmt.Fprintf(s.Err(), "\n%v\n", context.Cause(s.ctx))
+		<-s.ctx.Done()
+		fmt.Fprintf(s.Err(), "\n%v\n", context.Cause(s.ctx))
 
-			os.Exit(1)
-		}
+		os.Exit(1)
 	}()
 
 	return term.ReadPassword(int(s.in.Fd()))
