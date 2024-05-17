@@ -1,7 +1,7 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package secrets
+package versions
 
 import (
 	"context"
@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
 
+	appname "github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/helper"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -18,8 +19,8 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
 
-func NewCmdVersions(ctx *cmd.Context, runF func(*VersionsOpts) error) *cmd.Command {
-	opts := &VersionsOpts{
+func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
+	opts := &ListOpts{
 		Ctx:           ctx.ShutdownCtx,
 		Profile:       ctx.Profile,
 		IO:            ctx.IO,
@@ -29,10 +30,10 @@ func NewCmdVersions(ctx *cmd.Context, runF func(*VersionsOpts) error) *cmd.Comma
 	}
 
 	cmd := &cmd.Command{
-		Name:      "versions",
+		Name:      "list",
 		ShortHelp: "List an application's secret versions.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets versions" }} command lists all versions for a secret under a Vault Secrets application.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets versions list" }} command lists all versions for a secret under a Vault Secrets application.
 		`),
 		Args: cmd.PositionalArguments{
 			Args: []cmd.PositionalArgument{
@@ -57,9 +58,8 @@ func NewCmdVersions(ctx *cmd.Context, runF func(*VersionsOpts) error) *cmd.Comma
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {
-			opts.AppName = appName
 			opts.SecretName = args[0]
-
+			opts.AppName = appname.Get()
 			if runF != nil {
 				return runF(opts)
 			}
@@ -70,7 +70,7 @@ func NewCmdVersions(ctx *cmd.Context, runF func(*VersionsOpts) error) *cmd.Comma
 	return cmd
 }
 
-type VersionsOpts struct {
+type ListOpts struct {
 	Ctx     context.Context
 	Profile *profile.Profile
 	IO      iostreams.IOStreams
@@ -82,7 +82,7 @@ type VersionsOpts struct {
 	Client        secret_service.ClientService
 }
 
-func versionsRun(opts *VersionsOpts) error {
+func versionsRun(opts *ListOpts) error {
 	req := preview_secret_service.NewListAppSecretVersionsParamsWithContext(opts.Ctx)
 	req.OrganizationID = opts.Profile.OrganizationID
 	req.ProjectID = opts.Profile.ProjectID
