@@ -47,7 +47,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 			{
 				Preamble: `Create a new secret in Vault Secrets application by piping the plaintext secret from a command output:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
-				$ echo "my super secret" | hcp vault-secrets secrets create secret_2 --data-file=-
+				$ echo -n "my super secret" | hcp vault-secrets secrets create secret_2 --data-file=-
 				`),
 			},
 			{

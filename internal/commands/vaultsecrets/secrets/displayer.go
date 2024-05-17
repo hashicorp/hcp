@@ -10,12 +10,13 @@ import (
 )
 
 type displayer struct {
-	secrets        []*models.Secrets20230613Secret
-	previewSecrets []*preview_models.Secrets20231128Secret
-	openAppSecrets []*models.Secrets20230613OpenSecret
-	single         bool
-	fields         []format.Field
-	format         format.Format
+	secrets                    []*models.Secrets20230613Secret
+	previewSecrets             []*preview_models.Secrets20231128Secret
+	openAppSecrets             []*models.Secrets20230613OpenSecret
+	previewStaticSecretVerions []*preview_models.Secrets20231128SecretStaticVersion
+	single                     bool
+	fields                     []format.Field
+	format                     format.Format
 }
 
 func newDisplayer(single bool) *displayer {
@@ -37,6 +38,11 @@ func (d *displayer) PreviewSecrets(secrets ...*preview_models.Secrets20231128Sec
 
 func (d *displayer) OpenAppSecrets(secrets ...*models.Secrets20230613OpenSecret) *displayer {
 	d.openAppSecrets = secrets
+	return d
+}
+
+func (d *displayer) StaticVersions(secrets ...*preview_models.Secrets20231128SecretStaticVersion) *displayer {
+	d.previewStaticSecretVerions = secrets
 	return d
 }
 
@@ -63,6 +69,10 @@ func (d *displayer) Payload() any {
 		return d.openAppSecretsPayload()
 	}
 
+	if d.previewStaticSecretVerions != nil {
+		return d.previewStaticSecretVerionsPayload()
+	}
+
 	if d.secrets == nil {
 		return nil
 	}
@@ -70,7 +80,19 @@ func (d *displayer) Payload() any {
 }
 
 func (d *displayer) FieldTemplates() []format.Field {
-	fields := []format.Field{
+	if d.openAppSecrets != nil {
+		return d.openAppSecretsFieldTemplate()
+	}
+
+	if d.previewStaticSecretVerions != nil {
+		return d.previewStaticSecretVerionsFieldTemplate()
+	}
+
+	return d.secretsFieldTemplate()
+}
+
+func (d *displayer) secretsFieldTemplate() []format.Field {
+	return []format.Field{
 		{
 			Name:        "Secret Name",
 			ValueFormat: "{{ .Name }}",
@@ -84,10 +106,33 @@ func (d *displayer) FieldTemplates() []format.Field {
 			ValueFormat: "{{ .CreatedAt }}",
 		},
 	}
-	fields = append(fields, d.fields...)
+}
+
+func (d *displayer) openAppSecretsFieldTemplate() []format.Field {
+	fields := d.secretsFieldTemplate()
+	fields = append(fields, format.Field{
+		Name:        "Value",
+		ValueFormat: "{{ .Version.Value }}",
+	})
 	return fields
 }
 
+func (displayer) previewStaticSecretVerionsFieldTemplate() []format.Field {
+	return []format.Field{
+		{
+			Name:        "Version",
+			ValueFormat: "{{ .Version }}",
+		},
+		{
+			Name:        "Created At",
+			ValueFormat: "{{ .CreatedAt }}",
+		},
+		{
+			Name:        "Created By",
+			ValueFormat: "{{ .CreatedBy.Email }}",
+		},
+	}
+}
 func (d *displayer) secretsPayload() any {
 	if d.single {
 		if len(d.secrets) != 1 {
@@ -116,4 +161,14 @@ func (d *displayer) openAppSecretsPayload() any {
 		return d.openAppSecrets[0]
 	}
 	return d.openAppSecrets
+}
+
+func (d *displayer) previewStaticSecretVerionsPayload() any {
+	if d.single {
+		if len(d.previewStaticSecretVerions) != 1 {
+			return nil
+		}
+		return d.previewStaticSecretVerions[0]
+	}
+	return d.previewStaticSecretVerions
 }
