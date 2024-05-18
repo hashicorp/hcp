@@ -7,9 +7,10 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
+	"strings"
 	"text/template"
 
-	"github.com/rodaine/table"
+	"github.com/hashicorp/hcp/internal/pkg/table"
 )
 
 // TableFormatter is an optional interface to implement to customize how a table
@@ -28,17 +29,18 @@ func (o *Outputter) outputTable(d Displayer) error {
 		headers[i] = f.Name
 	}
 
-	// Instantiate the header and apply default formatting.
-	tbl := table.New(headers...)
-	tbl.WithWriter(o.io.Out())
-	tbl.WithFirstColumnFormatter(o.defaultFirstColumnFormatter())
-	tbl.WithHeaderFormatter(o.defaultHeaderFormatter())
+	// Create the table outputter
+	tbl := table.New()
+	tbl.AddRow(headers...)
+	tbl.Wrap = true
+	tbl.MaxColWidth = uint(o.io.TerminalWidth() / len(headers))
+	tbl.HeaderFormatter = o.defaultHeaderFormatter
+	tbl.FirstColumnFormatter = o.defaultFirstColumnFormatter
 
 	// If the displayer has implemented the table formatter, then use it.
-	formatter, ok := d.(TableFormatter)
-	if ok {
-		tbl.WithFirstColumnFormatter(wrapFormatter(formatter.FirstColumnFormatter))
-		tbl.WithHeaderFormatter(wrapFormatter(formatter.HeaderFormatter))
+	if formatter, ok := d.(TableFormatter); ok {
+		tbl.HeaderFormatter = formatter.FirstColumnFormatter
+		tbl.FirstColumnFormatter = formatter.HeaderFormatter
 	}
 
 	// Get the payload
@@ -50,7 +52,7 @@ func (o *Outputter) outputTable(d Displayer) error {
 	}
 
 	// Build the rows
-	var rows [][]string
+	var rows [][]interface{}
 	rv := reflect.ValueOf(p)
 
 	// If the payload is a slice, render each row and add it to the table.
@@ -74,45 +76,35 @@ func (o *Outputter) outputTable(d Displayer) error {
 		rows = append(rows, row)
 	}
 
+	for _, row := range rows {
+		tbl.AddRow(row...)
+	}
+
 	// Output the table
-	tbl.SetRows(rows)
-	tbl.Print()
+	fmt.Fprintln(o.io.Out(), tbl.String())
 	return nil
 }
 
 // defaultHeaderFormatter is the default header formatter which prints the
 // header in green.
-func (o *Outputter) defaultHeaderFormatter() func(string, ...interface{}) string {
-	return func(format string, vals ...interface{}) string {
-		cs := o.io.ColorScheme()
-		formatted := fmt.Sprintf(format, vals...)
-		return cs.String(formatted).Color(cs.Green()).Underline().String()
-	}
+func (o *Outputter) defaultHeaderFormatter(input string) string {
+	nonPadded := strings.TrimRight(input, " ")
+	cs := o.io.ColorScheme()
+	return cs.String(nonPadded).Color(cs.Green()).Underline().String() +
+		strings.Repeat(" ", len(input)-len(nonPadded))
 }
 
 // defaultFirstColumnFormatter is the default first column formatter which
 // prints the column in yellow.
-func (o *Outputter) defaultFirstColumnFormatter() func(string, ...interface{}) string {
-	return func(format string, vals ...interface{}) string {
-		cs := o.io.ColorScheme()
-		formatted := fmt.Sprintf(format, vals...)
-		return cs.String(formatted).Color(cs.Yellow()).String()
-	}
-}
-
-// wrapFormatter wraps a TableFormatter function to be the type expected by our
-// table implementation.
-func wrapFormatter(formatter func(string) string) func(string, ...interface{}) string {
-	return func(format string, vals ...interface{}) string {
-		formatted := fmt.Sprintf(format, vals...)
-		return formatter(formatted)
-	}
+func (o *Outputter) defaultFirstColumnFormatter(input string) string {
+	cs := o.io.ColorScheme()
+	return cs.String(input).Color(cs.Yellow()).String()
 }
 
 // renderRow renders each field by executing the text/template given the
 // payload.
-func renderRow(p any, fields []Field) ([]string, error) {
-	renderedFields := make([]string, len(fields))
+func renderRow(p any, fields []Field) ([]interface{}, error) {
+	renderedFields := make([]interface{}, len(fields))
 	for i, f := range fields {
 		tmpl, err := template.New("hcp").Parse(f.ValueFormat)
 		if err != nil {

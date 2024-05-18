@@ -78,6 +78,8 @@ func listRun(opts *ListOpts) error {
 		next := resp.Payload.Pagination.NextPageToken
 		req.PaginationNextPageToken = &next
 	}
+	roles[0].ID = strings.Repeat("blah blah ", 15)
+	roles[0].Description = strings.Repeat("super long text ", 100)
 
 	return opts.Output.Display(rolesDisplayer(sortRolesByID(roles)))
 }

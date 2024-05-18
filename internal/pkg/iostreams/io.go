@@ -18,6 +18,12 @@ import (
 	"golang.org/x/term"
 )
 
+const (
+	// TerminalDefaultWidth is the default width of the terminal if the width
+	// cannot be determined.
+	TerminalDefaultWidth = 80
+)
+
 // IOStreams is an interface for interacting with IO and general terminal
 // output. Commands should not directly interact with os.Stdout/Stderr/Stdin but
 // utilize the passed IOStreams.
@@ -59,6 +65,9 @@ type IOStreams interface {
 
 	// IsErrorTTY returns whether the error output is a TTY
 	IsErrorTTY() bool
+
+	// TerminalWidth returns the width of the terminal that controls the process
+	TerminalWidth() int
 
 	// CanPrompt returns true if prompting is available. Both the input and
 	// error output must be a TTY for this to return true as well as SetQuiet
@@ -231,6 +240,20 @@ func (s *system) IsErrorTTY() bool {
 
 func (s *system) CanPrompt() bool {
 	return !s.quiet && s.IsErrorTTY() && s.IsInputTTY()
+}
+
+// TerminalWidth returns the width of the terminal that controls the process
+func (s *system) TerminalWidth() int {
+	if !s.IsOutputTTY() {
+		return TerminalDefaultWidth
+	}
+
+	width, _, err := term.GetSize(int(s.out.TTY().Fd()))
+	if err != nil {
+		return TerminalDefaultWidth
+	}
+
+	return width
 }
 
 func (s *system) RestoreConsole() error {

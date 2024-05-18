@@ -147,6 +147,10 @@ func (t *Testing) CanPrompt() bool {
 	return !t.quiet && t.IsErrorTTY() && t.IsInputTTY()
 }
 
+func (t *Testing) TerminalWidth() int {
+	return TerminalDefaultWidth
+}
+
 // nopCloser wraps an io.Writer with a Close method
 type nopCloser struct{ io.Writer }
 
