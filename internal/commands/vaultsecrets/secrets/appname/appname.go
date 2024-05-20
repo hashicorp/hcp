@@ -1,7 +1,7 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package helper
+package appname
 
 import (
 	"errors"
@@ -26,14 +26,14 @@ func Get() string {
 	return appName
 }
 
-// AppNameFlag returns a flag value for the Vault Secrets application name.
-func AppNameFlag() flagvalue.Value {
+// Flag returns a flag value for the Vault Secrets application name.
+func Flag() flagvalue.Value {
 	return flagvalue.Simple("", &appName)
 }
 
-// RequireVaultSecretsAppName requires that the profile has a set organization and project ID along with
+// Require requires that the profile has a set organization and project ID along with
 // the Vault Secrets application name.
-func RequireVaultSecretsAppName(ctx *cmd.Context) error {
+func Require(ctx *cmd.Context) error {
 	err := cmd.RequireOrgAndProject(ctx)
 	if err != nil {
 		return err
