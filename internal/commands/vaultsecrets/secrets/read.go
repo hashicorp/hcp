@@ -55,7 +55,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 					Documentation: "The name of the secret to read.",
 				},
 			},
-			Autocomplete: helper.PredictSecretName(ctx, ctx.Profile.OrganizationID, ctx.Profile.ProjectID, appname.Get(), opts.PreviewClient),
+			Autocomplete: helper.PredictSecretName(ctx, ctx.Profile.OrganizationID, ctx.Profile.ProjectID, opts.PreviewClient),
 		},
 		RunF: func(c *cmd.Command, args []string) error {
 			opts.AppName = appname.Get()
