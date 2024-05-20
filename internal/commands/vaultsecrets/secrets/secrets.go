@@ -4,7 +4,7 @@
 package secrets
 
 import (
-	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/helper"
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/versions"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -25,13 +25,12 @@ func NewCmdSecrets(ctx *cmd.Context) *cmd.Command {
 					DisplayValue: "NAME",
 					Description:  "The name of the Vault Secrets application. If not specified, the value from the active profile will be used.",
 					Shorthand:    "a",
-					Value:        helper.AppNameFlag(),
+					Value:        appname.Flag(),
 				},
 			},
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
-
-			return helper.RequireVaultSecretsAppName(ctx)
+			return appname.Require(ctx)
 		},
 	}
 
