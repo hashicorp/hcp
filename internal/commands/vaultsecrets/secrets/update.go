@@ -5,10 +5,7 @@ package secrets
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"io"
-	"os"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
@@ -21,8 +18,8 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
 
-func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
-	opts := &CreateOpts{
+func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
+	opts := &UpdateOpts{
 		Ctx:           ctx.ShutdownCtx,
 		Profile:       ctx.Profile,
 		IO:            ctx.IO,
@@ -32,28 +29,21 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 	}
 
 	cmd := &cmd.Command{
-		Name:      "create",
-		ShortHelp: "Create a new static secret.",
+		Name:      "delete",
+		ShortHelp: "Update a static secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create" }} command creates a new static secret under an Vault Secrets application.
-		`),
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets delete" }} command updates a static secret under an Vault Secrets application.`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Create a new secret in Vault Secrets application on active profile:`,
+				Preamble: `Update a secret from Vault Secrets application on active profile:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp vault-secrets secrets create secret_1 --data-file=tmp/secrets1.txt
+				$ hcp vault-secrets secrets update secret_1
 				`),
 			},
 			{
-				Preamble: `Create a new secret in Vault Secrets application by piping the plaintext secret from a command output:`,
+				Preamble: `Update a secret from specified Vault Secrets application:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
-				$ echo -n "my super secret" | hcp vault-secrets secrets create secret_2 --data-file=-
-				`),
-			},
-			{
-				Preamble: `Create a new secret in the specified Vault Secrets application:`,
-				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
-				$ hcp vault-secrets secrets create secret_3 --app test-app --secret_file=/tmp/secrets2.txt
+				$ hcp vault-secrets secrets update secret_2 --app test-app
 				`),
 			},
 		},
@@ -61,7 +51,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 			Args: []cmd.PositionalArgument{
 				{
 					Name:          "NAME",
-					Documentation: "The name of the secret to create.",
+					Documentation: "The name of the secret to update.",
 				},
 			},
 		},
@@ -82,14 +72,14 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 			if runF != nil {
 				return runF(opts)
 			}
-			return createRun(opts)
+			return updateRun(opts)
 		},
 	}
 
 	return cmd
 }
 
-type CreateOpts struct {
+type UpdateOpts struct {
 	Ctx     context.Context
 	Profile *profile.Profile
 	IO      iostreams.IOStreams
@@ -103,8 +93,17 @@ type CreateOpts struct {
 	Client               secret_service.ClientService
 }
 
-func createRun(opts *CreateOpts) error {
-	var err error
+func updateRun(opts *UpdateOpts) error {
+	getReq := secret_service.NewGetAppSecretParamsWithContext(opts.Ctx)
+	getReq.LocationOrganizationID = opts.Profile.OrganizationID
+	getReq.LocationProjectID = opts.Profile.ProjectID
+	getReq.AppName = opts.AppName
+	getReq.SecretName = opts.SecretName
+
+	_, err := opts.Client.GetAppSecret(getReq, nil)
+	if err != nil {
+		return fmt.Errorf("failed to get the secret %q: %w", opts.SecretName, err)
+	}
 
 	opts.SecretValuePlaintext, err = readPlainTextSecret(opts.SecretValuePlaintext, opts.SecretFilePath, opts.IO.In())
 	if err != nil {
@@ -125,56 +124,16 @@ func createRun(opts *CreateOpts) error {
 	if err != nil {
 		return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 	}
-
 	if err := opts.Output.Display(newDisplayer(true).Secrets(resp.Payload.Secret)); err != nil {
 		return err
 	}
 
 	command := fmt.Sprintf(`$ hcp vault-secrets secrets read %s --app %s`, opts.SecretName, req.AppName)
 	fmt.Fprintln(opts.IO.Err())
-	fmt.Fprintf(opts.IO.Err(), "%s Successfully created secret with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
+	fmt.Fprintf(opts.IO.Err(), "%s Successfully updated secret with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
 	fmt.Fprintln(opts.IO.Err())
 	fmt.Fprintf(opts.IO.Err(), `To read your secret, run:
   %s`, opts.IO.ColorScheme().String(command).Bold())
 	fmt.Fprintln(opts.IO.Err())
 	return nil
-}
-
-func readPlainTextSecret(plaintextSecret, secretFilePath string, r io.Reader) (string, error) {
-	// If the secret value is provided, then we don't need to read it from the file
-	// this is used for making testing easier without needing to create a file
-	if plaintextSecret != "" {
-		return plaintextSecret, nil
-	}
-
-	if secretFilePath == "" {
-		return "", errors.New("data file path is required")
-	}
-
-	if secretFilePath == "-" {
-		plaintextSecretBytes, err := io.ReadAll(r)
-		if err != nil {
-			return "", fmt.Errorf("failed to read the plaintext secret: %w", err)
-		}
-
-		if len(plaintextSecretBytes) == 0 {
-			return "", errors.New("secret value cannot be empty")
-		}
-		return string(plaintextSecretBytes), nil
-	}
-
-	fileInfo, err := os.Stat(secretFilePath)
-	if err != nil {
-		return "", fmt.Errorf("failed to get data file info: %w", err)
-	}
-
-	if fileInfo.Size() == 0 {
-		return "", errors.New("data file cannot be empty")
-	}
-
-	data, err := os.ReadFile(secretFilePath)
-	if err != nil {
-		return "", fmt.Errorf("unable to read the data file: %w", err)
-	}
-	return string(data), nil
 }
