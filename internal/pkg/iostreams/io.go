@@ -9,7 +9,6 @@ package iostreams
 import (
 	"bufio"
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -18,7 +17,6 @@ import (
 	"github.com/muesli/termenv"
 	"golang.org/x/term"
 )
-
 
 // IOStreams is an interface for interacting with IO and general terminal
 // output. Commands should not directly interact with os.Stdout/Stderr/Stdin but
@@ -178,12 +176,12 @@ func (s *system) ReadSecret() ([]byte, error) {
 
 	// Cancelled context restores the terminal, otherwise the no-echo mode would remain intact
 	go func() {
-		select {	
+		select {
 		case <-doneChannel:
 			return
 		case <-s.ctx.Done():
 		}
-		
+
 		if oldState != nil {
 			_ = term.Restore(fd, oldState)
 		}
