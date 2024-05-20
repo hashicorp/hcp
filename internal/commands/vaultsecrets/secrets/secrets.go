@@ -4,13 +4,8 @@
 package secrets
 
 import (
-<<<<<<< HEAD
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/versions"
-=======
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/apps/helper"
->>>>>>> 16ec8bc (allow things so as to pass on CI/CD)
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
