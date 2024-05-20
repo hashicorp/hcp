@@ -108,7 +108,7 @@ func updateRun(opts *UpdateOpts) error {
 
 	_, err := opts.Client.GetAppSecret(getReq, nil)
 	if err != nil {
-		return fmt.Errorf("secret %q not found: %w", opts.SecretName, err)
+		return fmt.Errorf("secret with name %q not found: %w", opts.SecretName, err)
 	}
 
 	opts.SecretValuePlaintext, err = readPlainTextSecret(opts.SecretValuePlaintext, opts.SecretFilePath, opts.IO.In())

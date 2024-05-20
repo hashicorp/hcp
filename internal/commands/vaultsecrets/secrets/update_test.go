@@ -5,14 +5,22 @@ package secrets
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -90,131 +98,152 @@ func TestNewCmdUpdate(t *testing.T) {
 	}
 }
 
-// func TestUpdateRun(t *testing.T) {
-// 	t.Parallel()
+func TestUpdateRun(t *testing.T) {
+	t.Parallel()
 
-// 	testProfile := func(t *testing.T) *profile.Profile {
-// 		tp := profile.TestProfile(t).SetOrgID("123").SetProjectID("456")
-// 		tp.VaultSecrets = &profile.VaultSecretsConf{
-// 			AppName: "test-app",
-// 		}
-// 		return tp
-// 	}
-// 	testSecretValue := "my super secret value"
+	testProfile := func(t *testing.T) *profile.Profile {
+		tp := profile.TestProfile(t).SetOrgID("123").SetProjectID("456")
+		tp.VaultSecrets = &profile.VaultSecretsConf{
+			AppName: "test-app",
+		}
+		return tp
+	}
+	testSecretValue := "my super secret value"
 
-// 	cases := []struct {
-// 		Name             string
-// 		RespErr          bool
-// 		ReadViaStdin     bool
-// 		EmptySecretValue bool
-// 		ErrMsg           string
-// 		MockCalled       bool
-// 		AugmentOpts      func(*CreateOpts)
-// 	}{
-// 		{
-// 			Name:   "Failed: Read via stdin as hypen not supplied for --data-file flag",
-// 			ErrMsg: "data file path is required",
-// 		},
-// 		{
-// 			Name:             "Failed: Read empty secret value via stdin",
-// 			EmptySecretValue: true,
-// 			ReadViaStdin:     true,
-// 			RespErr:          true,
-// 			AugmentOpts:      func(o *CreateOpts) { o.SecretFilePath = "-" },
-// 			ErrMsg:           "secret value cannot be empty",
-// 		},
-// 		{
-// 			Name:         "Success: Create secret via stdin",
-// 			ReadViaStdin: true,
-// 			AugmentOpts:  func(o *CreateOpts) { o.SecretFilePath = "-" },
-// 			MockCalled:   true,
-// 		},
-// 		{
-// 			Name:        "Failed: Max secret versions reached",
-// 			RespErr:     true,
-// 			ErrMsg:      "[POST /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secret/kv][429] CreateAppKVSecret default  &{Code:8 Details:[] Message:maximum number of secret versions reached}",
-// 			AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
-// 			MockCalled:  true,
-// 		},
-// 		{
-// 			Name:        "Success: Created secret",
-// 			RespErr:     false,
-// 			AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
-// 			MockCalled:  true,
-// 		},
-// 	}
+	cases := []struct {
+		Name             string
+		RespErr          bool
+		ExpectGetErr     bool
+		ReadViaStdin     bool
+		EmptySecretValue bool
+		ErrMsg           string
+		MockCalled       bool
+		AugmentOpts      func(*UpdateOpts)
+	}{
+		{
+			Name:   "Failed: Read via stdin as hypen not supplied for --data-file flag",
+			ErrMsg: "data file path is required",
+		},
+		// {
+		// 	Name:             "Failed: Read empty secret value via stdin",
+		// 	EmptySecretValue: true,
+		// 	ReadViaStdin:     true,
+		// 	RespErr:          true,
+		// 	AugmentOpts:      func(o *CreateOpts) { o.SecretFilePath = "-" },
+		// 	ErrMsg:           "secret value cannot be empty",
+		// },
+		// {
+		// 	Name:         "Success: Create secret via stdin",
+		// 	ReadViaStdin: true,
+		// 	AugmentOpts:  func(o *CreateOpts) { o.SecretFilePath = "-" },
+		// 	MockCalled:   true,
+		// },
+		// {
+		// 	Name:        "Failed: Max secret versions reached",
+		// 	RespErr:     true,
+		// 	ErrMsg:      "[POST /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secret/kv][429] CreateAppKVSecret default  &{Code:8 Details:[] Message:maximum number of secret versions reached}",
+		// 	AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
+		// 	MockCalled:  true,
+		// },
+		// {
+		// 	Name:        "Success: Created secret",
+		// 	RespErr:     false,
+		// 	AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
+		// 	MockCalled:  true,
+		// },
+	}
 
-// 	for _, c := range cases {
-// 		c := c
-// 		t.Run(c.Name, func(t *testing.T) {
-// 			t.Parallel()
-// 			r := require.New(t)
+	for _, c := range cases {
+		c := c
+		t.Run(c.Name, func(t *testing.T) {
+			t.Parallel()
+			r := require.New(t)
 
-// 			io := iostreams.Test()
-// 			if c.ReadViaStdin {
-// 				io.InputTTY = true
-// 				io.ErrorTTY = true
+			io := iostreams.Test()
+			if c.ReadViaStdin {
+				io.InputTTY = true
+				io.ErrorTTY = true
 
-// 				if !c.EmptySecretValue {
-// 					_, err := io.Input.WriteString(testSecretValue)
-// 					r.NoError(err)
-// 				}
-// 			}
-// 			vs := mock_secret_service.NewMockClientService(t)
-// 			opts := &CreateOpts{
-// 				Ctx:        context.Background(),
-// 				IO:         io,
-// 				Profile:    testProfile(t),
-// 				Output:     format.New(io),
-// 				Client:     vs,
-// 				AppName:    testProfile(t).VaultSecrets.AppName,
-// 				SecretName: "test_secret",
-// 			}
+				if !c.EmptySecretValue {
+					_, err := io.Input.WriteString(testSecretValue)
+					r.NoError(err)
+				}
+			}
+			vs := mock_secret_service.NewMockClientService(t)
+			opts := &UpdateOpts{
+				Ctx:        context.Background(),
+				IO:         io,
+				Profile:    testProfile(t),
+				Output:     format.New(io),
+				Client:     vs,
+				AppName:    testProfile(t).VaultSecrets.AppName,
+				SecretName: "test_secret",
+			}
 
-// 			if c.AugmentOpts != nil {
-// 				c.AugmentOpts(opts)
-// 			}
+			if c.AugmentOpts != nil {
+				c.AugmentOpts(opts)
+			}
 
-// 			dt := strfmt.NewDateTime()
-// 			if c.MockCalled {
-// 				if c.RespErr {
-// 					vs.EXPECT().CreateAppKVSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
-// 				} else {
-// 					vs.EXPECT().CreateAppKVSecret(&secret_service.CreateAppKVSecretParams{
-// 						LocationOrganizationID: testProfile(t).OrganizationID,
-// 						LocationProjectID:      testProfile(t).ProjectID,
-// 						AppName:                testProfile(t).VaultSecrets.AppName,
-// 						Body: secret_service.CreateAppKVSecretBody{
-// 							Name:  opts.SecretName,
-// 							Value: testSecretValue,
-// 						},
-// 						Context: opts.Ctx,
-// 					}, mock.Anything).Return(&secret_service.CreateAppKVSecretOK{
-// 						Payload: &models.Secrets20230613CreateAppKVSecretResponse{
-// 							Secret: &models.Secrets20230613Secret{
-// 								Name:      opts.SecretName,
-// 								CreatedAt: dt,
-// 								Version: &models.Secrets20230613SecretVersion{
-// 									Version:   "2",
-// 									CreatedAt: dt,
-// 									Type:      "kv",
-// 								},
-// 								LatestVersion: "2",
-// 							},
-// 						},
-// 					}, nil).Once()
-// 				}
-// 			}
+			dt := strfmt.NewDateTime()
+			if c.MockCalled {
+				if c.RespErr {
+					if c.ExpectGetErr {
+						vs.EXPECT().GetAppSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+					} else {
+						vs.EXPECT().GetAppSecret(&secret_service.GetAppSecretParams{
+							LocationOrganizationID: testProfile(t).OrganizationID,
+							LocationProjectID:      testProfile(t).ProjectID,
+							AppName:                testProfile(t).VaultSecrets.AppName,
+							SecretName:             opts.SecretName,
+							Context:                opts.Ctx,
+						}, mock.Anything).Return(&secret_service.GetAppSecretOK{
+							Payload: &models.Secrets20230613GetAppSecretResponse{
+								Secret: &models.Secrets20230613Secret{
+									Name:          opts.SecretName,
+									LatestVersion: "2",
+									CreatedAt:     strfmt.DateTime(time.Now()),
+								},
+							},
+						}, nil).Once()
+					}
 
-// 			// Run the command
-// 			err := createRun(opts)
-// 			if c.ErrMsg != "" {
-// 				r.Contains(err.Error(), c.ErrMsg)
-// 				return
-// 			}
+					vs.EXPECT().CreateAppKVSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+				} else {
+					vs.EXPECT().CreateAppKVSecret(&secret_service.CreateAppKVSecretParams{
+						LocationOrganizationID: testProfile(t).OrganizationID,
+						LocationProjectID:      testProfile(t).ProjectID,
+						AppName:                testProfile(t).VaultSecrets.AppName,
+						Body: secret_service.CreateAppKVSecretBody{
+							Name:  opts.SecretName,
+							Value: testSecretValue,
+						},
+						Context: opts.Ctx,
+					}, mock.Anything).Return(&secret_service.CreateAppKVSecretOK{
+						Payload: &models.Secrets20230613CreateAppKVSecretResponse{
+							Secret: &models.Secrets20230613Secret{
+								Name:      opts.SecretName,
+								CreatedAt: dt,
+								Version: &models.Secrets20230613SecretVersion{
+									Version:   "3",
+									CreatedAt: dt,
+									Type:      "kv",
+								},
+								LatestVersion: "3",
+							},
+						},
+					}, nil).Once()
+				}
+			}
 
-// 			r.NoError(err)
-// 			r.Contains(io.Error.String(), fmt.Sprintf("✓ Successfully created secret with name %q\n", opts.SecretName))
-// 		})
-// 	}
-// }
+			// Run the command
+			err := updateRun(opts)
+			if c.ErrMsg != "" {
+				r.Contains(err.Error(), c.ErrMsg)
+				return
+			}
+
+			r.NoError(err)
+			r.Contains(io.Error.String(), fmt.Sprintf("✓ Successfully updated secret with name %q\n", opts.SecretName))
+		})
+	}
+}
