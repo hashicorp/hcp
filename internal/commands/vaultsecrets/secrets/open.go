@@ -5,6 +5,7 @@ package secrets
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -99,7 +100,7 @@ func openRun(opts *OpenOpts) (err error) {
 	}
 	defer func() {
 		if opts.OutputFilePath != "" {
-			err = fd.Close()
+			err = errors.Join(err, fd.Close())
 		}
 	}()
 
