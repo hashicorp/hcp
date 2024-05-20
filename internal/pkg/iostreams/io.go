@@ -156,7 +156,46 @@ func (s *system) ReadSecret() ([]byte, error) {
 		return nil, fmt.Errorf("prompting is disabled")
 	}
 
-	return term.ReadPassword(int(s.in.Fd()))
+	fd := int(s.in.Fd())
+
+	// Store and restore the terminal status on interruptions to
+	// avoid that the terminal remains in the password state
+	// This is necessary as for https://github.com/golang/go/issues/31180
+	oldState, err := term.GetState(fd)
+	if err != nil {
+		return nil, err
+	}
+
+	type Buffer struct {
+		Buffer []byte
+		Error  error
+	}
+	errorChannel := make(chan Buffer, 1)
+	doneChannel := make(chan struct{})
+	defer close(doneChannel)
+
+	// Cancelled context restores the terminal, otherwise the no-echo mode would remain intact
+	go func() {
+		select {
+		case <-doneChannel:
+			return
+		case <-s.ctx.Done():
+		}
+
+		if oldState != nil {
+			_ = term.Restore(fd, oldState)
+		}
+		errorChannel <- Buffer{Buffer: make([]byte, 0), Error: context.Cause(s.ctx)}
+	}()
+
+	go func() {
+		buf, err := term.ReadPassword(fd)
+		errorChannel <- Buffer{Buffer: buf, Error: err}
+	}()
+
+	buf := <-errorChannel
+
+	return buf.Buffer, buf.Error
 }
 
 func (s *system) PromptConfirm(prompt string) (confirmed bool, err error) {
