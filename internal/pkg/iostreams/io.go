@@ -174,14 +174,21 @@ func (s *system) ReadSecret() ([]byte, error) {
 		Error  error
 	}
 	errorChannel := make(chan Buffer, 1)
+	doneChannel := make(chan struct{})
+	defer close(doneChannel)
 
 	// Cancelled context restores the terminal, otherwise the no-echo mode would remain intact
 	go func() {
-		<-s.ctx.Done()
+		select {	
+		case <-doneChannel:
+			return
+		case <-s.ctx.Done():
+		}
+		
 		if oldState != nil {
 			_ = term.Restore(fd, oldState)
 		}
-		errorChannel <- Buffer{Buffer: make([]byte, 0), Error: ErrInterrupt}
+		errorChannel <- Buffer{Buffer: make([]byte, 0), Error: context.Cause(s.ctx)}
 	}()
 
 	go func() {
