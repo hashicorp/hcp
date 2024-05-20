@@ -14,7 +14,7 @@ func NewCmdVersions(ctx *cmd.Context) *cmd.Command {
 		ShortHelp: "Manage Vault Secrets application secret's versions.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets versions" }} command group lets you
-		manage Vault Secrets application secret's versions.
+		manage a secret's versions.
 		`),
 	}
 

@@ -27,11 +27,6 @@ func (d *displayer) StaticVersions(secrets ...*preview_models.Secrets20231128Sec
 	return d
 }
 
-func (d *displayer) AddFields(fields []format.Field) []format.Field {
-	d.fields = append(d.fields, fields...)
-	return d.fields
-}
-
 func (d *displayer) SetDefaultFormat(f format.Format) *displayer {
 	d.format = f
 	return d
