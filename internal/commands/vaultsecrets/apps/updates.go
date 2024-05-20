@@ -58,7 +58,6 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 				{
 					Name:          "NAME",
 					Documentation: "The name of the app to update.",
-					Optional:      false,
 				},
 			},
 		},
