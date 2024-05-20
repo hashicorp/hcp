@@ -6,6 +6,8 @@ package secrets
 import (
 	"context"
 	"errors"
+	"os"
+	"path"
 	"testing"
 	"time"
 
@@ -23,7 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewCmdRead(t *testing.T) {
+func TestNewCmdOpen(t *testing.T) {
 	t.Parallel()
 
 	testSecretName := "test_secret"
@@ -40,7 +42,7 @@ func TestNewCmdRead(t *testing.T) {
 		Args    []string
 		Profile func(t *testing.T) *profile.Profile
 		Error   string
-		Expect  *ReadOpts
+		Expect  *OpenOpts
 	}{
 		{
 			Name:    "No many args",
@@ -58,7 +60,7 @@ func TestNewCmdRead(t *testing.T) {
 			Name:    "Good",
 			Profile: testProfile,
 			Args:    []string{"foo"},
-			Expect: &ReadOpts{
+			Expect: &OpenOpts{
 				AppName:    testProfile(t).VaultSecrets.AppName,
 				SecretName: testSecretName,
 			},
@@ -81,8 +83,8 @@ func TestNewCmdRead(t *testing.T) {
 				ShutdownCtx: context.Background(),
 			}
 
-			var gotOpts *ReadOpts
-			readCmd := NewCmdRead(ctx, func(o *ReadOpts) error {
+			var gotOpts *OpenOpts
+			readCmd := NewCmdOpen(ctx, func(o *OpenOpts) error {
 				gotOpts = o
 				gotOpts.AppName = c.Profile(t).VaultSecrets.AppName
 				gotOpts.SecretName = testSecretName
@@ -105,7 +107,7 @@ func TestNewCmdRead(t *testing.T) {
 	}
 }
 
-func TestReadRun(t *testing.T) {
+func TestOpenRun(t *testing.T) {
 	t.Parallel()
 
 	testProfile := func(t *testing.T) *profile.Profile {
@@ -116,23 +118,31 @@ func TestReadRun(t *testing.T) {
 		return tp
 	}
 	testSecretName := "test_secret"
+	testSecretValue := "my super secret value"
 
 	cases := []struct {
-		Name       string
-		RespErr    bool
-		ErrMsg     string
-		MockCalled bool
+		Name        string
+		RespErr     bool
+		ErrMsg      string
+		MockCalled  bool
+		WriteToFile bool
 	}{
 		{
 			Name:       "Failed: Secret not found",
 			RespErr:    true,
-			ErrMsg:     "[GET] /secrets/2023-06-13/organizations/{location.organization_id}/projects/{location.project_id}/apps/{app_name}/secrets/{secret_name}][404] GetAppSecret default  &{Code:5 Details:[] Message:secret not found}",
+			ErrMsg:     "[GET] /secrets/2023-06-13/organizations/{location.organization_id}/projects/{location.project_id}/apps/{app_name}/open/{secret_name}][404]OpenAppSecret default  &{Code:5 Details:[] Message:secret not found}",
 			MockCalled: true,
 		},
 		{
-			Name:       "Success: Read secret's metadata",
+			Name:       "Success: Opened plaintext secret",
 			RespErr:    false,
 			MockCalled: true,
+		},
+		{
+			Name:        "Success: Wrote plaintext secret to the file",
+			RespErr:     false,
+			MockCalled:  true,
+			WriteToFile: true,
 		},
 	}
 
@@ -145,7 +155,7 @@ func TestReadRun(t *testing.T) {
 			io := iostreams.Test()
 			io.ErrorTTY = true
 			vs := mock_secret_service.NewMockClientService(t)
-			opts := &ReadOpts{
+			opts := &OpenOpts{
 				Ctx:        context.Background(),
 				IO:         io,
 				Profile:    testProfile(t),
@@ -155,37 +165,62 @@ func TestReadRun(t *testing.T) {
 				SecretName: testSecretName,
 			}
 
+			if c.WriteToFile {
+				tempDir, err := os.MkdirTemp("", "test")
+				if err != nil {
+					t.Fatalf("Failed to create temp dir: %v", err)
+				}
+				opts.OutputFilePath = path.Join(tempDir, "secret_value")
+			}
+			defer func() {
+				os.RemoveAll(path.Dir(opts.OutputFilePath))
+			}()
+
 			if c.MockCalled {
 				if c.RespErr {
-					vs.EXPECT().GetAppSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+					vs.EXPECT().OpenAppSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 				} else {
-					vs.EXPECT().GetAppSecret(&secret_service.GetAppSecretParams{
+					vs.EXPECT().OpenAppSecret(&secret_service.OpenAppSecretParams{
 						LocationOrganizationID: testProfile(t).OrganizationID,
 						LocationProjectID:      testProfile(t).ProjectID,
 						AppName:                testProfile(t).VaultSecrets.AppName,
 						SecretName:             opts.SecretName,
 						Context:                opts.Ctx,
-					}, mock.Anything).Return(&secret_service.GetAppSecretOK{
-						Payload: &models.Secrets20230613GetAppSecretResponse{
-							Secret: &models.Secrets20230613Secret{
+					}, mock.Anything).Return(&secret_service.OpenAppSecretOK{
+						Payload: &models.Secrets20230613OpenAppSecretResponse{
+							Secret: &models.Secrets20230613OpenSecret{
 								Name:          opts.SecretName,
-								LatestVersion: "2",
-								CreatedAt:     strfmt.DateTime(time.Now()),
+								LatestVersion: "3",
+								Version: &models.Secrets20230613OpenSecretVersion{
+									Version: "3",
+									Value:   "my super secret value",
+								},
+								CreatedAt: strfmt.DateTime(time.Now()),
 							},
 						},
 					}, nil).Once()
+
 				}
 			}
 
 			// Run the command
-			err := readRun(opts)
+			err := openRun(opts)
 			if c.ErrMsg != "" {
 				r.Contains(err.Error(), c.ErrMsg)
 				return
 			}
-
 			r.NoError(err)
-			r.Contains(io.Output.String(), "Secret Name:")
+			if !c.WriteToFile {
+				r.Contains(io.Output.String(), "Value:          my super secret value")
+			} else {
+				readContent, err := os.ReadFile(opts.OutputFilePath)
+				if err != nil {
+					t.Fatalf("Failed to read test file: %v", err)
+				}
+				if string(readContent) != testSecretValue {
+					t.Errorf("Expected file content %q, but got %q", testSecretValue, string(readContent))
+				}
+			}
 		})
 	}
 }
