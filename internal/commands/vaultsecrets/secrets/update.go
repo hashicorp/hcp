@@ -35,15 +35,21 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets delete" }} command updates a static secret under an Vault Secrets application.`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Update a secret from Vault Secrets application on active profile:`,
+				Preamble: `Update a new secret in Vault Secrets application on active profile:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp vault-secrets secrets update secret_1
+				$ hcp vault-secrets secrets update secret_1 --data-file=tmp/secrets1.txt
 				`),
 			},
 			{
-				Preamble: `Update a secret from specified Vault Secrets application:`,
+				Preamble: `Update a new secret in Vault Secrets application by piping the plaintext secret from a command output:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
-				$ hcp vault-secrets secrets update secret_2 --app test-app
+				$ echo -n "my super secret" | hcp vault-secrets secrets update secret_2 --data-file=-
+				`),
+			},
+			{
+				Preamble: `Update a new secret in the specified Vault Secrets application:`,
+				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
+				$ hcp vault-secrets secrets update secret_3 --app test-app --secret_file=/tmp/secrets2.txt
 				`),
 			},
 		},
@@ -102,7 +108,7 @@ func updateRun(opts *UpdateOpts) error {
 
 	_, err := opts.Client.GetAppSecret(getReq, nil)
 	if err != nil {
-		return fmt.Errorf("failed to get the secret %q: %w", opts.SecretName, err)
+		return fmt.Errorf("secret %q not found: %w", opts.SecretName, err)
 	}
 
 	opts.SecretValuePlaintext, err = readPlainTextSecret(opts.SecretValuePlaintext, opts.SecretFilePath, opts.IO.In())
@@ -122,7 +128,7 @@ func updateRun(opts *UpdateOpts) error {
 
 	resp, err := opts.Client.CreateAppKVSecret(req, nil)
 	if err != nil {
-		return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
+		return fmt.Errorf("failed to update secret with name %q: %w", opts.SecretName, err)
 	}
 	if err := opts.Output.Display(newDisplayer(true).Secrets(resp.Payload.Secret)); err != nil {
 		return err
