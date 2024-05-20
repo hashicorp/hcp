@@ -112,45 +112,51 @@ func TestUpdateRun(t *testing.T) {
 
 	cases := []struct {
 		Name             string
-		RespErr          bool
 		ExpectGetErr     bool
+		RespErr          bool
+		ExpectCreateCall bool
 		ReadViaStdin     bool
 		EmptySecretValue bool
 		ErrMsg           string
-		MockCalled       bool
 		AugmentOpts      func(*UpdateOpts)
 	}{
 		{
 			Name:   "Failed: Read via stdin as hypen not supplied for --data-file flag",
 			ErrMsg: "data file path is required",
 		},
-		// {
-		// 	Name:             "Failed: Read empty secret value via stdin",
-		// 	EmptySecretValue: true,
-		// 	ReadViaStdin:     true,
-		// 	RespErr:          true,
-		// 	AugmentOpts:      func(o *CreateOpts) { o.SecretFilePath = "-" },
-		// 	ErrMsg:           "secret value cannot be empty",
-		// },
-		// {
-		// 	Name:         "Success: Create secret via stdin",
-		// 	ReadViaStdin: true,
-		// 	AugmentOpts:  func(o *CreateOpts) { o.SecretFilePath = "-" },
-		// 	MockCalled:   true,
-		// },
-		// {
-		// 	Name:        "Failed: Max secret versions reached",
-		// 	RespErr:     true,
-		// 	ErrMsg:      "[POST /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secret/kv][429] CreateAppKVSecret default  &{Code:8 Details:[] Message:maximum number of secret versions reached}",
-		// 	AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
-		// 	MockCalled:  true,
-		// },
-		// {
-		// 	Name:        "Success: Created secret",
-		// 	RespErr:     false,
-		// 	AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
-		// 	MockCalled:  true,
-		// },
+		{
+			Name:             "Failed: Read empty secret value via stdin",
+			EmptySecretValue: true,
+			ReadViaStdin:     true,
+			RespErr:          true,
+			AugmentOpts:      func(o *UpdateOpts) { o.SecretFilePath = "-" },
+			ErrMsg:           "secret value cannot be empty",
+		},
+		{
+			Name:         "Failed: Secret not found",
+			ReadViaStdin: true,
+			ExpectGetErr: true,
+			AugmentOpts:  func(o *UpdateOpts) { o.SecretFilePath = "-" },
+			ErrMsg:       "secret not found",
+		},
+		{
+			Name:             "Success: Update secret via stdin",
+			ReadViaStdin:     true,
+			ExpectCreateCall: true,
+			AugmentOpts:      func(o *UpdateOpts) { o.SecretFilePath = "-" },
+		},
+		{
+			Name:             "Failed: Max secret versions reached",
+			RespErr:          true,
+			ExpectCreateCall: true,
+			ErrMsg:           "[POST /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secret/kv][429] CreateAppKVSecret default  &{Code:8 Details:[] Message:maximum number of secret versions reached}",
+			AugmentOpts:      func(o *UpdateOpts) { o.SecretValuePlaintext = testSecretValue },
+		},
+		{
+			Name:             "Success: Update secret",
+			AugmentOpts:      func(o *UpdateOpts) { o.SecretValuePlaintext = testSecretValue },
+			ExpectCreateCall: true,
+		},
 	}
 
 	for _, c := range cases {
@@ -169,6 +175,7 @@ func TestUpdateRun(t *testing.T) {
 					r.NoError(err)
 				}
 			}
+
 			vs := mock_secret_service.NewMockClientService(t)
 			opts := &UpdateOpts{
 				Ctx:        context.Background(),
@@ -184,29 +191,28 @@ func TestUpdateRun(t *testing.T) {
 				c.AugmentOpts(opts)
 			}
 
-			dt := strfmt.NewDateTime()
-			if c.MockCalled {
-				if c.RespErr {
-					if c.ExpectGetErr {
-						vs.EXPECT().GetAppSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
-					} else {
-						vs.EXPECT().GetAppSecret(&secret_service.GetAppSecretParams{
-							LocationOrganizationID: testProfile(t).OrganizationID,
-							LocationProjectID:      testProfile(t).ProjectID,
-							AppName:                testProfile(t).VaultSecrets.AppName,
-							SecretName:             opts.SecretName,
-							Context:                opts.Ctx,
-						}, mock.Anything).Return(&secret_service.GetAppSecretOK{
-							Payload: &models.Secrets20230613GetAppSecretResponse{
-								Secret: &models.Secrets20230613Secret{
-									Name:          opts.SecretName,
-									LatestVersion: "2",
-									CreatedAt:     strfmt.DateTime(time.Now()),
-								},
-							},
-						}, nil).Once()
-					}
+			if c.ExpectGetErr {
+				vs.EXPECT().GetAppSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+			} else {
+				vs.EXPECT().GetAppSecret(&secret_service.GetAppSecretParams{
+					LocationOrganizationID: testProfile(t).OrganizationID,
+					LocationProjectID:      testProfile(t).ProjectID,
+					AppName:                testProfile(t).VaultSecrets.AppName,
+					SecretName:             opts.SecretName,
+					Context:                opts.Ctx,
+				}, mock.Anything).Return(&secret_service.GetAppSecretOK{
+					Payload: &models.Secrets20230613GetAppSecretResponse{
+						Secret: &models.Secrets20230613Secret{
+							Name:          opts.SecretName,
+							LatestVersion: "2",
+							CreatedAt:     strfmt.DateTime(time.Now()),
+						},
+					},
+				}, nil).Once()
+			}
 
+			if c.ExpectCreateCall {
+				if c.RespErr {
 					vs.EXPECT().CreateAppKVSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 				} else {
 					vs.EXPECT().CreateAppKVSecret(&secret_service.CreateAppKVSecretParams{
@@ -222,10 +228,10 @@ func TestUpdateRun(t *testing.T) {
 						Payload: &models.Secrets20230613CreateAppKVSecretResponse{
 							Secret: &models.Secrets20230613Secret{
 								Name:      opts.SecretName,
-								CreatedAt: dt,
+								CreatedAt: strfmt.DateTime(time.Now()),
 								Version: &models.Secrets20230613SecretVersion{
 									Version:   "3",
-									CreatedAt: dt,
+									CreatedAt: strfmt.DateTime(time.Now()),
 									Type:      "kv",
 								},
 								LatestVersion: "3",

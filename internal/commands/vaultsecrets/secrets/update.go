@@ -29,10 +29,10 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 	}
 
 	cmd := &cmd.Command{
-		Name:      "delete",
+		Name:      "update",
 		ShortHelp: "Update a static secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets delete" }} command updates a static secret under an Vault Secrets application.`),
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets update" }} command updates a static secret under an Vault Secrets application.`),
 		Examples: []cmd.Example{
 			{
 				Preamble: `Update a new secret in Vault Secrets application on active profile:`,
