@@ -6,6 +6,8 @@ package secrets
 import (
 	"context"
 	"errors"
+	"os"
+	"path"
 	"testing"
 	"time"
 
@@ -116,12 +118,14 @@ func TestOpenRun(t *testing.T) {
 		return tp
 	}
 	testSecretName := "test_secret"
+	testSecretValue := "my super secret value"
 
 	cases := []struct {
-		Name       string
-		RespErr    bool
-		ErrMsg     string
-		MockCalled bool
+		Name        string
+		RespErr     bool
+		ErrMsg      string
+		MockCalled  bool
+		WriteToFile bool
 	}{
 		{
 			Name:       "Failed: Secret not found",
@@ -130,9 +134,15 @@ func TestOpenRun(t *testing.T) {
 			MockCalled: true,
 		},
 		{
-			Name:       "Success: Read plaintext secret",
+			Name:       "Success: Opened plaintext secret",
 			RespErr:    false,
 			MockCalled: true,
+		},
+		{
+			Name:        "Success: Wrote plaintext secret to the file",
+			RespErr:     false,
+			MockCalled:  true,
+			WriteToFile: true,
 		},
 	}
 
@@ -154,6 +164,17 @@ func TestOpenRun(t *testing.T) {
 				AppName:    testProfile(t).VaultSecrets.AppName,
 				SecretName: testSecretName,
 			}
+
+			if c.WriteToFile {
+				tempDir, err := os.MkdirTemp("", "test")
+				if err != nil {
+					t.Fatalf("Failed to create temp dir: %v", err)
+				}
+				opts.OutputFilePath = path.Join(tempDir, "secret_value")
+			}
+			defer func() {
+				os.RemoveAll(path.Dir(opts.OutputFilePath))
+			}()
 
 			if c.MockCalled {
 				if c.RespErr {
@@ -188,9 +209,18 @@ func TestOpenRun(t *testing.T) {
 				r.Contains(err.Error(), c.ErrMsg)
 				return
 			}
-
 			r.NoError(err)
-			r.Contains(io.Output.String(), "Value:          my super secret value")
+			if !c.WriteToFile {
+				r.Contains(io.Output.String(), "Value:          my super secret value")
+			} else {
+				readContent, err := os.ReadFile(opts.OutputFilePath)
+				if err != nil {
+					t.Fatalf("Failed to read test file: %v", err)
+				}
+				if string(readContent) != testSecretValue {
+					t.Errorf("Expected file content %q, but got %q", testSecretValue, string(readContent))
+				}
+			}
 		})
 	}
 }
