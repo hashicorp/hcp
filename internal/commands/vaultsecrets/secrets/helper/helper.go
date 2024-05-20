@@ -9,17 +9,22 @@ import (
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/posener/complete"
 )
 
 // PredictAppName returns a predict function for application names.
-func PredictSecretName(ctx *cmd.Context, orgID, projectID, appName string, client preview_secret_service.ClientService) complete.PredictFunc {
+func PredictSecretName(ctx *cmd.Context, orgID, projectID string, client preview_secret_service.ClientService) complete.PredictFunc {
 	return func(args complete.Args) []string {
 		if len(args.Completed) > 1 {
 			return nil
 		}
 
+		appName := appname.Get()
+		if ctx.Profile.VaultSecrets != nil && appName == "" {
+			appName = ctx.Profile.VaultSecrets.AppName
+		}
 		secrets, err := getSecrets(ctx.ShutdownCtx, orgID, projectID, appName, client)
 		if err != nil {
 			return nil

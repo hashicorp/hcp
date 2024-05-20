@@ -5,6 +5,7 @@ package appname
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/MakeNowJust/heredoc/v2"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -41,6 +42,7 @@ func Require(ctx *cmd.Context) error {
 
 	if appName == "" && ctx.Profile.VaultSecrets != nil {
 		set(ctx.Profile.VaultSecrets.AppName)
+		fmt.Println("Appname is set", appName)
 	}
 
 	if appName != "" || ctx.Profile.VaultSecrets != nil && ctx.Profile.VaultSecrets.AppName != "" {

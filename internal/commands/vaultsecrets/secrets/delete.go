@@ -54,7 +54,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 					Documentation: "The name of the secret to create.",
 				},
 			},
-			Autocomplete: helper.PredictSecretName(ctx, ctx.Profile.OrganizationID, ctx.Profile.ProjectID, appname.Get(), opts.PreviewClient),
+			Autocomplete: helper.PredictSecretName(ctx, ctx.Profile.OrganizationID, ctx.Profile.ProjectID, opts.PreviewClient),
 		},
 		RunF: func(c *cmd.Command, args []string) error {
 			opts.AppName = appname.Get()
