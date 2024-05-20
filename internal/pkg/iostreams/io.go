@@ -13,9 +13,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/signal"
 	"strings"
-	"syscall"
 
 	"github.com/muesli/termenv"
 	"golang.org/x/term"
@@ -184,20 +182,13 @@ func (s *system) ReadSecret() ([]byte, error) {
 	}
 	errorChannel := make(chan Buffer, 1)
 
-	// SIGINT and SIGTERM restore the terminal, otherwise the no-echo mode would remain intact
-	interruptChannel := make(chan os.Signal, 1)
-	signal.Notify(interruptChannel, syscall.SIGINT, syscall.SIGTERM)
-	defer func() {
-		signal.Stop(interruptChannel)
-		close(interruptChannel)
-	}()
+	// Cancelled context restores the terminal, otherwise the no-echo mode would remain intact
 	go func() {
-		for range interruptChannel {
-			if oldState != nil {
-				_ = term.Restore(fd, oldState)
-			}
-			errorChannel <- Buffer{Buffer: make([]byte, 0), Error: ErrInterrupt}
+		<-s.ctx.Done()
+		if oldState != nil {
+			_ = term.Restore(fd, oldState)
 		}
+		errorChannel <- Buffer{Buffer: make([]byte, 0), Error: ErrInterrupt}
 	}()
 
 	go func() {
