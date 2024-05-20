@@ -11,7 +11,6 @@ import (
 type displayer struct {
 	previewStaticSecretVerions []*preview_models.Secrets20231128SecretStaticVersion
 	single                     bool
-	fields                     []format.Field
 	format                     format.Format
 }
 
