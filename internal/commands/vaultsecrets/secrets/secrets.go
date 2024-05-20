@@ -36,6 +36,7 @@ func NewCmdSecrets(ctx *cmd.Context) *cmd.Command {
 
 	cmd.AddChild(NewCmdCreate(ctx, nil))
 	cmd.AddChild(NewCmdRead(ctx, nil))
+	cmd.AddChild(NewCmdUpdate(ctx, nil))
 	cmd.AddChild(NewCmdDelete(ctx, nil))
 	cmd.AddChild(NewCmdList(ctx, nil))
 	cmd.AddChild(NewCmdOpen(ctx, nil))
