@@ -1,21 +1,46 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package vaultsecrets
+package appname
 
 import (
 	"errors"
 
 	"github.com/MakeNowJust/heredoc/v2"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
+	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 )
 
-// RequireVaultSecretsAppName requires that the profile has a set organization and project ID along with
+var (
+	// appName is the name of the Vault Secrets application. If not specified,
+	// then the value from the active profile will be used.
+	appName string
+)
+
+func set(val string) {
+	appName = val
+}
+
+// Get returns the Vault Secrets application name.
+func Get() string {
+	return appName
+}
+
+// Flag returns a flag value for the Vault Secrets application name.
+func Flag() flagvalue.Value {
+	return flagvalue.Simple("", &appName)
+}
+
+// Require requires that the profile has a set organization and project ID along with
 // the Vault Secrets application name.
-func RequireVaultSecretsAppName(ctx *cmd.Context, appName string) error {
+func Require(ctx *cmd.Context) error {
 	err := cmd.RequireOrgAndProject(ctx)
 	if err != nil {
 		return err
+	}
+
+	if appName == "" && ctx.Profile.VaultSecrets != nil {
+		set(ctx.Profile.VaultSecrets.AppName)
 	}
 
 	if appName != "" || ctx.Profile.VaultSecrets != nil && ctx.Profile.VaultSecrets.AppName != "" {

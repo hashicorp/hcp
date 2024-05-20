@@ -70,7 +70,15 @@ func (d *displayer) Payload() any {
 }
 
 func (d *displayer) FieldTemplates() []format.Field {
-	fields := []format.Field{
+	if d.openAppSecrets != nil {
+		return d.openAppSecretsFieldTemplate()
+	}
+
+	return d.secretsFieldTemplate()
+}
+
+func (d *displayer) secretsFieldTemplate() []format.Field {
+	return []format.Field{
 		{
 			Name:        "Secret Name",
 			ValueFormat: "{{ .Name }}",
@@ -84,7 +92,14 @@ func (d *displayer) FieldTemplates() []format.Field {
 			ValueFormat: "{{ .CreatedAt }}",
 		},
 	}
-	fields = append(fields, d.fields...)
+}
+
+func (d *displayer) openAppSecretsFieldTemplate() []format.Field {
+	fields := d.secretsFieldTemplate()
+	fields = append(fields, format.Field{
+		Name:        "Value",
+		ValueFormat: "{{ .Version.Value }}",
+	})
 	return fields
 }
 
