@@ -166,7 +166,7 @@ func (s *system) ReadSecret() ([]byte, error) {
 	// This is necessary as for https://github.com/golang/go/issues/31180
 	oldState, err := term.GetState(fd)
 	if err != nil {
-		return make([]byte, 0), err
+		return nil, err
 	}
 
 	type Buffer struct {
