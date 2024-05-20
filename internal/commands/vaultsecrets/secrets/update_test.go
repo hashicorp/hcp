@@ -137,7 +137,7 @@ func TestUpdateRun(t *testing.T) {
 			ReadViaStdin: true,
 			ExpectGetErr: true,
 			AugmentOpts:  func(o *UpdateOpts) { o.SecretFilePath = "-" },
-			ErrMsg:       "secret not found",
+			ErrMsg:       "[GET] /secrets/2023-06-13/organizations/{location.organization_id}/projects{location.project_id}/apps/{app_name}/secrets/{secret_name}][404] GetAppSecret default  &{Code:5 Details:[] Message:secret not found}",
 		},
 		{
 			Name:             "Success: Update secret via stdin",
