@@ -15,17 +15,21 @@ import (
 )
 
 // PredictAppName returns a predict function for application names.
-func PredictSecretName(ctx *cmd.Context, orgID, projectID string, client preview_secret_service.ClientService) complete.PredictFunc {
+func PredictSecretName(ctx *cmd.Context, c *cmd.Command, client preview_secret_service.ClientService) complete.PredictFunc {
 	return func(args complete.Args) []string {
-		if len(args.Completed) > 1 {
+		// Parse the args
+		remainingArgs, err := ctx.ParseFlags(c, args.All)
+		if err != nil {
 			return nil
 		}
 
-		appName := appname.Get()
-		if ctx.Profile.VaultSecrets != nil && appName == "" {
-			appName = ctx.Profile.VaultSecrets.AppName
+		if len(remainingArgs) > 1 {
+			return nil
 		}
-		secrets, err := getSecrets(ctx.ShutdownCtx, orgID, projectID, appName, client)
+
+		appname.Require(ctx)
+		appName := appname.Get()
+		secrets, err := getSecrets(ctx.ShutdownCtx, ctx.Profile.OrganizationID, ctx.Profile.ProjectID, appName, client)
 		if err != nil {
 			return nil
 		}

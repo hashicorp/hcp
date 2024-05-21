@@ -52,7 +52,6 @@ func NewCmdOpen(ctx *cmd.Context, runF func(*OpenOpts) error) *cmd.Command {
 					Documentation: "The name of the secret to open.",
 				},
 			},
-			Autocomplete: helper.PredictSecretName(ctx, ctx.Profile.OrganizationID, ctx.Profile.ProjectID, opts.PreviewClient),
 		},
 		Flags: cmd.Flags{
 			Local: []*cmd.Flag{
@@ -75,6 +74,7 @@ func NewCmdOpen(ctx *cmd.Context, runF func(*OpenOpts) error) *cmd.Command {
 			return openRun(opts)
 		},
 	}
+	cmd.Args.Autocomplete = helper.PredictSecretName(ctx, cmd, opts.PreviewClient)
 
 	return cmd
 }
