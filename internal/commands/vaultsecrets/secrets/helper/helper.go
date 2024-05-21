@@ -27,7 +27,11 @@ func PredictSecretName(ctx *cmd.Context, c *cmd.Command, client preview_secret_s
 			return nil
 		}
 
-		appname.Require(ctx)
+		// Parse the app name from the flags or profile
+		if err := appname.Require(ctx); err != nil {
+			return nil
+		}
+
 		appName := appname.Get()
 		secrets, err := getSecrets(ctx.ShutdownCtx, ctx.Profile.OrganizationID, ctx.Profile.ProjectID, appName, client)
 		if err != nil {
