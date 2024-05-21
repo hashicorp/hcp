@@ -59,7 +59,6 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 					Documentation: "The name of the app to read.",
 				},
 			},
-			Autocomplete: helper.PredictAppName(ctx, ctx.Profile.OrganizationID, ctx.Profile.ProjectID, opts.PreviewClient),
 		},
 		RunF: func(c *cmd.Command, args []string) error {
 			opts.AppName = args[0]
@@ -70,6 +69,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 			return readRun(opts)
 		},
 	}
+	cmd.Args.Autocomplete = helper.PredictAppName(ctx, cmd, preview_secret_service.New(ctx.HCP, nil))
 
 	return cmd
 }

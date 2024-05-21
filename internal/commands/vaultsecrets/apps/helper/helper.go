@@ -14,13 +14,19 @@ import (
 )
 
 // PredictAppName returns a predict function for application names.
-func PredictAppName(ctx *cmd.Context, orgID, projectID string, client preview_secret_service.ClientService) complete.PredictFunc {
+func PredictAppName(ctx *cmd.Context, c *cmd.Command, client preview_secret_service.ClientService) complete.PredictFunc {
 	return func(args complete.Args) []string {
-		if len(args.Completed) > 1 {
+		// Parse the args
+		remainingArgs, err := ctx.ParseFlags(c, args.All)
+		if err != nil {
 			return nil
 		}
 
-		apps, err := getApps(ctx.ShutdownCtx, orgID, projectID, client)
+		if len(remainingArgs) > 1 {
+			return nil
+		}
+
+		apps, err := getApps(ctx.ShutdownCtx, ctx.Profile.OrganizationID, ctx.Profile.ProjectID, client)
 		if err != nil {
 			return nil
 		}
