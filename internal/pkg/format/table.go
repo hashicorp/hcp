@@ -30,18 +30,22 @@ func (o *Outputter) outputTable(d Displayer) error {
 	}
 
 	// Create the table outputter
-	tbl := table.New()
-	tbl.AddRow(headers...)
-	tbl.Wrap = true
-	tbl.MaxColWidth = uint(o.io.TerminalWidth() / len(headers))
-	tbl.HeaderFormatter = o.defaultHeaderFormatter
-	tbl.FirstColumnFormatter = o.defaultFirstColumnFormatter
+	tbl := table.Table{
+		LineLength:           uint(o.io.TerminalWidth()),
+		Wrap:                 true,
+		SeparatorSpaces:      3,
+		HeaderFormatter:      o.defaultHeaderFormatter,
+		FirstColumnFormatter: o.defaultFirstColumnFormatter,
+	}
 
 	// If the displayer has implemented the table formatter, then use it.
 	if formatter, ok := d.(TableFormatter); ok {
 		tbl.HeaderFormatter = formatter.FirstColumnFormatter
 		tbl.FirstColumnFormatter = formatter.HeaderFormatter
 	}
+
+	// Add the headers
+	tbl.AddRow(headers...)
 
 	// Get the payload
 	var p any
