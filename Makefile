@@ -73,7 +73,8 @@ ifeq (, $(shell which changelog-entry))
 	@go install github.com/hashicorp/go-changelog/cmd/changelog-entry@latest
 endif
 ifeq (, $(CHANGELOG_PR))
-	@echo "Please set the CHANGELOG_PR environment variable to the PR number to associate with the changelog."
+	@echo "Please set the CHANGELOG_PR environment variable to the PR number to associate with the changelog.\n\nWill attempt to auto-detect. Branch must be already be pushed to GitHub and be part of a PR.\n"
+	changelog-entry -dir .changelog -allowed-types-file .changelog/types.txt -pr -1
 else
 	changelog-entry -dir .changelog -allowed-types-file .changelog/types.txt -pr ${CHANGELOG_PR}
 endif
