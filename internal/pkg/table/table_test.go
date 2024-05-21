@@ -13,6 +13,7 @@ import (
 // This test ensures that we expand columns to fill the width of the line if the
 // total output is less than the line width.
 func TestTable_LessThanLineWidth(t *testing.T) {
+	t.Parallel()
 	r := require.New(t)
 	tbl := &Table{
 		LineLength:      22,
@@ -38,6 +39,7 @@ func TestTable_LessThanLineWidth(t *testing.T) {
 // This test ensures that column width is evenly distributed when the overall
 // output exceeds the line length.
 func TestTable_MoreThanLineWidth(t *testing.T) {
+	t.Parallel()
 	r := require.New(t)
 	tbl := &Table{
 		LineLength:      18,
@@ -66,6 +68,7 @@ func TestTable_MoreThanLineWidth(t *testing.T) {
 }
 
 func TestCell(t *testing.T) {
+	t.Parallel()
 	r := require.New(t)
 	c := &cell{
 		data:  "foo bar",
@@ -83,6 +86,7 @@ func TestCell(t *testing.T) {
 }
 
 func TestRow(t *testing.T) {
+	t.Parallel()
 	r := require.New(t)
 	row := &row{
 		separator: "  ",

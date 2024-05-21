@@ -38,7 +38,7 @@ type Table struct {
 	// maxColWidth is the maximum allowed width for cells in the table
 	maxColWidth uint
 
-	// separator is the seperator for columns in the table. Default is "\t"
+	// separator is the separator for columns in the table. Default is "\t"
 	separator string
 }
 
@@ -164,7 +164,7 @@ func (r *row) string() string {
 		}
 	}
 
-	// allocate a two-dimentional array of cells for each line and add size them
+	// allocate a two-dimensional array of cells for each line and add size them
 	cells := make([][]*cell, lc)
 	for x := 0; x < lc; x++ {
 		cells[x] = make([]*cell, len(r.cells))
@@ -206,7 +206,7 @@ type cell struct {
 	// width is the width of the cell
 	width uint
 
-	// wrap when true wraps the contents of the cell when the lenght exceeds the width
+	// wrap when true wraps the contents of the cell when the length exceeds the width
 	wrap bool
 
 	// data is the cell data
