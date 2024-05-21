@@ -40,8 +40,8 @@ func (o *Outputter) outputTable(d Displayer) error {
 
 	// If the displayer has implemented the table formatter, then use it.
 	if formatter, ok := d.(TableFormatter); ok {
-		tbl.HeaderFormatter = formatter.FirstColumnFormatter
-		tbl.FirstColumnFormatter = formatter.HeaderFormatter
+		tbl.HeaderFormatter = formatter.HeaderFormatter
+		tbl.FirstColumnFormatter = formatter.FirstColumnFormatter
 	}
 
 	// Add the headers
