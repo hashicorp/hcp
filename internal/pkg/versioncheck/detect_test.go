@@ -35,7 +35,7 @@ func testCheckerWithStatePath(t *testing.T, currentVersion, statePath string) *t
 		statePath: statePath,
 	}
 	var err error
-	tc.c, err = newChecker(tc.io, tc.statePath, currentVersion, tc.client)
+	tc.c, err = newChecker(tc.io, tc.statePath, currentVersion, tc.client, true)
 	if err != nil {
 		t.Fatalf("failed to create checker: %s", err)
 	}
@@ -68,13 +68,12 @@ func TestChecker_Check_CancelCtx(t *testing.T) {
 }
 
 func TestChecker_Check_InCI(t *testing.T) {
-	t.Parallel()
 	cases := []string{"CI", "BUILD_NUMBER", "RUN_ID"}
 	for _, c := range cases {
 		t.Run(c, func(t *testing.T) {
-			t.Parallel()
 			r := require.New(t)
 			tc := testChecker(t, "1.2.3")
+			tc.c.skipCICheck = false
 			t.Setenv(c, "1")
 			r.NoError(tc.c.Check(context.Background()))
 			r.False(tc.c.UpdateToDisplay())

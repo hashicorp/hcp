@@ -33,6 +33,11 @@ type Checker struct {
 	currentVersion *version.Version
 	checkState     *versionCheckState
 	statePath      string
+
+	// skipCICheck allows for skipping the CI variables. This is needed when
+	// testing, since we test in CI environments.
+	skipCICheck bool
+
 	sync.Mutex
 }
 
@@ -41,12 +46,11 @@ type Checker struct {
 // stateFilePath.
 func New(io iostreams.IOStreams, stateFilePath string) (*Checker, error) {
 	return newChecker(io, stateFilePath,
-		hcpversion.FullVersion(), operations.New(client.Default.Transport, nil))
+		hcpversion.FullVersion(), operations.New(client.Default.Transport, nil), false)
 }
 
 func newChecker(io iostreams.IOStreams, stateFilePath string,
-	currentVersion string, client operations.ClientService) (*Checker, error) {
-
+	currentVersion string, client operations.ClientService, skipCICheck bool) (*Checker, error) {
 	// Parse the current version.
 	current, err := version.NewVersion(currentVersion)
 	if err != nil {
@@ -76,6 +80,7 @@ func newChecker(io iostreams.IOStreams, stateFilePath string,
 		client:         client,
 		currentVersion: current,
 		statePath:      path,
+		skipCICheck:    skipCICheck,
 	}, nil
 }
 
@@ -183,7 +188,7 @@ func (c *Checker) getCheckState() *versionCheckState {
 // shouldCheckNewVersion returns whether to check for a new version.
 func (c *Checker) shouldCheckNewVersion() bool {
 	// Don't check for new versions in CI environments.
-	if isCI() {
+	if !c.skipCICheck && isCI() {
 		return false
 	}
 
