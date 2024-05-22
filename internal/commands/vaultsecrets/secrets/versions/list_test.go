@@ -193,7 +193,7 @@ func TestListRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Contains(io.Output.String(), "Version  Created At")
+			r.Contains(io.Output.String(), "Version   Created At")
 		})
 	}
 }
