@@ -1,0 +1,3 @@
+```release-note:improvement
+format: Improved table output when length exceeds terminal width.
+```

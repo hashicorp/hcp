@@ -71,9 +71,9 @@ func ExampleOutputter() {
 	fmt.Println(strings.Join(lines, "\n"))
 
 	// Output:
-	// Name     ID   Description  Bytes    Metadata Owner  Metadata Created At
-	// hello    123  world        100      Bob Builder     2021-01-01
-	// another  456  example      1048576  Jeff Bezos      2023-02-04
+	// Name      ID    Description   Bytes     Metadata Owner   Metadata Created At
+	// hello     123   world         100       Bob Builder      2021-01-01
+	// another   456   example       1048576   Jeff Bezos       2023-02-04
 	//
 
 }
