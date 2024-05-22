@@ -43,7 +43,7 @@ func TestNewCmdRead(t *testing.T) {
 		Expect  *ReadOpts
 	}{
 		{
-			Name:    "No many args",
+			Name:    "No args",
 			Profile: testProfile,
 			Args:    []string{},
 			Error:   "accepts 1 arg(s), received 0",
