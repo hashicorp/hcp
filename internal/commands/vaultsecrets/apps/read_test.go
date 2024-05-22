@@ -154,7 +154,7 @@ func TestReadRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Contains(io.Output.String(), fmt.Sprintf("App Name      Description  \n%s", opts.AppName))
+			r.Contains(io.Output.String(), fmt.Sprintf("App Name       Description\n%s", opts.AppName))
 		})
 	}
 }
