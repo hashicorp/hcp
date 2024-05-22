@@ -27,7 +27,6 @@ func NewCmdSecrets(ctx *cmd.Context) *cmd.Command {
 					Name:         "app",
 					DisplayValue: "NAME",
 					Description:  "The name of the Vault Secrets application. If not specified, the value from the active profile will be used.",
-					Shorthand:    "a",
 					Value:        appname.Flag(),
 				},
 			},
