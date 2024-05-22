@@ -48,7 +48,7 @@ func NewCmdRun(ctx *cmd.Context, runF func(*RunOpts) error) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "run",
-		ShortHelp: "Run a process while injecting secrets from a Vault Secrets app as an environment variable.",
+		ShortHelp: "Run a process with secrets from a Vault Secrets app.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets run" }} command lets you
 		run the provided command as a child process while injecting
