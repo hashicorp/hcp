@@ -5,7 +5,7 @@ ROOT_DIR = $(dir $(abspath $(firstword $(MAKEFILE_LIST))))
 # the mock file is generated in the same package as the actual implementation,
 # store the mock file in MOCKERY_OUTPUT_FILES.
 MOCKERY_DIRS=./ internal/commands/auth/ internal/pkg/api/iampolicy
-MOCKERY_OUTPUT_DIRS=internal/pkg/api/mocks internal/commands/auth/mocks
+MOCKERY_OUTPUT_DIRS=internal/pkg/api/mocks internal/commands/auth/mocks internal/pkg/api/releasesapi/mocks
 MOCKERY_OUTPUT_FILES=internal/pkg/api/iampolicy/mock_setter.go \
 					 internal/pkg/api/iampolicy/mock_resource_updater.go
 
@@ -20,6 +20,10 @@ gen/docs: go/build ## Generate the HCP CLI documentation
 	@mkdir -p web-docs
 	@rm -rf web-docs/*
 	@./bin/gendocs -output-dir web-docs/
+
+.PHONY: gen/releasesapi
+gen/releasesapi: ## Generate the releases API client
+	@./hack/gen_releases_client.sh
 
 .PHONY: go/build
 go/build: ## Build the HCP CLI binary

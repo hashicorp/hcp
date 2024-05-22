@@ -1,0 +1,3 @@
+```release-note:improvement
+Detect new versions of the CLI and prompt for update.
+```
