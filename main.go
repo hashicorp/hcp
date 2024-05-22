@@ -66,8 +66,9 @@ func realMain() int {
 	// Create the version checker
 	checker, err := versioncheck.New(io, versionCheckStatePath)
 	if err != nil {
+		// On error, a nil checker is returned but it is still safe to call
+		// Check/Display.
 		fmt.Fprintf(os.Stderr, "failed to configure version checker: %v\n", err)
-		return 1
 	}
 
 	// Start checking for a new version as soon as possible
@@ -137,8 +138,10 @@ func realMain() int {
 		fmt.Fprintf(io.Err(), "Error executing hcp: %s\n", err.Error())
 	}
 
-	// Cancel the update check if it hasn't finished already
-	if checker.UpdateToDisplay() && !isAutocomplete() {
+	// Display the check results if we aren't being run in autocomplete. The
+	// check results will only be displayed if there is a new version and we
+	// haven't prompted recently.
+	if !isAutocomplete() {
 		checker.Display()
 	}
 

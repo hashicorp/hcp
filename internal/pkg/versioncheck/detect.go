@@ -86,6 +86,10 @@ func newChecker(io iostreams.IOStreams, stateFilePath string,
 
 // Check checks for a new version of the HCP CLI.
 func (c *Checker) Check(ctx context.Context) error {
+	if c == nil {
+		return nil
+	}
+
 	if !c.shouldCheckNewVersion() {
 		return nil
 	}
@@ -136,16 +140,12 @@ func (c *Checker) Check(ctx context.Context) error {
 	return nil
 }
 
-// UpdateToDisplay returns whether there is a new version to display. If called
-// before Check is complete, it will return false. It will also return false if the
-// current version is the same as the latest version or we recently displayed the
-// update message.
-func (c *Checker) UpdateToDisplay() bool {
-	return c.getCheckState() != nil
-}
-
 // Display displays the new version information to the user.
 func (c *Checker) Display() {
+	if c == nil {
+		return
+	}
+
 	vs := c.getCheckState()
 	if vs == nil {
 		return

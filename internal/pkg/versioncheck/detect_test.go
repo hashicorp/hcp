@@ -64,7 +64,6 @@ func TestChecker_Check_CancelCtx(t *testing.T) {
 	tc.client.EXPECT().ListReleasesV1(mock.Anything, mock.Anything).Once().Return(nil, context.Canceled)
 	err := tc.c.Check(ctx)
 	r.NoError(err)
-	r.False(tc.c.UpdateToDisplay())
 }
 
 func TestChecker_Check_InCI(t *testing.T) {
@@ -76,7 +75,6 @@ func TestChecker_Check_InCI(t *testing.T) {
 			tc.c.skipCICheck = false
 			t.Setenv(c, "1")
 			r.NoError(tc.c.Check(context.Background()))
-			r.False(tc.c.UpdateToDisplay())
 		})
 	}
 }
@@ -95,7 +93,6 @@ func TestChecker_Check_RecentUpdate(t *testing.T) {
 
 	// Check if there is an upgrade available
 	r.NoError(tc.c.Check(context.Background()))
-	r.False(tc.c.UpdateToDisplay())
 }
 
 func stringToPtr(s string) *string {
@@ -140,7 +137,6 @@ func TestChecker_Check(t *testing.T) {
 
 	// Check if there is an upgrade available
 	r.NoError(tc.c.Check(context.Background()))
-	r.True(tc.c.UpdateToDisplay())
 
 	cs := tc.c.getCheckState()
 	r.Equal(expectedVersion, *cs.latestRelease.Version)
@@ -167,4 +163,12 @@ func TestChecker_Check_InvalidState_Read(t *testing.T) {
 	expectedErr := fmt.Errorf("fine, just want to test that the api is still called")
 	tc.client.EXPECT().ListReleasesV1(mock.Anything, mock.Anything).Once().Return(nil, expectedErr)
 	r.ErrorIs(tc.c.Check(context.Background()), expectedErr)
+}
+
+func TestChecker_Check_Nil(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+	var c *Checker
+	r.NoError(c.Check(context.Background()))
+	c.Display()
 }
