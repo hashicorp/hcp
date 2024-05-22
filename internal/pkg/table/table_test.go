@@ -51,7 +51,7 @@ func TestTable_MoreThanLineWidth(t *testing.T) {
 	tbl.AddRow("short", "alongervalue")        // 5  + 2 + 12 = 19
 	tbl.AddRow("alongervalue", "alongervalue") // 12 + 2 + 12 = 26
 
-	// Only have two rows and but expect the second to be wrapped.
+	// Expect both rows to be wrapped.
 	// header1   header2
 	// short     alongerv
 	//           alue

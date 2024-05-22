@@ -65,13 +65,13 @@ func (t *Table) String() string {
 	t.maxColWidth = (t.LineLength - uint(headerSpacing)) / uint(numHeaders)
 
 	// determine the width for each column (cell in a row)
-	var colwidths []uint
+	var colWidths []uint
 	var rawColWidths []uint
 	for _, row := range t.rows {
 		for i, cell := range row.cells {
 			// resize colwidth array
-			if i+1 > len(colwidths) {
-				colwidths = append(colwidths, 0)
+			if i+1 > len(colWidths) {
+				colWidths = append(colWidths, 0)
 				rawColWidths = append(rawColWidths, 0)
 			}
 			cellwidth := cell.lineWidth()
@@ -82,8 +82,8 @@ func (t *Table) String() string {
 			if t.maxColWidth != 0 && cellwidth > t.maxColWidth {
 				cellwidth = t.maxColWidth
 			}
-			if cellwidth > colwidths[i] {
-				colwidths[i] = cellwidth
+			if cellwidth > colWidths[i] {
+				colWidths[i] = cellwidth
 			}
 		}
 	}
@@ -92,21 +92,21 @@ func (t *Table) String() string {
 	// the remaining width to the columns whose colwidth is less than the
 	// rawColWidths.
 	if t.LineLength > 0 {
-		totalWidth := uint(int(t.SeparatorSpaces) * (len(colwidths) - 1))
-		for _, w := range colwidths {
+		totalWidth := uint(int(t.SeparatorSpaces) * (len(colWidths) - 1))
+		for _, w := range colWidths {
 			totalWidth += w
 		}
 
 		// Determine the remaining width to distribute.
 		remainingWidth := t.LineLength - totalWidth
 		if remainingWidth > 0 {
-			for i, w := range colwidths {
+			for i, w := range colWidths {
 				if desiredWidth := rawColWidths[i]; w < desiredWidth {
 					add := desiredWidth - w
 					if add > remainingWidth {
 						add = remainingWidth
 					}
-					colwidths[i] += add
+					colWidths[i] += add
 					remainingWidth -= add
 				}
 			}
@@ -122,7 +122,7 @@ func (t *Table) String() string {
 			row.firstColumnFormatter = t.FirstColumnFormatter
 		}
 		for i, cell := range row.cells {
-			cell.width = colwidths[i]
+			cell.width = colWidths[i]
 			cell.wrap = t.Wrap
 		}
 		lines = append(lines, row.string())
