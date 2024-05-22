@@ -12,6 +12,7 @@ import (
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/helper"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -73,6 +74,7 @@ func NewCmdOpen(ctx *cmd.Context, runF func(*OpenOpts) error) *cmd.Command {
 			return openRun(opts)
 		},
 	}
+	cmd.Args.Autocomplete = helper.PredictSecretName(ctx, cmd, opts.PreviewClient)
 
 	return cmd
 }

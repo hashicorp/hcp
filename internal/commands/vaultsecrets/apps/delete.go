@@ -9,6 +9,7 @@ import (
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/apps/helper"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -68,6 +69,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 			return deleteRun(opts)
 		},
 	}
+	cmd.Args.Autocomplete = helper.PredictAppName(ctx, cmd, preview_secret_service.New(ctx.HCP, nil))
 
 	return cmd
 }

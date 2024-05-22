@@ -4,6 +4,8 @@
 package secrets
 
 import (
+	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/apps/helper"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/versions"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -18,6 +20,7 @@ func NewCmdSecrets(ctx *cmd.Context) *cmd.Command {
 		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets" }} command group lets you
 		manage Vault Secrets application secrets.
 		`),
+		Aliases: []string{"s"},
 		Flags: cmd.Flags{
 			Persistent: []*cmd.Flag{
 				{
@@ -32,6 +35,13 @@ func NewCmdSecrets(ctx *cmd.Context) *cmd.Command {
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
 			return appname.Require(ctx)
 		},
+	}
+
+	// Autocomplete the persistent flag.
+	for _, f := range cmd.Flags.Persistent {
+		if f.Name == "app" {
+			f.Autocomplete = helper.PredictAppName(ctx, cmd, preview_secret_service.New(ctx.HCP, nil))
+		}
 	}
 
 	cmd.AddChild(NewCmdCreate(ctx, nil))

@@ -19,6 +19,7 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"github.com/posener/complete"
 )
 
 func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
@@ -72,6 +73,10 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 					DisplayValue: "DATA_FILE_PATH",
 					Description:  "File path to read secret data from. Set this to '-' to read the secret data from stdin.",
 					Value:        flagvalue.Simple("", &opts.SecretFilePath),
+					Autocomplete: complete.PredictOr(
+						complete.PredictFiles("*"),
+						complete.PredictSet("-"),
+					),
 				},
 			},
 		},
