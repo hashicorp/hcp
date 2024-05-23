@@ -58,7 +58,7 @@ $ hcp waypoint add-ons create -n=my-addon -a=my-application -d=my-addon-definiti
 					Required:     true,
 				},
 				{
-					Name:         "application-name",
+					Name:         "app",
 					DisplayValue: "NAME",
 					Description:  "The name of the application to which the add-on will be added.",
 					Value:        flagvalue.Simple("", &opts.ApplicationName),
