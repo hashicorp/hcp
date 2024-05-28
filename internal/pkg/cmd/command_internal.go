@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/go-openapi/runtime"
@@ -107,17 +108,7 @@ func (c *Command) Run(args []string) int {
 			return 1
 		} else if errors.As(err, &runtimeErr) && runtimeErr.IsCode(http.StatusUnauthorized) {
 			// Request failed because of authentication issues.
-			fmt.Fprintf(io.Err(), "%s %s\n\n",
-				cs.ErrorLabel(),
-				heredoc.New(io, heredoc.WithPreserveNewlines()).Mustf(`
-				Unauthorized request. Re-attempt by first logging out and back in, and then re-run the command.
-
-				  {{ Bold "$ hcp auth logout" }}
-				  {{ Bold "$ hcp auth login" }}
-				  {{ Bold "$ %s %s" }}
-			`, c.commandPath(), strings.Join(args, " "),
-				),
-			)
+			fmt.Fprintf(io.Err(), "%s %s\n\n", cs.ErrorLabel(), authErrorHelp(io, c.commandPath(), args))
 			return 1
 		}
 
@@ -126,6 +117,33 @@ func (c *Command) Run(args []string) int {
 	}
 
 	return 0
+}
+
+// authErrorHelp returns a help message for recovering from authentication errors.
+func authErrorHelp(io iostreams.IOStreams, commandPath string, args []string) string {
+	// Build the original command
+	command := "$ " + commandPath
+	for _, a := range args {
+		// If there are spaces in the argument, quote it.
+		if strings.Contains(a, " ") {
+			command += fmt.Sprintf(" %s", strconv.Quote(a))
+		} else {
+			command += fmt.Sprintf(" %s", a)
+		}
+	}
+
+	// Quote the entire command so we can inject it into the template as a
+	// variable.
+	command = strconv.Quote(command)
+
+	// Render the help message to logout, login, and re-run the command.
+	return heredoc.New(io, heredoc.WithPreserveNewlines(), heredoc.WithWidth(0)).Mustf(`
+		Unauthorized request. Re-attempt by first logging out and back in, and then re-run the command.
+
+		  {{ Bold "$ hcp auth logout" }}
+		  {{ Bold "$ hcp auth login" }}
+		  {{ with $cmd := %s }}{{ Bold $cmd }}{{ end }}
+	`, command)
 }
 
 // helpEntry is used to structure help output with titles.

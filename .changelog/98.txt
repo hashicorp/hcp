@@ -1,0 +1,3 @@
+```release-note:bug
+Fix rare panic that could occur on authentication error when running a command that had quoted arguments.
+```
