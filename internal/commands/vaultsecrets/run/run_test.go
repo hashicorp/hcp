@@ -42,23 +42,23 @@ func TestNewCmdRun(t *testing.T) {
 		Expect  *RunOpts
 	}{
 		{
-			Name:    "Missing command flag",
+			Name:    "Missing command arg",
 			Profile: testProfile,
 			Args:    []string{},
-			Error:   "missing required flag: --command=COMMAND",
+			Error:   "accepts 1 arg(s), received 0",
 		},
 		{
 			Name:    "Too many args",
 			Profile: testProfile,
-			Args:    []string{"foo", "--command", "env"},
-			Error:   "no arguments allowed, but received 1",
+			Args:    []string{"env", "foo"},
+			Error:   "accepts 1 arg(s), received 2",
 		},
 		{
 			Name:    "Good",
 			Profile: testProfile,
-			Args:    []string{"--command", "env"},
+			Args:    []string{"env"},
 			Expect: &RunOpts{
-				App:     testProfile(t).VaultSecrets.AppName,
+				AppName: testProfile(t).VaultSecrets.AppName,
 				Command: "env",
 			},
 		},
@@ -83,7 +83,7 @@ func TestNewCmdRun(t *testing.T) {
 			var gotOpts *RunOpts
 			runCmd := NewCmdRun(ctx, func(o *RunOpts) error {
 				gotOpts = o
-				gotOpts.App = c.Profile(t).VaultSecrets.AppName
+				gotOpts.AppName = c.Profile(t).VaultSecrets.AppName
 				return nil
 			})
 			runCmd.SetIO(io)
@@ -97,7 +97,7 @@ func TestNewCmdRun(t *testing.T) {
 
 			r.Zero(code, io.Error.String())
 			r.NotNil(gotOpts)
-			r.Equal(c.Expect.App, gotOpts.App)
+			r.Equal(c.Expect.AppName, gotOpts.AppName)
 			r.Equal(c.Expect.Command, gotOpts.Command)
 		})
 	}
@@ -148,7 +148,7 @@ func TestRunRun(t *testing.T) {
 				Profile:       testProfile(t),
 				Output:        format.New(io),
 				PreviewClient: vs,
-				App:           testProfile(t).VaultSecrets.AppName,
+				AppName:       testProfile(t).VaultSecrets.AppName,
 				Command:       "echo \"Testing\"",
 			}
 
