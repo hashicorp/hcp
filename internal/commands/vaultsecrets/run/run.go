@@ -6,6 +6,10 @@ package run
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/exec"
+	"strings"
+
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/apps/helper"
@@ -15,9 +19,6 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
-	"os"
-	"os/exec"
-	"strings"
 )
 
 type RunOpts struct {
@@ -104,8 +105,7 @@ func runRun(opts *RunOpts) (err error) {
 	}
 
 	childProcess := setupChildProcess(opts.Ctx, opts.Command, envSecrets)
-	childProcess.Run()
-
+	err = childProcess.Run()
 	if err != nil {
 		return fmt.Errorf("failed to run with secrets in app %q: %w", opts.AppName, err)
 	}
