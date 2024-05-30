@@ -8,7 +8,6 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-openapi/runtime v0.28.0
 	github.com/go-openapi/strfmt v0.23.0
-	github.com/hashicorp/consul-template v0.37.6
 	github.com/hashicorp/go-hclog v1.5.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/go-version v1.6.0
