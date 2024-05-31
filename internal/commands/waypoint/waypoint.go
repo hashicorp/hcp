@@ -4,9 +4,7 @@
 package waypoint
 
 import (
-	"github.com/hashicorp/hcp/internal/commands/waypoint/actions"
 	addon "github.com/hashicorp/hcp/internal/commands/waypoint/add-ons"
-	"github.com/hashicorp/hcp/internal/commands/waypoint/agent"
 	"github.com/hashicorp/hcp/internal/commands/waypoint/applications"
 	"github.com/hashicorp/hcp/internal/commands/waypoint/templates"
 	"github.com/hashicorp/hcp/internal/commands/waypoint/tfcconfig"
@@ -17,7 +15,7 @@ import (
 func NewCmdWaypoint(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "waypoint",
-		ShortHelp: "Manage Waypoint.",
+		ShortHelp: "Manage HCP Waypoint.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp waypoint" }} command group lets you
 		manage HCP Waypoint resources through the CLI. These commands let you to interact
@@ -26,8 +24,9 @@ func NewCmdWaypoint(ctx *cmd.Context) *cmd.Command {
 	}
 
 	cmd.AddChild(tfcconfig.NewCmdTFCConfig(ctx))
-	cmd.AddChild(actions.NewCmdActionConfig(ctx))
-	cmd.AddChild(agent.NewCmdAgent(ctx))
+	// TODO: Enable later
+	// cmd.AddChild(actions.NewCmdActionConfig(ctx))
+	// cmd.AddChild(agent.NewCmdAgent(ctx))
 	cmd.AddChild(templates.NewCmdTemplate(ctx))
 	cmd.AddChild(addon.NewCmdAddOn(ctx))
 	cmd.AddChild(applications.NewCmdApplications(ctx))
