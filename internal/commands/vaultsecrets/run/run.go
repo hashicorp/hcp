@@ -6,10 +6,14 @@ package run
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
+	"syscall"
 
+	"github.com/hashicorp/go-hclog"
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/apps/helper"
@@ -26,6 +30,7 @@ type RunOpts struct {
 	Profile *profile.Profile
 	IO      iostreams.IOStreams
 	Output  *format.Outputter
+	Logger  hclog.Logger
 
 	AppName       string
 	Command       string
@@ -84,7 +89,6 @@ func NewCmdRun(ctx *cmd.Context, runF func(*RunOpts) error) *cmd.Command {
 		},
 		RunF: func(c *cmd.Command, args []string) error {
 			opts.Command = args[0]
-
 			opts.AppName = appname.Get()
 
 			if runF != nil {
@@ -93,7 +97,11 @@ func NewCmdRun(ctx *cmd.Context, runF func(*RunOpts) error) *cmd.Command {
 			return runRun(opts)
 		},
 	}
-	cmd.Args.Autocomplete = helper.PredictAppName(ctx, cmd, preview_secret_service.New(ctx.HCP, nil))
+	for _, f := range cmd.Flags.Local {
+		if f.Name == "app" {
+			f.Autocomplete = helper.PredictAppName(ctx, cmd, opts.PreviewClient)
+		}
+	}
 
 	return cmd
 }
@@ -105,12 +113,24 @@ func runRun(opts *RunOpts) (err error) {
 	}
 
 	childProcess := setupChildProcess(opts.Ctx, opts.Command, envSecrets)
-	err = childProcess.Run()
-	if err != nil {
+
+	if err := childProcess.Run(); err != nil {
 		return fmt.Errorf("failed to run with secrets in app %q: %w", opts.AppName, err)
 	}
 
-	return nil
+	sigC := make(chan os.Signal, 1)
+	signal.Notify(sigC, os.Interrupt, syscall.SIGTERM)
+
+	for {
+		select {
+		case <-sigC:
+			log.Print("from sigC")
+			return nil
+		case <-opts.Ctx.Done():
+			log.Print("from ctx done")
+			return nil
+		}
+	}
 }
 
 func getAllSecretsForEnv(opts *RunOpts) ([]string, error) {
