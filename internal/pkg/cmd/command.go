@@ -299,7 +299,7 @@ type ExitCodeError struct {
 	Code int
 }
 
-// NewExitError returns an ExitCodError. This can be returned to have the
+// NewExitError returns an ExitCodeError. This can be returned to have the
 // command exit code be set to a specific value.
 func NewExitError(code int, wrapErr error) error {
 	return &ExitCodeError{
