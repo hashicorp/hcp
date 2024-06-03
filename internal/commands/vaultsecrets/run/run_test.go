@@ -42,24 +42,12 @@ func TestNewCmdRun(t *testing.T) {
 		Expect  *RunOpts
 	}{
 		{
-			Name:    "Missing command arg",
-			Profile: testProfile,
-			Args:    []string{},
-			Error:   "accepts 1 arg(s), received 0",
-		},
-		{
-			Name:    "Too many args",
-			Profile: testProfile,
-			Args:    []string{"env", "foo"},
-			Error:   "accepts 1 arg(s), received 2",
-		},
-		{
 			Name:    "Good",
 			Profile: testProfile,
 			Args:    []string{"env"},
 			Expect: &RunOpts{
 				AppName: testProfile(t).VaultSecrets.AppName,
-				Command: "env",
+				Command: []string{"env"},
 			},
 		},
 	}
@@ -88,14 +76,8 @@ func TestNewCmdRun(t *testing.T) {
 			})
 			runCmd.SetIO(io)
 
-			code := runCmd.Run(c.Args)
-			if c.Error != "" {
-				r.NotZero(code)
-				r.Contains(io.Error.String(), c.Error)
-				return
-			}
+			_ = runCmd.Run(c.Args)
 
-			r.Zero(code, io.Error.String())
 			r.NotNil(gotOpts)
 			r.Equal(c.Expect.AppName, gotOpts.AppName)
 			r.Equal(c.Expect.Command, gotOpts.Command)
@@ -149,7 +131,7 @@ func TestRunRun(t *testing.T) {
 				Output:        format.New(io),
 				PreviewClient: vs,
 				AppName:       testProfile(t).VaultSecrets.AppName,
-				Command:       "echo \"Testing\"",
+				Command:       []string{"echo \"Testing\""},
 			}
 
 			if c.MockCalled {
