@@ -4,6 +4,7 @@
 package cmd
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -110,4 +111,23 @@ func TestCommand_Logger(t *testing.T) {
 	root.AddChild(child)
 	r.Zero(child.Run([]string{}))
 	r.Contains(io.Error.String(), "hcp.child: hello, world!")
+}
+
+func TestCommand_ExitCode(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	// Create the command tree
+	io := iostreams.Test()
+	code := 42
+	err := fmt.Errorf("bad bad bad")
+	root := &Command{
+		Name: "root",
+		io:   io,
+		RunF: func(c *Command, args []string) error {
+			return NewExitError(code, err)
+		},
+	}
+	r.Equal(code, root.Run([]string{}))
+	r.Contains(io.Error.String(), err.Error())
 }
