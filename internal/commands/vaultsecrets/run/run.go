@@ -6,13 +6,6 @@ package run
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
-	"os/exec"
-	"os/signal"
-	"strings"
-	"syscall"
-
 	"github.com/hashicorp/go-hclog"
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
@@ -23,6 +16,9 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"os"
+	"os/exec"
+	"strings"
 )
 
 type RunOpts struct {
@@ -60,7 +56,7 @@ func NewCmdRun(ctx *cmd.Context, runF func(*RunOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Inject secrets as an environment variable:`,
+				Preamble: `Inject secrets as environment variables:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp vault-secrets run "env"
 				`),
@@ -118,19 +114,7 @@ func runRun(opts *RunOpts) (err error) {
 		return fmt.Errorf("failed to run with secrets in app %q: %w", opts.AppName, err)
 	}
 
-	sigC := make(chan os.Signal, 1)
-	signal.Notify(sigC, os.Interrupt, syscall.SIGTERM)
-
-	for {
-		select {
-		case <-sigC:
-			log.Print("from sigC")
-			return nil
-		case <-opts.Ctx.Done():
-			log.Print("from ctx done")
-			return nil
-		}
-	}
+	return nil
 }
 
 func getAllSecretsForEnv(opts *RunOpts) ([]string, error) {
