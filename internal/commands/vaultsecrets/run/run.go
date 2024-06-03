@@ -59,7 +59,7 @@ func NewCmdRun(ctx *cmd.Context, runF func(*RunOpts) error) *cmd.Command {
 			{
 				Preamble: `Inject secrets as environment variables:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp vault-secrets run "env"
+				$ hcp vault-secrets run 'env'
 				`),
 			},
 		},
