@@ -100,7 +100,9 @@ func (c *Command) Run(args []string) int {
 
 	// Run the command
 	if err := c.RunF(c, parsedArgs); err != nil {
+		exitCode := 1
 		var runtimeErr runtime.ClientResponseStatus
+		var exitCodeErr *ExitCodeError
 		if errors.Is(err, ErrDisplayHelp) {
 			return cli.RunResultHelp
 		} else if errors.Is(err, ErrDisplayUsage) {
@@ -110,10 +112,12 @@ func (c *Command) Run(args []string) int {
 			// Request failed because of authentication issues.
 			fmt.Fprintf(io.Err(), "%s %s\n\n", cs.ErrorLabel(), authErrorHelp(io, c.commandPath(), args))
 			return 1
+		} else if errors.As(err, &exitCodeErr) {
+			exitCode = exitCodeErr.Code
 		}
 
 		fmt.Fprintf(io.Err(), "%s %s\n", cs.ErrorLabel(), wordWrap(err.Error(), 120))
-		return 1
+		return exitCode
 	}
 
 	return 0

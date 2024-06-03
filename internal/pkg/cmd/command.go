@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/hashicorp/go-hclog"
@@ -290,3 +291,29 @@ func (c *Command) Logger() hclog.Logger {
 	c.logger = hclog.New(logOpt)
 	return c.logger
 }
+
+// ExitCodeError is an error that includes an exit code. If returned by a
+// command run, the command will exit using the specified exit code.
+type ExitCodeError struct {
+	Err  error
+	Code int
+}
+
+// NewExitError returns an ExitCodError. This can be returned to have the
+// command exit code be set to a specific value.
+func NewExitError(code int, wrapErr error) error {
+	return &ExitCodeError{
+		Err:  wrapErr,
+		Code: code,
+	}
+}
+
+func (e *ExitCodeError) Error() string {
+	if e.Err != nil {
+		return fmt.Sprintf("exit code %d: %v", e.Code, e.Err)
+	}
+
+	return fmt.Sprintf("exit code %d", e.Code)
+}
+
+func (e *ExitCodeError) Unwrap() error { return e.Err }
