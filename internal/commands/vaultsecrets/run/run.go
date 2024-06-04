@@ -121,7 +121,7 @@ func runRun(opts *RunOpts) (err error) {
 		var exitErr *exec.ExitError
 		if errors.As(err, &exitErr) {
 			exitCode := exitErr.ExitCode()
-			return fmt.Errorf("failed to run with secrets in app %q; received code %v : %w", opts.AppName, exitCode, err)
+			return cmd.NewExitError(exitCode, err)
 		} else {
 			return fmt.Errorf("failed to run with secrets in app %q: %w", opts.AppName, err)
 		}

@@ -6,6 +6,7 @@ package run
 import (
 	"context"
 	"errors"
+	"os/exec"
 	"testing"
 	"time"
 
@@ -44,10 +45,10 @@ func TestNewCmdRun(t *testing.T) {
 		{
 			Name:    "Good",
 			Profile: testProfile,
-			Args:    []string{"env"},
+			Args:    []string{"--app=test-app", "--", "env", "-i"},
 			Expect: &RunOpts{
 				AppName: testProfile(t).VaultSecrets.AppName,
-				Command: []string{"env"},
+				Command: []string{"env", "-i"},
 			},
 		},
 	}
@@ -170,6 +171,52 @@ func TestRunRun(t *testing.T) {
 			}
 
 			r.NoError(err)
+		})
+	}
+}
+
+func TestSetupChildProcess(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		Name        string
+		EnvVars     []string
+		Command     []string
+		ExpectedCmd *exec.Cmd
+	}{
+		{
+			Name:    "Single string command yields correct args",
+			EnvVars: []string{"test=123"},
+			Command: []string{"echo \"Testing\""},
+			ExpectedCmd: &exec.Cmd{
+				Args: []string{"echo", "\"Testing\""},
+				Env:  []string{"test=123"},
+				Path: "/bin/echo",
+			},
+		},
+		{
+			Name:    "Arbitrary args and multiple env vars",
+			EnvVars: []string{"test=123", "test2=abc"},
+			Command: []string{"go", "run", "main.go", "--flag=value"},
+			ExpectedCmd: &exec.Cmd{
+				Args: []string{"go", "run", "main.go", "--flag=value"},
+				Env:  []string{"test=123", "test2=abc"},
+				Path: "/opt/homebrew/bin/go",
+			},
+		},
+	}
+
+	for _, c := range cases {
+		c := c
+		t.Run(c.Name, func(t *testing.T) {
+			t.Parallel()
+			r := require.New(t)
+
+			cmd := setupChildProcess(context.Background(), c.Command, c.EnvVars)
+
+			r.Equal(cmd.Args, c.ExpectedCmd.Args)
+			r.Equal(cmd.Env, c.ExpectedCmd.Env)
+			r.Equal(cmd.Path, c.ExpectedCmd.Path)
 		})
 	}
 }
