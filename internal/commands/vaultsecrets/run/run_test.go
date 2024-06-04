@@ -191,7 +191,6 @@ func TestSetupChildProcess(t *testing.T) {
 			ExpectedCmd: &exec.Cmd{
 				Args: []string{"echo", "\"Testing\""},
 				Env:  []string{"test=123"},
-				Path: "/bin/echo",
 			},
 		},
 		{
@@ -201,7 +200,6 @@ func TestSetupChildProcess(t *testing.T) {
 			ExpectedCmd: &exec.Cmd{
 				Args: []string{"go", "run", "main.go", "--flag=value"},
 				Env:  []string{"test=123", "test2=abc"},
-				Path: "/opt/homebrew/bin/go",
 			},
 		},
 	}
@@ -216,7 +214,7 @@ func TestSetupChildProcess(t *testing.T) {
 
 			r.Equal(cmd.Args, c.ExpectedCmd.Args)
 			r.Equal(cmd.Env, c.ExpectedCmd.Env)
-			r.Equal(cmd.Path, c.ExpectedCmd.Path)
+			r.Contains(cmd.Path, c.ExpectedCmd.Args[0])
 		})
 	}
 }
