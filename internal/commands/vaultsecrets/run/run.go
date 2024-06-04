@@ -52,10 +52,16 @@ func NewCmdRun(ctx *cmd.Context, runF func(*RunOpts) error) *cmd.Command {
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets run" }} command lets you run 
 		the provided command as a child process while injecting all of the app's secrets
-		as environment variables, with all secret names converted to upper-case. The stdout
-		and stderr from the child process are forwarded to the top level {{ template "mdCodeOrBold" "hcp vault-secrets run" }} command.
+		as environment variables, with all secret names converted to upper-case. STDIN, STDOUT,
+		and STDERR will be passed to the created child process.
 		`),
 		Examples: []cmd.Example{
+			{
+				Preamble: `Display your current environment with app secrets included`,
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				$ hcp vault-secrets run 'env'
+				`),
+			},
 			{
 				Preamble: `Inject secrets as environment variables:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
@@ -106,7 +112,7 @@ func NewCmdRun(ctx *cmd.Context, runF func(*RunOpts) error) *cmd.Command {
 
 func runRun(opts *RunOpts) (err error) {
 	if len(opts.Command) == 0 {
-		return fmt.Errorf("failed to run app secrets from name %q - no command provided", opts.AppName)
+		return fmt.Errorf("failed to run with secrets in app %q: no command provided", opts.AppName)
 	}
 
 	envSecrets, err := getAllSecretsForEnv(opts)
@@ -148,7 +154,7 @@ func getAllSecretsForEnv(opts *RunOpts) ([]string, error) {
 		switch {
 		case secret.RotatingVersion != nil:
 			for name, value := range secret.RotatingVersion.Values {
-				result = append(result, fmt.Sprintf("%v_%v=%v", strings.ToUpper(secret.Name), name, value))
+				result = append(result, fmt.Sprintf("%v_%v=%v", strings.ToUpper(secret.Name), strings.ToUpper(name), value))
 			}
 		case secret.StaticVersion != nil:
 			result = append(result, fmt.Sprintf("%v=%v", strings.ToUpper(secret.Name), secret.StaticVersion.Value))
