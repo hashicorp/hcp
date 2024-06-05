@@ -38,7 +38,7 @@ func TestNewCmdReadBinding(t *testing.T) {
 			Error: "no arguments allowed, but received 2",
 		},
 		{
-			Name: "No Group Specific",
+			Name: "No Group Specified",
 			Profile: func(t *testing.T) *profile.Profile {
 				return profile.TestProfile(t).SetOrgID("123").SetProjectID("456")
 			},
