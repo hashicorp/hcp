@@ -19,7 +19,7 @@ func NewCmdIAM(ctx *cmd.Context) *cmd.Command {
 	}
 
 	// TODO: Uncomment as subcommands are added
-	// cmd.AddChild(NewCmdAddBinding(ctx, nil))
+	cmd.AddChild(NewCmdAddBinding(ctx, nil))
 	// cmd.AddChild(NewCmdDeleteBinding(ctx, nil))
 	cmd.AddChild(NewCmdReadPolicy(ctx, nil))
 	// cmd.AddChild(NewCmdSetPolicy(ctx, nil))
