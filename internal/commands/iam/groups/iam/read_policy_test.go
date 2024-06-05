@@ -27,14 +27,7 @@ func TestNewCmdReadBinding(t *testing.T) {
 		{
 			Name:    "No Org",
 			Profile: profile.TestProfile,
-			Error:   "Organization ID and Project ID must be configured",
-		},
-		{
-			Name: "No Project passed/profile",
-			Profile: func(t *testing.T) *profile.Profile {
-				return profile.TestProfile(t).SetOrgID("123")
-			},
-			Error: "Organization ID and Project ID must be configured",
+			Error:   "Organization ID must be configured",
 		},
 		{
 			Name: "Too many args",

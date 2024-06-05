@@ -70,7 +70,7 @@ func NewCmdReadPolicy(ctx *cmd.Context, runF func(*ReadPolicyOpts) error) *cmd.C
 			return readPolicyRun(opts)
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
-			return cmd.RequireOrgAndProject(ctx)
+			return cmd.RequireOrganization(ctx)
 		},
 	}
 
@@ -92,15 +92,10 @@ type ReadPolicyOpts struct {
 func readPolicyRun(opts *ReadPolicyOpts) error {
 	resourceName := helper.ResourceName(opts.GroupName, opts.Profile.OrganizationID)
 
-	resourceID, err := helper.GetResourceIDFromResourceName(opts.Ctx, resourceName, opts.GroupsClient)
-	if err != nil {
-		return err
-	}
-
-	// Create our group IAM Updater
+	// Create the group IAM Updater
 	u := &iamUpdater{
-		groupID: resourceID,
-		client:  opts.ResourceClient,
+		resourceName: resourceName,
+		client:       opts.ResourceClient,
 	}
 
 	// Get the existing policy

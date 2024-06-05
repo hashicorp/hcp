@@ -68,19 +68,6 @@ func PredictGroupResourceNameSuffix(ctx context.Context, orgID string, client gr
 	}
 }
 
-// GetResourceIDFromResourceName retrieves the resource name from a group ID.
-func GetResourceIDFromResourceName(ctx context.Context, resourceName string, client groups_service.ClientService) (string, error) {
-	req := groups_service.NewGroupsServiceGetGroupParamsWithContext(ctx)
-	req.ResourceName = resourceName
-
-	resp, err := client.GroupsServiceGetGroup(req, nil)
-	if err != nil {
-		return "", fmt.Errorf("failed to get group: %w", err)
-	}
-
-	return resp.Payload.Group.ResourceID, nil
-}
-
 // GetGroups retrieves the groups in the organization.
 func GetGroups(ctx context.Context, orgID string, client groups_service.ClientService) ([]*models.HashicorpCloudIamGroup, error) {
 	req := groups_service.NewGroupsServiceListGroupsParamsWithContext(ctx)
