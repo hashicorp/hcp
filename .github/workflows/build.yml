@@ -6,6 +6,8 @@ on:
     branches:
       - main
       - release/**
+    tags:
+      - "pr/build-binaries"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
