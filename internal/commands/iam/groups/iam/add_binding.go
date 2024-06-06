@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-iam/stable/2019-12-10/client/groups_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-iam/stable/2019-12-10/client/iam_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/organization_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/resource_service"
@@ -16,13 +17,16 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
+	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
 
 func NewCmdAddBinding(ctx *cmd.Context, runF func(*AddBindingOpts) error) *cmd.Command {
 	opts := &AddBindingOpts{
-		Ctx: ctx.ShutdownCtx,
-		IO:  ctx.IO,
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		IO:      ctx.IO,
 
+		GroupsClient:   groups_service.New(ctx.HCP, nil),
 		ResourceClient: resource_service.New(ctx.HCP, nil),
 	}
 
@@ -37,13 +41,15 @@ func NewCmdAddBinding(ctx *cmd.Context, runF func(*AddBindingOpts) error) *cmd.C
 		To view the available roles to bind, run {{ template "mdCodeOrBold" "hcp iam roles list" }}.
 
 		Currently, the only supported role on a principal in a group is {{ template "mdCodeOrBold" "roles/iam.group-manager" }}.
+
+		A group manager can add/remove members from the group and update the group name/description.
 		`),
 		Examples: []cmd.Example{
 			{
 				Preamble: heredoc.New(ctx.IO).Must(`Bind a principal to role {{ template "mdCodeOrBold" "roles/iam.group-manager" }}:`),
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp iam groups iam add-binding \
-				  --group=8647ae06-ca65-467a-b72d-edba1f908fc8 \
+				  --group=Group-Name \
 				  --member=ef938a22-09cf-4be9-b4d0-1f4587f80f53 \
 				  --role=roles/iam.group-manager
 				`),
@@ -57,6 +63,7 @@ func NewCmdAddBinding(ctx *cmd.Context, runF func(*AddBindingOpts) error) *cmd.C
 					DisplayValue: "NAME",
 					Description:  "The name of the group to add the role binding to.",
 					Value:        flagvalue.Simple("", &opts.GroupName),
+					Autocomplete: helper.PredictGroupResourceNameSuffix(opts.Ctx, opts.Profile.OrganizationID, opts.GroupsClient),
 					Required:     true,
 				},
 				{
@@ -109,20 +116,21 @@ func NewCmdAddBinding(ctx *cmd.Context, runF func(*AddBindingOpts) error) *cmd.C
 }
 
 type AddBindingOpts struct {
-	Ctx context.Context
-	IO  iostreams.IOStreams
+	Ctx     context.Context
+	Profile *profile.Profile
+	IO      iostreams.IOStreams
 
 	Setter         iampolicy.Setter
 	GroupName      string
 	PrincipalID    string
 	Role           string
+	GroupsClient   groups_service.ClientService
 	ResourceClient resource_service.ClientService
 }
 
 func addBindingRun(opts *AddBindingOpts) error {
 	_, err := opts.Setter.AddBinding(opts.Ctx, opts.PrincipalID, opts.Role)
 	if err != nil {
-		fmt.Fprintf(opts.IO.Err(), "Principal %q bound to role %q.\n", opts.PrincipalID, opts.Role)
 		return err
 	}
 
