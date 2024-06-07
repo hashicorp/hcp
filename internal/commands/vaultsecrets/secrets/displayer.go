@@ -10,12 +10,13 @@ import (
 )
 
 type displayer struct {
-	secrets        []*models.Secrets20230613Secret
-	previewSecrets []*preview_models.Secrets20231128Secret
-	openAppSecrets []*models.Secrets20230613OpenSecret
-	single         bool
-	fields         []format.Field
-	format         format.Format
+	secrets               []*models.Secrets20230613Secret
+	previewSecrets        []*preview_models.Secrets20231128Secret
+	openAppSecrets        []*models.Secrets20230613OpenSecret
+	previewOpenAppSecrets []*preview_models.Secrets20231128OpenSecret
+	single                bool
+	fields                []format.Field
+	format                format.Format
 }
 
 func newDisplayer(single bool) *displayer {
@@ -37,6 +38,11 @@ func (d *displayer) PreviewSecrets(secrets ...*preview_models.Secrets20231128Sec
 
 func (d *displayer) OpenAppSecrets(secrets ...*models.Secrets20230613OpenSecret) *displayer {
 	d.openAppSecrets = secrets
+	return d
+}
+
+func (d *displayer) PreviewOpenAppSecrets(secrets ...*preview_models.Secrets20231128OpenSecret) *displayer {
+	d.previewOpenAppSecrets = secrets
 	return d
 }
 

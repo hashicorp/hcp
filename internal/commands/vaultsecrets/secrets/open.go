@@ -106,25 +106,25 @@ func openRun(opts *OpenOpts) (err error) {
 		}
 	}()
 
-	req := secret_service.NewOpenAppSecretParamsWithContext(opts.Ctx)
-	req.LocationOrganizationID = opts.Profile.OrganizationID
-	req.LocationProjectID = opts.Profile.ProjectID
+	req := preview_secret_service.NewOpenAppSecretParams()
+	req.OrganizationID = opts.Profile.OrganizationID
+	req.ProjectID = opts.Profile.ProjectID
 	req.AppName = opts.AppName
 	req.SecretName = opts.SecretName
 
-	resp, err := opts.Client.OpenAppSecret(req, nil)
+	resp, err := opts.PreviewClient.OpenAppSecret(req, nil)
 	if err != nil {
 		return fmt.Errorf("failed to read the secret %q: %w", opts.SecretName, err)
 	}
 
 	if opts.OutputFilePath != "" {
-		_, err = fd.WriteString(resp.Payload.Secret.Version.Value)
+		_, err = fd.WriteString(resp.Payload.Secret.StaticVersion.Value)
 		if err != nil {
 			return fmt.Errorf("failed to write the secret value to the output file %q: %w", opts.OutputFilePath, err)
 		}
 		fmt.Fprintf(opts.IO.Err(), "%s Successfully wrote plaintext secret with name %q to path %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName, opts.OutputFilePath)
 		return nil
 	}
-	d := newDisplayer(true).OpenAppSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty)
-	return opts.Output.Display(d.OpenAppSecrets(resp.Payload.Secret))
+	d := newDisplayer(true).PreviewOpenAppSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty)
+	return opts.Output.Display(d.PreviewOpenAppSecrets(resp.Payload.Secret))
 }
