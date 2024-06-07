@@ -106,7 +106,7 @@ func openRun(opts *OpenOpts) (err error) {
 		}
 	}()
 
-	req := preview_secret_service.NewOpenAppSecretParams()
+	req := preview_secret_service.NewOpenAppSecretParamsWithContext(opts.Ctx)
 	req.OrganizationID = opts.Profile.OrganizationID
 	req.ProjectID = opts.Profile.ProjectID
 	req.AppName = opts.AppName
