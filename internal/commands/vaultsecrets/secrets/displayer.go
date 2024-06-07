@@ -10,9 +10,10 @@ import (
 )
 
 type displayer struct {
-	secrets               []*models.Secrets20230613Secret
-	previewSecrets        []*preview_models.Secrets20231128Secret
-	openAppSecrets        []*models.Secrets20230613OpenSecret
+	secrets        []*models.Secrets20230613Secret
+	previewSecrets []*preview_models.Secrets20231128Secret
+	openAppSecrets []*models.Secrets20230613OpenSecret
+	//previewOpenAppSecrets []*preview_models.Secrets20231128OpenSecret
 	previewOpenAppSecrets []*preview_models.Secrets20231128OpenSecret
 	single                bool
 	fields                []format.Field
@@ -69,6 +70,10 @@ func (d *displayer) Payload() any {
 		return d.openAppSecretsPayload()
 	}
 
+	if d.previewOpenAppSecrets != nil {
+		return d.openAppSecretsPayload()
+	}
+
 	if d.secrets == nil {
 		return nil
 	}
@@ -77,6 +82,10 @@ func (d *displayer) Payload() any {
 
 func (d *displayer) FieldTemplates() []format.Field {
 	if d.openAppSecrets != nil {
+		return d.openAppSecretsFieldTemplate()
+	}
+
+	if d.previewOpenAppSecrets != nil {
 		return d.openAppSecretsFieldTemplate()
 	}
 
@@ -97,11 +106,16 @@ func (d *displayer) secretsFieldTemplate() []format.Field {
 			Name:        "Created At",
 			ValueFormat: "{{ .CreatedAt }}",
 		},
+		{
+			Name:        "Type",
+			ValueFormat: "{{ .Type }}",
+		},
 	}
 }
 
 func (d *displayer) openAppSecretsFieldTemplate() []format.Field {
 	fields := d.secretsFieldTemplate()
+
 	fields = append(fields, format.Field{
 		Name:        "Value",
 		ValueFormat: "{{ .Version.Value }}",
@@ -137,4 +151,14 @@ func (d *displayer) openAppSecretsPayload() any {
 		return d.openAppSecrets[0]
 	}
 	return d.openAppSecrets
+}
+
+func (d *displayer) previewOpenAppSecretsPayload() any {
+	if d.single {
+		if len(d.previewOpenAppSecrets) != 1 {
+			return nil
+		}
+		return d.previewOpenAppSecrets[0]
+	}
+	return d.previewOpenAppSecrets
 }
