@@ -89,17 +89,17 @@ func readRun(opts *ReadOpts) error {
 		return runOpenAppSecret(opts)
 	}
 
-	req := secret_service.NewGetAppSecretParamsWithContext(opts.Ctx)
-	req.LocationOrganizationID = opts.Profile.OrganizationID
-	req.LocationProjectID = opts.Profile.ProjectID
-	req.AppName = opts.AppName
-	req.SecretName = opts.SecretName
+	params := preview_secret_service.NewGetAppSecretParams()
+	params.OrganizationID = opts.Profile.OrganizationID
+	params.ProjectID = opts.Profile.ProjectID
+	params.AppName = opts.AppName
+	params.SecretName = opts.SecretName
 
-	resp, err := opts.Client.GetAppSecret(req, nil)
+	resp, err := opts.PreviewClient.GetAppSecret(params, nil)
 	if err != nil {
 		return fmt.Errorf("failed to read the secret %q: %w", opts.SecretName, err)
 	}
-	return opts.Output.Display(newDisplayer(true).Secrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty))
+	return opts.Output.Display(newDisplayer(true).PreviewSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty))
 }
 
 func runOpenAppSecret(opts *ReadOpts) error {
