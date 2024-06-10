@@ -99,11 +99,11 @@ func (d *displayer) openAppSecretsFieldTemplate() []format.Field {
 
 	fields = append(fields, []format.Field{
 		{
-			Name:        "Value",
-			ValueFormat: "{{ .StaticVersion.Value }}",
-		}, {
 			Name:        "Type",
 			ValueFormat: "{{ .Type }}",
+		}, {
+			Name:        "Value",
+			ValueFormat: "{{ .StaticVersion.Value }}",
 		},
 	}...)
 	return fields

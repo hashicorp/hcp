@@ -14,9 +14,9 @@ import (
 	"github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
-	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -154,15 +154,15 @@ func TestOpenRun(t *testing.T) {
 
 			io := iostreams.Test()
 			io.ErrorTTY = true
-			vs := mock_secret_service.NewMockClientService(t)
+			vs := mock_preview_secret_service.NewMockClientService(t)
 			opts := &OpenOpts{
-				Ctx:        context.Background(),
-				IO:         io,
-				Profile:    testProfile(t),
-				Output:     format.New(io),
-				Client:     vs,
-				AppName:    testProfile(t).VaultSecrets.AppName,
-				SecretName: testSecretName,
+				Ctx:           context.Background(),
+				IO:            io,
+				Profile:       testProfile(t),
+				Output:        format.New(io),
+				PreviewClient: vs,
+				AppName:       testProfile(t).VaultSecrets.AppName,
+				SecretName:    testSecretName,
 			}
 
 			if c.WriteToFile {
@@ -180,19 +180,19 @@ func TestOpenRun(t *testing.T) {
 				if c.RespErr {
 					vs.EXPECT().OpenAppSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 				} else {
-					vs.EXPECT().OpenAppSecret(&secret_service.OpenAppSecretParams{
-						LocationOrganizationID: testProfile(t).OrganizationID,
-						LocationProjectID:      testProfile(t).ProjectID,
-						AppName:                testProfile(t).VaultSecrets.AppName,
-						SecretName:             opts.SecretName,
-						Context:                opts.Ctx,
-					}, mock.Anything).Return(&secret_service.OpenAppSecretOK{
-						Payload: &models.Secrets20230613OpenAppSecretResponse{
-							Secret: &models.Secrets20230613OpenSecret{
+					vs.EXPECT().OpenAppSecret(&preview_secret_service.OpenAppSecretParams{
+						OrganizationID: testProfile(t).OrganizationID,
+						ProjectID:      testProfile(t).ProjectID,
+						AppName:        testProfile(t).VaultSecrets.AppName,
+						SecretName:     opts.SecretName,
+						Context:        opts.Ctx,
+					}, mock.Anything).Return(&preview_secret_service.OpenAppSecretOK{
+						Payload: &preview_models.Secrets20231128OpenAppSecretResponse{
+							Secret: &preview_models.Secrets20231128OpenSecret{
 								Name:          opts.SecretName,
-								LatestVersion: "3",
-								Version: &models.Secrets20230613OpenSecretVersion{
-									Version: "3",
+								LatestVersion: 3,
+								StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{
+									Version: 3,
 									Value:   "my super secret value",
 								},
 								CreatedAt: strfmt.DateTime(time.Now()),
