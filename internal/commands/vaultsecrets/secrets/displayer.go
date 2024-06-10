@@ -12,7 +12,7 @@ import (
 type displayer struct {
 	secrets        []*models.Secrets20230613Secret
 	previewSecrets []*preview_models.Secrets20231128Secret
-	openAppSecrets []*models.Secrets20230613OpenSecret
+	openAppSecrets []*preview_models.Secrets20231128OpenSecret
 	single         bool
 	fields         []format.Field
 	format         format.Format
@@ -35,7 +35,7 @@ func (d *displayer) PreviewSecrets(secrets ...*preview_models.Secrets20231128Sec
 	return d
 }
 
-func (d *displayer) OpenAppSecrets(secrets ...*models.Secrets20230613OpenSecret) *displayer {
+func (d *displayer) OpenAppSecrets(secrets ...*preview_models.Secrets20231128OpenSecret) *displayer {
 	d.openAppSecrets = secrets
 	return d
 }
@@ -96,10 +96,16 @@ func (d *displayer) secretsFieldTemplate() []format.Field {
 
 func (d *displayer) openAppSecretsFieldTemplate() []format.Field {
 	fields := d.secretsFieldTemplate()
-	fields = append(fields, format.Field{
-		Name:        "Value",
-		ValueFormat: "{{ .Version.Value }}",
-	})
+
+	fields = append(fields, []format.Field{
+		{
+			Name:        "Type",
+			ValueFormat: "{{ .Type }}",
+		}, {
+			Name:        "Value",
+			ValueFormat: "{{ .StaticVersion.Value }}",
+		},
+	}...)
 	return fields
 }
 
