@@ -5,9 +5,12 @@ package secrets
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"os"
+	"strings"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
@@ -117,14 +120,49 @@ func openRun(opts *OpenOpts) (err error) {
 		return fmt.Errorf("failed to read the secret %q: %w", opts.SecretName, err)
 	}
 
+	var secretValue string
+
+	switch {
+	case resp.Payload.Secret.RotatingVersion != nil:
+		secretValue, err = formatSecretMap(resp.Payload.Secret.RotatingVersion.Values)
+		if err != nil {
+			secretValue = "<< COULD NOT ENCODE TO JSON >>"
+		}
+	case resp.Payload.Secret.StaticVersion != nil:
+		secretValue = resp.Payload.Secret.StaticVersion.Value
+	default:
+		secretValue = "<< SECRET TYPE NOT SUPPORTED >>"
+	}
+
+	secret := &models.Secrets20231128OpenSecret{
+		Name:          resp.Payload.Secret.Name,
+		CreatedAt:     resp.Payload.Secret.CreatedAt,
+		LatestVersion: resp.Payload.Secret.LatestVersion,
+		Type:          resp.Payload.Secret.Type,
+		// Doesn't matter if its static or rotating, this simplifies the output format
+		StaticVersion: &models.Secrets20231128OpenSecretStaticVersion{
+			Value: secretValue,
+		},
+	}
+
 	if opts.OutputFilePath != "" {
-		_, err = fd.WriteString(resp.Payload.Secret.StaticVersion.Value)
+		_, err = fd.WriteString(secret.StaticVersion.Value)
 		if err != nil {
 			return fmt.Errorf("failed to write the secret value to the output file %q: %w", opts.OutputFilePath, err)
 		}
 		fmt.Fprintf(opts.IO.Err(), "%s Successfully wrote plaintext secret with name %q to path %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName, opts.OutputFilePath)
 		return nil
 	}
-	d := newDisplayer(true).PreviewOpenAppSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty)
-	return opts.Output.Display(d.PreviewOpenAppSecrets(resp.Payload.Secret))
+
+	d := newDisplayer(true).OpenAppSecrets(secret).SetDefaultFormat(format.Pretty)
+	return opts.Output.Display(d.OpenAppSecrets(secret))
+}
+
+func formatSecretMap(secretMap map[string]string) (string, error) {
+	var buf strings.Builder
+	encoder := json.NewEncoder(&buf)
+	if err := encoder.Encode(secretMap); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }

@@ -79,16 +79,11 @@ type ReadOpts struct {
 
 	AppName       string
 	SecretName    string
-	OpenSecret    bool
 	PreviewClient preview_secret_service.ClientService
 	Client        secret_service.ClientService
 }
 
 func readRun(opts *ReadOpts) error {
-	if opts.OpenSecret {
-		return runOpenAppSecret(opts)
-	}
-
 	params := preview_secret_service.NewGetAppSecretParams()
 	params.OrganizationID = opts.Profile.OrganizationID
 	params.ProjectID = opts.Profile.ProjectID
@@ -100,20 +95,4 @@ func readRun(opts *ReadOpts) error {
 		return fmt.Errorf("failed to read the secret %q: %w", opts.SecretName, err)
 	}
 	return opts.Output.Display(newDisplayer(true).PreviewSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty))
-}
-
-func runOpenAppSecret(opts *ReadOpts) error {
-	req := secret_service.NewOpenAppSecretParamsWithContext(opts.Ctx)
-	req.LocationOrganizationID = opts.Profile.OrganizationID
-	req.LocationProjectID = opts.Profile.ProjectID
-	req.AppName = opts.AppName
-	req.SecretName = opts.SecretName
-
-	resp, err := opts.Client.OpenAppSecret(req, nil)
-	if err != nil {
-		return fmt.Errorf("failed to read the secret %q: %w", opts.SecretName, err)
-	}
-
-	d := newDisplayer(true).OpenAppSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty)
-	return opts.Output.Display(d.OpenAppSecrets(resp.Payload.Secret))
 }
