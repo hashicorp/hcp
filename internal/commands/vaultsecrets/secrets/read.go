@@ -84,13 +84,13 @@ type ReadOpts struct {
 }
 
 func readRun(opts *ReadOpts) error {
-	params := preview_secret_service.NewGetAppSecretParams()
-	params.OrganizationID = opts.Profile.OrganizationID
-	params.ProjectID = opts.Profile.ProjectID
-	params.AppName = opts.AppName
-	params.SecretName = opts.SecretName
+	req := preview_secret_service.NewGetAppSecretParamsWithContext(opts.Ctx)
+	req.OrganizationID = opts.Profile.OrganizationID
+	req.ProjectID = opts.Profile.ProjectID
+	req.AppName = opts.AppName
+	req.SecretName = opts.SecretName
 
-	resp, err := opts.PreviewClient.GetAppSecret(params, nil)
+	resp, err := opts.PreviewClient.GetAppSecret(req, nil)
 	if err != nil {
 		return fmt.Errorf("failed to read the secret %q: %w", opts.SecretName, err)
 	}
