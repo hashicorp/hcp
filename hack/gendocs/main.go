@@ -30,7 +30,7 @@ func run() error {
 	var outputNavJSON string
 	var linkPrefix string
 
-	flag.StringVar(&outputDir, "output-dir", "web-docs", "The output directory for the generated documentation")
+	flag.StringVar(&outputDir, "output-dir", "web-docs/commands/", "The output directory for the generated documentation")
 	flag.StringVar(&outputNavJSON, "output-nav-json", "web-docs/nav.json", "The output path for the generated nav json")
 	flag.StringVar(&linkPrefix, "cmd-link-prefix", "/hcp/docs/cli/commands/", "Link prefix for the commands")
 

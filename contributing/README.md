@@ -471,19 +471,9 @@ assume the `hcp-docs` repository is checked out in the same parent directory as
 `hcp`.
 
 ```sh
-$ make gen/docs
-$ rm -rf ../hcp-docs/content/docs/cli/commands/*
-$ mv web-docs/* ../hcp-docs/content/docs/cli/commands/
+$ make docs/gen
+$ make docs/move
 $ cd ../hcp-docs
-```
-
-Next, you need to copy the data from `content/docs/cli/commands/nav.json` into
-the correct position in the `data/docs-nav-data.json` file. You need to replace
-the entire content of the section beginning with `"title": "Commands (CLI)"`
-that is nested under `"title": "HCP CLI"`. Once this is done, delete
-`content/docs/cli/commands/nav.json` and run the following command:
-
-```sh
 $ make website
 ```
 

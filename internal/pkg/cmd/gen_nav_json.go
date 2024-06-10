@@ -11,22 +11,23 @@ import (
 	"strings"
 )
 
-// navItem is a single item in the navigation JSON.
-type navItem struct {
-	Title  string     `json:"title"`
-	Path   string     `json:"path,omitempty"`
-	Routes []*navItem `json:"routes,omitempty"`
+// DocNavItem is a single item in the navigation JSON.
+type DocNavItem struct {
+	Title  string        `json:"title"`
+	Href   string        `json:"href,omitempty"`
+	Path   string        `json:"path,omitempty"`
+	Routes []*DocNavItem `json:"routes,omitempty"`
 }
 
 // GenNavJSON generates the navigation JSON in the format that hcp-docs expects,
 // for the command structure.
 func GenNavJSON(c *Command, w io.Writer) error {
 
-	root := &navItem{}
+	root := &DocNavItem{}
 	genNavJSON(c, root, "cli/commands")
 
 	// Create the top level nav item
-	nav := &navItem{
+	nav := &DocNavItem{
 		Title:  "Commands (CLI)",
 		Routes: root.Routes[0].Routes,
 	}
@@ -43,9 +44,9 @@ func GenNavJSON(c *Command, w io.Writer) error {
 
 // genNavJSON is a recursive function that generates the navigation JSON for
 // the command structure.
-func genNavJSON(c *Command, nav *navItem, path string) {
+func genNavJSON(c *Command, nav *DocNavItem, path string) {
 	// Generate a new nav item for this command
-	var self *navItem
+	var self *DocNavItem
 
 	if c.parent != nil {
 		path = filepath.Join(path, c.Name)
@@ -53,9 +54,9 @@ func genNavJSON(c *Command, nav *navItem, path string) {
 
 	// Handle being a command group
 	if len(c.children) > 0 {
-		self = &navItem{
+		self = &DocNavItem{
 			Title: c.Name,
-			Routes: []*navItem{
+			Routes: []*DocNavItem{
 				{
 					Title: "Overview",
 					Path:  path,
@@ -63,7 +64,7 @@ func genNavJSON(c *Command, nav *navItem, path string) {
 			},
 		}
 	} else {
-		self = &navItem{
+		self = &DocNavItem{
 			Title: c.Name,
 			Path:  path,
 		}
