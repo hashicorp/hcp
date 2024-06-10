@@ -67,6 +67,8 @@ The format for the policy JSON file is an object with the following format:
 If set, the etag of the policy must be equal to that of the existing policy. To view the
 existing policy and its etag, run {{ template "mdCodeOrBold" "hcp iam groups iam read-policy --format=json" }}.
 If unset, the existing policy's etag will be fetched and used.
+
+Note that the only supported member_type is {{ template "mdCodeOrBold" "USER" }} and the only supported role_id is {{ template "mdCodeOrBold" "roles/iam.group-manager" }}".
 		`),
 		Examples: []cmd.Example{
 			{
