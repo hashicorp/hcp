@@ -457,7 +457,7 @@ func getSecret(io iostreams.IOStreams) (string, error) {
 }
 ```
 
-### Validating the developer.hashicorp.com documentation
+### Validating/generating the developer.hashicorp.com documentation
 
 The `hcp` CLI generates the command documentation found on
 [developer.hashicorp.com](https://developer.hashicorp.com/hcp/docs/cli/commands).
@@ -475,6 +475,15 @@ $ make gen/docs
 $ rm -rf ../hcp-docs/content/docs/cli/commands/*
 $ mv web-docs/* ../hcp-docs/content/docs/cli/commands/
 $ cd ../hcp-docs
+```
+
+Next, you need to copy the data from `content/docs/cli/commands/nav.json` into
+the correct position in the `data/docs-nav-data.json` file. You need to replace
+the entire content of the section beginning with `"title": "Commands (CLI)"`
+that is nested under `"title": "HCP CLI"`. Once this is done, delete
+`content/docs/cli/commands/nav.json` and run the following command:
+
+```sh
 $ make website
 ```
 
@@ -497,3 +506,7 @@ After a successful release:
 
 - [ ] Tag the release commit with the version that was released.
 - [ ] Update the `cmd/VERSION` file to the next version with `-dev` appended.
+- [ ] Update the developer.hashicorp.com documentation by following the steps
+  outlined in the "Validating/generating the developer.hashicorp.com documentation" section.
+  PR the changes to the `hcp-docs` repository, have a team member review them,
+  and merge.
