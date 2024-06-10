@@ -36,25 +36,19 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		Name:      "create",
 		ShortHelp: "Create a new static secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create" }} command creates a new static secret under an Vault Secrets application.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create" }} command creates a new static secret under a Vault Secrets application.
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Create a new secret in Vault Secrets application on active profile:`,
+				Preamble: `Create a new secret in the Vault Secrets application on your active profile:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp vault-secrets secrets create secret_1 --data-file=tmp/secrets1.txt
 				`),
 			},
 			{
-				Preamble: `Create a new secret in Vault Secrets application by piping the plaintext secret from a command output:`,
+				Preamble: `Create a new secret in a Vault Secrets application by piping the plaintext secret from a command output:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
 				$ echo -n "my super secret" | hcp vault-secrets secrets create secret_2 --data-file=-
-				`),
-			},
-			{
-				Preamble: `Create a new secret in the specified Vault Secrets application:`,
-				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
-				$ hcp vault-secrets secrets create secret_3 --app test-app --secret_file=/tmp/secrets2.txt
 				`),
 			},
 		},
