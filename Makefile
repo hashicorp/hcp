@@ -11,15 +11,20 @@ MOCKERY_OUTPUT_FILES=internal/pkg/api/iampolicy/mock_setter.go \
 
 default: help
 
+.PHONY: docs/gen
+docs/gen: go/build ## Generate the HCP CLI documentation
+	@mkdir -p web-docs
+	@rm -rf web-docs/*
+	@./bin/gendocs -output-dir web-docs/commands --output-nav-json web-docs/nav.json
+
+.PHONY: docs/move
+docs/move: go/build ## Copy the generated documentation to the HCP docs repository
+	@./bin/mvdocs -generated-commands-dir web-docs/commands --generated-nav-json web-docs/nav.json \
+		--dest-commands-dir ../hcp-docs/content/docs/cli/commands --dest-nav-json ../hcp-docs/data/docs-nav-data.json
+
 .PHONY: gen/screenshot
 gen/screenshot: go/install ## Create a screenshot of the HCP CLI
 	@go run github.com/homeport/termshot/cmd/termshot@v0.2.7 -c -f assets/hcp.png -- hcp
-
-.PHONY: gen/docs
-gen/docs: go/build ## Generate the HCP CLI documentation
-	@mkdir -p web-docs
-	@rm -rf web-docs/*
-	@./bin/gendocs -output-dir web-docs/
 
 .PHONY: gen/releasesapi
 gen/releasesapi: ## Generate the releases API client
