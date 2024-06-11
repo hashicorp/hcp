@@ -1,3 +1,7 @@
 ```release-note:feature
-iam: Adds read-policy, set-policy, add-binding, and delete-binding subcommands to hcp iam groups iam which allow the ability to manage an IAM policy on a group.
+iam: Adds `read-policy`, `set-policy`, `add-binding`, and `delete-binding` subcommands to `hcp iam groups iam` which allow the ability to manage an IAM policy on a group.
+- `read-policy` Reads an IAM policy for a specified group.
+- `set-policy` Sets an IAM policy for a group using a JSON file.
+- `add-binding` Adds a single role binding to a user principal.
+- `delete-binding` Removes a single role binding from a user principal.
 ```
