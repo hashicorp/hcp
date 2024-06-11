@@ -1,0 +1,3 @@
+```release-note:feature
+iam: Adds read-policy, set-policy, add-binding, and delete-binding subcommands to hcp iam groups iam which allow the ability to manage an IAM policy on a group.
+```
