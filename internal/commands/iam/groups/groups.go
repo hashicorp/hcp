@@ -4,6 +4,7 @@
 package groups
 
 import (
+	"github.com/hashicorp/hcp/internal/commands/iam/groups/iam"
 	"github.com/hashicorp/hcp/internal/commands/iam/groups/members"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -30,5 +31,6 @@ func NewCmdGroups(ctx *cmd.Context) *cmd.Command {
 	cmd.AddChild(NewCmdDelete(ctx, nil))
 	cmd.AddChild(NewCmdUpdate(ctx, nil))
 	cmd.AddChild(members.NewCmdMembers(ctx))
+	cmd.AddChild(iam.NewCmdIAM(ctx))
 	return cmd
 }
