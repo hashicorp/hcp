@@ -1,7 +1,7 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-// This tool is used to move the generated commands documentation from the `web-docs` repository to the `hcp-docs` repository.
+// This tool is used to move the generated commands documentation from the `web-docs` directory to the `hcp-docs` repository.
 package main
 
 import (
