@@ -1,3 +1,14 @@
+## 0.3.0 (June 11, 2024)
+
+FEATURES:
+
+* iam: Adds `read-policy`, `set-policy`, `add-binding`, and `delete-binding` subcommands to `hcp iam groups iam` which allow the ability to manage an IAM policy on a group.
+- `read-policy` Reads an IAM policy for a specified group.
+- `set-policy` Sets an IAM policy for a group using a JSON file.
+- `add-binding` Adds a single role binding to a user principal.
+- `delete-binding` Removes a single role binding from a user principal. [[GH-113](https://github.com/hashicorp/hcp/issues/113)]
+* vault-secrets: Add `vault-secrets` CLI for managing Vault Secrets resources. [[GH-105](https://github.com/hashicorp/hcp/issues/105)]
+
 ## 0.2.0 (May 31, 2024)
 
 BREAKING CHANGES:
