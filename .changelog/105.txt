@@ -1,0 +1,3 @@
+```release-note:feature
+vault-secrets: Add `vault-secrets` CLI for managing Vault Secrets resources.
+```
