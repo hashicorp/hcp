@@ -480,12 +480,14 @@ $ make website
 
 ## Releasing
 
+> Releasing is currently a manual process, please reach out to [#team-cloud-core-platform](https://hashicorp.enterprise.slack.com/archives/C073FTXFLTA) for assistance.
+
 If it is your first time releasing, following the onboarding [steps
 here](https://hashicorp.atlassian.net/wiki/spaces/RELENG/pages/2301263888/Part+1+Onboarding+Pre-Requisites#Steps-for-each-member-of-your-team-to-complete).
 
 To get the main branch ready for a release ensure the following:
 
-- [ ] The version in `cmd/VERSION` is updated to the desired version.
+- [ ] The version in `version/VERSION` is updated to the desired version.
 - [ ] The `CHANGELOG.md` is updated with the new version and the changes. The
 changelog can be generated using `LAST_RELEASE_GIT_TAG=v0.x.y make changelog/build`
 - [ ] Changes since the last release are manually tested and working.
