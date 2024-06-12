@@ -30,3 +30,7 @@ bin/*
 
 # web-docs/ directory
 web-docs/*
+
+# release artifacts
+.bob/*
+hcp*
