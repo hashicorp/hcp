@@ -499,6 +499,6 @@ After a successful release:
 
 - [ ] Update the `cmd/VERSION` file to the next version with `-dev` appended.
 - [ ] Update the developer.hashicorp.com documentation by following the steps
-  outlined in the "Validating/generating the developer.hashicorp.com documentation" section.
+  outlined in the [Validating/generating the developer.hashicorp.com documentation](#validating/generating-the-developer.hashicorp.com-documentation) section.
   PR the changes to the `hcp-docs` repository, have a team member review them,
   and merge.
