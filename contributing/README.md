@@ -497,7 +497,6 @@ here](https://hashicorp.atlassian.net/wiki/spaces/RELENG/pages/2303492328/Trigge
 
 After a successful release:
 
-- [ ] Tag the release commit with the version that was released.
 - [ ] Update the `cmd/VERSION` file to the next version with `-dev` appended.
 - [ ] Update the developer.hashicorp.com documentation by following the steps
   outlined in the "Validating/generating the developer.hashicorp.com documentation" section.
