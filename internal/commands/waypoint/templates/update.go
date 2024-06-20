@@ -31,7 +31,6 @@ $ hcp waypoint templates update -n=my-template \
   -s="My Template Summary" \
   -d="My Template Description" \
   -readme-markdown-template-file "README.tpl" \
-  --tfc-no-code-module-source="app.terraform.io/hashicorp/dir/template" \
   --tfc-project-name="my-tfc-project" \
   --tfc-project-id="prj-123456 \
   -l="label1" \
@@ -103,17 +102,6 @@ $ hcp waypoint templates update -n=my-template \
 					Hidden:       true,
 				},
 				{
-					Name:         "tfc-no-code-module-source",
-					DisplayValue: "TFC_NO_CODE_MODULE_SOURCE",
-					Description: heredoc.New(ctx.IO).Must(`
-			The source of the Terraform no-code module. 
-			The expected format is "NAMESPACE/NAME/PROVIDER". An
-			optional "HOSTNAME/" can be added at the beginning for
-			a private registry.
-					`),
-					Value: flagvalue.Simple("", &opts.TerraformNoCodeModuleSource),
-				},
-				{
 					Name:         "tfc-project-name",
 					DisplayValue: "TFC_PROJECT_NAME",
 					Description: "The name of the Terraform Cloud project where" +
@@ -169,7 +157,6 @@ func templateUpdate(opts *TemplateOpts) error {
 			Name:      opts.TerraformCloudProjectName,
 			ProjectID: opts.TerraformCloudProjectID,
 		},
-		ModuleSource: opts.TerraformNoCodeModuleSource,
 	}
 
 	_, err = opts.WS.WaypointServiceUpdateApplicationTemplate2(
