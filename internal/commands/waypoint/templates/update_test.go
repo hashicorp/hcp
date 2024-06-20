@@ -51,24 +51,22 @@ func TestCmdTemplateUpdate(t *testing.T) {
 				"--tfc-project-id", "prj-abcdefghij",
 				"--tfc-project-name", "test",
 				"--tfc-no-code-module-source", "private/waypoint/waypoint-nocode-module/null",
-				"--tfc-no-code-module-version", "0.0.1",
 				"-l", "cli",
 				"-d", "A template created with the CLI.",
 				"-t", "cli=true",
 				"--readme-markdown-template-file", "readme_test.txt",
 			},
 			Expect: &TemplateOpts{
-				Name:                         "cli-test",
-				UpdatedName:                  "cli-test-new",
-				Summary:                      "A template created using the CLI.",
-				Description:                  "A template created with the CLI.",
-				TerraformCloudProjectID:      "prj-abcdefghij",
-				TerraformCloudProjectName:    "test",
-				TerraformNoCodeModuleSource:  "private/waypoint/waypoint-nocode-module/null",
-				TerraformNoCodeModuleVersion: "0.0.1",
-				ReadmeMarkdownTemplateFile:   "readme_test.txt",
-				Labels:                       []string{"cli"},
-				Tags:                         map[string]string{"cli": "true"},
+				Name:                        "cli-test",
+				UpdatedName:                 "cli-test-new",
+				Summary:                     "A template created using the CLI.",
+				Description:                 "A template created with the CLI.",
+				TerraformCloudProjectID:     "prj-abcdefghij",
+				TerraformCloudProjectName:   "test",
+				TerraformNoCodeModuleSource: "private/waypoint/waypoint-nocode-module/null",
+				ReadmeMarkdownTemplateFile:  "readme_test.txt",
+				Labels:                      []string{"cli"},
+				Tags:                        map[string]string{"cli": "true"},
 			},
 		},
 	}
@@ -109,7 +107,6 @@ func TestCmdTemplateUpdate(t *testing.T) {
 				r.Equal(c.Expect.TerraformCloudProjectID, tplOpts.TerraformCloudProjectID)
 				r.Equal(c.Expect.TerraformCloudProjectName, tplOpts.TerraformCloudProjectName)
 				r.Equal(c.Expect.TerraformNoCodeModuleSource, tplOpts.TerraformNoCodeModuleSource)
-				r.Equal(c.Expect.TerraformNoCodeModuleVersion, tplOpts.TerraformNoCodeModuleVersion)
 				r.Equal(c.Expect.ReadmeMarkdownTemplateFile, tplOpts.ReadmeMarkdownTemplateFile)
 				r.Equal(c.Expect.Labels, tplOpts.Labels)
 				r.Equal(c.Expect.Tags, tplOpts.Tags)

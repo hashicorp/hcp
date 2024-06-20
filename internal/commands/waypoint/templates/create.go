@@ -32,7 +32,6 @@ $ hcp waypoint templates create -n=my-template \
   -d="My Template Description" \
   --readme-markdown-template-file "README.tpl" \
   --tfc-no-code-module-source="app.terraform.io/hashicorp/dir/template" \
-  --tfc-no-code-module-version="1.0.2" \
   --tfc-project-name="my-tfc-project" \
   --tfc-project-id="prj-123456"" \
   -l="label1" \
@@ -110,13 +109,6 @@ $ hcp waypoint templates create -n=my-template \
 					Required: true,
 				},
 				{
-					Name:         "tfc-no-code-module-version",
-					DisplayValue: "TFC_NO_CODE_MODULE_VERSION",
-					Description:  "The version of the Terraform no-code module.",
-					Value:        flagvalue.Simple("", &opts.TerraformNoCodeModuleVersion),
-					Required:     true,
-				},
-				{
 					Name:         "tfc-project-name",
 					DisplayValue: "TFC_PROJECT_NAME",
 					Description: "The name of the Terraform Cloud project where" +
@@ -175,14 +167,11 @@ func templateCreate(opts *TemplateOpts) error {
 					ReadmeMarkdownTemplate: readmeTpl,
 					Labels:                 opts.Labels,
 					Tags:                   tags,
-					TerraformNocodeModule: &models.HashicorpCloudWaypointTerraformNocodeModule{
-						Source:  opts.TerraformNoCodeModuleSource,
-						Version: opts.TerraformNoCodeModuleVersion,
-					},
 					TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointTerraformCloudWorkspaceDetails{
 						Name:      opts.TerraformCloudProjectName,
 						ProjectID: opts.TerraformCloudProjectID,
 					},
+					ModuleSource: opts.TerraformNoCodeModuleSource,
 				},
 			},
 			Context: opts.Ctx,
