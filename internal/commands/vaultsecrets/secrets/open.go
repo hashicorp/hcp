@@ -35,7 +35,7 @@ func NewCmdOpen(ctx *cmd.Context, runF func(*OpenOpts) error) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "open",
-		ShortHelp: "Open a static, rotating, or dynamic secret.",
+		ShortHelp: "Open a secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets open" }} command reads the plaintext value of a static, rotating, or dynamic secret from the Vault Secrets application.
 		`),
