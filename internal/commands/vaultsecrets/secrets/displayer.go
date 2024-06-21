@@ -40,9 +40,9 @@ func (d *displayer) OpenAppSecrets(secrets ...*preview_models.Secrets20231128Ope
 	return d
 }
 
-func (d *displayer) AddFields(fields []format.Field) []format.Field {
+func (d *displayer) AddFields(fields ...format.Field) *displayer {
 	d.fields = append(d.fields, fields...)
-	return d.fields
+	return d
 }
 
 func (d *displayer) SetDefaultFormat(f format.Format) *displayer {
@@ -101,12 +101,10 @@ func (d *displayer) openAppSecretsFieldTemplate() []format.Field {
 		{
 			Name:        "Type",
 			ValueFormat: "{{ .Type }}",
-		}, {
-			Name:        "Value",
-			ValueFormat: "{{ .StaticVersion.Value }}",
 		},
 	}...)
-	return fields
+
+	return append(fields, d.fields...)
 }
 
 func (d *displayer) secretsPayload() any {
