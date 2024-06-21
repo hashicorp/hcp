@@ -86,14 +86,14 @@ func ConfigureRootCommand(ctx *Context, cmd *Command) {
 		Name:         "project",
 		DisplayValue: "ID",
 		Description:  "The HCP Project ID to use. If omitted the current project set in the configuration is used.",
-		Value:        flagvalue.Simple[string]("", &ctx.flags.project),
+		Value:        flagvalue.Simple("", &ctx.flags.project),
 		global:       true,
 		Autocomplete: complete.PredictAnything,
 	}, &Flag{
 		Name:         "profile",
 		DisplayValue: "NAME",
 		Description:  "The profile to use. If omitted, the currently selected profile will be used.",
-		Value:        flagvalue.Simple[string]("", &ctx.flags.profile),
+		Value:        flagvalue.Simple("", &ctx.flags.profile),
 		global:       true,
 		Autocomplete: complete.PredictFunc(func(_ complete.Args) []string {
 			l, err := profile.NewLoader()
@@ -112,13 +112,13 @@ func ConfigureRootCommand(ctx *Context, cmd *Command) {
 		Name:         "format",
 		DisplayValue: "FORMAT",
 		Description:  "Sets the output format.",
-		Value:        flagvalue.Enum[string](formats, "", &ctx.flags.format),
+		Value:        flagvalue.Enum(formats, "", &ctx.flags.format),
 		global:       true,
 		Autocomplete: complete.PredictSet(formats...),
 	}, &Flag{
 		Name:          "quiet",
 		Description:   "Minimizes output and disables interactive prompting.",
-		Value:         flagvalue.Simple[bool](false, &ctx.flags.Quiet),
+		Value:         flagvalue.Simple(false, &ctx.flags.Quiet),
 		IsBooleanFlag: true,
 		global:        true,
 		Autocomplete:  complete.PredictNothing,
@@ -137,7 +137,7 @@ func ConfigureRootCommand(ctx *Context, cmd *Command) {
 		ctx.HCP.SetLogger(newAPILogger(c.Logger()))
 		ctx.HCP.Debug = true
 
-		if err := ctx.applyGlobalFlags(c, args); err != nil {
+		if err := ctx.applyGlobalFlags(c); err != nil {
 			return err
 		}
 
@@ -146,7 +146,7 @@ func ConfigureRootCommand(ctx *Context, cmd *Command) {
 }
 
 // applyGlobalFlags applies the global flags.
-func (ctx *Context) applyGlobalFlags(c *Command, args []string) error {
+func (ctx *Context) applyGlobalFlags(c *Command) error {
 	// Mark that we have parsed flags
 	ctx.flags.parsed = true
 
@@ -210,8 +210,8 @@ func (ctx *Context) applyGlobalFlags(c *Command, args []string) error {
 		ctx.IO.ForceNoColor()
 	}
 
-	// Set quiet on the IOStream if enabled.
-	if ctx.flags.Quiet {
+	// Set quiet on the IOStream if enabled by the flag or profile
+	if ctx.flags.Quiet || ctx.Profile.Core.IsQuiet() {
 		ctx.IO.SetQuiet(true)
 	}
 
@@ -226,7 +226,7 @@ func (ctx *Context) ParseFlags(c *Command, args []string) ([]string, error) {
 		return nil, err
 	}
 
-	if err := ctx.applyGlobalFlags(c, args); err != nil {
+	if err := ctx.applyGlobalFlags(c); err != nil {
 		return nil, err
 	}
 
