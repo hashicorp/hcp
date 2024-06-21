@@ -91,19 +91,15 @@ func (d *displayer) secretsFieldTemplate() []format.Field {
 			Name:        "Created At",
 			ValueFormat: "{{ .CreatedAt }}",
 		},
+		{
+			Name:        "Type",
+			ValueFormat: "{{ .Type }}",
+		},
 	}
 }
 
 func (d *displayer) openAppSecretsFieldTemplate() []format.Field {
 	fields := d.secretsFieldTemplate()
-
-	fields = append(fields, []format.Field{
-		{
-			Name:        "Type",
-			ValueFormat: "{{ .Type }}",
-		},
-	}...)
-
 	return append(fields, d.fields...)
 }
 

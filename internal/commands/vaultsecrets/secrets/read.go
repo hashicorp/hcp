@@ -30,9 +30,9 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "read",
-		ShortHelp: "Read a static secret's metatdata.",
+		ShortHelp: "Read a static, rotating, or dynamic secret's metatdata.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets read" }} command reads a static secret's metadata from the Vault Secrets application.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets read" }} command reads a static, rotating, or dynamic secret's metadata from the Vault Secrets application.
 		`),
 		Examples: []cmd.Example{
 			{
