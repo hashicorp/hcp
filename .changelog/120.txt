@@ -1,0 +1,3 @@
+```release-note:improvement
+Turn actions and agents sub-commands in waypoint back on
+```
