@@ -1,0 +1,6 @@
+```release-note:feature
+vault-secrets: Adds support for dynamic secrets to the `secrets open` and `run` commands.
+```
+```release-note:improvement
+vault-secrets: Adds secret type to the `secrets read` and `secrets list` output.
+```

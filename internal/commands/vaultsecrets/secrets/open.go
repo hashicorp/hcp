@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/helper"
@@ -36,9 +35,9 @@ func NewCmdOpen(ctx *cmd.Context, runF func(*OpenOpts) error) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "open",
-		ShortHelp: "Open a static secret.",
+		ShortHelp: "Open a secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets open" }} command reads the plaintext value of a static secret from the Vault Secrets application.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets open" }} command reads the plaintext value of a static, rotating, or dynamic secret from the Vault Secrets application.
 		`),
 		Examples: []cmd.Example{
 			{
@@ -120,7 +119,10 @@ func openRun(opts *OpenOpts) (err error) {
 		return fmt.Errorf("failed to read the secret %q: %w", opts.SecretName, err)
 	}
 
-	var secretValue string
+	var (
+		secretValue string
+		field       format.Field
+	)
 
 	switch {
 	case resp.Payload.Secret.RotatingVersion != nil:
@@ -128,25 +130,34 @@ func openRun(opts *OpenOpts) (err error) {
 		if err != nil {
 			secretValue = "<< COULD NOT ENCODE TO JSON >>"
 		}
+
+		field = format.Field{
+			Name:        "Values",
+			ValueFormat: `{{ range $key, $value := .RotatingVersion.Values }}{{printf "%s: %s\n" $key $value}}{{ end }}`,
+		}
+	case resp.Payload.Secret.DynamicInstance != nil:
+		secretValue, err = formatSecretMap(resp.Payload.Secret.DynamicInstance.Values)
+		if err != nil {
+			secretValue = "<< COULD NOT ENCODE TO JSON >>"
+		}
+
+		field = format.Field{
+			Name:        "Values",
+			ValueFormat: `{{ range $key, $value := .DynamicInstance.Values }}{{printf "%s: %s\n" $key $value}}{{ end }}`,
+		}
 	case resp.Payload.Secret.StaticVersion != nil:
 		secretValue = resp.Payload.Secret.StaticVersion.Value
+
+		field = format.Field{
+			Name:        "Value",
+			ValueFormat: "{{ .StaticVersion.Value }}",
+		}
 	default:
 		secretValue = "<< SECRET TYPE NOT SUPPORTED >>"
 	}
 
-	secret := &models.Secrets20231128OpenSecret{
-		Name:          resp.Payload.Secret.Name,
-		CreatedAt:     resp.Payload.Secret.CreatedAt,
-		LatestVersion: resp.Payload.Secret.LatestVersion,
-		Type:          resp.Payload.Secret.Type,
-		// Doesn't matter if its static or rotating, this simplifies the output format
-		StaticVersion: &models.Secrets20231128OpenSecretStaticVersion{
-			Value: secretValue,
-		},
-	}
-
 	if opts.OutputFilePath != "" {
-		_, err = fd.WriteString(secret.StaticVersion.Value)
+		_, err = fd.WriteString(secretValue)
 		if err != nil {
 			return fmt.Errorf("failed to write the secret value to the output file %q: %w", opts.OutputFilePath, err)
 		}
@@ -154,8 +165,9 @@ func openRun(opts *OpenOpts) (err error) {
 		return nil
 	}
 
-	d := newDisplayer(true).OpenAppSecrets(secret).SetDefaultFormat(format.Pretty)
-	return opts.Output.Display(d.OpenAppSecrets(secret))
+	displayer := newDisplayer(true).OpenAppSecrets(resp.Payload.Secret).
+		SetDefaultFormat(format.Pretty).AddFields(field)
+	return opts.Output.Display(displayer)
 }
 
 func formatSecretMap(secretMap map[string]string) (string, error) {
