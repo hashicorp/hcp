@@ -188,10 +188,10 @@ func loadProfile(ctx context.Context, iam iam_service.ClientService, tokenSource
 		}
 	}
 
-	// If the profile has an org/project, or we don't have a valid access
+	// If the profile has an org, or we don't have a valid access
 	// token, skip trying to infer the organization and project.
 	tkn, err := tokenSource.Token()
-	if p.OrganizationID != "" || p.ProjectID != "" || err != nil || !tkn.Expiry.After(time.Now()) {
+	if p.OrganizationID != "" || err != nil || !tkn.Expiry.After(time.Now()) {
 		return p, nil
 	}
 
@@ -210,9 +210,13 @@ func loadProfile(ctx context.Context, iam iam_service.ClientService, tokenSource
 		return p, nil
 	}
 
-	// Set the organization and project. Project may be empty.
+	// Set the organization.
 	p.OrganizationID = ident.Payload.Principal.Service.OrganizationID
-	p.ProjectID = ident.Payload.Principal.Service.ProjectID
+
+	// Only set the project if it is not already set.
+	if p.ProjectID == "" {
+		p.ProjectID = ident.Payload.Principal.Service.ProjectID
+	}
 
 	// Save the profile.
 	if err := p.Write(); err != nil {
