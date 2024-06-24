@@ -20,6 +20,7 @@ func TestPropertyNames(t *testing.T) {
 	r.Contains(properties, "organization_id")
 	r.Contains(properties, "project_id")
 	r.Contains(properties, "core/no_color")
+	r.Contains(properties, "core/quiet")
 	r.Contains(properties, "core/verbosity")
 	r.Contains(properties, "vault-secrets/app")
 }
@@ -111,14 +112,7 @@ func TestProfile_Predict(t *testing.T) {
 			Args: complete.Args{
 				All: []string{"core/"},
 			},
-			Expected: []string{"core/no_color", "core/output_format", "core/verbosity"},
-		},
-		{
-			Name: "core",
-			Args: complete.Args{
-				All: []string{"core/"},
-			},
-			Expected: []string{"core/no_color", "core/output_format", "core/verbosity"},
+			Expected: []string{"core/no_color", "core/output_format", "core/quiet", "core/verbosity"},
 		},
 		{
 			Name: "vault-secrets",
@@ -207,7 +201,7 @@ func TestCore_Predict(t *testing.T) {
 			Args: complete.Args{
 				All: []string{"core/"},
 			},
-			Expected: []string{"core/no_color", "core/output_format", "core/verbosity"},
+			Expected: []string{"core/no_color", "core/output_format", "core/quiet", "core/verbosity"},
 		},
 		{
 			Name: "no_color",

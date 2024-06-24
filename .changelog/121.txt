@@ -1,0 +1,3 @@
+```release-note:improvement
+profile: Add a core/quiet property which allows disabling prompting in the profile.
+```

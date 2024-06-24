@@ -244,6 +244,9 @@ type Core struct {
 	// NoColor disables color output
 	NoColor *bool `hcl:"no_color,optional" json:",omitempty"`
 
+	// Quiet disables prompting for user input and minimizes output.
+	Quiet *bool `hcl:"quiet,optional" json:",omitempty"`
+
 	// OutputFormat dictates the default output format if unspecified.
 	OutputFormat *string `hcl:"output_format,optional" json:",omitempty"`
 
@@ -254,6 +257,7 @@ type Core struct {
 func (c *Core) Predict(args complete.Args) []string {
 	properties := map[string][]string{
 		"core/no_color":      {"true", "false"},
+		"core/quiet":         {"true", "false"},
 		"core/output_format": {"pretty", "table", "json"},
 		"core/verbosity":     {"trace", "debug", "info", "warn", "error"},
 	}
@@ -300,7 +304,8 @@ func (c *Core) isEmpty() bool {
 		return true
 	}
 
-	if c.NoColor != nil || c.OutputFormat != nil || c.Verbosity != nil {
+	if c.NoColor != nil || c.OutputFormat != nil || c.Verbosity != nil ||
+		c.Quiet != nil {
 		return false
 	}
 
@@ -333,4 +338,17 @@ func (c *Core) GetVerbosity() string {
 	}
 
 	return *c.Verbosity
+}
+
+// IsQueit returns whether the quiet property has been configured to be quiet.
+func (c *Core) IsQuiet() bool {
+	if c == nil {
+		return false
+	}
+
+	if c.Quiet == nil {
+		return false
+	}
+
+	return *c.Quiet
 }
