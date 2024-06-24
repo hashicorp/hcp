@@ -1,0 +1,3 @@
+```release-note:improvement
+Run auto-detection of organization ID even if project ID is configured in the profile.
+```
