@@ -95,16 +95,18 @@ func createIntegration(opts *CreateOpts) error {
 
 	if i.Type == "mongodb" {
 		privkey := i.Details["private_key"].(string)
-		fmt.Fprintf(opts.IO.Err(), "got privkey %q", privkey)
-		resp, err := opts.PreviewClient.CreateMongoDBAtlasRotationIntegration(&preview_secret_service.CreateMongoDBAtlasRotationIntegrationParams{
+		pubKey := i.Details["public_key"].(string)
+		body := preview_secret_service.CreateMongoDBAtlasIntegrationBody{
+			IntegrationName:      i.Name,
+			MongodbAPIPrivateKey: privkey,
+			MongodbAPIPublicKey:  pubKey,
+		}
+		fmt.Fprintf(opts.IO.Err(), "got privkey %q pubkeu %q body %+q", privkey, pubKey, body)
+		resp, err := opts.PreviewClient.CreateMongoDBAtlasIntegration(&preview_secret_service.CreateMongoDBAtlasIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
-			Body: preview_secret_service.CreateMongoDBAtlasRotationIntegrationBody{
-				IntegrationName:      i.Name,
-				MongodbAPIPrivateKey: i.Details["private_key"].(string),
-				MongodbAPIPublicKey:  i.Details["public_key"].(string),
-			},
+			Body:           body,
 		}, nil)
 
 		if err != nil {
@@ -112,7 +114,7 @@ func createIntegration(opts *CreateOpts) error {
 		}
 
 		fmt.Fprintln(opts.IO.Err())
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.RotationIntegration.IntegrationName)
+		fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.Integration.IntegrationName)
 	} else {
 		fmt.Errorf("invalid type given")
 	}
