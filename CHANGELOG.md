@@ -1,3 +1,16 @@
+## 0.4.0 (June 25, 2024)
+
+FEATURES:
+
+* vault-secrets: Adds support for dynamic secrets to the `secrets open` and `run` commands. [[GH-119](https://github.com/hashicorp/hcp/issues/119)]
+
+IMPROVEMENTS:
+
+* Run auto-detection of organization ID even if project ID is configured in the profile. [[GH-122](https://github.com/hashicorp/hcp/issues/122)]
+* Turn actions and agents sub-commands in waypoint back on [[GH-120](https://github.com/hashicorp/hcp/issues/120)]
+* profile: Add a core/quiet property which allows disabling prompting in the profile. [[GH-121](https://github.com/hashicorp/hcp/issues/121)]
+* vault-secrets: Adds secret type to the `secrets read` and `secrets list` output. [[GH-119](https://github.com/hashicorp/hcp/issues/119)]
+
 ## 0.3.0 (June 11, 2024)
 
 FEATURES:
