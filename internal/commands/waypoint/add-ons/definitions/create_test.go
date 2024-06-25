@@ -50,21 +50,19 @@ func TestCmdAddOnDefinitionCreate(t *testing.T) {
 				"--tfc-project-id", "prj-abcdefghij",
 				"--tfc-project-name", "test",
 				"--tfc-no-code-module-source", "private/waypoint/waypoint-nocode-module/null",
-				"--tfc-no-code-module-version", "0.0.1",
 				"-l", "cli",
 				"-d", "An add-on definition created with the CLI.",
 				"--readme-markdown-template-file", "readme_test.txt",
 			},
 			Expect: &AddOnDefinitionOpts{
-				Name:                         "cli-test",
-				Summary:                      "An add-on definition created using the CLI.",
-				Description:                  "An add-on definition created with the CLI.",
-				TerraformCloudProjectID:      "prj-abcdefghij",
-				TerraformCloudProjectName:    "test",
-				TerraformNoCodeModuleSource:  "private/waypoint/waypoint-nocode-module/null",
-				TerraformNoCodeModuleVersion: "0.0.1",
-				Labels:                       []string{"cli"},
-				ReadmeMarkdownTemplateFile:   "readme_test.txt",
+				Name:                        "cli-test",
+				Summary:                     "An add-on definition created using the CLI.",
+				Description:                 "An add-on definition created with the CLI.",
+				TerraformCloudProjectID:     "prj-abcdefghij",
+				TerraformCloudProjectName:   "test",
+				TerraformNoCodeModuleSource: "private/waypoint/waypoint-nocode-module/null",
+				Labels:                      []string{"cli"},
+				ReadmeMarkdownTemplateFile:  "readme_test.txt",
 			},
 		},
 	}
@@ -104,7 +102,6 @@ func TestCmdAddOnDefinitionCreate(t *testing.T) {
 				r.Equal(c.Expect.TerraformCloudProjectID, aodOpts.TerraformCloudProjectID)
 				r.Equal(c.Expect.TerraformCloudProjectName, aodOpts.TerraformCloudProjectName)
 				r.Equal(c.Expect.TerraformNoCodeModuleSource, aodOpts.TerraformNoCodeModuleSource)
-				r.Equal(c.Expect.TerraformNoCodeModuleVersion, aodOpts.TerraformNoCodeModuleVersion)
 				r.Equal(c.Expect.ReadmeMarkdownTemplateFile, aodOpts.ReadmeMarkdownTemplateFile)
 				r.Equal(c.Expect.Labels, aodOpts.Labels)
 			}

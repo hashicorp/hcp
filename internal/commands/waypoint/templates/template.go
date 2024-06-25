@@ -27,10 +27,9 @@ type TemplateOpts struct {
 	Labels                     []string
 	Tags                       map[string]string
 
-	TerraformNoCodeModuleSource  string
-	TerraformNoCodeModuleVersion string
-	TerraformCloudProjectName    string
-	TerraformCloudProjectID      string
+	TerraformNoCodeModuleSource string
+	TerraformCloudProjectName   string
+	TerraformCloudProjectID     string
 
 	// testFunc is used for testing, so that the command can be tested without
 	// using the real API.

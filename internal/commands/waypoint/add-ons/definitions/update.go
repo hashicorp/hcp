@@ -31,8 +31,6 @@ $ hcp waypoint add-ons definitions update -n=my-add-on-definition \
   -s="My updated Add-on Definition summary." \
   -d="My updated Add-on Definition description." \
   --readme-markdown-template-file "README.tpl" \
-  --tfc-no-code-module-source="app.terraform.io/hashicorp/dir/template" \
-  --tfc-no-code-module-version="1.0.2" \
   --tfc-project-name="my-tfc-project" \
   --tfc-project-id="prj-123456" \
   -l=label1 \
@@ -88,18 +86,6 @@ $ hcp waypoint add-ons definitions update -n=my-add-on-definition \
 					Value:        flagvalue.SimpleSlice(nil, &opts.Labels),
 				},
 				{
-					Name:         "tfc-no-code-module-source",
-					DisplayValue: "TFC_NO_CODE_MODULE_SOURCE",
-					Description:  "The Terraform Cloud no-code module source.",
-					Value:        flagvalue.Simple("", &opts.TerraformNoCodeModuleSource),
-				},
-				{
-					Name:         "tfc-no-code-module-version",
-					DisplayValue: "TFC_NO_CODE_MODULE_VERSION",
-					Description:  "The Terraform Cloud no-code module version.",
-					Value:        flagvalue.Simple("", &opts.TerraformNoCodeModuleVersion),
-				},
-				{
 					Name:         "tfc-project-id",
 					DisplayValue: "TFC_PROJECT_ID",
 					Description:  "The Terraform Cloud project ID.",
@@ -145,10 +131,6 @@ func addOnDefinitionUpdate(opts *AddOnDefinitionOpts) error {
 				Description:            opts.Description,
 				ReadmeMarkdownTemplate: readmeTpl,
 				Labels:                 opts.Labels,
-				TerraformNocodeModule: &models.HashicorpCloudWaypointTerraformNocodeModule{
-					Source:  opts.TerraformNoCodeModuleSource,
-					Version: opts.TerraformNoCodeModuleVersion,
-				},
 				TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointTerraformCloudWorkspaceDetails{
 					ProjectID: opts.TerraformCloudProjectID,
 					Name:      opts.TerraformCloudProjectName,
