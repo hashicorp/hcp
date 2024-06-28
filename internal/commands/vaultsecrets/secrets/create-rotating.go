@@ -34,14 +34,14 @@ func NewCmdCreateRotating(ctx *cmd.Context, runF func(*CreateRotatingOpts) error
 		Name:      "create-rotating",
 		ShortHelp: "Create a new rotating secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create" }} command creates a new static secret under a Vault Secrets application.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create-rotating" }} command creates a new rotating secret under a Vault Secrets application.
 		`),
 		Flags: cmd.Flags{
 			Local: []*cmd.Flag{
 				{
 					Name:         "config-file",
 					DisplayValue: "CONFIG_FILE_PATH",
-					Description:  "File path to read secret data from. Set this to '-' to read the secret data from stdin.",
+					Description:  "File path to a secret config",
 					Value:        flagvalue.Simple("", &opts.SecretConfigFile),
 					Autocomplete: complete.PredictOr(
 						complete.PredictFiles("*"),
@@ -123,7 +123,6 @@ func createRotatingRun(opts *CreateRotatingOpts) error {
 				RoleName:       castRole.RoleName,
 				DatabaseName:   castRole.DatabaseName,
 			}
-			fmt.Fprintf(opts.IO.Err(), "creating secret with role %+v\n", reqRole)
 			reqRoles = append(reqRoles, reqRole)
 		}
 		req.Body = preview_secret_service.CreateMongoDBAtlasRotatingSecretBody{

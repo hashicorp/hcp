@@ -47,7 +47,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 				{
 					Name:         "config-file",
 					DisplayValue: "PATH",
-					Description:  "The path to a file containing an IAM policy object.",
+					Description:  "The path to a file containing an integration config.",
 					Value:        flagvalue.Simple("", &opts.ConfigFilePath),
 					Required:     true,
 					Autocomplete: complete.PredictFiles("*.json"),
@@ -77,9 +77,6 @@ type IntegrationConfig struct {
 	Details map[string]interface{}
 }
 
-type MongoDBDetails struct {
-}
-
 func createIntegration(opts *CreateOpts) error {
 	// Open the file
 	f, err := os.ReadFile(opts.ConfigFilePath)
@@ -101,7 +98,6 @@ func createIntegration(opts *CreateOpts) error {
 			MongodbAPIPrivateKey: privkey,
 			MongodbAPIPublicKey:  pubKey,
 		}
-		fmt.Fprintf(opts.IO.Err(), "got privkey %q pubkeu %q body %+q", privkey, pubKey, body)
 		resp, err := opts.PreviewClient.CreateMongoDBAtlasIntegration(&preview_secret_service.CreateMongoDBAtlasIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,

@@ -13,8 +13,8 @@ func NewCmdIntegrations(ctx *cmd.Context) *cmd.Command {
 		Name:      "integrations",
 		ShortHelp: "Manage Vault Secrets integrations.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets apps" }} command group lets you
-		manage Vault Secrets applications.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets integrations" }} command group lets you
+		manage Vault Secrets integrations.
 		`),
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
 			return cmd.RequireOrgAndProject(ctx)

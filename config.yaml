@@ -1,6 +1,6 @@
 version: "2024-06-24"
 type: "mongodb"
-name: "climongo1"
+name: "climongo"
 details:
-  private_key: "zdkfmzvu"
-  public_key: "cfbafbb3-f615-4436-a7c4-55b4d94e93a3"
+  private_key: "{mongodb_private_key}"
+  public_key: "{mongodb_public_key}"
