@@ -38,6 +38,7 @@ func addCoreProperties(b *availablePropertiesBuilder) {
 	This can be overridden by using the global {{ template "mdCodeOrBold" "--project" }} flag.`)
 
 	b.AddProperty("core", "no_color", "If True, color will not be used when printing messages in the terminal.")
+	b.AddProperty("core", "quiet", "If True, prompts will be disabled and output will be minimized.")
 	b.AddProperty("core", "verbosity", `
 		Default logging verbosity for {{ template "mdCodeOrBold" "hcp" }} commands. This is the
 		equivalent of using the global {{ template "mdCodeOrBold" "--verbosity" }} flag. Supported log levels:

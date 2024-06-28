@@ -156,6 +156,10 @@ func getAllSecretsForEnv(opts *RunOpts) ([]string, error) {
 			for name, value := range secret.RotatingVersion.Values {
 				result = append(result, fmt.Sprintf("%v_%v=%v", strings.ToUpper(secret.Name), strings.ToUpper(name), value))
 			}
+		case secret.DynamicInstance != nil:
+			for name, value := range secret.DynamicInstance.Values {
+				result = append(result, fmt.Sprintf("%v_%v=%v", strings.ToUpper(secret.Name), strings.ToUpper(name), value))
+			}
 		case secret.StaticVersion != nil:
 			result = append(result, fmt.Sprintf("%v=%v", strings.ToUpper(secret.Name), secret.StaticVersion.Value))
 		}
