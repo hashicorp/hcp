@@ -132,7 +132,6 @@ func createRotatingRun(opts *CreateRotatingOpts) error {
 			MongodbGroupID:          rsc.Details["group_id"].(string),
 			MongodbRoles:            reqRoles,
 		}
-		fmt.Fprintf(opts.IO.Err(), "creating secret with body %+v\n", req.Body)
 		_, err := opts.PreviewClient.CreateMongoDBAtlasRotatingSecret(req, nil)
 		if err != nil {
 			return fmt.Errorf("failed to create secret with name %q: %w", rsc.SecretName, err)
