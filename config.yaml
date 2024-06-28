@@ -1,0 +1,6 @@
+version: "2024-06-24"
+type: "mongodb"
+name: "climongo"
+details:
+  private_key: "{mongodb_private_key}"
+  public_key: "{mongodb_public_key}"

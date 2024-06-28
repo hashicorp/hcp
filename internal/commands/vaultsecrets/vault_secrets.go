@@ -5,6 +5,7 @@ package vaultsecrets
 
 import (
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/apps"
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/run"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -26,6 +27,7 @@ func NewCmdVaultSecrets(ctx *cmd.Context) *cmd.Command {
 
 	cmd.AddChild(apps.NewCmdApps(ctx))
 	cmd.AddChild(secrets.NewCmdSecrets(ctx))
+	cmd.AddChild(integrations.NewCmdIntegrations(ctx))
 	cmd.AddChild(run.NewCmdRun(ctx, nil))
 	return cmd
 }
