@@ -256,6 +256,7 @@ func TestSetupChildProcess(t *testing.T) {
 }
 
 func Test_processCollisions(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name              string
 		expectedCollision bool
