@@ -4,6 +4,7 @@
 package run
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"os/exec"
@@ -12,11 +13,13 @@ import (
 
 	"github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/hashicorp/go-hclog"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+
 	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -98,14 +101,17 @@ func TestRunRun(t *testing.T) {
 	}
 
 	cases := []struct {
-		Name       string
-		RespErr    bool
-		ErrMsg     string
-		MockCalled bool
+		Name        string
+		Secrets     []*preview_models.Secrets20231128OpenSecret
+		RespErr     bool
+		ErrMsg      string
+		LogContains string
+		MockCalled  bool
 	}{
 		{
 			Name:       "Failed: Secret not found",
 			RespErr:    true,
+			Secrets:    nil,
 			ErrMsg:     "[GET /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secrets:open][403]",
 			MockCalled: true,
 		},
@@ -113,6 +119,46 @@ func TestRunRun(t *testing.T) {
 			Name:       "Success",
 			RespErr:    false,
 			MockCalled: true,
+			Secrets: []*preview_models.Secrets20231128OpenSecret{
+				{
+					Name:          "static",
+					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
+				},
+				{
+					Name: "rotating",
+					RotatingVersion: &preview_models.Secrets20231128OpenSecretRotatingVersion{
+						Values: map[string]string{"sub_key": "value"},
+					},
+				},
+				{
+					Name: "dynamic",
+					DynamicInstance: &preview_models.Secrets20231128OpenSecretDynamicInstance{
+						Values: map[string]string{"sub_key": "value"},
+					},
+				},
+			},
+		},
+		{
+			Name:        "Collide",
+			RespErr:     false,
+			MockCalled:  true,
+			LogContains: "environment variable \"STATIC_COLLISION\" was assigned more than once",
+			Secrets: []*preview_models.Secrets20231128OpenSecret{
+				{
+					Name:          "static_collision",
+					LatestVersion: 1,
+					CreatedAt:     strfmt.DateTime(time.Now()),
+					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
+				},
+				{
+					Name:          "static",
+					LatestVersion: 1,
+					CreatedAt:     strfmt.DateTime(time.Now()),
+					RotatingVersion: &preview_models.Secrets20231128OpenSecretRotatingVersion{
+						Values: map[string]string{"collision": ""},
+					},
+				},
+			},
 		},
 	}
 
@@ -121,6 +167,7 @@ func TestRunRun(t *testing.T) {
 		t.Run(c.Name, func(t *testing.T) {
 			t.Parallel()
 			r := require.New(t)
+			var logBuff bytes.Buffer
 
 			io := iostreams.Test()
 			io.ErrorTTY = true
@@ -133,6 +180,11 @@ func TestRunRun(t *testing.T) {
 				PreviewClient: vs,
 				AppName:       testProfile(t).VaultSecrets.AppName,
 				Command:       []string{"echo \"Testing\""},
+				Logger: hclog.New(&hclog.LoggerOptions{
+					Level:  hclog.DefaultLevel,
+					Output: &logBuff,
+					TimeFn: time.Now,
+				}),
 			}
 
 			if c.MockCalled {
@@ -146,18 +198,7 @@ func TestRunRun(t *testing.T) {
 						Context:        opts.Ctx,
 					}, nil).Return(&preview_secret_service.OpenAppSecretsOK{
 						Payload: &preview_models.Secrets20231128OpenAppSecretsResponse{
-							Secrets: []*preview_models.Secrets20231128OpenSecret{
-								{
-									Name:          "secret_1",
-									LatestVersion: 2,
-									CreatedAt:     strfmt.DateTime(time.Now()),
-								},
-								{
-									Name:          "secret_2",
-									LatestVersion: 2,
-									CreatedAt:     strfmt.DateTime(time.Now()),
-								},
-							},
+							Secrets: c.Secrets,
 						},
 					}, nil).Once()
 				}
@@ -171,6 +212,9 @@ func TestRunRun(t *testing.T) {
 			}
 
 			r.NoError(err)
+
+			// Check for log messages
+			r.Contains(logBuff.String(), c.LogContains)
 		})
 	}
 }
@@ -215,6 +259,54 @@ func TestSetupChildProcess(t *testing.T) {
 			r.Equal(cmd.Args, c.ExpectedCmd.Args)
 			r.Equal(cmd.Env, c.ExpectedCmd.Env)
 			r.Contains(cmd.Path, c.ExpectedCmd.Args[0])
+		})
+	}
+}
+
+func Test_processCollisions(t *testing.T) {
+	tests := []struct {
+		name              string
+		expectedCollision bool
+		fmtNames          []string
+	}{
+		{
+			name:              "success",
+			expectedCollision: false,
+			fmtNames:          []string{"secret_1", "secret_2", "secret_3"},
+		},
+		{
+			name:              "one collision",
+			expectedCollision: true,
+			fmtNames:          []string{"secret_1", "secret_1", "secret_2"},
+		},
+		{
+			name:              "multiple single key collision",
+			expectedCollision: true,
+			fmtNames:          []string{"secret_1", "secret_1", "secret_1", "secret_2"},
+		},
+		{
+			name:              "two key collision",
+			expectedCollision: true,
+			fmtNames:          []string{"secret_1", "secret_1", "secret_2", "secret_2"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			collisions := make(map[string]bool, 0)
+			for _, fmtName := range tt.fmtNames {
+				processCollisions(collisions, fmtName)
+			}
+			t.Log("before: ", collisions)
+			// drop false records
+			for fmtName, collided := range collisions {
+				if !collided {
+					delete(collisions, fmtName)
+				}
+			}
+			t.Log("after: ", collisions)
+			if len(collisions) > 0 != tt.expectedCollision {
+				t.Fail()
+			}
 		})
 	}
 }

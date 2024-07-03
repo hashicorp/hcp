@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/go-hclog"
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/apps/helper"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -148,24 +149,48 @@ func getAllSecretsForEnv(opts *RunOpts) ([]string, error) {
 	}
 
 	result := os.Environ()
+	collisions := make(map[string]bool, 0)
 
 	for _, secret := range res.Payload.Secrets {
 		// we need to append results in case of duplicates we want secrets to override
 		switch {
 		case secret.RotatingVersion != nil:
 			for name, value := range secret.RotatingVersion.Values {
-				result = append(result, fmt.Sprintf("%v_%v=%v", strings.ToUpper(secret.Name), strings.ToUpper(name), value))
+				fmtName := fmt.Sprintf("%v_%v", strings.ToUpper(secret.Name), strings.ToUpper(name))
+				processCollisions(collisions, fmtName)
+				result = append(result, fmt.Sprintf("%v=%v", fmtName, value))
 			}
 		case secret.DynamicInstance != nil:
 			for name, value := range secret.DynamicInstance.Values {
-				result = append(result, fmt.Sprintf("%v_%v=%v", strings.ToUpper(secret.Name), strings.ToUpper(name), value))
+				fmtName := fmt.Sprintf("%v_%v", strings.ToUpper(secret.Name), strings.ToUpper(name))
+				processCollisions(collisions, fmtName)
+				result = append(result, fmt.Sprintf("%v=%v", fmtName, value))
 			}
 		case secret.StaticVersion != nil:
-			result = append(result, fmt.Sprintf("%v=%v", strings.ToUpper(secret.Name), secret.StaticVersion.Value))
+			fmtName := strings.ToUpper(secret.Name)
+			processCollisions(collisions, fmtName)
+			result = append(result, fmt.Sprintf("%v=%v", fmtName, secret.StaticVersion.Value))
+		}
+	}
+
+	// check collisions by dropping unique records from the map
+	for fmtName, collided := range collisions {
+		if !collided {
+			delete(collisions, fmtName)
+		} else {
+			opts.Logger.Warn(fmt.Sprintf("environment variable \"%s\" was assigned more than once", fmtName))
 		}
 	}
 
 	return result, nil
+}
+
+func processCollisions(collisions map[string]bool, fmtName string) {
+	if _, collide := collisions[fmtName]; collide {
+		collisions[fmtName] = true
+	} else {
+		collisions[fmtName] = false
+	}
 }
 
 func setupChildProcess(ctx context.Context, command []string, envVars []string) *exec.Cmd {
