@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/hclsimple"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -33,7 +35,7 @@ $ hcp waypoint templates create -n=my-template \
   --readme-markdown-template-file "README.tpl" \
   --tfc-no-code-module-source="app.terraform.io/hashicorp/dir/template" \
   --tfc-project-name="my-tfc-project" \
-  --tfc-project-id="prj-123456"" \
+  --tfc-project-id="prj-123456" \
   -l="label1" \
   -l="label2"
 `),
@@ -100,7 +102,7 @@ $ hcp waypoint templates create -n=my-template \
 					Name:         "tfc-no-code-module-source",
 					DisplayValue: "TFC_NO_CODE_MODULE_SOURCE",
 					Description: heredoc.New(ctx.IO).Must(`
-			The source of the Terraform no-code module. 
+			The source of the Terraform no-code module.
 			The expected format is "NAMESPACE/NAME/PROVIDER". An
 			optional "HOSTNAME/" can be added at the beginning for
 			a private registry.
@@ -123,6 +125,12 @@ $ hcp waypoint templates create -n=my-template \
 						" applications using this template will be created.",
 					Value:    flagvalue.Simple("", &opts.TerraformCloudProjectID),
 					Required: true,
+				},
+				{
+					Name:         "variable-options-file",
+					DisplayValue: "VARIABLE_OPTIONS_FILE",
+					Description:  "The file containing the HCL definition of Variable Options.",
+					Value:        flagvalue.Simple("", &opts.VariableOptionsFile),
 				},
 			},
 		},
@@ -156,6 +164,21 @@ func templateCreate(opts *TemplateOpts) error {
 		}
 	}
 
+	// read variable options file and parse hcl
+	var variables []*models.HashicorpCloudWaypointTFModuleVariable
+	if opts.VariableOptionsFile != "" {
+		vars, err := parseVariableInputFile(opts.VariableOptionsFile)
+		if err != nil {
+			return errors.Wrapf(err, "%s failed to read Variable Options hcl file %q",
+				opts.IO.ColorScheme().FailureIcon(),
+				opts.VariableOptionsFile,
+			)
+		}
+		if vars != nil {
+			variables = vars
+		}
+	}
+
 	_, err = opts.WS.WaypointServiceCreateApplicationTemplate(
 		&waypoint_service.WaypointServiceCreateApplicationTemplateParams{
 			NamespaceID: ns.ID,
@@ -172,6 +195,7 @@ func templateCreate(opts *TemplateOpts) error {
 						ProjectID: opts.TerraformCloudProjectID,
 					},
 					ModuleSource: opts.TerraformNoCodeModuleSource,
+					VariableOptions: variables,
 				},
 			},
 			Context: opts.Ctx,
@@ -191,4 +215,68 @@ func templateCreate(opts *TemplateOpts) error {
 	)
 
 	return nil
+}
+
+// parseVariableInputs reads the input bytes and parses the HCL file to extract the
+// variable inputs. Note that we intentionally do not provide much in terms of
+// validation of the HCL file, as we expect the HCL to be validated by the
+// server side.
+//
+// # Example contents of a vars.hcl file
+//
+//	variable_option "string_variable" {
+//	  type = "string"
+//	  options = [
+//	    "a string value",
+//	  ]
+//	  user_editable = false
+//	}
+//
+//	variable_option "misc_variable" {
+//	  type = "string"
+//	  options = [
+//	    "another string value",
+//	  ]
+//	  user_editable = false
+//	}
+func parseVariableInputs(filename string, input []byte) ([]*models.HashicorpCloudWaypointTFModuleVariable, error) {
+	var hc hclVariableInputFile
+	var ctx hcl.EvalContext
+	// the Decode method expects a filename to provide context to the error; it
+	// does not actually load anything from the file system
+	if err := hclsimple.Decode(filename, input, &ctx, &hc); err != nil {
+		return nil, err
+	}
+
+	var variables []*models.HashicorpCloudWaypointTFModuleVariable
+	if len(hc.VariableOptions) > 0 {
+		for _, v := range hc.VariableOptions {
+			variables = append(variables, &models.HashicorpCloudWaypointTFModuleVariable{
+				Name:         v.Name,
+				VariableType: v.Type,
+				Options:      v.Options,
+				UserEditable: v.UserEditable,
+			})
+		}
+	}
+	return variables, nil
+}
+
+func parseVariableInputFile(path string) ([]*models.HashicorpCloudWaypointTFModuleVariable, error) {
+	input, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return parseVariableInputs(path, input)
+}
+
+type hclVariableOption struct {
+	Name         string   `hcl:",label"`
+	Type         string   `hcl:"type"`
+	Options      []string `hcl:"options"`
+	UserEditable bool     `hcl:"user_editable,optional"`
+}
+
+type hclVariableInputFile struct {
+	VariableOptions []*hclVariableOption `hcl:"variable_option,block"`
 }
