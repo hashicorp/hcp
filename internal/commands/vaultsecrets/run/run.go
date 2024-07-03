@@ -178,7 +178,12 @@ func getAllSecretsForEnv(opts *RunOpts) ([]string, error) {
 		if !collided {
 			delete(collisions, fmtName)
 		} else {
-			opts.Logger.Warn(fmt.Sprintf("environment variable \"%s\" was assigned more than once", fmtName))
+			_, err = fmt.Fprintf(opts.IO.Err(), "%s Environment variable \"%s\" was assigned more than once\n",
+				opts.IO.ColorScheme().WarningLabel(), fmtName)
+			if err != nil {
+				return nil, err
+			}
+
 		}
 	}
 

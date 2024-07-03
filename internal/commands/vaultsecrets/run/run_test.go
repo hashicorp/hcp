@@ -4,7 +4,6 @@
 package run
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"os/exec"
@@ -13,7 +12,6 @@ import (
 
 	"github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-	"github.com/hashicorp/go-hclog"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -101,12 +99,12 @@ func TestRunRun(t *testing.T) {
 	}
 
 	cases := []struct {
-		Name        string
-		Secrets     []*preview_models.Secrets20231128OpenSecret
-		RespErr     bool
-		ErrMsg      string
-		LogContains string
-		MockCalled  bool
+		Name            string
+		Secrets         []*preview_models.Secrets20231128OpenSecret
+		RespErr         bool
+		ErrMsg          string
+		IOErrorContains string
+		MockCalled      bool
 	}{
 		{
 			Name:       "Failed: Secret not found",
@@ -139,10 +137,10 @@ func TestRunRun(t *testing.T) {
 			},
 		},
 		{
-			Name:        "Collide",
-			RespErr:     false,
-			MockCalled:  true,
-			LogContains: "environment variable \"STATIC_COLLISION\" was assigned more than once",
+			Name:            "Collide",
+			RespErr:         false,
+			MockCalled:      true,
+			IOErrorContains: "\"STATIC_COLLISION\" was assigned more than once",
 			Secrets: []*preview_models.Secrets20231128OpenSecret{
 				{
 					Name:          "static_collision",
@@ -167,7 +165,6 @@ func TestRunRun(t *testing.T) {
 		t.Run(c.Name, func(t *testing.T) {
 			t.Parallel()
 			r := require.New(t)
-			var logBuff bytes.Buffer
 
 			io := iostreams.Test()
 			io.ErrorTTY = true
@@ -180,11 +177,6 @@ func TestRunRun(t *testing.T) {
 				PreviewClient: vs,
 				AppName:       testProfile(t).VaultSecrets.AppName,
 				Command:       []string{"echo \"Testing\""},
-				Logger: hclog.New(&hclog.LoggerOptions{
-					Level:  hclog.DefaultLevel,
-					Output: &logBuff,
-					TimeFn: time.Now,
-				}),
 			}
 
 			if c.MockCalled {
@@ -214,7 +206,7 @@ func TestRunRun(t *testing.T) {
 			r.NoError(err)
 
 			// Check for log messages
-			r.Contains(logBuff.String(), c.LogContains)
+			r.Contains(io.Error.String(), c.IOErrorContains)
 		})
 	}
 }
