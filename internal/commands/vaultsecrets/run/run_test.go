@@ -285,6 +285,7 @@ func Test_processCollisions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			collisions := make(map[string]bool, 0)
 			for _, fmtName := range tt.fmtNames {
 				processCollisions(collisions, fmtName)
