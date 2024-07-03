@@ -296,14 +296,12 @@ func Test_processCollisions(t *testing.T) {
 			for _, fmtName := range tt.fmtNames {
 				processCollisions(collisions, fmtName)
 			}
-			t.Log("before: ", collisions)
 			// drop false records
 			for fmtName, collided := range collisions {
 				if !collided {
 					delete(collisions, fmtName)
 				}
 			}
-			t.Log("after: ", collisions)
 			if len(collisions) > 0 != tt.expectedCollision {
 				t.Fail()
 			}
