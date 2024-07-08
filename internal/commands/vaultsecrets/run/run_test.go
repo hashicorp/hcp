@@ -17,6 +17,7 @@ import (
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+
 	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -98,14 +99,17 @@ func TestRunRun(t *testing.T) {
 	}
 
 	cases := []struct {
-		Name       string
-		RespErr    bool
-		ErrMsg     string
-		MockCalled bool
+		Name            string
+		Secrets         []*preview_models.Secrets20231128OpenSecret
+		RespErr         bool
+		ErrMsg          string
+		IOErrorContains string
+		MockCalled      bool
 	}{
 		{
 			Name:       "Failed: Secret not found",
 			RespErr:    true,
+			Secrets:    nil,
 			ErrMsg:     "[GET /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secrets:open][403]",
 			MockCalled: true,
 		},
@@ -113,6 +117,49 @@ func TestRunRun(t *testing.T) {
 			Name:       "Success",
 			RespErr:    false,
 			MockCalled: true,
+			Secrets: []*preview_models.Secrets20231128OpenSecret{
+				{
+					Name:          "static",
+					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
+				},
+				{
+					Name: "rotating",
+					RotatingVersion: &preview_models.Secrets20231128OpenSecretRotatingVersion{
+						Values: map[string]string{"sub_key": "value"},
+					},
+				},
+				{
+					Name: "dynamic",
+					DynamicInstance: &preview_models.Secrets20231128OpenSecretDynamicInstance{
+						Values: map[string]string{"sub_key": "value"},
+					},
+				},
+			},
+		},
+		{
+			Name:            "Collide",
+			RespErr:         false,
+			MockCalled:      true,
+			ErrMsg:          "multiple secrets map to the same environment variable",
+			IOErrorContains: "ERROR: \"static_collision\" [static], \"static\" [rotating] map to the same environment variable \"STATIC_COLLISION\"",
+			Secrets: []*preview_models.Secrets20231128OpenSecret{
+				{
+					Name:          "static_collision",
+					Type:          "static",
+					LatestVersion: 1,
+					CreatedAt:     strfmt.DateTime(time.Now()),
+					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
+				},
+				{
+					Name:          "static",
+					Type:          "rotating",
+					LatestVersion: 1,
+					CreatedAt:     strfmt.DateTime(time.Now()),
+					RotatingVersion: &preview_models.Secrets20231128OpenSecretRotatingVersion{
+						Values: map[string]string{"collision": ""},
+					},
+				},
+			},
 		},
 	}
 
@@ -146,18 +193,7 @@ func TestRunRun(t *testing.T) {
 						Context:        opts.Ctx,
 					}, nil).Return(&preview_secret_service.OpenAppSecretsOK{
 						Payload: &preview_models.Secrets20231128OpenAppSecretsResponse{
-							Secrets: []*preview_models.Secrets20231128OpenSecret{
-								{
-									Name:          "secret_1",
-									LatestVersion: 2,
-									CreatedAt:     strfmt.DateTime(time.Now()),
-								},
-								{
-									Name:          "secret_2",
-									LatestVersion: 2,
-									CreatedAt:     strfmt.DateTime(time.Now()),
-								},
-							},
+							Secrets: c.Secrets,
 						},
 					}, nil).Once()
 				}
@@ -166,6 +202,9 @@ func TestRunRun(t *testing.T) {
 			// Run the command
 			err := runRun(opts)
 			if c.ErrMsg != "" {
+				// Check for additional error messages
+				r.Contains(io.Error.String(), c.IOErrorContains)
+
 				r.Contains(err.Error(), c.ErrMsg)
 				return
 			}
