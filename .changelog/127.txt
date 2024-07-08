@@ -1,3 +1,3 @@
 ```release-note:bug
-vault-secrets: issue a warning if formatted secret names collide during a run command
+vault-secrets: issue an error if formatted secret names collide during a run command
 ```

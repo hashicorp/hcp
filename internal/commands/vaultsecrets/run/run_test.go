@@ -140,16 +140,19 @@ func TestRunRun(t *testing.T) {
 			Name:            "Collide",
 			RespErr:         false,
 			MockCalled:      true,
-			IOErrorContains: "\"STATIC_COLLISION\" was assigned more than once",
+			ErrMsg:          "multiple secrets map to the same environment variable",
+			IOErrorContains: "ERROR: \"static_collision\" [static], \"static\" [rotating] map to the same environment variable \"STATIC_COLLISION\"",
 			Secrets: []*preview_models.Secrets20231128OpenSecret{
 				{
 					Name:          "static_collision",
+					Type:          "static",
 					LatestVersion: 1,
 					CreatedAt:     strfmt.DateTime(time.Now()),
 					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
 				},
 				{
 					Name:          "static",
+					Type:          "rotating",
 					LatestVersion: 1,
 					CreatedAt:     strfmt.DateTime(time.Now()),
 					RotatingVersion: &preview_models.Secrets20231128OpenSecretRotatingVersion{
@@ -199,14 +202,14 @@ func TestRunRun(t *testing.T) {
 			// Run the command
 			err := runRun(opts)
 			if c.ErrMsg != "" {
+				// Check for additional error messages
+				r.Contains(io.Error.String(), c.IOErrorContains)
+
 				r.Contains(err.Error(), c.ErrMsg)
 				return
 			}
 
 			r.NoError(err)
-
-			// Check for log messages
-			r.Contains(io.Error.String(), c.IOErrorContains)
 		})
 	}
 }
@@ -251,54 +254,6 @@ func TestSetupChildProcess(t *testing.T) {
 			r.Equal(cmd.Args, c.ExpectedCmd.Args)
 			r.Equal(cmd.Env, c.ExpectedCmd.Env)
 			r.Contains(cmd.Path, c.ExpectedCmd.Args[0])
-		})
-	}
-}
-
-func Test_processCollisions(t *testing.T) {
-	t.Parallel()
-	tests := []struct {
-		name              string
-		expectedCollision bool
-		fmtNames          []string
-	}{
-		{
-			name:              "success",
-			expectedCollision: false,
-			fmtNames:          []string{"secret_1", "secret_2", "secret_3"},
-		},
-		{
-			name:              "one collision",
-			expectedCollision: true,
-			fmtNames:          []string{"secret_1", "secret_1", "secret_2"},
-		},
-		{
-			name:              "multiple single key collision",
-			expectedCollision: true,
-			fmtNames:          []string{"secret_1", "secret_1", "secret_1", "secret_2"},
-		},
-		{
-			name:              "two key collision",
-			expectedCollision: true,
-			fmtNames:          []string{"secret_1", "secret_1", "secret_2", "secret_2"},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			collisions := make(map[string]bool, 0)
-			for _, fmtName := range tt.fmtNames {
-				processCollisions(collisions, fmtName)
-			}
-			// drop false records
-			for fmtName, collided := range collisions {
-				if !collided {
-					delete(collisions, fmtName)
-				}
-			}
-			if len(collisions) > 0 != tt.expectedCollision {
-				t.Fail()
-			}
 		})
 	}
 }
