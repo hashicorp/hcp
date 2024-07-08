@@ -179,9 +179,9 @@ func getAllSecretsForEnv(opts *RunOpts) ([]string, error) {
 	for fmtName, uses := range collisions {
 		if len(uses) > 1 {
 			hasCollisions = true
-			offenders := make([]string, len(uses))
-			for i, use := range uses {
-				offenders[i] = fmt.Sprintf("\"%s\" [%s]", use.Name, use.Type)
+			var offenders []string
+			for _, use := range uses {
+				offenders = append(offenders, fmt.Sprintf("\"%s\" [%s]", use.Name, use.Type))
 			}
 			_, err = fmt.Fprintf(opts.IO.Err(), "%s %s map to the same environment variable \"%s\"\n",
 				opts.IO.ColorScheme().ErrorLabel(), strings.Join(offenders, ", "), fmtName)
