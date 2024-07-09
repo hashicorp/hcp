@@ -36,7 +36,7 @@ $ hcp waypoint templates update -n=my-template \
   --tfc-project-name="my-tfc-project" \
   --tfc-project-id="prj-123456 \
   -l="label1" \
-  -l="label2" 
+  -l="label2"
 `),
 			},
 		},
@@ -107,7 +107,7 @@ $ hcp waypoint templates update -n=my-template \
 					Name:         "tfc-no-code-module-source",
 					DisplayValue: "TFC_NO_CODE_MODULE_SOURCE",
 					Description: heredoc.New(ctx.IO).Must(`
-			The source of the Terraform no-code module. 
+			The source of the Terraform no-code module.
 			The expected format is "NAMESPACE/NAME/PROVIDER". An
 			optional "HOSTNAME/" can be added at the beginning for
 			a private registry.
@@ -133,6 +133,12 @@ $ hcp waypoint templates update -n=my-template \
 					Description: "The ID of the Terraform Cloud project where" +
 						" applications using this template will be created.",
 					Value: flagvalue.Simple("", &opts.TerraformCloudProjectID),
+				},
+				{
+					Name:         "variable-options-file",
+					DisplayValue: "VARIABLE_OPTIONS_FILE",
+					Description:  "The file containing the HCL definition of Variable Options.",
+					Value:        flagvalue.Simple("", &opts.VariableOptionsFile),
 				},
 			},
 		},
