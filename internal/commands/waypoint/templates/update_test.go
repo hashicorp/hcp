@@ -67,6 +67,38 @@ func TestCmdTemplateUpdate(t *testing.T) {
 				Tags:                       map[string]string{"cli": "true"},
 			},
 		},
+		{
+			Name: "accepts valid variable file",
+			Profile: func(t *testing.T) *profile.Profile {
+				return profile.TestProfile(t).SetOrgID("123")
+			},
+			Args: []string{
+				"-n=cli-test",
+				"-s", "A template created using the CLI.",
+				"--tfc-project-id", "prj-abcdefghij",
+				"--tfc-project-name", "test",
+				"--tfc-no-code-module-source", "private/waypoint/waypoint-nocode-module/null",
+				"--tfc-no-code-module-version", "0.0.1",
+				"-l", "cli",
+				"-d", "A template created with the CLI.",
+				"-t", "cli=true",
+				"--readme-markdown-template-file", "readme_test.txt",
+				"--variable-options-file", "variable_options.hcl",
+			},
+			Expect: &TemplateOpts{
+				Name:                         "cli-test",
+				Summary:                      "A template created using the CLI.",
+				Description:                  "A template created with the CLI.",
+				TerraformCloudProjectID:      "prj-abcdefghij",
+				TerraformCloudProjectName:    "test",
+				TerraformNoCodeModuleSource:  "private/waypoint/waypoint-nocode-module/null",
+				TerraformNoCodeModuleVersion: "0.0.1",
+				ReadmeMarkdownTemplateFile:   "readme_test.txt",
+				VariableOptionsFile:          "variable_options.hcl",
+				Labels:                       []string{"cli"},
+				Tags:                         map[string]string{"cli": "true"},
+			},
+		},
 	}
 
 	for _, c := range cases {
@@ -105,6 +137,7 @@ func TestCmdTemplateUpdate(t *testing.T) {
 				r.Equal(c.Expect.TerraformCloudProjectID, tplOpts.TerraformCloudProjectID)
 				r.Equal(c.Expect.TerraformCloudProjectName, tplOpts.TerraformCloudProjectName)
 				r.Equal(c.Expect.ReadmeMarkdownTemplateFile, tplOpts.ReadmeMarkdownTemplateFile)
+				r.Equal(c.Expect.VariableOptionsFile, tplOpts.VariableOptionsFile)
 				r.Equal(c.Expect.Labels, tplOpts.Labels)
 				r.Equal(c.Expect.Tags, tplOpts.Tags)
 			}
