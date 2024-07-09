@@ -170,80 +170,6 @@ func (_c *MockClientService_BillingAccountServiceCreateSetupIntent_Call) RunAndR
 	return _c
 }
 
-// BillingAccountServiceDeleteBillingAccount provides a mock function with given fields: params, authInfo, opts
-func (_m *MockClientService) BillingAccountServiceDeleteBillingAccount(params *billing_account_service.BillingAccountServiceDeleteBillingAccountParams, authInfo runtime.ClientAuthInfoWriter, opts ...billing_account_service.ClientOption) (*billing_account_service.BillingAccountServiceDeleteBillingAccountOK, error) {
-	_va := make([]interface{}, len(opts))
-	for _i := range opts {
-		_va[_i] = opts[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, params, authInfo)
-	_ca = append(_ca, _va...)
-	ret := _m.Called(_ca...)
-
-	if len(ret) == 0 {
-		panic("no return value specified for BillingAccountServiceDeleteBillingAccount")
-	}
-
-	var r0 *billing_account_service.BillingAccountServiceDeleteBillingAccountOK
-	var r1 error
-	if rf, ok := ret.Get(0).(func(*billing_account_service.BillingAccountServiceDeleteBillingAccountParams, runtime.ClientAuthInfoWriter, ...billing_account_service.ClientOption) (*billing_account_service.BillingAccountServiceDeleteBillingAccountOK, error)); ok {
-		return rf(params, authInfo, opts...)
-	}
-	if rf, ok := ret.Get(0).(func(*billing_account_service.BillingAccountServiceDeleteBillingAccountParams, runtime.ClientAuthInfoWriter, ...billing_account_service.ClientOption) *billing_account_service.BillingAccountServiceDeleteBillingAccountOK); ok {
-		r0 = rf(params, authInfo, opts...)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*billing_account_service.BillingAccountServiceDeleteBillingAccountOK)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(*billing_account_service.BillingAccountServiceDeleteBillingAccountParams, runtime.ClientAuthInfoWriter, ...billing_account_service.ClientOption) error); ok {
-		r1 = rf(params, authInfo, opts...)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// MockClientService_BillingAccountServiceDeleteBillingAccount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'BillingAccountServiceDeleteBillingAccount'
-type MockClientService_BillingAccountServiceDeleteBillingAccount_Call struct {
-	*mock.Call
-}
-
-// BillingAccountServiceDeleteBillingAccount is a helper method to define mock.On call
-//   - params *billing_account_service.BillingAccountServiceDeleteBillingAccountParams
-//   - authInfo runtime.ClientAuthInfoWriter
-//   - opts ...billing_account_service.ClientOption
-func (_e *MockClientService_Expecter) BillingAccountServiceDeleteBillingAccount(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_BillingAccountServiceDeleteBillingAccount_Call {
-	return &MockClientService_BillingAccountServiceDeleteBillingAccount_Call{Call: _e.mock.On("BillingAccountServiceDeleteBillingAccount",
-		append([]interface{}{params, authInfo}, opts...)...)}
-}
-
-func (_c *MockClientService_BillingAccountServiceDeleteBillingAccount_Call) Run(run func(params *billing_account_service.BillingAccountServiceDeleteBillingAccountParams, authInfo runtime.ClientAuthInfoWriter, opts ...billing_account_service.ClientOption)) *MockClientService_BillingAccountServiceDeleteBillingAccount_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]billing_account_service.ClientOption, len(args)-2)
-		for i, a := range args[2:] {
-			if a != nil {
-				variadicArgs[i] = a.(billing_account_service.ClientOption)
-			}
-		}
-		run(args[0].(*billing_account_service.BillingAccountServiceDeleteBillingAccountParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
-	})
-	return _c
-}
-
-func (_c *MockClientService_BillingAccountServiceDeleteBillingAccount_Call) Return(_a0 *billing_account_service.BillingAccountServiceDeleteBillingAccountOK, _a1 error) *MockClientService_BillingAccountServiceDeleteBillingAccount_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *MockClientService_BillingAccountServiceDeleteBillingAccount_Call) RunAndReturn(run func(*billing_account_service.BillingAccountServiceDeleteBillingAccountParams, runtime.ClientAuthInfoWriter, ...billing_account_service.ClientOption) (*billing_account_service.BillingAccountServiceDeleteBillingAccountOK, error)) *MockClientService_BillingAccountServiceDeleteBillingAccount_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // BillingAccountServiceGet provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) BillingAccountServiceGet(params *billing_account_service.BillingAccountServiceGetParams, authInfo runtime.ClientAuthInfoWriter, opts ...billing_account_service.ClientOption) (*billing_account_service.BillingAccountServiceGetOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -392,8 +318,8 @@ func (_c *MockClientService_BillingAccountServiceGetByProject_Call) RunAndReturn
 	return _c
 }
 
-// BillingAccountServiceList provides a mock function with given fields: params, authInfo, opts
-func (_m *MockClientService) BillingAccountServiceList(params *billing_account_service.BillingAccountServiceListParams, authInfo runtime.ClientAuthInfoWriter, opts ...billing_account_service.ClientOption) (*billing_account_service.BillingAccountServiceListOK, error) {
+// BillingAccountServiceGetPricingModelTransitions provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) BillingAccountServiceGetPricingModelTransitions(params *billing_account_service.BillingAccountServiceGetPricingModelTransitionsParams, authInfo runtime.ClientAuthInfoWriter, opts ...billing_account_service.ClientOption) (*billing_account_service.BillingAccountServiceGetPricingModelTransitionsOK, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -404,23 +330,23 @@ func (_m *MockClientService) BillingAccountServiceList(params *billing_account_s
 	ret := _m.Called(_ca...)
 
 	if len(ret) == 0 {
-		panic("no return value specified for BillingAccountServiceList")
+		panic("no return value specified for BillingAccountServiceGetPricingModelTransitions")
 	}
 
-	var r0 *billing_account_service.BillingAccountServiceListOK
+	var r0 *billing_account_service.BillingAccountServiceGetPricingModelTransitionsOK
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*billing_account_service.BillingAccountServiceListParams, runtime.ClientAuthInfoWriter, ...billing_account_service.ClientOption) (*billing_account_service.BillingAccountServiceListOK, error)); ok {
+	if rf, ok := ret.Get(0).(func(*billing_account_service.BillingAccountServiceGetPricingModelTransitionsParams, runtime.ClientAuthInfoWriter, ...billing_account_service.ClientOption) (*billing_account_service.BillingAccountServiceGetPricingModelTransitionsOK, error)); ok {
 		return rf(params, authInfo, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(*billing_account_service.BillingAccountServiceListParams, runtime.ClientAuthInfoWriter, ...billing_account_service.ClientOption) *billing_account_service.BillingAccountServiceListOK); ok {
+	if rf, ok := ret.Get(0).(func(*billing_account_service.BillingAccountServiceGetPricingModelTransitionsParams, runtime.ClientAuthInfoWriter, ...billing_account_service.ClientOption) *billing_account_service.BillingAccountServiceGetPricingModelTransitionsOK); ok {
 		r0 = rf(params, authInfo, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*billing_account_service.BillingAccountServiceListOK)
+			r0 = ret.Get(0).(*billing_account_service.BillingAccountServiceGetPricingModelTransitionsOK)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(*billing_account_service.BillingAccountServiceListParams, runtime.ClientAuthInfoWriter, ...billing_account_service.ClientOption) error); ok {
+	if rf, ok := ret.Get(1).(func(*billing_account_service.BillingAccountServiceGetPricingModelTransitionsParams, runtime.ClientAuthInfoWriter, ...billing_account_service.ClientOption) error); ok {
 		r1 = rf(params, authInfo, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -429,21 +355,21 @@ func (_m *MockClientService) BillingAccountServiceList(params *billing_account_s
 	return r0, r1
 }
 
-// MockClientService_BillingAccountServiceList_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'BillingAccountServiceList'
-type MockClientService_BillingAccountServiceList_Call struct {
+// MockClientService_BillingAccountServiceGetPricingModelTransitions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'BillingAccountServiceGetPricingModelTransitions'
+type MockClientService_BillingAccountServiceGetPricingModelTransitions_Call struct {
 	*mock.Call
 }
 
-// BillingAccountServiceList is a helper method to define mock.On call
-//   - params *billing_account_service.BillingAccountServiceListParams
+// BillingAccountServiceGetPricingModelTransitions is a helper method to define mock.On call
+//   - params *billing_account_service.BillingAccountServiceGetPricingModelTransitionsParams
 //   - authInfo runtime.ClientAuthInfoWriter
 //   - opts ...billing_account_service.ClientOption
-func (_e *MockClientService_Expecter) BillingAccountServiceList(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_BillingAccountServiceList_Call {
-	return &MockClientService_BillingAccountServiceList_Call{Call: _e.mock.On("BillingAccountServiceList",
+func (_e *MockClientService_Expecter) BillingAccountServiceGetPricingModelTransitions(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_BillingAccountServiceGetPricingModelTransitions_Call {
+	return &MockClientService_BillingAccountServiceGetPricingModelTransitions_Call{Call: _e.mock.On("BillingAccountServiceGetPricingModelTransitions",
 		append([]interface{}{params, authInfo}, opts...)...)}
 }
 
-func (_c *MockClientService_BillingAccountServiceList_Call) Run(run func(params *billing_account_service.BillingAccountServiceListParams, authInfo runtime.ClientAuthInfoWriter, opts ...billing_account_service.ClientOption)) *MockClientService_BillingAccountServiceList_Call {
+func (_c *MockClientService_BillingAccountServiceGetPricingModelTransitions_Call) Run(run func(params *billing_account_service.BillingAccountServiceGetPricingModelTransitionsParams, authInfo runtime.ClientAuthInfoWriter, opts ...billing_account_service.ClientOption)) *MockClientService_BillingAccountServiceGetPricingModelTransitions_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]billing_account_service.ClientOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -451,17 +377,17 @@ func (_c *MockClientService_BillingAccountServiceList_Call) Run(run func(params 
 				variadicArgs[i] = a.(billing_account_service.ClientOption)
 			}
 		}
-		run(args[0].(*billing_account_service.BillingAccountServiceListParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+		run(args[0].(*billing_account_service.BillingAccountServiceGetPricingModelTransitionsParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
 	})
 	return _c
 }
 
-func (_c *MockClientService_BillingAccountServiceList_Call) Return(_a0 *billing_account_service.BillingAccountServiceListOK, _a1 error) *MockClientService_BillingAccountServiceList_Call {
+func (_c *MockClientService_BillingAccountServiceGetPricingModelTransitions_Call) Return(_a0 *billing_account_service.BillingAccountServiceGetPricingModelTransitionsOK, _a1 error) *MockClientService_BillingAccountServiceGetPricingModelTransitions_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockClientService_BillingAccountServiceList_Call) RunAndReturn(run func(*billing_account_service.BillingAccountServiceListParams, runtime.ClientAuthInfoWriter, ...billing_account_service.ClientOption) (*billing_account_service.BillingAccountServiceListOK, error)) *MockClientService_BillingAccountServiceList_Call {
+func (_c *MockClientService_BillingAccountServiceGetPricingModelTransitions_Call) RunAndReturn(run func(*billing_account_service.BillingAccountServiceGetPricingModelTransitionsParams, runtime.ClientAuthInfoWriter, ...billing_account_service.ClientOption) (*billing_account_service.BillingAccountServiceGetPricingModelTransitionsOK, error)) *MockClientService_BillingAccountServiceGetPricingModelTransitions_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -203,6 +203,80 @@ func (_c *MockClientService_StatementServiceGetStatement_Call) RunAndReturn(run 
 	return _c
 }
 
+// StatementServiceGetStatementCSV provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) StatementServiceGetStatementCSV(params *statement_service.StatementServiceGetStatementCSVParams, authInfo runtime.ClientAuthInfoWriter, opts ...statement_service.ClientOption) (*statement_service.StatementServiceGetStatementCSVOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for StatementServiceGetStatementCSV")
+	}
+
+	var r0 *statement_service.StatementServiceGetStatementCSVOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*statement_service.StatementServiceGetStatementCSVParams, runtime.ClientAuthInfoWriter, ...statement_service.ClientOption) (*statement_service.StatementServiceGetStatementCSVOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*statement_service.StatementServiceGetStatementCSVParams, runtime.ClientAuthInfoWriter, ...statement_service.ClientOption) *statement_service.StatementServiceGetStatementCSVOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*statement_service.StatementServiceGetStatementCSVOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*statement_service.StatementServiceGetStatementCSVParams, runtime.ClientAuthInfoWriter, ...statement_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_StatementServiceGetStatementCSV_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'StatementServiceGetStatementCSV'
+type MockClientService_StatementServiceGetStatementCSV_Call struct {
+	*mock.Call
+}
+
+// StatementServiceGetStatementCSV is a helper method to define mock.On call
+//   - params *statement_service.StatementServiceGetStatementCSVParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...statement_service.ClientOption
+func (_e *MockClientService_Expecter) StatementServiceGetStatementCSV(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_StatementServiceGetStatementCSV_Call {
+	return &MockClientService_StatementServiceGetStatementCSV_Call{Call: _e.mock.On("StatementServiceGetStatementCSV",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_StatementServiceGetStatementCSV_Call) Run(run func(params *statement_service.StatementServiceGetStatementCSVParams, authInfo runtime.ClientAuthInfoWriter, opts ...statement_service.ClientOption)) *MockClientService_StatementServiceGetStatementCSV_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]statement_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(statement_service.ClientOption)
+			}
+		}
+		run(args[0].(*statement_service.StatementServiceGetStatementCSVParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_StatementServiceGetStatementCSV_Call) Return(_a0 *statement_service.StatementServiceGetStatementCSVOK, _a1 error) *MockClientService_StatementServiceGetStatementCSV_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_StatementServiceGetStatementCSV_Call) RunAndReturn(run func(*statement_service.StatementServiceGetStatementCSVParams, runtime.ClientAuthInfoWriter, ...statement_service.ClientOption) (*statement_service.StatementServiceGetStatementCSVOK, error)) *MockClientService_StatementServiceGetStatementCSV_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // StatementServiceListStatements provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) StatementServiceListStatements(params *statement_service.StatementServiceListStatementsParams, authInfo runtime.ClientAuthInfoWriter, opts ...statement_service.ClientOption) (*statement_service.StatementServiceListStatementsOK, error) {
 	_va := make([]interface{}, len(opts))
