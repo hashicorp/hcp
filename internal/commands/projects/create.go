@@ -156,12 +156,10 @@ func addToBillingAccount(opts *CreateOpts, projectID string) error {
 	updateReq := billing_account_service.NewBillingAccountServiceUpdateParams()
 	updateReq.OrganizationID = ba.OrganizationID
 	updateReq.ID = ba.ID
-	updateReq.Body = &billingModels.Billing20201105UpdateBillingAccountRequest{
-		OrganizationID: opts.Profile.OrganizationID,
-		ID:             ba.ID,
-		ProjectIds:     ba.ProjectIds,
-		Name:           ba.Name,
-		Country:        ba.Country,
+	updateReq.Body = &billingModels.BillingAccountServiceUpdateBody{
+		ProjectIds: ba.ProjectIds,
+		Name:       ba.Name,
+		Country:    ba.Country,
 	}
 
 	updateReq.Body.ProjectIds = append(updateReq.Body.ProjectIds, projectID)
