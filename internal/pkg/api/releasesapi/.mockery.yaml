@@ -1,0 +1,14 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+with-expecter: true
+disable-version-string: true
+packages:
+  github.com/hashicorp/hcp/internal/pkg/api/releasesapi/client/operations:
+    config:
+      dir: "mocks"
+      filename: "mock_{{.InterfaceName}}.go"
+      outpkg: "mock_operations"
+    interfaces:
+      ClientService:
+      ClientOption:

@@ -4,7 +4,7 @@ ROOT_DIR = $(dir $(abspath $(firstword $(MAKEFILE_LIST))))
 # is run, the existing mocks will be deleted and new ones will be generated. If
 # the mock file is generated in the same package as the actual implementation,
 # store the mock file in MOCKERY_OUTPUT_FILES.
-MOCKERY_DIRS=./ internal/commands/auth/ internal/pkg/api/iampolicy
+MOCKERY_DIRS=./ internal/commands/auth/ internal/pkg/api/iampolicy internal/pkg/api/releasesapi
 MOCKERY_OUTPUT_DIRS=internal/pkg/api/mocks internal/commands/auth/mocks internal/pkg/api/releasesapi/mocks
 MOCKERY_OUTPUT_FILES=internal/pkg/api/iampolicy/mock_setter.go \
 					 internal/pkg/api/iampolicy/mock_resource_updater.go
