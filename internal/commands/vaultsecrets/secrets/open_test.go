@@ -196,6 +196,7 @@ func TestOpenRun(t *testing.T) {
 									Value:   "my super secret value",
 								},
 								CreatedAt: strfmt.DateTime(time.Now()),
+								Type:      secretTypeKV,
 							},
 						},
 					}, nil).Once()

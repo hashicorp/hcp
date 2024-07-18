@@ -119,39 +119,21 @@ func openRun(opts *OpenOpts) (err error) {
 		return fmt.Errorf("failed to read the secret %q: %w", opts.SecretName, err)
 	}
 
-	var (
-		secretValue string
-		field       format.Field
-	)
+	var secretValue string
 
-	switch {
-	case resp.Payload.Secret.RotatingVersion != nil:
+	switch resp.Payload.Secret.Type {
+	case secretTypeRotating:
 		secretValue, err = formatSecretMap(resp.Payload.Secret.RotatingVersion.Values)
 		if err != nil {
 			secretValue = "<< COULD NOT ENCODE TO JSON >>"
 		}
-
-		field = format.Field{
-			Name:        "Values",
-			ValueFormat: `{{ range $key, $value := .RotatingVersion.Values }}{{printf "%s: %s\n" $key $value}}{{ end }}`,
-		}
-	case resp.Payload.Secret.DynamicInstance != nil:
+	case secretTypeDynamic:
 		secretValue, err = formatSecretMap(resp.Payload.Secret.DynamicInstance.Values)
 		if err != nil {
 			secretValue = "<< COULD NOT ENCODE TO JSON >>"
 		}
-
-		field = format.Field{
-			Name:        "Values",
-			ValueFormat: `{{ range $key, $value := .DynamicInstance.Values }}{{printf "%s: %s\n" $key $value}}{{ end }}`,
-		}
-	case resp.Payload.Secret.StaticVersion != nil:
+	case secretTypeKV:
 		secretValue = resp.Payload.Secret.StaticVersion.Value
-
-		field = format.Field{
-			Name:        "Value",
-			ValueFormat: "{{ .StaticVersion.Value }}",
-		}
 	default:
 		secretValue = "<< SECRET TYPE NOT SUPPORTED >>"
 	}
@@ -165,8 +147,8 @@ func openRun(opts *OpenOpts) (err error) {
 		return nil
 	}
 
-	displayer := newDisplayer(true).OpenAppSecrets(resp.Payload.Secret).
-		SetDefaultFormat(format.Pretty).AddFields(field)
+	displayer := newDisplayer().OpenAppSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty).
+		SetSingleSecret(resp.Payload.Secret.Type)
 	return opts.Output.Display(displayer)
 }
 

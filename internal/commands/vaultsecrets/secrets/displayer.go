@@ -4,23 +4,26 @@
 package secrets
 
 import (
+	"fmt"
+
 	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 )
 
+const multiValueSecretFmt = "{{ range $key, $value := %s }}{{printf \"%%s: %%s\\n\" $key $value}}{{ end }}"
+
 type displayer struct {
 	secrets        []*models.Secrets20230613Secret
 	previewSecrets []*preview_models.Secrets20231128Secret
 	openAppSecrets []*preview_models.Secrets20231128OpenSecret
-	single         bool
+	secretType     string
 	fields         []format.Field
 	format         format.Format
 }
 
-func newDisplayer(single bool) *displayer {
+func newDisplayer() *displayer {
 	return &displayer{
-		single: single,
 		format: format.Table,
 	}
 }
@@ -50,6 +53,15 @@ func (d *displayer) SetDefaultFormat(f format.Format) *displayer {
 	return d
 }
 
+func (d *displayer) SetSingleSecret(s string) *displayer {
+	d.secretType = s
+	return d
+}
+
+func (d *displayer) single() bool {
+	return d.secretType != ""
+}
+
 func (d *displayer) DefaultFormat() format.Format {
 	return d.format
 }
@@ -70,11 +82,12 @@ func (d *displayer) Payload() any {
 }
 
 func (d *displayer) FieldTemplates() []format.Field {
+	fields := d.secretsFieldTemplate()
 	if d.openAppSecrets != nil {
-		return d.openAppSecretsFieldTemplate()
+		fields = d.openAppSecretsFieldTemplate()
 	}
 
-	return d.secretsFieldTemplate()
+	return append(fields, d.fields...)
 }
 
 func (d *displayer) secretsFieldTemplate() []format.Field {
@@ -82,14 +95,6 @@ func (d *displayer) secretsFieldTemplate() []format.Field {
 		{
 			Name:        "Secret Name",
 			ValueFormat: "{{ .Name }}",
-		},
-		{
-			Name:        "Latest Version",
-			ValueFormat: "{{ .LatestVersion }}",
-		},
-		{
-			Name:        "Created At",
-			ValueFormat: "{{ .CreatedAt }}",
 		},
 	}
 
@@ -100,16 +105,92 @@ func (d *displayer) secretsFieldTemplate() []format.Field {
 		})
 	}
 
+	fields = append(fields, format.Field{
+		Name:        "Created At",
+		ValueFormat: "{{ .CreatedAt }}",
+	})
+
+	switch d.secretType {
+	case secretTypeKV, secretTypeRotating:
+		fields = append(fields, format.Field{
+			Name:        "Latest Version",
+			ValueFormat: "{{ .LatestVersion }}",
+		})
+	}
+
 	return fields
 }
 
 func (d *displayer) openAppSecretsFieldTemplate() []format.Field {
-	fields := d.secretsFieldTemplate()
-	return append(fields, d.fields...)
+	fields := []format.Field{
+		{
+			Name:        "Secret Name",
+			ValueFormat: "{{ .Name }}",
+		},
+		{
+			Name:        "Type",
+			ValueFormat: "{{ .Type }}",
+		},
+	}
+
+	// Secret type specific fields
+	switch d.secretType {
+	case secretTypeKV:
+		fields = append(fields, []format.Field{
+			{
+				Name:        "Created At",
+				ValueFormat: "{{ .CreatedAt }}",
+			},
+			{
+				Name:        "Latest Version",
+				ValueFormat: "{{ .LatestVersion }}",
+			},
+			{
+				Name:        "Value",
+				ValueFormat: "{{ .StaticVersion.Value }}",
+			},
+		}...)
+	case secretTypeDynamic:
+		fields = append(fields, []format.Field{
+			{
+				Name:        "Created At",
+				ValueFormat: "{{ .DynamicInstance.CreatedAt }}",
+			},
+			{
+				Name:        "Expires At",
+				ValueFormat: "{{ .DynamicInstance.ExpiresAt }}",
+			},
+			{
+				Name:        "Time-to-Live",
+				ValueFormat: "{{ .DynamicInstance.TTL }}",
+			},
+			{
+				Name:        "Values",
+				ValueFormat: fmt.Sprintf(multiValueSecretFmt, ".DynamicInstance.Values"),
+			},
+		}...)
+	case secretTypeRotating:
+		fields = append(fields, []format.Field{
+			{
+				Name:        "Created At",
+				ValueFormat: "{{ .CreatedAt }}",
+			},
+			{
+				Name:        "Latest Version",
+				ValueFormat: "{{ .LatestVersion }}",
+			},
+			{
+				Name:        "Values",
+				ValueFormat: fmt.Sprintf(multiValueSecretFmt, ".RotatingVersion.Values"),
+			},
+		}...)
+	}
+
+	return fields
 }
 
 func (d *displayer) secretsPayload() any {
-	if d.single {
+	if d.single() {
 		if len(d.secrets) != 1 {
 			return nil
 		}
@@ -119,7 +200,7 @@ func (d *displayer) secretsPayload() any {
 }
 
 func (d *displayer) previewSecretsPayload() any {
-	if d.single {
+	if d.single() {
 		if len(d.previewSecrets) != 1 {
 			return nil
 		}
@@ -129,7 +210,7 @@ func (d *displayer) previewSecretsPayload() any {
 }
 
 func (d *displayer) openAppSecretsPayload() any {
-	if d.single {
+	if d.single() {
 		if len(d.openAppSecrets) != 1 {
 			return nil
 		}

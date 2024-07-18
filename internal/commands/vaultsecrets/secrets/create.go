@@ -122,7 +122,8 @@ func createRun(opts *CreateOpts) error {
 		return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 	}
 
-	if err := opts.Output.Display(newDisplayer(true).Secrets(resp.Payload.Secret)); err != nil {
+	displayer := newDisplayer().Secrets(resp.Payload.Secret).SetSingleSecret(secretTypeKV)
+	if err := opts.Output.Display(displayer); err != nil {
 		return err
 	}
 
