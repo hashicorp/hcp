@@ -141,7 +141,7 @@ func templateUpdate(opts *TemplateOpts) error {
 	// API is then removing the collection (variables, et.al) even if we don't
 	// set it here in the request (ex: we don't intend to change things).
 	//
-	// Unfortuantely even if the model had omitempty, this would then cause the
+	// Unfortunately even if the model had omitempty, this would then cause the
 	// fieldmask to not get set, which is needed for the PATCH semantics, thus
 	// no change would occur.
 	resp, err := opts.WS.WaypointServiceGetApplicationTemplate2(
