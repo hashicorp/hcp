@@ -248,7 +248,8 @@ func parseVariableInputs(filename string, input []byte) ([]*models.HashicorpClou
 		return nil, err
 	}
 
-	var variables []*models.HashicorpCloudWaypointTFModuleVariable
+	// var variables []*models.HashicorpCloudWaypointTFModuleVariable
+	variables := make([]*models.HashicorpCloudWaypointTFModuleVariable, 0)
 	if len(hc.VariableOptions) > 0 {
 		for _, v := range hc.VariableOptions {
 			variables = append(variables, &models.HashicorpCloudWaypointTFModuleVariable{

@@ -133,12 +133,78 @@ func templateUpdate(opts *TemplateOpts) error {
 		return err
 	}
 
-	var tags []*models.HashicorpCloudWaypointTag
-	for k, v := range opts.Tags {
-		tags = append(tags, &models.HashicorpCloudWaypointTag{
-			Key:   k,
-			Value: v,
-		})
+	// We have to get the existing template to get the collections (labels,
+	// tags, actions, variables) so that we can either omit or post updates to
+	// them based on the inputs here. This is because of how the model is
+	// generated from swagger with collections NOT being omit empty. As a
+	// result, the fieldmask is getting set even if nothing is set, and our API
+	// is then removing the collection (variables, et.al) even if we don't set
+	// it here in the request (ex: we don't intend to change things).
+	//
+	// Unfortuantely even if the model had omitempty, this would then cause the
+	// fieldmask to not get set, which is needed for the PATCH semantics, thus
+	// no change would occur.
+
+	resp, err := opts.WS.WaypointServiceGetApplicationTemplate2(
+		&waypoint_service.WaypointServiceGetApplicationTemplate2Params{
+			NamespaceID:             ns.ID,
+			Context:                 opts.Ctx,
+			ApplicationTemplateName: opts.Name,
+		}, nil,
+	)
+	if err != nil {
+		return errors.Wrapf(err, "%s failed to get template %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name,
+		)
+	}
+
+	respPayload := resp.GetPayload()
+	if respPayload.ApplicationTemplate == nil {
+		return errors.Wrapf(err, "%s empty template returned for name %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name,
+		)
+	}
+	template := respPayload.ApplicationTemplate
+
+	// start our updated template with the existing template
+	updatedTpl := &models.HashicorpCloudWaypointApplicationTemplate{
+		Name:        opts.UpdatedName,
+		Summary:     opts.Summary,
+		Description: opts.Description,
+		// Labels:   opts.Labels
+		TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointTerraformCloudWorkspaceDetails{
+			Name:      opts.TerraformCloudProjectName,
+			ProjectID: opts.TerraformCloudProjectID,
+		},
+	}
+
+	// grab the existing collection things
+	updatedTpl.Labels = template.Labels
+	// grab the existing template options
+	updatedTpl.VariableOptions = template.VariableOptions
+
+	// the HCP CLI doesn't support working with Action Cfgs yet, so we just copy
+	// over
+	updatedTpl.ActionCfgRefs = template.ActionCfgRefs
+
+	// var tags []*models.HashicorpCloudWaypointTag
+	tags := template.Tags
+	if len(opts.Tags) > 0 {
+		// clear out the existing tags to replace with new ones
+		tags = []*models.HashicorpCloudWaypointTag{}
+		for k, v := range opts.Tags {
+			tags = append(tags, &models.HashicorpCloudWaypointTag{
+				Key:   k,
+				Value: v,
+			})
+		}
+	}
+	updatedTpl.Tags = tags
+
+	if len(opts.Labels) > 0 {
+		updatedTpl.Labels = opts.Labels
 	}
 
 	var readmeTpl []byte
@@ -151,28 +217,33 @@ func templateUpdate(opts *TemplateOpts) error {
 			)
 		}
 	}
+	updatedTpl.ReadmeMarkdownTemplate = readmeTpl
 
-	updatedTpl := &models.HashicorpCloudWaypointApplicationTemplate{
-		Name:                   opts.UpdatedName,
-		Summary:                opts.Summary,
-		Description:            opts.Description,
-		ReadmeMarkdownTemplate: readmeTpl,
-		Labels:                 opts.Labels,
-		Tags:                   tags,
-		TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointTerraformCloudWorkspaceDetails{
-			Name:      opts.TerraformCloudProjectName,
-			ProjectID: opts.TerraformCloudProjectID,
-		},
+	// read variable options file and parse hcl
+	var variables []*models.HashicorpCloudWaypointTFModuleVariable
+
+	if opts.VariableOptionsFile != "" {
+		vars, err := parseVariableInputFile(opts.VariableOptionsFile)
+		if err != nil {
+			return errors.Wrapf(err, "%s failed to read Variable Options hcl file %q",
+				opts.IO.ColorScheme().FailureIcon(),
+				opts.VariableOptionsFile,
+			)
+		}
+		variables = vars
+		updatedTpl.VariableOptions = variables
 	}
 
-	_, err = opts.WS.WaypointServiceUpdateApplicationTemplate2(
-		&waypoint_service.WaypointServiceUpdateApplicationTemplate2Params{
+	// if a variable file is present but represents an empty list of variables,
+	// we need to set the fieldmask for variables to clear them out
+
+	_, err = opts.WS.WaypointServiceUpdateApplicationTemplate6(
+		&waypoint_service.WaypointServiceUpdateApplicationTemplate6Params{
 			NamespaceID:                     ns.ID,
 			Context:                         opts.Ctx,
 			ExistingApplicationTemplateName: opts.Name,
-			Body: &models.HashicorpCloudWaypointWaypointServiceUpdateApplicationTemplateBody{
-				ApplicationTemplate: updatedTpl,
-			},
+			ApplicationTemplate:             updatedTpl,
+			// FieldMask:                       &fieldMasks,
 		}, nil,
 	)
 	if err != nil {
