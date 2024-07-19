@@ -107,6 +107,5 @@ func templateRead(opts *TemplateOpts) error {
 	}
 
 	// Display the created project
-	d := format.NewDisplayer(template, format.Pretty, projectFields)
-	return opts.Output.Display(d)
+	return opts.Output.Display(format.NewDisplayer(template, format.Pretty, projectFields))
 }

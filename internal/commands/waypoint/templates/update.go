@@ -133,18 +133,17 @@ func templateUpdate(opts *TemplateOpts) error {
 		return err
 	}
 
-	// We have to get the existing template to get the collections (labels,
-	// tags, actions, variables) so that we can either omit or post updates to
-	// them based on the inputs here. This is because of how the model is
-	// generated from swagger with collections NOT being omit empty. As a
-	// result, the fieldmask is getting set even if nothing is set, and our API
-	// is then removing the collection (variables, et.al) even if we don't set
-	// it here in the request (ex: we don't intend to change things).
+	// NOTE (clint): We have to get the existing template to get the collections
+	// (labels, tags, actions, variables) so that we can either omit or post
+	// updates to them based on the inputs here. This is because of how the
+	// model is generated from swagger with collections NOT being omit empty. As
+	// a result, the fieldmask is getting set even if nothing is set, and our
+	// API is then removing the collection (variables, et.al) even if we don't
+	// set it here in the request (ex: we don't intend to change things).
 	//
 	// Unfortuantely even if the model had omitempty, this would then cause the
 	// fieldmask to not get set, which is needed for the PATCH semantics, thus
 	// no change would occur.
-
 	resp, err := opts.WS.WaypointServiceGetApplicationTemplate2(
 		&waypoint_service.WaypointServiceGetApplicationTemplate2Params{
 			NamespaceID:             ns.ID,
