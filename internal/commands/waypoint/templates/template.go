@@ -32,7 +32,6 @@ type TemplateOpts struct {
 	TerraformCloudProjectID     string
 
 	VariableOptionsFile string
-	// VariableOptions []VariableOptions
 
 	// testFunc is used for testing, so that the command can be tested without
 	// using the real API.

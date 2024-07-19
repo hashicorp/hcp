@@ -167,15 +167,12 @@ func templateCreate(opts *TemplateOpts) error {
 	// read variable options file and parse hcl
 	var variables []*models.HashicorpCloudWaypointTFModuleVariable
 	if opts.VariableOptionsFile != "" {
-		vars, err := parseVariableInputFile(opts.VariableOptionsFile)
+		variables, err = parseVariableInputFile(opts.VariableOptionsFile)
 		if err != nil {
 			return errors.Wrapf(err, "%s failed to read Variable Options hcl file %q",
 				opts.IO.ColorScheme().FailureIcon(),
 				opts.VariableOptionsFile,
 			)
-		}
-		if vars != nil {
-			variables = vars
 		}
 	}
 
