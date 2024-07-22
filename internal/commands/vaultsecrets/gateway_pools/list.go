@@ -1,4 +1,4 @@
-package gatewaypools
+package gateway_pools
 
 import (
 	"context"

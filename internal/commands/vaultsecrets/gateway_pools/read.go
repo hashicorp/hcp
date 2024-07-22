@@ -1,7 +1,7 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package gatewaypools
+package gateway_pools
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
 
-type DeleteOpts struct {
+type ReadOpts struct {
 	Ctx     context.Context
 	Profile *profile.Profile
 	Output  *format.Outputter
@@ -25,8 +25,8 @@ type DeleteOpts struct {
 	PreviewClient   preview_secret_service.ClientService
 }
 
-func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
-	opts := &DeleteOpts{
+func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
+	opts := &ReadOpts{
 		Ctx:           ctx.ShutdownCtx,
 		Profile:       ctx.Profile,
 		Output:        ctx.Output,
@@ -35,16 +35,16 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 	}
 
 	cmd := &cmd.Command{
-		Name:      "delete",
-		ShortHelp: "Delete a Vault Secrets gateway pool.",
+		Name:      "read",
+		ShortHelp: "Read a Vault Secrets gateway pool.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets gateway-pools delete" }} command deletes a Vault Secrets gateway pool.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets gateway-pools read" }} command gets a Vault Secrets gateway pool.
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Delete a gateway pool:`,
+				Preamble: `Read a gateway pool:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp vault-secrets gateway-pools delete company-tunnel
+				$ hcp vault-secrets gateway-pools read company-tunnel
 				`),
 			},
 		},
@@ -52,7 +52,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 			Args: []cmd.PositionalArgument{
 				{
 					Name:          "NAME",
-					Documentation: "The name of the gateway pool to delete.",
+					Documentation: "The name of the gateway pool to read.",
 				},
 			},
 		},
@@ -62,7 +62,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 			if runF != nil {
 				return runF(opts)
 			}
-			return deleteRun(opts)
+			return readRun(opts)
 		},
 	}
 	cmd.Args.Autocomplete = PredictGatewayPoolName(ctx, cmd, preview_secret_service.New(ctx.HCP, nil))
@@ -70,18 +70,21 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 	return cmd
 }
 
-func deleteRun(opts *DeleteOpts) error {
-	_, err := opts.PreviewClient.DeleteGatewayPool(&preview_secret_service.DeleteGatewayPoolParams{
+func readRun(opts *ReadOpts) error {
+	resp, err := opts.PreviewClient.GetGatewayPool(&preview_secret_service.GetGatewayPoolParams{
 		Context:         opts.Ctx,
-		OrganizationID:  opts.Profile.OrganizationID,
 		ProjectID:       opts.Profile.ProjectID,
+		OrganizationID:  opts.Profile.OrganizationID,
 		GatewayPoolName: opts.GatewayPoolName,
 	}, nil)
 
 	if err != nil {
-		return fmt.Errorf("failed to delete gateway pool: %w", err)
+		return fmt.Errorf("failed to read gateway pool: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Successfully deleted the gateway pool with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.GatewayPoolName)
-	return nil
+	if resp.Payload == nil || resp.Payload.GatewayPool == nil {
+		return fmt.Errorf("gateway pool not found")
+	}
+
+	return opts.Output.Display(newDisplayer(true, resp.Payload.GatewayPool))
 }
