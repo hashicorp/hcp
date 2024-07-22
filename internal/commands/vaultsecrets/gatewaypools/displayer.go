@@ -53,7 +53,7 @@ func (d *displayer) FieldTemplates() []format.Field {
 	return []format.Field{
 		{
 			Name:        "GatewayPool Name",
-			ValueFormat: "{{ .GatewayPoolName }}",
+			ValueFormat: "{{ .Name }}",
 		},
 		{
 			Name:        "Description",
