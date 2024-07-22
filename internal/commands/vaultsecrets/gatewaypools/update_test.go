@@ -43,7 +43,7 @@ func TestNewCmdUpdate(t *testing.T) {
 				return profile.TestProfile(t).SetOrgID("123").SetProjectID("abc")
 			},
 			Args:  []string{"gp1"},
-			Error: "ERROR: missing required flag: --description=DESCRIPTION",
+			Error: "no fields specified for update",
 		},
 		{
 			Name: "No gwp name",

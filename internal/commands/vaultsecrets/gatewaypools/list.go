@@ -34,7 +34,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 		Name:      "list",
 		ShortHelp: "List Vault Secrets gateway pools.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets gateway-pools list" }} command list all Vault Secrets gateway pools.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets gateway-pools list" }} command lists all Vault Secrets gateway pools.
 		`),
 		Examples: []cmd.Example{
 			{

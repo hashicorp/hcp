@@ -41,7 +41,7 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 		Name:      "update",
 		ShortHelp: "Update a Vault Secrets gateway pool.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets gateway-pools update" }} command updates the description of a Vault Secrets gateway pool.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets gateway-pools update" }} command updates a Vault Secrets gateway pool.
 		`),
 		Examples: []cmd.Example{
 			{
@@ -66,12 +66,15 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 					DisplayValue: "DESCRIPTION",
 					Description:  "The updated gateway pool description.",
 					Value:        flagvalue.Simple("", &opts.Description),
-					Required:     true,
+					Required:     false,
 				},
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {
 			opts.GatewayPoolName = args[0]
+			if opts.Description == "" {
+				return fmt.Errorf("no fields specified for update")
+			}
 
 			if runF != nil {
 				return runF(opts)

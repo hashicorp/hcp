@@ -31,6 +31,14 @@ func TestNewCmdList(t *testing.T) {
 				return profile.TestProfile(t).SetOrgID("123").SetProjectID("abc")
 			},
 		},
+		{
+			Name: "Too many args",
+			Profile: func(t *testing.T) *profile.Profile {
+				return profile.TestProfile(t).SetOrgID("123").SetProjectID("abc")
+			},
+			Args:  []string{"additional-arg"},
+			Error: "ERROR: no arguments allowed, but received 1",
+		},
 	}
 
 	for _, c := range cases {
