@@ -13,7 +13,9 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/apps/helper"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -148,21 +150,49 @@ func getAllSecretsForEnv(opts *RunOpts) ([]string, error) {
 	}
 
 	result := os.Environ()
+	collisions := make(map[string][]*models.Secrets20231128OpenSecret, 0)
 
 	for _, secret := range res.Payload.Secrets {
 		// we need to append results in case of duplicates we want secrets to override
 		switch {
 		case secret.RotatingVersion != nil:
 			for name, value := range secret.RotatingVersion.Values {
-				result = append(result, fmt.Sprintf("%v_%v=%v", strings.ToUpper(secret.Name), strings.ToUpper(name), value))
+				fmtName := fmt.Sprintf("%v_%v", strings.ToUpper(secret.Name), strings.ToUpper(name))
+				collisions[fmtName] = append(collisions[fmtName], secret)
+				result = append(result, fmt.Sprintf("%v=%v", fmtName, value))
 			}
 		case secret.DynamicInstance != nil:
 			for name, value := range secret.DynamicInstance.Values {
-				result = append(result, fmt.Sprintf("%v_%v=%v", strings.ToUpper(secret.Name), strings.ToUpper(name), value))
+				fmtName := fmt.Sprintf("%v_%v", strings.ToUpper(secret.Name), strings.ToUpper(name))
+				collisions[fmtName] = append(collisions[fmtName], secret)
+				result = append(result, fmt.Sprintf("%v=%v", fmtName, value))
 			}
 		case secret.StaticVersion != nil:
-			result = append(result, fmt.Sprintf("%v=%v", strings.ToUpper(secret.Name), secret.StaticVersion.Value))
+			fmtName := strings.ToUpper(secret.Name)
+			collisions[fmtName] = append(collisions[fmtName], secret)
+			result = append(result, fmt.Sprintf("%v=%v", fmtName, secret.StaticVersion.Value))
 		}
+	}
+
+	// check collisions and emit an error for each
+	hasCollisions := false
+	for fmtName, uses := range collisions {
+		if len(uses) > 1 {
+			hasCollisions = true
+			var offenders []string
+			for _, use := range uses {
+				offenders = append(offenders, fmt.Sprintf("\"%s\" [%s]", use.Name, use.Type))
+			}
+			_, err = fmt.Fprintf(opts.IO.Err(), "%s %s map to the same environment variable \"%s\"\n",
+				opts.IO.ColorScheme().ErrorLabel(), strings.Join(offenders, ", "), fmtName)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	if hasCollisions {
+		return nil, fmt.Errorf("multiple secrets map to the same environment variable")
 	}
 
 	return result, nil
