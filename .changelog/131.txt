@@ -1,0 +1,3 @@
+```release-note:feature
+vault-secrets: CRUD operations for vault-secrets gateway pools
+```
