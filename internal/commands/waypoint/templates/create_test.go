@@ -146,9 +146,9 @@ func TestCmdTemplateCreate(t *testing.T) {
 	}
 }
 
-// Test_VariableInputFileParse tests the parsing of variable options from a
+// Test_VariableOptionsFileParse tests the parsing of variable options from a
 // file.
-func Test_VariableInputFileParse(t *testing.T) {
+func Test_VariableOptionsFileParse(t *testing.T) {
 	t.Parallel()
 
 	t.Run("can parse variables", func(t *testing.T) {
@@ -166,7 +166,7 @@ func Test_VariableInputFileParse(t *testing.T) {
           }
 `
 
-		variableInputs, err := parseVariableInputs("blah.hcl", []byte(hcl))
+		variableInputs, err := parseVariableOptions("blah.hcl", []byte(hcl))
 		r.NoError(err)
 		r.Equal(1, len(variableInputs))
 		r.Equal("string_variable", variableInputs[0].Name)
@@ -190,7 +190,7 @@ func Test_VariableInputFileParse(t *testing.T) {
           }
 `
 
-		variableInputs, err := parseVariableInputs("blah.hcl", []byte(hcl))
+		variableInputs, err := parseVariableOptions("blah.hcl", []byte(hcl))
 		r.NoError(err)
 		r.Equal(1, len(variableInputs))
 		r.Equal("string_variable", variableInputs[0].Name)
@@ -223,7 +223,7 @@ variable_option "misc_variable" {
 }
 `
 
-		variableInputs, err := parseVariableInputs("blah.hcl", []byte(hcl))
+		variableInputs, err := parseVariableOptions("blah.hcl", []byte(hcl))
 		r.NoError(err)
 		r.Equal(2, len(variableInputs))
 		r.Equal("string_variable", variableInputs[0].Name)
@@ -250,7 +250,7 @@ variable_option "" {
 }
 `
 
-		_, err := parseVariableInputs("blah.hcl", []byte(hcl))
+		_, err := parseVariableOptions("blah.hcl", []byte(hcl))
 		r.Error(err)
 	})
 
@@ -261,7 +261,7 @@ variable_option "" {
 
 		hcl := ``
 
-		variableInputs, err := parseVariableInputs("blah.hcl", []byte(hcl))
+		variableInputs, err := parseVariableOptions("blah.hcl", []byte(hcl))
 		r.NoError(err)
 		r.Equal(0, len(variableInputs))
 	})

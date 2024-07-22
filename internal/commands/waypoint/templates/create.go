@@ -167,7 +167,7 @@ func templateCreate(opts *TemplateOpts) error {
 	// read variable options file and parse hcl
 	var variables []*models.HashicorpCloudWaypointTFModuleVariable
 	if opts.VariableOptionsFile != "" {
-		variables, err = parseVariableInputFile(opts.VariableOptionsFile)
+		variables, err = parseVariableOptionsFile(opts.VariableOptionsFile)
 		if err != nil {
 			return errors.Wrapf(err, "%s failed to read Variable Options hcl file %q",
 				opts.IO.ColorScheme().FailureIcon(),
@@ -214,9 +214,9 @@ func templateCreate(opts *TemplateOpts) error {
 	return nil
 }
 
-// parseVariableInputs reads the input bytes and parses the HCL file to extract the
-// variable inputs. Note that we intentionally do not provide much in terms of
-// validation of the HCL file, as we expect the HCL to be validated by the
+// parseVariableOptions reads the input bytes and parses the HCL file to extract
+// the variable options. Note that we intentionally do not provide much in terms
+// of validation of the HCL file, as we expect the HCL to be validated by the
 // server side.
 //
 // # Example contents of a vars.hcl file
@@ -236,8 +236,8 @@ func templateCreate(opts *TemplateOpts) error {
 //	  ]
 //	  user_editable = false
 //	}
-func parseVariableInputs(filename string, input []byte) ([]*models.HashicorpCloudWaypointTFModuleVariable, error) {
-	var hc hclVariableInputFile
+func parseVariableOptions(filename string, input []byte) ([]*models.HashicorpCloudWaypointTFModuleVariable, error) {
+	var hc hclVariableOptionsFile
 	var ctx hcl.EvalContext
 	// the Decode method expects a filename to provide context to the error; it
 	// does not actually load anything from the file system
@@ -260,12 +260,12 @@ func parseVariableInputs(filename string, input []byte) ([]*models.HashicorpClou
 	return variables, nil
 }
 
-func parseVariableInputFile(path string) ([]*models.HashicorpCloudWaypointTFModuleVariable, error) {
+func parseVariableOptionsFile(path string) ([]*models.HashicorpCloudWaypointTFModuleVariable, error) {
 	input, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	return parseVariableInputs(path, input)
+	return parseVariableOptions(path, input)
 }
 
 type hclVariableOption struct {
@@ -275,6 +275,6 @@ type hclVariableOption struct {
 	UserEditable bool     `hcl:"user_editable,optional"`
 }
 
-type hclVariableInputFile struct {
+type hclVariableOptionsFile struct {
 	VariableOptions []*hclVariableOption `hcl:"variable_option,block"`
 }
