@@ -1,7 +1,7 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package gateway_pools
+package gatewaypools
 
 import (
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
