@@ -1,0 +1,3 @@
+```release-note:improvement
+vault-secrets: improving vault-secrets gateway-pools read to include associated integrations
+```

@@ -69,5 +69,11 @@ func listRun(opts *ListOpts) error {
 		return fmt.Errorf("failed to list gateway pools: empty response")
 	}
 
-	return opts.Output.Display(newDisplayer(false, resp.Payload.GatewayPools...))
+	gws := make([]*gatewayPoolWithIntegrations, 0, len(resp.Payload.GatewayPools))
+	for _, gp := range resp.Payload.GatewayPools {
+		gws = append(gws, &gatewayPoolWithIntegrations{
+			GatewayPool: gp,
+		})
+	}
+	return opts.Output.Display(newDisplayer(false, false, gws...))
 }

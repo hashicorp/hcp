@@ -4684,6 +4684,80 @@ func (_c *MockClientService_ListGatewayPoolGateways_Call) RunAndReturn(run func(
 	return _c
 }
 
+// ListGatewayPoolIntegrations provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) ListGatewayPoolIntegrations(params *secret_service.ListGatewayPoolIntegrationsParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.ListGatewayPoolIntegrationsOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListGatewayPoolIntegrations")
+	}
+
+	var r0 *secret_service.ListGatewayPoolIntegrationsOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.ListGatewayPoolIntegrationsParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.ListGatewayPoolIntegrationsOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.ListGatewayPoolIntegrationsParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.ListGatewayPoolIntegrationsOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.ListGatewayPoolIntegrationsOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.ListGatewayPoolIntegrationsParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_ListGatewayPoolIntegrations_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListGatewayPoolIntegrations'
+type MockClientService_ListGatewayPoolIntegrations_Call struct {
+	*mock.Call
+}
+
+// ListGatewayPoolIntegrations is a helper method to define mock.On call
+//   - params *secret_service.ListGatewayPoolIntegrationsParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) ListGatewayPoolIntegrations(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_ListGatewayPoolIntegrations_Call {
+	return &MockClientService_ListGatewayPoolIntegrations_Call{Call: _e.mock.On("ListGatewayPoolIntegrations",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_ListGatewayPoolIntegrations_Call) Run(run func(params *secret_service.ListGatewayPoolIntegrationsParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_ListGatewayPoolIntegrations_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.ListGatewayPoolIntegrationsParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_ListGatewayPoolIntegrations_Call) Return(_a0 *secret_service.ListGatewayPoolIntegrationsOK, _a1 error) *MockClientService_ListGatewayPoolIntegrations_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_ListGatewayPoolIntegrations_Call) RunAndReturn(run func(*secret_service.ListGatewayPoolIntegrationsParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.ListGatewayPoolIntegrationsOK, error)) *MockClientService_ListGatewayPoolIntegrations_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListGatewayPools provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) ListGatewayPools(params *secret_service.ListGatewayPoolsParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.ListGatewayPoolsOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -5975,8 +6049,8 @@ func (_c *MockClientService_UpdateGatewayPool_Call) RunAndReturn(run func(*secre
 	return _c
 }
 
-// UpsertSyncInstallation provides a mock function with given fields: params, authInfo, opts
-func (_m *MockClientService) UpsertSyncInstallation(params *secret_service.UpsertSyncInstallationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpsertSyncInstallationOK, error) {
+// UpdateSyncInstallation provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) UpdateSyncInstallation(params *secret_service.UpdateSyncInstallationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdateSyncInstallationOK, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -5987,23 +6061,23 @@ func (_m *MockClientService) UpsertSyncInstallation(params *secret_service.Upser
 	ret := _m.Called(_ca...)
 
 	if len(ret) == 0 {
-		panic("no return value specified for UpsertSyncInstallation")
+		panic("no return value specified for UpdateSyncInstallation")
 	}
 
-	var r0 *secret_service.UpsertSyncInstallationOK
+	var r0 *secret_service.UpdateSyncInstallationOK
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*secret_service.UpsertSyncInstallationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpsertSyncInstallationOK, error)); ok {
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateSyncInstallationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateSyncInstallationOK, error)); ok {
 		return rf(params, authInfo, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(*secret_service.UpsertSyncInstallationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.UpsertSyncInstallationOK); ok {
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateSyncInstallationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.UpdateSyncInstallationOK); ok {
 		r0 = rf(params, authInfo, opts...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*secret_service.UpsertSyncInstallationOK)
+			r0 = ret.Get(0).(*secret_service.UpdateSyncInstallationOK)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(*secret_service.UpsertSyncInstallationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+	if rf, ok := ret.Get(1).(func(*secret_service.UpdateSyncInstallationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
 		r1 = rf(params, authInfo, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -6012,21 +6086,21 @@ func (_m *MockClientService) UpsertSyncInstallation(params *secret_service.Upser
 	return r0, r1
 }
 
-// MockClientService_UpsertSyncInstallation_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpsertSyncInstallation'
-type MockClientService_UpsertSyncInstallation_Call struct {
+// MockClientService_UpdateSyncInstallation_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateSyncInstallation'
+type MockClientService_UpdateSyncInstallation_Call struct {
 	*mock.Call
 }
 
-// UpsertSyncInstallation is a helper method to define mock.On call
-//   - params *secret_service.UpsertSyncInstallationParams
+// UpdateSyncInstallation is a helper method to define mock.On call
+//   - params *secret_service.UpdateSyncInstallationParams
 //   - authInfo runtime.ClientAuthInfoWriter
 //   - opts ...secret_service.ClientOption
-func (_e *MockClientService_Expecter) UpsertSyncInstallation(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_UpsertSyncInstallation_Call {
-	return &MockClientService_UpsertSyncInstallation_Call{Call: _e.mock.On("UpsertSyncInstallation",
+func (_e *MockClientService_Expecter) UpdateSyncInstallation(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_UpdateSyncInstallation_Call {
+	return &MockClientService_UpdateSyncInstallation_Call{Call: _e.mock.On("UpdateSyncInstallation",
 		append([]interface{}{params, authInfo}, opts...)...)}
 }
 
-func (_c *MockClientService_UpsertSyncInstallation_Call) Run(run func(params *secret_service.UpsertSyncInstallationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_UpsertSyncInstallation_Call {
+func (_c *MockClientService_UpdateSyncInstallation_Call) Run(run func(params *secret_service.UpdateSyncInstallationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_UpdateSyncInstallation_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
 		for i, a := range args[2:] {
@@ -6034,17 +6108,17 @@ func (_c *MockClientService_UpsertSyncInstallation_Call) Run(run func(params *se
 				variadicArgs[i] = a.(secret_service.ClientOption)
 			}
 		}
-		run(args[0].(*secret_service.UpsertSyncInstallationParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+		run(args[0].(*secret_service.UpdateSyncInstallationParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
 	})
 	return _c
 }
 
-func (_c *MockClientService_UpsertSyncInstallation_Call) Return(_a0 *secret_service.UpsertSyncInstallationOK, _a1 error) *MockClientService_UpsertSyncInstallation_Call {
+func (_c *MockClientService_UpdateSyncInstallation_Call) Return(_a0 *secret_service.UpdateSyncInstallationOK, _a1 error) *MockClientService_UpdateSyncInstallation_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockClientService_UpsertSyncInstallation_Call) RunAndReturn(run func(*secret_service.UpsertSyncInstallationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpsertSyncInstallationOK, error)) *MockClientService_UpsertSyncInstallation_Call {
+func (_c *MockClientService_UpdateSyncInstallation_Call) RunAndReturn(run func(*secret_service.UpdateSyncInstallationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateSyncInstallationOK, error)) *MockClientService_UpdateSyncInstallation_Call {
 	_c.Call.Return(run)
 	return _c
 }
