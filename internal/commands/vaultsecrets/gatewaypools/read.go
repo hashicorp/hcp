@@ -86,5 +86,20 @@ func readRun(opts *ReadOpts) error {
 		return fmt.Errorf("gateway pool not found")
 	}
 
-	return opts.Output.Display(newDisplayer(true, resp.Payload.GatewayPool))
+	integList, err := opts.PreviewClient.ListGatewayPoolIntegrations(&preview_secret_service.ListGatewayPoolIntegrationsParams{
+		Context:         opts.Ctx,
+		ProjectID:       opts.Profile.ProjectID,
+		OrganizationID:  opts.Profile.OrganizationID,
+		GatewayPoolName: resp.Payload.GatewayPool.Name,
+	}, nil)
+	if err != nil {
+		return fmt.Errorf("failed to list gateway pool integrations: %w", err)
+	}
+
+	gwIntegrations := &gatewayPoolWithIntegrations{
+		GatewayPool:  resp.Payload.GatewayPool,
+		Integrations: integList.Payload.Integrations,
+	}
+
+	return opts.Output.Display(newDisplayer(true, true, gwIntegrations))
 }

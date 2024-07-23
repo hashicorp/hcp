@@ -99,5 +99,7 @@ func createRun(opts *CreateOpts) error {
 		return fmt.Errorf("failed to create gateway pool: %w", err)
 	}
 
-	return opts.Output.Display(newDisplayer(true, resp.Payload.GatewayPool))
+	return opts.Output.Display(newDisplayer(true, false, &gatewayPoolWithIntegrations{
+		GatewayPool: resp.Payload.GatewayPool,
+	}))
 }

@@ -17,13 +17,19 @@ type gatewayPoolWithIntegrations struct {
 type displayer struct {
 	gatewayPools []*gatewayPoolWithIntegrations
 
+	// showIntegrations is used to determine if the integrations should be shown
+	// This is used only for the read command where the integrations associated with
+	// the gateway pool is also displayed
+	showIntegrations bool
+
 	single bool
 }
 
-func newDisplayer(single bool, gatewayPools ...*gatewayPoolWithIntegrations) *displayer {
+func newDisplayer(single, showIntegrations bool, gatewayPools ...*gatewayPoolWithIntegrations) *displayer {
 	return &displayer{
-		gatewayPools: gatewayPools,
-		single:       single,
+		gatewayPools:     gatewayPools,
+		single:           single,
+		showIntegrations: showIntegrations,
 	}
 }
 
@@ -56,14 +62,23 @@ func (d *displayer) Payload() any {
 }
 
 func (d *displayer) FieldTemplates() []format.Field {
-	return []format.Field{
+	fields := []format.Field{
 		{
 			Name:        "GatewayPool Name",
-			ValueFormat: "{{ .Name }}",
+			ValueFormat: "{{ .GatewayPool.Name }}",
 		},
 		{
 			Name:        "Description",
-			ValueFormat: "{{ .Description }}",
+			ValueFormat: "{{ .GatewayPool.Description }}",
 		},
 	}
+
+	if d.showIntegrations {
+		fields = append(fields, format.Field{
+			Name:        "Integrations",
+			ValueFormat: "{{ .Integrations }}",
+		})
+	}
+
+	return fields
 }
