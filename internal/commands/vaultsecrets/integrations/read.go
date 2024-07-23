@@ -9,7 +9,6 @@ import (
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/apps/helper"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -48,9 +47,9 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Read an application:`,
+				Preamble: `Read an integration:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp vault-secrets apps read company-card
+				$ hcp vault-secrets integrations read sample-integration --type twilio
 				`),
 			},
 		},
@@ -58,7 +57,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 			Args: []cmd.PositionalArgument{
 				{
 					Name:          "NAME",
-					Documentation: "The name of the app to read.",
+					Documentation: "The name of the integration to read.",
 				},
 			},
 		},
@@ -82,7 +81,6 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 			return readRun(opts)
 		},
 	}
-	cmd.Args.Autocomplete = helper.PredictAppName(ctx, cmd, preview_secret_service.New(ctx.HCP, nil))
 
 	return cmd
 }
