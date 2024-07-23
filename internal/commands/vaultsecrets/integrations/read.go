@@ -66,7 +66,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 				{
 					Name:         "type",
 					DisplayValue: "TYPE",
-					Description:  "A required type for the integration to be read.",
+					Description:  "The type of the integration to read.",
 					Value:        flagvalue.Simple("", &opts.Type),
 					Required:     true,
 				},
