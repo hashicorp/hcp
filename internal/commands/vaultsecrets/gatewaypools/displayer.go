@@ -8,13 +8,19 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/format"
 )
 
+type gatewayPoolWithIntegrations struct {
+	GatewayPool  *preview_models.Secrets20231128GatewayPool
+	Gateways     []*preview_models.Secrets20231128Gateway
+	Integrations []string
+}
+
 type displayer struct {
-	gatewayPools []*preview_models.Secrets20231128GatewayPool
+	gatewayPools []*gatewayPoolWithIntegrations
 
 	single bool
 }
 
-func newDisplayer(single bool, gatewayPools ...*preview_models.Secrets20231128GatewayPool) *displayer {
+func newDisplayer(single bool, gatewayPools ...*gatewayPoolWithIntegrations) *displayer {
 	return &displayer{
 		gatewayPools: gatewayPools,
 		single:       single,

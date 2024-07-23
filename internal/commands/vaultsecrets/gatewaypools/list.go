@@ -65,9 +65,6 @@ func listRun(opts *ListOpts) error {
 	if err != nil {
 		return fmt.Errorf("failed to list gateway pools: %w", err)
 	}
-	if resp.Payload == nil || resp.Payload.GatewayPools == nil {
-		return fmt.Errorf("failed to list gateway pools: empty response")
-	}
 
 	return opts.Output.Display(newDisplayer(false, resp.Payload.GatewayPools...))
 }
