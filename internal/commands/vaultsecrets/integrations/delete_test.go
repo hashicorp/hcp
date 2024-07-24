@@ -13,7 +13,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -22,7 +21,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestNewCmdRead(t *testing.T) {
+func TestNewCmdDelete(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
@@ -30,7 +29,7 @@ func TestNewCmdRead(t *testing.T) {
 		Args    []string
 		Profile func(t *testing.T) *profile.Profile
 		Error   string
-		Expect  *ReadOpts
+		Expect  *DeleteOpts
 	}{
 		{
 			Name: "Good",
@@ -38,7 +37,7 @@ func TestNewCmdRead(t *testing.T) {
 				return profile.TestProfile(t).SetOrgID("123").SetProjectID("abc")
 			},
 			Args: []string{"sample-integration", "--type", "twilio"},
-			Expect: &ReadOpts{
+			Expect: &DeleteOpts{
 				IntegrationName: "sample-integration",
 				Type:            "twilio",
 			},
@@ -68,9 +67,9 @@ func TestNewCmdRead(t *testing.T) {
 				Output:      format.New(io),
 			}
 
-			var readOpts *ReadOpts
-			readCmd := NewCmdRead(ctx, func(o *ReadOpts) error {
-				readOpts = o
+			var deleteOpts *DeleteOpts
+			readCmd := NewCmdDelete(ctx, func(o *DeleteOpts) error {
+				deleteOpts = o
 				return nil
 			})
 			readCmd.SetIO(io)
@@ -83,15 +82,14 @@ func TestNewCmdRead(t *testing.T) {
 			}
 
 			r.Zero(code, io.Error.String())
-			r.NotNil(readOpts)
-			r.Equal(c.Expect.IntegrationName, readOpts.IntegrationName)
-			r.Equal(c.Expect.Type, readOpts.Type)
-
+			r.NotNil(deleteOpts)
+			r.Equal(c.Expect.IntegrationName, deleteOpts.IntegrationName)
+			r.Equal(c.Expect.Type, deleteOpts.Type)
 		})
 	}
 }
 
-func TestReadRun(t *testing.T) {
+func TestDeleteRun(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
@@ -102,11 +100,11 @@ func TestReadRun(t *testing.T) {
 	}{
 		{
 			Name:   "Failed: Integration not found",
-			ErrMsg: "[GET /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/integrations/twilio/config/{integration_name}][404] GetTwilioIntegration",
+			ErrMsg: "[DELETE /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/integrations/twilio/config/{integration_name}][404] DeleteTwilioIntegration",
 			Type:   "twilio",
 		},
 		{
-			Name:            "Success: Read integration",
+			Name:            "Success: Delete integration",
 			IntegrationName: "sample-integration",
 			Type:            "twilio",
 		},
@@ -121,7 +119,7 @@ func TestReadRun(t *testing.T) {
 			io := iostreams.Test()
 			vs := mock_preview_secret_service.NewMockClientService(t)
 
-			opts := &ReadOpts{
+			opts := &DeleteOpts{
 				Ctx:             context.Background(),
 				Profile:         profile.TestProfile(t).SetOrgID("123").SetProjectID("abc"),
 				IO:              io,
@@ -132,31 +130,25 @@ func TestReadRun(t *testing.T) {
 			}
 
 			if c.ErrMsg != "" {
-				vs.EXPECT().GetTwilioIntegration(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+				vs.EXPECT().DeleteTwilioIntegration(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 			} else {
-				vs.EXPECT().GetTwilioIntegration(&preview_secret_service.GetTwilioIntegrationParams{
+				vs.EXPECT().DeleteTwilioIntegration(&preview_secret_service.DeleteTwilioIntegrationParams{
 					OrganizationID:  "123",
 					ProjectID:       "abc",
 					IntegrationName: opts.IntegrationName,
 					Context:         opts.Ctx,
-				}, nil).Return(&preview_secret_service.GetTwilioIntegrationOK{
-					Payload: &preview_models.Secrets20231128GetTwilioIntegrationResponse{
-						Integration: &preview_models.Secrets20231128TwilioIntegration{
-							IntegrationName: opts.IntegrationName,
-						},
-					},
-				}, nil).Once()
+				}, nil).Return(&preview_secret_service.DeleteTwilioIntegrationOK{}, nil).Once()
 			}
 
 			// Run the command
-			err := readRun(opts)
+			err := deleteRun(opts)
 			if c.ErrMsg != "" {
 				r.Contains(err.Error(), c.ErrMsg)
 				return
 			}
 
 			r.NoError(err)
-			r.Contains(io.Output.String(), fmt.Sprintf("Integration Name     Account SID\n%s              \n", opts.IntegrationName))
+			r.Contains(io.Error.String(), fmt.Sprintf("✓ Successfully deleted integration with name \"sample-integration\"\n"))
 		})
 	}
 }
