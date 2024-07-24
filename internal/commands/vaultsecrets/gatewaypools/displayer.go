@@ -4,36 +4,45 @@
 package gatewaypools
 
 import (
+	"github.com/hashicorp/hcp-sdk-go/auth"
 	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 )
 
 type gatewayPoolWithIntegrations struct {
 	GatewayPool  *preview_models.Secrets20231128GatewayPool
+	Oauth        *auth.OauthConfig
 	Integrations []string
 }
 
 type displayer struct {
 	gatewayPools []*gatewayPoolWithIntegrations
 
-	// showIntegrations is used to determine if the integrations should be shown
-	// This is used only for the read command where the integrations associated with
-	// the gateway pool is also displayed
-	showIntegrations bool
-
-	single bool
+	extraFields []format.Field
+	format      format.Format
+	single      bool
 }
 
-func newDisplayer(single, showIntegrations bool, gatewayPools ...*gatewayPoolWithIntegrations) *displayer {
+func newDisplayer(single bool, gatewayPools ...*gatewayPoolWithIntegrations) *displayer {
 	return &displayer{
-		gatewayPools:     gatewayPools,
-		single:           single,
-		showIntegrations: showIntegrations,
+		gatewayPools: gatewayPools,
+		single:       single,
+		format:       format.Table,
 	}
 }
 
+func (d *displayer) AddExtraFields(fields ...format.Field) *displayer {
+	d.extraFields = append(d.extraFields, fields...)
+	return d
+}
+
+func (d *displayer) SetDefaultFormat(f format.Format) *displayer {
+	d.format = f
+	return d
+}
+
 func (d *displayer) DefaultFormat() format.Format {
-	return format.Table
+	return d.format
 }
 
 func (d *displayer) Payload() any {
@@ -72,11 +81,8 @@ func (d *displayer) FieldTemplates() []format.Field {
 		},
 	}
 
-	if d.showIntegrations {
-		fields = append(fields, format.Field{
-			Name:        "Integrations",
-			ValueFormat: "{{ .Integrations }}",
-		})
+	if d.extraFields != nil {
+		fields = append(fields, d.extraFields...)
 	}
 
 	return fields
