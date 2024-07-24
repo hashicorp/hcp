@@ -95,7 +95,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 					Name:          "show-client-secret",
 					DisplayValue:  "SHOW_CLIENT_SECRET",
 					IsBooleanFlag: true,
-					Description:   "Show the client secret in the output. If this is not set, CRED_FILE_PATH should be set",
+					Description:   "Show the client secret in the output. If this is not set, OUTPUT_DIR_PATH should be set.",
 					Shorthand:     "s",
 					Value:         flagvalue.Simple(false, &opts.ShowClientSecret),
 					Required:      false,
