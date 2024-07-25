@@ -148,7 +148,7 @@ func TestDeleteRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Contains(io.Error.String(), fmt.Sprintf("✓ Successfully deleted integration with name \"sample-integration\"\n"))
+			r.Contains(io.Error.String(), fmt.Sprintf("✓ Successfully deleted integration with name \"%s\"\n", c.IntegrationName))
 		})
 	}
 }
