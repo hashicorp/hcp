@@ -143,8 +143,8 @@ func createRun(opts *CreateOpts) error {
 		return fmt.Errorf("either show-client-secret or output-dir should be set")
 	}
 	if opts.OutDirPath != "" {
-		if err := makeGatewayRootDir(opts.OutDirPath); err != nil {
-			return err
+		if err := os.Mkdir(opts.OutDirPath, 0o700); err != nil {
+			return fmt.Errorf("failed to create the output directory: %w", err)
 		}
 	}
 	resp, err := opts.PreviewClient.CreateGatewayPool(&preview_secret_service.CreateGatewayPoolParams{
@@ -230,12 +230,4 @@ func WriteConfig(path string, c *config) error {
 	f := hclwrite.NewEmptyFile()
 	gohcl.EncodeIntoBody(c, f.Body())
 	return os.WriteFile(path, f.Bytes(), 0o700)
-}
-
-func makeGatewayRootDir(path string) error {
-	err := os.Mkdir(path, 0o700)
-	if err != nil && os.IsExist(err) {
-		return fmt.Errorf("failed to create the output directory: %w", err)
-	}
-	return nil
 }
