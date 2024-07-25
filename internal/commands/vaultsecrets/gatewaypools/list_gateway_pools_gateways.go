@@ -91,7 +91,7 @@ func listGatewaysRun(opts *ListGatewaysOpts) error {
 		return fmt.Errorf("failed to list gateway pools: %w", err)
 	}
 
-	d := newDisplayer(true, false, &gatewayPoolWithIntegrations{
+	d := newDisplayer(true, &gatewayPoolWithIntegrations{
 		Gateways: resp.Payload.Gateways,
 	})
 

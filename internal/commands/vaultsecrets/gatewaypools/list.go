@@ -72,5 +72,5 @@ func listRun(opts *ListOpts) error {
 			GatewayPool: gp,
 		})
 	}
-	return opts.Output.Display(newDisplayer(false, false, gws...))
+	return opts.Output.Display(newDisplayer(false, gws...))
 }
