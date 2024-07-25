@@ -101,5 +101,12 @@ func readRun(opts *ReadOpts) error {
 		Integrations: integList.Payload.Integrations,
 	}
 
-	return opts.Output.Display(newDisplayer(true, true, gwIntegrations))
+	return opts.Output.Display(
+		newDisplayer(true, gwIntegrations).AddExtraFields(
+			format.Field{
+				Name:        "Integrations",
+				ValueFormat: "{{ .Integrations }}",
+			},
+		),
+	)
 }
