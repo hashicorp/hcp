@@ -55,6 +55,7 @@ func NewCmdListGatewayPoolsGateway(ctx *cmd.Context, runF func(*ListGatewaysOpts
 				{
 					Name:          "show-all",
 					Shorthand:     "a",
+					Description:   "Show all fields.",
 					IsBooleanFlag: true,
 					Value:         flagvalue.Simple(false, &opts.ShowAll),
 					Required:      false,
