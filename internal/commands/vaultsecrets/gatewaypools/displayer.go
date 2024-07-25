@@ -97,13 +97,6 @@ func (d *displayer) previewGateways() any {
 	return d.gateways
 }
 
-func (d *displayer) previewGatewayPoolWithIntegrations() any {
-	if d.gatewayPoolsWithIntegrations != nil {
-		return d.gatewayPoolsWithIntegrations
-	}
-	return nil
-}
-
 func (d *displayer) Payload() any {
 	if d.gatewayPools != nil {
 		return d.previewGatewayPools()
