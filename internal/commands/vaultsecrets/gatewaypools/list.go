@@ -1,3 +1,6 @@
+// Copyright (c) HashiCorp, Inc.
+// SPDX-License-Identifier: MPL-2.0
+
 package gatewaypools
 
 import (
@@ -54,6 +57,19 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 	return cmd
 }
 
+func listFields() []format.Field {
+	return []format.Field{
+		{
+			Name:        "GatewayPool Name",
+			ValueFormat: "{{ .Name }}",
+		},
+		{
+			Name:        "Description",
+			ValueFormat: "{{ .Description }}",
+		},
+	}
+}
+
 func listRun(opts *ListOpts) error {
 	params := &preview_secret_service.ListGatewayPoolsParams{
 		Context:        opts.Ctx,
@@ -65,15 +81,6 @@ func listRun(opts *ListOpts) error {
 	if err != nil {
 		return fmt.Errorf("failed to list gateway pools: %w", err)
 	}
-	if resp.Payload == nil || resp.Payload.GatewayPools == nil {
-		return fmt.Errorf("failed to list gateway pools: empty response")
-	}
 
-	gws := make([]*gatewayPoolWithIntegrations, 0, len(resp.Payload.GatewayPools))
-	for _, gp := range resp.Payload.GatewayPools {
-		gws = append(gws, &gatewayPoolWithIntegrations{
-			GatewayPool: gp,
-		})
-	}
-	return opts.Output.Display(newDisplayer(false, gws...))
+	return opts.Output.Display(newDisplayer(false).GatewayPools(resp.Payload.GatewayPools...).AddFields(listFields()...))
 }

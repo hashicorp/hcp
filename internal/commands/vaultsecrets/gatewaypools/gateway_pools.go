@@ -26,5 +26,6 @@ func NewCmdGatewayPools(ctx *cmd.Context) *cmd.Command {
 	command.AddChild(NewCmdUpdate(ctx, nil))
 	command.AddChild(NewCmdDelete(ctx, nil))
 	command.AddChild(NewCmdRead(ctx, nil))
+	command.AddChild(NewCmdListGatewayPoolsGateway(ctx, nil))
 	return command
 }

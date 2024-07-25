@@ -11,28 +11,58 @@ import (
 
 type gatewayPoolWithIntegrations struct {
 	GatewayPool  *preview_models.Secrets20231128GatewayPool
-	Oauth        *auth.OauthConfig
 	Integrations []string
 }
 
-type displayer struct {
-	gatewayPools []*gatewayPoolWithIntegrations
-
-	extraFields []format.Field
-	format      format.Format
-	single      bool
+type gatewayPoolWithOauth struct {
+	GatewayPool *preview_models.Secrets20231128GatewayPool
+	Oauth       *auth.OauthConfig
 }
 
-func newDisplayer(single bool, gatewayPools ...*gatewayPoolWithIntegrations) *displayer {
+type displayer struct {
+	gatewayPools                 []*preview_models.Secrets20231128GatewayPool
+	gatewayPoolsWithIntegrations *gatewayPoolWithIntegrations
+	gatewayPoolWithOauth         *gatewayPoolWithOauth
+	gateways                     []*preview_models.Secrets20231128Gateway
+
+	fields []format.Field
+	format format.Format
+	single bool
+}
+
+func newDisplayer(single bool) *displayer {
 	return &displayer{
-		gatewayPools: gatewayPools,
-		single:       single,
-		format:       format.Table,
+		single: single,
+		format: format.Table,
 	}
 }
 
-func (d *displayer) AddExtraFields(fields ...format.Field) *displayer {
-	d.extraFields = append(d.extraFields, fields...)
+func (d *displayer) GatewayPools(gatewayPools ...*preview_models.Secrets20231128GatewayPool) *displayer {
+	d.gatewayPools = gatewayPools
+	return d
+}
+
+func (d *displayer) GatewayPoolWithIntegrations(gatewayPool *preview_models.Secrets20231128GatewayPool, integrations ...string) *displayer {
+	d.gatewayPoolsWithIntegrations = &gatewayPoolWithIntegrations{
+		GatewayPool:  gatewayPool,
+		Integrations: integrations,
+	}
+
+	return d
+}
+
+func (d *displayer) Gateways(gateways ...*preview_models.Secrets20231128Gateway) *displayer {
+	d.gateways = gateways
+	return d
+}
+
+func (d *displayer) GatewayPoolsWithOauth(gpo *gatewayPoolWithOauth) *displayer {
+	d.gatewayPoolWithOauth = gpo
+	return d
+}
+
+func (d *displayer) AddFields(fields ...format.Field) *displayer {
+	d.fields = append(d.fields, fields...)
 	return d
 }
 
@@ -45,45 +75,45 @@ func (d *displayer) DefaultFormat() format.Format {
 	return d.format
 }
 
-func (d *displayer) Payload() any {
-	if d.gatewayPools != nil {
-		if d.single {
-			if len(d.gatewayPools) != 1 {
-				return nil
-			}
-
-			return d.gatewayPools[0]
-		}
-
-		return d.gatewayPools
-	}
-
+func (d *displayer) previewGatewayPools() any {
 	if d.single {
 		if len(d.gatewayPools) != 1 {
 			return nil
 		}
-
 		return d.gatewayPools[0]
 	}
 
 	return d.gatewayPools
 }
 
+func (d *displayer) previewGateways() any {
+	if d.single {
+		if len(d.gateways) != 1 {
+			return nil
+		}
+		return d.gateways[0]
+	}
+
+	return d.gateways
+}
+
+func (d *displayer) Payload() any {
+	if d.gatewayPools != nil {
+		return d.previewGatewayPools()
+	}
+	if d.gatewayPoolsWithIntegrations != nil {
+		return d.gatewayPoolsWithIntegrations
+	}
+	if d.gateways != nil {
+		return d.previewGateways()
+	}
+	if d.gatewayPoolWithOauth != nil {
+		return d.gatewayPoolWithOauth
+	}
+
+	return nil
+}
+
 func (d *displayer) FieldTemplates() []format.Field {
-	fields := []format.Field{
-		{
-			Name:        "GatewayPool Name",
-			ValueFormat: "{{ .GatewayPool.Name }}",
-		},
-		{
-			Name:        "Description",
-			ValueFormat: "{{ .GatewayPool.Description }}",
-		},
-	}
-
-	if d.extraFields != nil {
-		fields = append(fields, d.extraFields...)
-	}
-
-	return fields
+	return d.fields
 }
