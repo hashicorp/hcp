@@ -116,7 +116,7 @@ func listGatewaysFields(showAll bool) []format.Field {
 		},
 	}
 	if showAll {
-		ComplimentaryFields := []format.Field{
+		ComplementaryFields := []format.Field{
 			{
 				Name:        "Gateway Hostname",
 				ValueFormat: "{{ .Hostname }}",
