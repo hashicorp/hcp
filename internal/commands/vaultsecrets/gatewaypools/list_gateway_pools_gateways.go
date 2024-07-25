@@ -134,7 +134,7 @@ func listGatewaysFields(showAll bool) []format.Field {
 				ValueFormat: "{{ .StatusMessage }}",
 			},
 		}
-		fields = append(fields, ComplimentaryFields...)
+		fields = append(fields, ComplementaryFields...)
 	}
 
 	return fields
