@@ -1,0 +1,3 @@
+```release-note:improvement
+vault-secrets: adding list gateway pools gateways command to vault-secrets gateway-pools
+```
