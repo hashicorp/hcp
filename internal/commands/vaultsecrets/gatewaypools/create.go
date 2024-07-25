@@ -115,8 +115,16 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 	return cmd
 }
 
-func extraFields(showOauth bool) []format.Field {
-	extraFields := []format.Field{
+func createFields(showOauth bool) []format.Field {
+	fields := []format.Field{
+		{
+			Name:        "GatewayPool Name",
+			ValueFormat: "{{ .GatewayPool.Name }}",
+		},
+		{
+			Name:        "Description",
+			ValueFormat: "{{ .GatewayPool.Description }}",
+		},
 		{
 			Name:        "Resource Name",
 			ValueFormat: "{{ .GatewayPool.ResourceName }}",
@@ -124,7 +132,7 @@ func extraFields(showOauth bool) []format.Field {
 	}
 
 	if showOauth {
-		extraFields = append(extraFields, []format.Field{
+		fields = append(fields, []format.Field{
 			{
 				Name:        "Client ID",
 				ValueFormat: "{{ .Oauth.ClientID }}",
@@ -135,7 +143,7 @@ func extraFields(showOauth bool) []format.Field {
 			},
 		}...)
 	}
-	return extraFields
+	return fields
 }
 
 func createRun(opts *CreateOpts) error {
@@ -185,14 +193,15 @@ func createRun(opts *CreateOpts) error {
 	}
 
 	// Display Oauth in the output if explicitly asked for it
-	displayerOpts := &gatewayPoolWithIntegrations{
+	displayerOpts := &gatewayPoolWithOauth{
 		GatewayPool: resp.Payload.GatewayPool,
 	}
 	if opts.ShowClientSecret {
 		displayerOpts.Oauth = oauth
 	}
 
-	return opts.Output.Display(newDisplayer(true, displayerOpts).SetDefaultFormat(format.Pretty).AddExtraFields(extraFields(opts.ShowClientSecret)...))
+	d := newDisplayer(true).GatewayPoolsWithOauth(displayerOpts)
+	return opts.Output.Display(d.SetDefaultFormat(format.Pretty).AddFields(createFields(opts.ShowClientSecret)...))
 }
 
 type gatewayCreds struct {

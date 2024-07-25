@@ -1,3 +1,6 @@
+// Copyright (c) HashiCorp, Inc.
+// SPDX-License-Identifier: MPL-2.0
+
 package gatewaypools
 
 import (
@@ -91,64 +94,43 @@ func listGatewaysRun(opts *ListGatewaysOpts) error {
 		return fmt.Errorf("failed to list gateway pools: %w", err)
 	}
 
-	d := newDisplayer(true, &gatewayPoolWithIntegrations{
-		Gateways: resp.Payload.Gateways,
-	})
+	d := newDisplayer(false).Gateways(resp.Payload.Gateways...)
 
-	return opts.Output.Display(&listGatewaysDisplayer{displayer: d, showAll: opts.ShowAll})
+	return opts.Output.Display(d.AddFields(listGatewaysFields(opts.ShowAll)...))
 }
 
-type listGatewaysDisplayer struct {
-	*displayer
-
-	showAll bool
-}
-
-func (d *listGatewaysDisplayer) DefaultFormat() format.Format {
-	return d.displayer.DefaultFormat()
-}
-
-func (d *listGatewaysDisplayer) Payload() any {
-	// payload will return a single gateway pool with integrations
-	p, ok := d.displayer.Payload().(*gatewayPoolWithIntegrations)
-	if !ok {
-		return nil
-	}
-	return p.Gateways
-}
-
-func (d *listGatewaysDisplayer) FieldTemplates() []format.Field {
+func listGatewaysFields(showAll bool) []format.Field {
 	fields := []format.Field{
 		{
 			Name:        "Gateway ID",
-			ValueFormat: "{{ .Gateways.ID }}",
+			ValueFormat: "{{ .ID }}",
 		},
 		{
 			Name:        "Gateway Status",
-			ValueFormat: "{{ .Gateways.Status }}",
+			ValueFormat: "{{ .Status }}",
 		},
 		{
 			Name:        "Gateway Version",
-			ValueFormat: "{{ .Gateways.Version }}",
+			ValueFormat: "{{ .Version }}",
 		},
 	}
-	if d.showAll {
+	if showAll {
 		ComplimentaryFields := []format.Field{
 			{
 				Name:        "Gateway Hostname",
-				ValueFormat: "{{ .Gateways.Hostname }}",
+				ValueFormat: "{{ .Hostname }}",
 			},
 			{
 				Name:        "Gateway Os",
-				ValueFormat: "{{ .Gateways.Os }}",
+				ValueFormat: "{{ .Os }}",
 			},
 			{
 				Name:        "Gateway Metadata",
-				ValueFormat: "{{ .Gateways.Metadata }}",
+				ValueFormat: "{{ .Metadata }}",
 			},
 			{
 				Name:        "Gateway Status Message",
-				ValueFormat: "{{ .Gateways.StatusMessage }}",
+				ValueFormat: "{{ .StatusMessage }}",
 			},
 		}
 		fields = append(fields, ComplimentaryFields...)
