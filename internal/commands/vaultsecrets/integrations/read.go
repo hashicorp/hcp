@@ -30,8 +30,8 @@ type ReadOpts struct {
 }
 
 const (
-	Twilio  string = "twilio"
-	MongoDB        = "mongo"
+	Twilio  = "twilio"
+	MongoDB = "mongo"
 )
 
 func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
