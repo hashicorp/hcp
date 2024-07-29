@@ -29,6 +29,11 @@ type ReadOpts struct {
 	PreviewClient   preview_secret_service.ClientService
 }
 
+const (
+	Twilio  string = "twilio"
+	MongoDB        = "mongo"
+)
+
 func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 	opts := &ReadOpts{
 		Ctx:           ctx.ShutdownCtx,
@@ -87,7 +92,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 
 func readRun(opts *ReadOpts) error {
 	switch opts.Type {
-	case "twilio":
+	case Twilio:
 		resp, err := opts.PreviewClient.GetTwilioIntegration(&preview_secret_service.GetTwilioIntegrationParams{
 			Context:         opts.Ctx,
 			ProjectID:       opts.Profile.ProjectID,
@@ -100,7 +105,7 @@ func readRun(opts *ReadOpts) error {
 
 		return opts.Output.Display(newTwilioDisplayer(true, resp.Payload.Integration))
 
-	case "mongodb":
+	case MongoDB:
 		resp, err := opts.PreviewClient.GetMongoDBAtlasIntegration(&preview_secret_service.GetMongoDBAtlasIntegrationParams{
 			Context:         opts.Ctx,
 			ProjectID:       opts.Profile.ProjectID,
