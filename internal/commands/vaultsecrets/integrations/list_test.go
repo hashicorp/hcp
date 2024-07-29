@@ -48,7 +48,7 @@ func TestNewCmdList(t *testing.T) {
 			Profile: func(t *testing.T) *profile.Profile {
 				return profile.TestProfile(t).SetOrgID("123").SetProjectID("abc")
 			},
-			Error: "ERROR: missing required flag: --type=TYPE,o",
+			Error: "ERROR: missing required flag: --type=TYPE",
 		},
 	}
 
