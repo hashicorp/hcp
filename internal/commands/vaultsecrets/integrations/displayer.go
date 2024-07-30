@@ -44,15 +44,22 @@ func (t *twilioDisplayer) previewTwilioIntegrationsPayload() any {
 }
 
 func (t *twilioDisplayer) FieldTemplates() []format.Field {
-	return []format.Field{
+	fields := []format.Field{
 		{
 			Name:        "Integration Name",
 			ValueFormat: "{{ .IntegrationName }}",
 		},
-		{
-			Name:        "Account SID",
-			ValueFormat: "{{ .TwilioAccountSid }}",
-		},
+	}
+
+	if t.single {
+		return append(fields, []format.Field{
+			{
+				Name:        "Account SID",
+				ValueFormat: "{{ .TwilioAccountSid }}",
+			},
+		}...)
+	} else {
+		return fields
 	}
 }
 
@@ -101,6 +108,50 @@ func (m *mongodbDisplayer) FieldTemplates() []format.Field {
 		{
 			Name:        "API Public Key",
 			ValueFormat: "{{ .MongodbAPIPublicKey }}",
+		},
+	}
+}
+
+type genericDisplayer struct {
+	integrations []*preview_models.Secrets20231128Integration
+
+	single bool
+}
+
+func newGenericDisplayer(single bool, integrations ...*preview_models.Secrets20231128Integration) *genericDisplayer {
+	return &genericDisplayer{
+		integrations: integrations,
+		single:       single,
+	}
+}
+
+func (g *genericDisplayer) DefaultFormat() format.Format {
+	return format.Table
+}
+
+func (g *genericDisplayer) Payload() any {
+	if g.integrations != nil {
+		return g.integrationsPayload()
+	}
+
+	return nil
+}
+
+func (g *genericDisplayer) integrationsPayload() any {
+	if g.single {
+		if len(g.integrations) != 1 {
+			return nil
+		}
+		return g.integrations[0]
+	}
+	return g.integrations
+}
+
+func (g *genericDisplayer) FieldTemplates() []format.Field {
+	return []format.Field{
+		{
+			Name:        "Integration Name",
+			ValueFormat: "{{ .IntegrationName }}",
 		},
 	}
 }
