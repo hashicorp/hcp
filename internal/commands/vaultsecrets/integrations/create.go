@@ -110,8 +110,8 @@ func createRun(opts *CreateOpts) error {
 	case Twilio:
 
 		accountSid := i.Details["account_sid"].(string)
-		apiKeySecret := i.Details["twilio_api_key_secret"].(string)
-		apiKeySid := i.Details["twilio_api_key_sid"].(string)
+		apiKeySecret := i.Details["api_key_secret"].(string)
+		apiKeySid := i.Details["api_key_sid"].(string)
 
 		body := &models.SecretServiceCreateTwilioIntegrationBody{
 			IntegrationName:    opts.IntegrationName,
@@ -128,7 +128,7 @@ func createRun(opts *CreateOpts) error {
 		}, nil)
 
 		if err != nil {
-			return fmt.Errorf("failed to create MongoDB integration: %w", err)
+			return fmt.Errorf("failed to create Twilio integration: %w", err)
 		}
 
 		fmt.Fprintln(opts.IO.Err())
