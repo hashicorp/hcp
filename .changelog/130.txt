@@ -1,0 +1,3 @@
+```release-note:improvement
+Waypoint Templates: Add support for creating/updating Waypoint Templates with Variables
+```
