@@ -61,7 +61,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 					DisplayValue: "TYPE",
 					Description:  "The type of the integration to list.",
 					Value:        flagvalue.Simple("", &opts.Type),
-					Required:     true,
+					//Required:     true,
 				},
 			},
 		},
@@ -76,6 +76,32 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 }
 
 func listRun(opts *ListOpts) error {
+	if opts.Type == "" {
+		var integrations []*models.Secrets20231128Integration
+		params := &preview_secret_service.ListIntegrationsParams{
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+		}
+		for {
+			resp, err := opts.PreviewClient.ListIntegrations(params, nil)
+			if err != nil {
+				return fmt.Errorf("failed to list twilio integrations: %w", err)
+			}
+
+			integrations = append(integrations, resp.Payload.Integrations...)
+			if resp.Payload.Pagination == nil || resp.Payload.Pagination.NextPageToken == "" {
+				break
+			}
+
+			next := resp.Payload.Pagination.NextPageToken
+			params.PaginationNextPageToken = &next
+		}
+		return opts.Output.Display(newGenericDisplayer(true, integrations...))
+
+	}
+
+	fmt.Println("Type: ", opts.Type)
 	switch opts.Type {
 	case "twilio":
 		var integrations []*models.Secrets20231128TwilioIntegration
@@ -100,7 +126,15 @@ func listRun(opts *ListOpts) error {
 			next := resp.Payload.Pagination.NextPageToken
 			params.PaginationNextPageToken = &next
 		}
-		return opts.Output.Display(newTwilioDisplayer(true, integrations...))
+
+		//fmt.Println("Integrations: ", integrations)
+		for i, integration := range integrations {
+			fmt.Println(i, integration.IntegrationName)
+			//if integration.StaticCredentialDetails != nil {
+			fmt.Println(i, integration.CreatedAt)
+			//}
+		}
+		return opts.Output.Display(newTwilioDisplayer(false, integrations...))
 
 	case "mongodb":
 		var integrations []*models.Secrets20231128MongoDBAtlasIntegration
