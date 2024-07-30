@@ -100,15 +100,22 @@ func (m *mongodbDisplayer) previewMongoDBIntegrationsPayload() any {
 }
 
 func (m *mongodbDisplayer) FieldTemplates() []format.Field {
-	return []format.Field{
+	fields := []format.Field{
 		{
 			Name:        "Integration Name",
 			ValueFormat: "{{ .IntegrationName }}",
 		},
-		{
-			Name:        "API Public Key",
-			ValueFormat: "{{ .MongodbAPIPublicKey }}",
-		},
+	}
+
+	if m.single {
+		return append(fields, []format.Field{
+			{
+				Name:        "API Public Key",
+				ValueFormat: "{{ .MongodbAPIPublicKey }}",
+			},
+		}...)
+	} else {
+		return fields
 	}
 }
 
