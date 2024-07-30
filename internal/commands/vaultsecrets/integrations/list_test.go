@@ -43,13 +43,6 @@ func TestNewCmdList(t *testing.T) {
 				Type: "twilio",
 			},
 		},
-		{
-			Name: "Missing type flag",
-			Profile: func(t *testing.T) *profile.Profile {
-				return profile.TestProfile(t).SetOrgID("123").SetProjectID("abc")
-			},
-			Error: "ERROR: missing required flag: --type=TYPE",
-		},
 	}
 
 	for _, c := range cases {
@@ -165,8 +158,7 @@ func getIntegrations(start, limit int) []*preview_models.Secrets20231128TwilioIn
 	var secrets []*preview_models.Secrets20231128TwilioIntegration
 	for i := start; i < (start + limit); i++ {
 		secrets = append(secrets, &preview_models.Secrets20231128TwilioIntegration{
-			Name:             fmt.Sprint("test_app_", i),
-			TwilioAccountSid: fmt.Sprint("twilio_account_sid", i),
+			Name: fmt.Sprint("test_app_", i),
 		})
 	}
 	return secrets

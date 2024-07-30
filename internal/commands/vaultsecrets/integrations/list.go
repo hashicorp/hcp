@@ -43,8 +43,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 		Name:      "list",
 		ShortHelp: "List Vault Secrets integrations.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets integrations list" }} command lists all Vault Secrets generic integrations
-		of the specified type.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets integrations list" }} command lists Vault Secrets generic integrations.
 		`),
 		Examples: []cmd.Example{
 			{
@@ -53,15 +52,20 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 				$ hcp vault-secrets integrations list --type "twilio"
 				`),
 			},
+			{
+				Preamble: `List all generic integrations:`,
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				$ hcp vault-secrets integrations list"
+				`),
+			},
 		},
 		Flags: cmd.Flags{
 			Local: []*cmd.Flag{
 				{
 					Name:         "type",
 					DisplayValue: "TYPE",
-					Description:  "The type of the integration to list.",
+					Description:  "The optional type of integration to list.",
 					Value:        flagvalue.Simple("", &opts.Type),
-					//Required:     true,
 				},
 			},
 		},
@@ -86,7 +90,7 @@ func listRun(opts *ListOpts) error {
 		for {
 			resp, err := opts.PreviewClient.ListIntegrations(params, nil)
 			if err != nil {
-				return fmt.Errorf("failed to list twilio integrations: %w", err)
+				return fmt.Errorf("failed to list integrations: %w", err)
 			}
 
 			integrations = append(integrations, resp.Payload.Integrations...)
@@ -101,9 +105,8 @@ func listRun(opts *ListOpts) error {
 
 	}
 
-	fmt.Println("Type: ", opts.Type)
 	switch opts.Type {
-	case "twilio":
+	case Twilio:
 		var integrations []*models.Secrets20231128TwilioIntegration
 
 		params := &preview_secret_service.ListTwilioIntegrationsParams{
@@ -127,16 +130,9 @@ func listRun(opts *ListOpts) error {
 			params.PaginationNextPageToken = &next
 		}
 
-		//fmt.Println("Integrations: ", integrations)
-		for i, integration := range integrations {
-			fmt.Println(i, integration.IntegrationName)
-			//if integration.StaticCredentialDetails != nil {
-			fmt.Println(i, integration.CreatedAt)
-			//}
-		}
 		return opts.Output.Display(newTwilioDisplayer(false, integrations...))
 
-	case "mongodb":
+	case MongoDB:
 		var integrations []*models.Secrets20231128MongoDBAtlasIntegration
 
 		params := &preview_secret_service.ListMongoDBAtlasIntegrationsParams{
@@ -148,7 +144,7 @@ func listRun(opts *ListOpts) error {
 		for {
 			resp, err := opts.PreviewClient.ListMongoDBAtlasIntegrations(params, nil)
 			if err != nil {
-				return fmt.Errorf("failed to list mongodb integrations: %w", err)
+				return fmt.Errorf("failed to list mongo integrations: %w", err)
 			}
 
 			integrations = append(integrations, resp.Payload.Integrations...)
@@ -159,7 +155,7 @@ func listRun(opts *ListOpts) error {
 			next := resp.Payload.Pagination.NextPageToken
 			params.PaginationNextPageToken = &next
 		}
-		return opts.Output.Display(newMongoDBDisplayer(true, integrations...))
+		return opts.Output.Display(newMongoDBDisplayer(false, integrations...))
 
 	default:
 		return fmt.Errorf("not a valid integration type")
