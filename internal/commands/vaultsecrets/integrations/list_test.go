@@ -7,16 +7,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"testing"
+
+	"github.com/go-openapi/runtime/client"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	"github.com/stretchr/testify/mock"
-	"testing"
-
-	"github.com/go-openapi/runtime/client"
-	"github.com/stretchr/testify/require"
-
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
