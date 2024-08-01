@@ -98,17 +98,17 @@ func TestReadRun(t *testing.T) {
 		Name            string
 		ErrMsg          string
 		IntegrationName string
-		Type            string
+		Type            IntegrationType
 	}{
 		{
 			Name:   "Failed: Integration not found",
 			ErrMsg: "[GET /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/integrations/twilio/config/{integration_name}][404] GetTwilioIntegration",
-			Type:   "twilio",
+			Type:   Twilio,
 		},
 		{
 			Name:            "Success: Read integration",
 			IntegrationName: "sample-integration",
-			Type:            "twilio",
+			Type:            Twilio,
 		},
 	}
 

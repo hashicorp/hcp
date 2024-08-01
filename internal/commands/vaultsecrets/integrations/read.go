@@ -24,15 +24,10 @@ type ReadOpts struct {
 	IO      iostreams.IOStreams
 
 	IntegrationName string
-	Type            string
+	Type            IntegrationType
 	Client          secret_service.ClientService
 	PreviewClient   preview_secret_service.ClientService
 }
-
-const (
-	Twilio  = "twilio"
-	MongoDB = "mongo"
-)
 
 func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 	opts := &ReadOpts{
