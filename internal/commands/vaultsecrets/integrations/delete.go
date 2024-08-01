@@ -24,7 +24,7 @@ type DeleteOpts struct {
 	IO      iostreams.IOStreams
 
 	IntegrationName string
-	Type            string
+	Type            IntegrationType
 	Client          secret_service.ClientService
 	PreviewClient   preview_secret_service.ClientService
 }
@@ -93,6 +93,7 @@ func deleteRun(opts *DeleteOpts) error {
 			ProjectID:       opts.Profile.ProjectID,
 			OrganizationID:  opts.Profile.OrganizationID,
 			IntegrationName: opts.IntegrationName,
+			Name:            &opts.IntegrationName,
 		}, nil)
 		if err != nil {
 			return fmt.Errorf("failed to delete integration: %w", err)
@@ -107,6 +108,7 @@ func deleteRun(opts *DeleteOpts) error {
 			ProjectID:       opts.Profile.ProjectID,
 			OrganizationID:  opts.Profile.OrganizationID,
 			IntegrationName: opts.IntegrationName,
+			Name:            &opts.IntegrationName,
 		}, nil)
 		if err != nil {
 			return fmt.Errorf("failed to delete integration: %w", err)
