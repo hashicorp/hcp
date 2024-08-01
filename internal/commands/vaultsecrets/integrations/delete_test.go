@@ -96,17 +96,17 @@ func TestDeleteRun(t *testing.T) {
 		Name            string
 		ErrMsg          string
 		IntegrationName string
-		Type            string
+		Type            IntegrationType
 	}{
 		{
 			Name:   "Failed: Integration not found",
 			ErrMsg: "[DELETE /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/integrations/twilio/config/{integration_name}][404] DeleteTwilioIntegration",
-			Type:   "twilio",
+			Type:   Twilio,
 		},
 		{
 			Name:            "Success: Delete integration",
 			IntegrationName: "sample-integration",
-			Type:            "twilio",
+			Type:            Twilio,
 		},
 	}
 
@@ -136,6 +136,7 @@ func TestDeleteRun(t *testing.T) {
 					OrganizationID:  "123",
 					ProjectID:       "abc",
 					IntegrationName: opts.IntegrationName,
+					Name:            &opts.IntegrationName,
 					Context:         opts.Ctx,
 				}, nil).Return(&preview_secret_service.DeleteTwilioIntegrationOK{}, nil).Once()
 			}
