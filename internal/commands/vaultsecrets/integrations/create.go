@@ -6,9 +6,14 @@ package integrations
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+	"os"
+	"slices"
+
+	"golang.org/x/exp/maps"
+	"gopkg.in/yaml.v3"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -16,8 +21,6 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
-	"gopkg.in/yaml.v3"
-	"os"
 )
 
 type CreateOpts struct {
@@ -72,6 +75,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 					DisplayValue: "CONFIG_FILE",
 					Description:  "File path to read integration config data.",
 					Value:        flagvalue.Simple("", &opts.ConfigFilePath),
+					Required:     true,
 				},
 			},
 		},
@@ -89,9 +93,15 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 }
 
 type IntegrationConfig struct {
+	Version string
 	Type    string
-	Details map[string]any
+	Details map[string]string
 }
+
+var (
+	TwilioKeys = []string{"account_sid", "api_key_secret", "api_key_sid"}
+	MongoKeys  = []string{"private_key", "public_key"}
+)
 
 func createRun(opts *CreateOpts) error {
 	// Open the file
@@ -108,16 +118,17 @@ func createRun(opts *CreateOpts) error {
 
 	switch i.Type {
 	case Twilio:
+		missingField := validateDetails(i.Details, TwilioKeys)
 
-		accountSid := i.Details["account_sid"].(string)
-		apiKeySecret := i.Details["api_key_secret"].(string)
-		apiKeySid := i.Details["api_key_sid"].(string)
+		if missingField != "" {
+			return fmt.Errorf("missing required field in the config file: %s", missingField)
+		}
 
-		body := &models.SecretServiceCreateTwilioIntegrationBody{
+		body := &preview_models.SecretServiceCreateTwilioIntegrationBody{
 			IntegrationName:    opts.IntegrationName,
-			TwilioAccountSid:   accountSid,
-			TwilioAPIKeySecret: apiKeySecret,
-			TwilioAPIKeySid:    apiKeySid,
+			TwilioAccountSid:   i.Details["account_sid"],
+			TwilioAPIKeySecret: i.Details["api_key_secret"],
+			TwilioAPIKeySid:    i.Details["api_key_sid"],
 		}
 
 		resp, err := opts.PreviewClient.CreateTwilioIntegration(&preview_secret_service.CreateTwilioIntegrationParams{
@@ -135,12 +146,16 @@ func createRun(opts *CreateOpts) error {
 		fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.Integration.IntegrationName)
 
 	case MongoDB:
-		privkey := i.Details["private_key"].(string)
-		pubKey := i.Details["public_key"].(string)
-		body := &models.SecretServiceCreateMongoDBAtlasIntegrationBody{
+		missingField := validateDetails(i.Details, MongoKeys)
+
+		if missingField != "" {
+			return fmt.Errorf("missing required field in the config file: %s", missingField)
+		}
+
+		body := &preview_models.SecretServiceCreateMongoDBAtlasIntegrationBody{
 			IntegrationName:      opts.IntegrationName,
-			MongodbAPIPrivateKey: privkey,
-			MongodbAPIPublicKey:  pubKey,
+			MongodbAPIPrivateKey: i.Details["private_key"],
+			MongodbAPIPublicKey:  i.Details["public_key"],
 		}
 
 		resp, err := opts.PreviewClient.CreateMongoDBAtlasIntegration(&preview_secret_service.CreateMongoDBAtlasIntegrationParams{
@@ -159,4 +174,15 @@ func createRun(opts *CreateOpts) error {
 	}
 
 	return nil
+}
+
+func validateDetails(details map[string]string, requiredKeys []string) string {
+	detailsKeys := maps.Keys(details)
+
+	for _, r := range requiredKeys {
+		if !slices.Contains(detailsKeys, r) {
+			return r
+		}
+	}
+	return ""
 }
