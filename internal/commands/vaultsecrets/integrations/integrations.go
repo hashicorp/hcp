@@ -8,6 +8,13 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
 
+type IntegrationType string
+
+const (
+	Twilio  IntegrationType = "twilio"
+	MongoDB IntegrationType = "mongodb-atlas"
+)
+
 func NewCmdIntegrations(ctx *cmd.Context) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "integrations",
