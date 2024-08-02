@@ -161,7 +161,7 @@ details:
 					OrganizationID: "123",
 					ProjectID:      "abc",
 					Body: &preview_models.SecretServiceCreateTwilioIntegrationBody{
-						IntegrationName:    opts.IntegrationName,
+						Name:               opts.IntegrationName,
 						TwilioAccountSid:   "abc",
 						TwilioAPIKeySecret: "def",
 						TwilioAPIKeySid:    "ghi",
@@ -169,7 +169,7 @@ details:
 				}, nil).Return(&preview_secret_service.CreateTwilioIntegrationOK{
 					Payload: &preview_models.Secrets20231128CreateTwilioIntegrationResponse{
 						Integration: &preview_models.Secrets20231128TwilioIntegration{
-							IntegrationName:  opts.IntegrationName,
+							Name:             opts.IntegrationName,
 							TwilioAccountSid: "abc",
 						},
 					},
