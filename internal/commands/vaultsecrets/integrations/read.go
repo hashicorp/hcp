@@ -87,7 +87,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 
 func readRun(opts *ReadOpts) error {
 	switch opts.Type {
-	case IntegrationType_Twilio:
+	case Twilio:
 		resp, err := opts.PreviewClient.GetTwilioIntegration(&preview_secret_service.GetTwilioIntegrationParams{
 			Context:         opts.Ctx,
 			ProjectID:       opts.Profile.ProjectID,
@@ -100,7 +100,7 @@ func readRun(opts *ReadOpts) error {
 
 		return opts.Output.Display(newTwilioDisplayer(true, resp.Payload.Integration))
 
-	case IntegrationType_MONGODB_ATLAS:
+	case MongoDBAtlas:
 		resp, err := opts.PreviewClient.GetMongoDBAtlasIntegration(&preview_secret_service.GetMongoDBAtlasIntegrationParams{
 			Context:         opts.Ctx,
 			ProjectID:       opts.Profile.ProjectID,

@@ -87,7 +87,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 
 func deleteRun(opts *DeleteOpts) error {
 	switch opts.Type {
-	case IntegrationType_Twilio:
+	case Twilio:
 		_, err := opts.PreviewClient.DeleteTwilioIntegration(&preview_secret_service.DeleteTwilioIntegrationParams{
 			Context:         opts.Ctx,
 			ProjectID:       opts.Profile.ProjectID,
@@ -102,7 +102,7 @@ func deleteRun(opts *DeleteOpts) error {
 		fmt.Fprintf(opts.IO.Err(), "%s Successfully deleted integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.IntegrationName)
 		return nil
 
-	case IntegrationType_MONGODB_ATLAS:
+	case MongoDBAtlas:
 		_, err := opts.PreviewClient.DeleteMongoDBAtlasIntegration(&preview_secret_service.DeleteMongoDBAtlasIntegrationParams{
 			Context:         opts.Ctx,
 			ProjectID:       opts.Profile.ProjectID,
@@ -117,7 +117,7 @@ func deleteRun(opts *DeleteOpts) error {
 		fmt.Fprintf(opts.IO.Err(), "%s Successfully deleted integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.IntegrationName)
 		return nil
 
-	case IntegrationType_AWS:
+	case AWS:
 		_, err := opts.PreviewClient.DeleteAwsIntegration(&preview_secret_service.DeleteAwsIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
@@ -131,7 +131,7 @@ func deleteRun(opts *DeleteOpts) error {
 		fmt.Fprintf(opts.IO.Err(), "%s Successfully deleted integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.IntegrationName)
 		return nil
 
-	case IntegrationType_GCP:
+	case GCP:
 		_, err := opts.PreviewClient.DeleteGcpIntegration(&preview_secret_service.DeleteGcpIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
