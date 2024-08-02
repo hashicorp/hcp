@@ -11,8 +11,10 @@ import (
 type IntegrationType string
 
 const (
-	Twilio  IntegrationType = "twilio"
-	MongoDB IntegrationType = "mongodb-atlas"
+	IntegrationType_Twilio        IntegrationType = "twilio"
+	IntegrationType_MONGODB_ATLAS IntegrationType = "mongodb-atlas"
+	IntegrationType_AWS           IntegrationType = "aws"
+	IntegrationType_GCP           IntegrationType = "gcp"
 )
 
 func NewCmdIntegrations(ctx *cmd.Context) *cmd.Command {
