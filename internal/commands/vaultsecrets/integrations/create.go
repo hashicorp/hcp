@@ -94,13 +94,15 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 
 type IntegrationConfig struct {
 	Version string
-	Type    string
+	Type    IntegrationType
 	Details map[string]string
 }
 
 var (
 	TwilioKeys = []string{"account_sid", "api_key_secret", "api_key_sid"}
 	MongoKeys  = []string{"private_key", "public_key"}
+	AWSKeys    = []string{"audience", "role_arn"}
+	GCPKeys    = []string{"audience", "service_account_email"}
 )
 
 func createRun(opts *CreateOpts) error {
@@ -125,7 +127,7 @@ func createRun(opts *CreateOpts) error {
 		}
 
 		body := &preview_models.SecretServiceCreateTwilioIntegrationBody{
-			IntegrationName:    opts.IntegrationName,
+			Name:               opts.IntegrationName,
 			TwilioAccountSid:   i.Details["account_sid"],
 			TwilioAPIKeySecret: i.Details["api_key_secret"],
 			TwilioAPIKeySid:    i.Details["api_key_sid"],
@@ -143,9 +145,9 @@ func createRun(opts *CreateOpts) error {
 		}
 
 		fmt.Fprintln(opts.IO.Err())
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.Integration.IntegrationName)
+		fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.Integration.Name)
 
-	case MongoDB:
+	case MongoDBAtlas:
 		missingField := validateDetails(i.Details, MongoKeys)
 
 		if missingField != "" {
@@ -153,7 +155,7 @@ func createRun(opts *CreateOpts) error {
 		}
 
 		body := &preview_models.SecretServiceCreateMongoDBAtlasIntegrationBody{
-			IntegrationName:      opts.IntegrationName,
+			Name:                 opts.IntegrationName,
 			MongodbAPIPrivateKey: i.Details["private_key"],
 			MongodbAPIPublicKey:  i.Details["public_key"],
 		}
@@ -166,11 +168,69 @@ func createRun(opts *CreateOpts) error {
 		}, nil)
 
 		if err != nil {
-			return fmt.Errorf("failed to create MongoDB integration: %w", err)
+			return fmt.Errorf("failed to create MongoDB Atlas integration: %w", err)
 		}
 
 		fmt.Fprintln(opts.IO.Err())
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.Integration.IntegrationName)
+		fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.Integration.Name)
+
+	case AWS:
+		missingField := validateDetails(i.Details, AWSKeys)
+
+		if missingField != "" {
+			return fmt.Errorf("missing required field in the config file: %s", missingField)
+		}
+
+		body := &preview_models.SecretServiceCreateAwsIntegrationBody{
+			Name: opts.IntegrationName,
+			FederatedWorkloadIdentity: &preview_models.Secrets20231128AwsFederatedWorkloadIdentityRequest{
+				Audience: i.Details["audience"],
+				RoleArn:  i.Details["role_arn"],
+			},
+		}
+
+		resp, err := opts.PreviewClient.CreateAwsIntegration(&preview_secret_service.CreateAwsIntegrationParams{
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+			Body:           body,
+		}, nil)
+
+		if err != nil {
+			return fmt.Errorf("failed to create AWS integration: %w", err)
+		}
+
+		fmt.Fprintln(opts.IO.Err())
+		fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.Integration.Name)
+
+	case GCP:
+		missingField := validateDetails(i.Details, GCPKeys)
+
+		if missingField != "" {
+			return fmt.Errorf("missing required field in the config file: %s", missingField)
+		}
+
+		body := &preview_models.SecretServiceCreateGcpIntegrationBody{
+			Name: opts.IntegrationName,
+			FederatedWorkloadIdentity: &preview_models.Secrets20231128GcpFederatedWorkloadIdentityRequest{
+				Audience:            i.Details["audience"],
+				ServiceAccountEmail: i.Details["service_account_email"],
+			},
+		}
+
+		resp, err := opts.PreviewClient.CreateGcpIntegration(&preview_secret_service.CreateGcpIntegrationParams{
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+			Body:           body,
+		}, nil)
+
+		if err != nil {
+			return fmt.Errorf("failed to create GCP integration: %w", err)
+		}
+
+		fmt.Fprintln(opts.IO.Err())
+		fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.Integration.Name)
 	}
 
 	return nil
