@@ -47,7 +47,7 @@ func (t *twilioDisplayer) FieldTemplates() []format.Field {
 	fields := []format.Field{
 		{
 			Name:        "Integration Name",
-			ValueFormat: "{{ .IntegrationName }}",
+			ValueFormat: "{{ .Name }}",
 		},
 	}
 
@@ -103,7 +103,7 @@ func (m *mongodbDisplayer) FieldTemplates() []format.Field {
 	fields := []format.Field{
 		{
 			Name:        "Integration Name",
-			ValueFormat: "{{ .IntegrationName }}",
+			ValueFormat: "{{ .Name }}",
 		},
 	}
 
@@ -158,7 +158,7 @@ func (g *genericDisplayer) FieldTemplates() []format.Field {
 	return []format.Field{
 		{
 			Name:        "Integration Name",
-			ValueFormat: "{{ .IntegrationName }}",
+			ValueFormat: "{{ .Name }}",
 		},
 	}
 }

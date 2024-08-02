@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -81,7 +81,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 
 func listRun(opts *ListOpts) error {
 	if opts.Type == "" {
-		var integrations []*models.Secrets20231128Integration
+		var integrations []*preview_models.Secrets20231128Integration
 		params := &preview_secret_service.ListIntegrationsParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
@@ -101,13 +101,13 @@ func listRun(opts *ListOpts) error {
 			next := resp.Payload.Pagination.NextPageToken
 			params.PaginationNextPageToken = &next
 		}
-		return opts.Output.Display(newGenericDisplayer(true, integrations...))
+		return opts.Output.Display(newGenericDisplayer(false, integrations...))
 
 	}
 
 	switch opts.Type {
 	case Twilio:
-		var integrations []*models.Secrets20231128TwilioIntegration
+		var integrations []*preview_models.Secrets20231128TwilioIntegration
 
 		params := &preview_secret_service.ListTwilioIntegrationsParams{
 			Context:        opts.Ctx,
@@ -133,7 +133,7 @@ func listRun(opts *ListOpts) error {
 		return opts.Output.Display(newTwilioDisplayer(false, integrations...))
 
 	case MongoDB:
-		var integrations []*models.Secrets20231128MongoDBAtlasIntegration
+		var integrations []*preview_models.Secrets20231128MongoDBAtlasIntegration
 
 		params := &preview_secret_service.ListMongoDBAtlasIntegrationsParams{
 			Context:        opts.Ctx,
