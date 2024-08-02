@@ -100,7 +100,7 @@ func (m *mongodbDisplayer) FieldTemplates() []format.Field {
 		},
 		{
 			Name:        "API Public Key",
-			ValueFormat: "{{ .APIPublicKey }}",
+			ValueFormat: "{{ .MongodbAPIPublicKey }}",
 		},
 	}
 }
