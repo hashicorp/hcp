@@ -112,7 +112,7 @@ func (d *displayer) secretsFieldTemplate() []format.Field {
 		},
 		{
 			Name:        "Latest Version",
-			ValueFormat: "{{ if eq .LatestVersion 0 }}-{{ else }}{{ .LatestVersion }}{{ end }}",
+			ValueFormat: "{{ if eq (printf \"%v\" .LatestVersion) \"0\" }}-{{ else }}{{ .LatestVersion }}{{ end }}",
 		},
 	}...)
 
