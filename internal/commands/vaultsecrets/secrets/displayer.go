@@ -105,18 +105,16 @@ func (d *displayer) secretsFieldTemplate() []format.Field {
 		})
 	}
 
-	fields = append(fields, format.Field{
-		Name:        "Created At",
-		ValueFormat: "{{ .CreatedAt }}",
-	})
-
-	switch d.secretType {
-	case secretTypeKV, secretTypeRotating:
-		fields = append(fields, format.Field{
+	fields = append(fields, []format.Field{
+		{
+			Name:        "Created At",
+			ValueFormat: "{{ .CreatedAt }}",
+		},
+		{
 			Name:        "Latest Version",
-			ValueFormat: "{{ .LatestVersion }}",
-		})
-	}
+			ValueFormat: "{{ if eq .LatestVersion 0 }}-{{ else }}{{ .LatestVersion }}{{ end }}",
+		},
+	}...)
 
 	return fields
 }
