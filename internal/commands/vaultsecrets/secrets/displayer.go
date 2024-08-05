@@ -176,6 +176,10 @@ func (d *displayer) openAppSecretsFieldTemplate() []format.Field {
 				ValueFormat: "{{ .CreatedAt }}",
 			},
 			{
+				Name:        "Expires At",
+				ValueFormat: "{{ .RotatingVersion.ExpiresAt }}",
+			},
+			{
 				Name:        "Latest Version",
 				ValueFormat: "{{ .LatestVersion }}",
 			},
