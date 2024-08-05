@@ -53,7 +53,7 @@ func (d *displayer) SetDefaultFormat(f format.Format) *displayer {
 	return d
 }
 
-func (d *displayer) SetSingleSecret(s string) *displayer {
+func (d *displayer) SetSecretType(s string) *displayer {
 	d.secretType = s
 	return d
 }

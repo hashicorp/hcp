@@ -96,6 +96,6 @@ func readRun(opts *ReadOpts) error {
 	}
 
 	displayer := newDisplayer().PreviewSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty).
-		SetSingleSecret(resp.Payload.Secret.Type)
+		SetSecretType(resp.Payload.Secret.Type)
 	return opts.Output.Display(displayer)
 }
