@@ -32,5 +32,6 @@ func NewCmdIntegrations(ctx *cmd.Context) *cmd.Command {
 
 	cmd.AddChild(NewCmdRead(ctx, nil))
 	cmd.AddChild(NewCmdDelete(ctx, nil))
+	cmd.AddChild(NewCmdList(ctx, nil))
 	return cmd
 }
