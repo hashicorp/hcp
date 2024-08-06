@@ -24,7 +24,7 @@ type ListOpts struct {
 	Output  *format.Outputter
 	IO      iostreams.IOStreams
 
-	Type          string
+	Type          IntegrationType
 	Client        secret_service.ClientService
 	PreviewClient preview_secret_service.ClientService
 }
@@ -55,7 +55,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 			{
 				Preamble: `List all generic integrations:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp vault-secrets integrations list"
+				$ hcp vault-secrets integrations list
 				`),
 			},
 		},
@@ -132,7 +132,7 @@ func listRun(opts *ListOpts) error {
 
 		return opts.Output.Display(newTwilioDisplayer(false, integrations...))
 
-	case MongoDB:
+	case MongoDBAtlas:
 		var integrations []*preview_models.Secrets20231128MongoDBAtlasIntegration
 
 		params := &preview_secret_service.ListMongoDBAtlasIntegrationsParams{
@@ -156,6 +156,56 @@ func listRun(opts *ListOpts) error {
 			params.PaginationNextPageToken = &next
 		}
 		return opts.Output.Display(newMongoDBDisplayer(false, integrations...))
+
+	case AWS:
+		var integrations []*preview_models.Secrets20231128AwsIntegration
+
+		params := &preview_secret_service.ListAwsIntegrationsParams{
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+		}
+
+		for {
+			resp, err := opts.PreviewClient.ListAwsIntegrations(params, nil)
+			if err != nil {
+				return fmt.Errorf("failed to list AWS integrations: %w", err)
+			}
+
+			integrations = append(integrations, resp.Payload.Integrations...)
+			if resp.Payload.Pagination == nil || resp.Payload.Pagination.NextPageToken == "" {
+				break
+			}
+
+			next := resp.Payload.Pagination.NextPageToken
+			params.PaginationNextPageToken = &next
+		}
+		return opts.Output.Display(newAwsDisplayer(false, integrations...))
+
+	case GCP:
+		var integrations []*preview_models.Secrets20231128GcpIntegration
+
+		params := &preview_secret_service.ListGcpIntegrationsParams{
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+		}
+
+		for {
+			resp, err := opts.PreviewClient.ListGcpIntegrations(params, nil)
+			if err != nil {
+				return fmt.Errorf("failed to list GCP integrations: %w", err)
+			}
+
+			integrations = append(integrations, resp.Payload.Integrations...)
+			if resp.Payload.Pagination == nil || resp.Payload.Pagination.NextPageToken == "" {
+				break
+			}
+
+			next := resp.Payload.Pagination.NextPageToken
+			params.PaginationNextPageToken = &next
+		}
+		return opts.Output.Display(newGcpDisplayer(false, integrations...))
 
 	default:
 		return fmt.Errorf("not a valid integration type")

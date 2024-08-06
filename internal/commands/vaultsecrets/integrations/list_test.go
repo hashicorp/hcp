@@ -84,11 +84,17 @@ func TestListRun(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
-		Name   string
-		ErrMsg string
+		Name    string
+		RespErr bool
+		ErrMsg  string
 	}{
 		{
 			Name: "Success: List integrations",
+		},
+		{
+			Name:    "Failed: Unable to list integrations",
+			RespErr: true,
+			ErrMsg:  "[GET /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/integrations][404] ListIntegrations",
 		},
 	}
 
@@ -111,7 +117,7 @@ func TestListRun(t *testing.T) {
 				Type:          "twilio",
 			}
 
-			if c.ErrMsg != "" {
+			if c.RespErr {
 				vs.EXPECT().ListTwilioIntegrations(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 			} else {
 				paginationNextPageToken := "token"

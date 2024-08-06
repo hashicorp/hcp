@@ -55,7 +55,11 @@ func (t *twilioDisplayer) FieldTemplates() []format.Field {
 		return append(fields, []format.Field{
 			{
 				Name:        "Account SID",
-				ValueFormat: "{{ .TwilioAccountSid }}",
+				ValueFormat: "{{ .StaticCredentialDetails.AccountSid }}",
+			},
+			{
+				Name:        "API Key SID",
+				ValueFormat: "{{ .StaticCredentialDetails.APIKeySid }}",
 			},
 		}...)
 	} else {
@@ -111,7 +115,123 @@ func (m *mongodbDisplayer) FieldTemplates() []format.Field {
 		return append(fields, []format.Field{
 			{
 				Name:        "API Public Key",
-				ValueFormat: "{{ .MongodbAPIPublicKey }}",
+				ValueFormat: "{{ .StaticCredentialDetails.APIPublicKey }}",
+			},
+		}...)
+	} else {
+		return fields
+	}
+}
+
+type awsDisplayer struct {
+	previewAwsIntegrations []*preview_models.Secrets20231128AwsIntegration
+
+	single bool
+}
+
+func newAwsDisplayer(single bool, integrations ...*preview_models.Secrets20231128AwsIntegration) *awsDisplayer {
+	return &awsDisplayer{
+		previewAwsIntegrations: integrations,
+		single:                 single,
+	}
+}
+
+func (a *awsDisplayer) DefaultFormat() format.Format {
+	return format.Table
+}
+
+func (a *awsDisplayer) Payload() any {
+
+	if a.previewAwsIntegrations != nil {
+		return a.previewAwsIntegrationsPayload()
+	}
+
+	return nil
+}
+
+func (a *awsDisplayer) previewAwsIntegrationsPayload() any {
+	if a.single {
+		if len(a.previewAwsIntegrations) != 1 {
+			return nil
+		}
+		return a.previewAwsIntegrations[0]
+	}
+	return a.previewAwsIntegrations
+}
+
+func (a *awsDisplayer) FieldTemplates() []format.Field {
+	fields := []format.Field{
+		{
+			Name:        "Integration Name",
+			ValueFormat: "{{ .Name }}",
+		},
+	}
+
+	if a.single {
+		return append(fields, []format.Field{
+			{
+				Name:        "Audience",
+				ValueFormat: "{{ .FederatedWorkloadIdentity.Audience }}",
+			},
+		}...)
+	} else {
+		return fields
+	}
+}
+
+type gcpDisplayer struct {
+	previewGcpIntegrations []*preview_models.Secrets20231128GcpIntegration
+
+	single bool
+}
+
+func newGcpDisplayer(single bool, integrations ...*preview_models.Secrets20231128GcpIntegration) *gcpDisplayer {
+	return &gcpDisplayer{
+		previewGcpIntegrations: integrations,
+		single:                 single,
+	}
+}
+
+func (g *gcpDisplayer) DefaultFormat() format.Format {
+	return format.Table
+}
+
+func (g *gcpDisplayer) Payload() any {
+
+	if g.previewGcpIntegrations != nil {
+		return g.previewGcpIntegrationsPayload()
+	}
+
+	return nil
+}
+
+func (g *gcpDisplayer) previewGcpIntegrationsPayload() any {
+	if g.single {
+		if len(g.previewGcpIntegrations) != 1 {
+			return nil
+		}
+		return g.previewGcpIntegrations[0]
+	}
+	return g.previewGcpIntegrations
+}
+
+func (g *gcpDisplayer) FieldTemplates() []format.Field {
+	fields := []format.Field{
+		{
+			Name:        "Integration Name",
+			ValueFormat: "{{ .Name }}",
+		},
+	}
+
+	if g.single {
+		return append(fields, []format.Field{
+			{
+				Name:        "Audience",
+				ValueFormat: "{{ .FederatedWorkloadIdentity.Audience }}",
+			},
+			{
+				Name:        "Audience",
+				ValueFormat: "{{ .FederatedWorkloadIdentity.ServiceAccountEmail }}",
 			},
 		}...)
 	} else {
