@@ -7,15 +7,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
-	"github.com/mitchellh/mapstructure"
-	"gopkg.in/yaml.v3"
 	"io"
 	"os"
+
+	"github.com/mitchellh/mapstructure"
+	"github.com/posener/complete"
+	"gopkg.in/yaml.v3"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -23,7 +25,6 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
-	"github.com/posener/complete"
 )
 
 type SecretType string
