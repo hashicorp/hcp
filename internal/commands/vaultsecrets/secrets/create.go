@@ -7,19 +7,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
+	"github.com/mitchellh/mapstructure"
+	"gopkg.in/yaml.v3"
 	"io"
 	"os"
 	"slices"
 
-	"github.com/mitchellh/mapstructure"
-	"github.com/posener/complete"
-	"golang.org/x/exp/maps"
-	"gopkg.in/yaml.v3"
-
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -27,6 +24,8 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"github.com/posener/complete"
+	"golang.org/x/exp/maps"
 )
 
 type SecretType string
@@ -198,7 +197,6 @@ func createRun(opts *CreateOpts) error {
 
 		switch sc.Type {
 		case integrations.Twilio:
-
 			req := preview_secret_service.NewCreateTwilioRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
