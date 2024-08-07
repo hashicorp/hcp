@@ -56,6 +56,15 @@ func TestNewCmdCreate(t *testing.T) {
 				SecretName: "test",
 			},
 		},
+		{
+			Name:    "Good: Rotating secret",
+			Profile: testProfile,
+			Args:    []string{"test", "--secret-type=rotating"},
+			Expect: &CreateOpts{
+				AppName:    testProfile(t).VaultSecrets.AppName,
+				SecretName: "test",
+			},
+		},
 	}
 
 	for _, c := range cases {
