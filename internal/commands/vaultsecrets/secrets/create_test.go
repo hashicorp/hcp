@@ -45,12 +45,12 @@ func TestNewCmdCreate(t *testing.T) {
 			Name:    "Failed: No secret name arg specified",
 			Profile: testProfile,
 			Args:    []string{},
-			Error:   "ERROR: accepts 1 arg(s), received 0",
+			Error:   "ERROR: missing required flag: --data-file=DATA_FILE_PATH",
 		},
 		{
 			Name:    "Good: Secret name arg specified",
 			Profile: testProfile,
-			Args:    []string{"test"},
+			Args:    []string{"test", "--data-file=DATA_FILE_PATH"},
 			Expect: &CreateOpts{
 				AppName:    testProfile(t).VaultSecrets.AppName,
 				SecretName: "test",
@@ -59,7 +59,7 @@ func TestNewCmdCreate(t *testing.T) {
 		{
 			Name:    "Good: Rotating secret",
 			Profile: testProfile,
-			Args:    []string{"test", "--secret-type=rotating"},
+			Args:    []string{"test", "--secret-type=rotating", "--data-file=DATA_FILE_PATH"},
 			Expect: &CreateOpts{
 				AppName:    testProfile(t).VaultSecrets.AppName,
 				SecretName: "test",
