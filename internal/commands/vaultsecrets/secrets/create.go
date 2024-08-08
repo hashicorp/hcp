@@ -126,10 +126,10 @@ type CreateOpts struct {
 }
 
 type SecretConfig struct {
-	Version                 string
-	Type                    integrations.IntegrationType
-	RotationIntegrationName string `yaml:"rotation_integration_name"`
-	Details                 map[string]any
+	Version         string
+	Type            integrations.IntegrationType
+	IntegrationName string `yaml:"rotation_integration_name"`
+	Details         map[string]any
 }
 
 type MongoDBRole struct {
@@ -192,6 +192,14 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("failed to unmarshal config file: %w", err)
 		}
 
+		if sc.Type == "" || sc.IntegrationName == "" {
+			return fmt.Errorf("missing required field in the config file: type")
+		}
+
+		if sc.IntegrationName == "" {
+			return fmt.Errorf("missing required field in the config file: rotation_integration_name")
+		}
+
 		switch sc.Type {
 		case integrations.Twilio:
 			missingField := validateDetails(sc.Details, TwilioKeys)
@@ -205,7 +213,7 @@ func createRun(opts *CreateOpts) error {
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 			req.Body = &preview_models.SecretServiceCreateTwilioRotatingSecretBody{
-				RotationIntegrationName: sc.RotationIntegrationName,
+				RotationIntegrationName: sc.IntegrationName,
 				RotationPolicyName:      rotationPolicies[sc.Details["rotation_policy_name"].(string)],
 				SecretName:              opts.SecretName,
 			}
@@ -267,7 +275,7 @@ func createRun(opts *CreateOpts) error {
 				MongodbGroupID:          sc.Details["mongodb_group_id"].(string),
 				MongodbRoles:            reqRoles,
 				MongodbScopes:           reqScopes,
-				RotationIntegrationName: sc.RotationIntegrationName,
+				RotationIntegrationName: sc.IntegrationName,
 				RotationPolicyName:      rotationPolicies[sc.Details["rotation_policy_name"].(string)],
 				SecretName:              opts.SecretName,
 			}
