@@ -14,7 +14,7 @@ import (
 	"github.com/posener/complete"
 )
 
-// PredictAppName returns a predict function for application names.
+// PredictSecretName returns a predict function for secret names.
 func PredictSecretName(ctx *cmd.Context, c *cmd.Command, client preview_secret_service.ClientService) complete.PredictFunc {
 	return func(args complete.Args) []string {
 		// Parse the args

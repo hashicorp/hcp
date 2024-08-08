@@ -1,0 +1,3 @@
+```release-note:improvement
+vault-secrets: Enhances dynamic secrets output
+```
