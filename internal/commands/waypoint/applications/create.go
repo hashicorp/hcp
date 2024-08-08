@@ -50,10 +50,10 @@ $ hcp waypoint application create -n=my-application -t=my-template
 					Required:     true,
 				},
 				{
-					Name:         "templates-name",
+					Name:         "template-name",
 					Shorthand:    "t",
 					DisplayValue: "TEMPLATE_NAME",
-					Description:  "The name of the templates to use for the application.",
+					Description:  "The name of the template to use for the application.",
 					Value:        flagvalue.Simple("", &opts.TemplateName),
 					Required:     true,
 				},
