@@ -7,6 +7,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/go-openapi/runtime/client"
@@ -126,6 +131,7 @@ func TestCreateRun(t *testing.T) {
 		ErrMsg           string
 		MockCalled       bool
 		AugmentOpts      func(*CreateOpts)
+		Input            []byte
 	}{
 		{
 			Name:   "Failed: Read via stdin as hypen not supplied for --data-file flag",
@@ -136,27 +142,65 @@ func TestCreateRun(t *testing.T) {
 			EmptySecretValue: true,
 			ReadViaStdin:     true,
 			RespErr:          true,
-			AugmentOpts:      func(o *CreateOpts) { o.SecretFilePath = "-" },
-			ErrMsg:           "secret value cannot be empty",
+			AugmentOpts: func(o *CreateOpts) {
+				o.SecretFilePath = "-"
+				o.Type = Static
+			},
+			ErrMsg: "secret value cannot be empty",
 		},
 		{
 			Name:         "Success: Create secret via stdin",
 			ReadViaStdin: true,
-			AugmentOpts:  func(o *CreateOpts) { o.SecretFilePath = "-" },
-			MockCalled:   true,
+			AugmentOpts: func(o *CreateOpts) {
+				o.SecretFilePath = "-"
+				o.Type = Static
+			},
+			MockCalled: true,
 		},
 		{
-			Name:        "Failed: Max secret versions reached",
-			RespErr:     true,
-			ErrMsg:      "[POST /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secret/kv][429] CreateAppKVSecret default  &{Code:8 Details:[] Message:maximum number of secret versions reached}",
-			AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
-			MockCalled:  true,
+			Name:    "Failed: Max secret versions reached",
+			RespErr: true,
+			ErrMsg:  "[POST /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secret/kv][429] CreateAppKVSecret default  &{Code:8 Details:[] Message:maximum number of secret versions reached}",
+			AugmentOpts: func(o *CreateOpts) {
+				o.SecretValuePlaintext = testSecretValue
+				o.Type = Static
+			},
+			MockCalled: true,
 		},
 		{
-			Name:        "Success: Created secret",
-			RespErr:     false,
-			AugmentOpts: func(o *CreateOpts) { o.SecretValuePlaintext = testSecretValue },
-			MockCalled:  true,
+			Name:    "Success: Created secret",
+			RespErr: false,
+			AugmentOpts: func(o *CreateOpts) {
+				o.SecretValuePlaintext = testSecretValue
+				o.Type = Static
+			},
+			MockCalled: true,
+		},
+		{
+			Name:    "Success: Create a Twilio rotating secret",
+			RespErr: false,
+			AugmentOpts: func(o *CreateOpts) {
+				o.Type = Rotating
+			},
+			MockCalled: true,
+			Input: []byte(`version: 1.0.0
+type: "twilio"
+rotation_integration_name: "Twil-Int-11"
+details:
+  rotation_policy_name: "60"`),
+		},
+		{
+			Name:    "Failed: Missing required rotating secret field",
+			RespErr: false,
+			AugmentOpts: func(o *CreateOpts) {
+				o.Type = Rotating
+			},
+			Input: []byte(`version: 1.0.0
+type: "twilio"
+rotation_integration_name: "Twil-Int-11"
+details:
+  none: "none"`),
+			ErrMsg: "missing required field in the config file: rotation_policy_name",
 		},
 	}
 
@@ -177,48 +221,90 @@ func TestCreateRun(t *testing.T) {
 				}
 			}
 			vs := mock_secret_service.NewMockClientService(t)
+			pvs := mock_preview_secret_service.NewMockClientService(t)
+
 			opts := &CreateOpts{
-				Ctx:        context.Background(),
-				IO:         io,
-				Profile:    testProfile(t),
-				Output:     format.New(io),
-				Client:     vs,
-				AppName:    testProfile(t).VaultSecrets.AppName,
-				SecretName: "test_secret",
+				Ctx:           context.Background(),
+				IO:            io,
+				Profile:       testProfile(t),
+				Output:        format.New(io),
+				Client:        vs,
+				PreviewClient: pvs,
+				AppName:       testProfile(t).VaultSecrets.AppName,
+				SecretName:    "test_secret",
 			}
 
 			if c.AugmentOpts != nil {
 				c.AugmentOpts(opts)
 			}
 
+			if opts.Type == Rotating {
+				tempDir := t.TempDir()
+				f, err := os.Create(filepath.Join(tempDir, "config.yaml"))
+				r.NoError(err)
+				_, err = f.Write(c.Input)
+				r.NoError(err)
+				opts.SecretFilePath = f.Name()
+			}
+
 			dt := strfmt.NewDateTime()
-			if c.MockCalled {
-				if c.RespErr {
-					vs.EXPECT().CreateAppKVSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
-				} else {
-					vs.EXPECT().CreateAppKVSecret(&secret_service.CreateAppKVSecretParams{
-						LocationOrganizationID: testProfile(t).OrganizationID,
-						LocationProjectID:      testProfile(t).ProjectID,
-						AppName:                testProfile(t).VaultSecrets.AppName,
-						Body: secret_service.CreateAppKVSecretBody{
-							Name:  opts.SecretName,
-							Value: testSecretValue,
-						},
-						Context: opts.Ctx,
-					}, mock.Anything).Return(&secret_service.CreateAppKVSecretOK{
-						Payload: &models.Secrets20230613CreateAppKVSecretResponse{
-							Secret: &models.Secrets20230613Secret{
-								Name:      opts.SecretName,
-								CreatedAt: dt,
-								Version: &models.Secrets20230613SecretVersion{
-									Version:   "2",
-									CreatedAt: dt,
-									Type:      "kv",
-								},
-								LatestVersion: "2",
+			if opts.Type == Static {
+				if c.MockCalled {
+					if c.RespErr {
+						vs.EXPECT().CreateAppKVSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+					} else {
+						vs.EXPECT().CreateAppKVSecret(&secret_service.CreateAppKVSecretParams{
+							LocationOrganizationID: testProfile(t).OrganizationID,
+							LocationProjectID:      testProfile(t).ProjectID,
+							AppName:                testProfile(t).VaultSecrets.AppName,
+							Body: secret_service.CreateAppKVSecretBody{
+								Name:  opts.SecretName,
+								Value: testSecretValue,
 							},
-						},
-					}, nil).Once()
+							Context: opts.Ctx,
+						}, mock.Anything).Return(&secret_service.CreateAppKVSecretOK{
+							Payload: &models.Secrets20230613CreateAppKVSecretResponse{
+								Secret: &models.Secrets20230613Secret{
+									Name:      opts.SecretName,
+									CreatedAt: dt,
+									Version: &models.Secrets20230613SecretVersion{
+										Version:   "2",
+										CreatedAt: dt,
+										Type:      "kv",
+									},
+									LatestVersion: "2",
+								},
+							},
+						}, nil).Once()
+					}
+				}
+			} else if opts.Type == Rotating {
+				if c.MockCalled {
+					if c.RespErr {
+						pvs.EXPECT().CreateTwilioRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+					} else {
+						pvs.EXPECT().CreateTwilioRotatingSecret(&preview_secret_service.CreateTwilioRotatingSecretParams{
+							OrganizationID: testProfile(t).OrganizationID,
+							ProjectID:      testProfile(t).ProjectID,
+							AppName:        testProfile(t).VaultSecrets.AppName,
+							Body: &preview_models.SecretServiceCreateTwilioRotatingSecretBody{
+								SecretName:              opts.SecretName,
+								RotationIntegrationName: "Twil-Int-11",
+								RotationPolicyName:      "built-in:60-days-2-active",
+							},
+							Context: opts.Ctx,
+						}, mock.Anything).Return(&preview_secret_service.CreateTwilioRotatingSecretOK{
+							Payload: &preview_models.Secrets20231128CreateTwilioRotatingSecretResponse{
+								Config: &preview_models.Secrets20231128RotatingSecretConfig{
+									AppName:                 opts.AppName,
+									CreatedAt:               dt,
+									RotationIntegrationName: "Twil-Int-11",
+									RotationPolicyName:      "built-in:60-days-2-active",
+									SecretName:              opts.SecretName,
+								},
+							},
+						}, nil).Once()
+					}
 				}
 			}
 

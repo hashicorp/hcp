@@ -274,11 +274,11 @@ func (r *rotatingSecretsDisplayer) FieldTemplates() []format.Field {
 		},
 		{
 			Name:        " Rotation Integration",
-			ValueFormat: "{{ . RotationIntegrationName }}",
+			ValueFormat: "{{ .RotationIntegrationName }}",
 		},
 		{
 			Name:        " Rotation Policy",
-			ValueFormat: "{{ . RotationPolicyName }}",
+			ValueFormat: "{{ .RotationPolicyName }}",
 		},
 	}
 }
