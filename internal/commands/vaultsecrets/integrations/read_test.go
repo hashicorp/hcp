@@ -161,7 +161,7 @@ func TestReadRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Contains(io.Output.String(), fmt.Sprintf("Integration Name   Account SID   API Key SID\n                   %s account_sid   api_key_sid\n", opts.IntegrationName))
+			r.Contains(io.Output.String(), fmt.Sprintf("Integration Name     Account SID   API Key SID\n%s   account_sid   api_key_sid\n", opts.IntegrationName))
 		})
 	}
 }
