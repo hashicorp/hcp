@@ -147,8 +147,7 @@ func openRun(opts *OpenOpts) (err error) {
 		return nil
 	}
 
-	displayer := newDisplayer().OpenAppSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty).
-		SetSecretType(resp.Payload.Secret.Type)
+	displayer := newDisplayer().OpenAppSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty)
 	return opts.Output.Display(displayer)
 }
 

@@ -30,16 +30,25 @@ func newDisplayer() *displayer {
 
 func (d *displayer) Secrets(secrets ...*models.Secrets20230613Secret) *displayer {
 	d.secrets = secrets
+	if len(secrets) == 1 {
+		d.secretType = secretTypeKV
+	}
 	return d
 }
 
 func (d *displayer) PreviewSecrets(secrets ...*preview_models.Secrets20231128Secret) *displayer {
 	d.previewSecrets = secrets
+	if len(secrets) == 1 {
+		d.secretType = secrets[0].Type
+	}
 	return d
 }
 
 func (d *displayer) OpenAppSecrets(secrets ...*preview_models.Secrets20231128OpenSecret) *displayer {
 	d.openAppSecrets = secrets
+	if len(secrets) == 1 {
+		d.secretType = secrets[0].Type
+	}
 	return d
 }
 
