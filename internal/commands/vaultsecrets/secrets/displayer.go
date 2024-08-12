@@ -14,17 +14,92 @@ import (
 const multiValueSecretFmt = "{{ range $key, $value := %s }}{{printf \"%%s: %%s\\n\" $key $value}}{{ end }}"
 
 type displayer struct {
-	secrets        []*models.Secrets20230613Secret
-	previewSecrets []*preview_models.Secrets20231128Secret
-	openAppSecrets []*preview_models.Secrets20231128OpenSecret
-	secretType     string
-	fields         []format.Field
-	format         format.Format
+	secrets              []*models.Secrets20230613Secret
+	previewSecrets       []*preview_models.Secrets20231128Secret
+	openAppSecrets       []*preview_models.Secrets20231128OpenSecret
+	secretType           string
+	secretTypeFormatters map[string]secretTypeFormatter
+	fields               []format.Field
+	format               format.Format
+}
+
+type secretTypeFormatter interface {
+	fields() []format.Field
+}
+
+type kvSecretFormatter struct{}
+
+func (k kvSecretFormatter) fields() []format.Field {
+	return []format.Field{
+		{
+			Name:        "Created At",
+			ValueFormat: "{{ .CreatedAt }}",
+		},
+		{
+			Name:        "Latest Version",
+			ValueFormat: "{{ .LatestVersion }}",
+		},
+		{
+			Name:        "Value",
+			ValueFormat: "{{ .StaticVersion.Value }}",
+		},
+	}
+}
+
+type dynamicSecretFormatter struct{}
+
+func (k dynamicSecretFormatter) fields() []format.Field {
+	return []format.Field{
+		{
+			Name:        "Created At",
+			ValueFormat: "{{ .DynamicInstance.CreatedAt }}",
+		},
+		{
+			Name:        "Expires At",
+			ValueFormat: "{{ .DynamicInstance.ExpiresAt }}",
+		},
+		{
+			Name:        "Time-to-Live",
+			ValueFormat: "{{ .DynamicInstance.TTL }}",
+		},
+		{
+			Name:        "Values",
+			ValueFormat: fmt.Sprintf(multiValueSecretFmt, ".DynamicInstance.Values"),
+		},
+	}
+}
+
+type rotatingSecretFormatter struct{}
+
+func (k rotatingSecretFormatter) fields() []format.Field {
+	return []format.Field{
+		{
+			Name:        "Created At",
+			ValueFormat: "{{ .CreatedAt }}",
+		},
+		{
+			Name:        "Expires At",
+			ValueFormat: "{{ .RotatingVersion.ExpiresAt }}",
+		},
+		{
+			Name:        "Latest Version",
+			ValueFormat: "{{ .LatestVersion }}",
+		},
+		{
+			Name:        "Values",
+			ValueFormat: fmt.Sprintf(multiValueSecretFmt, ".RotatingVersion.Values"),
+		},
+	}
 }
 
 func newDisplayer() *displayer {
 	return &displayer{
 		format: format.Table,
+		secretTypeFormatters: map[string]secretTypeFormatter{
+			secretTypeKV:       kvSecretFormatter{},
+			secretTypeDynamic:  dynamicSecretFormatter{},
+			secretTypeRotating: rotatingSecretFormatter{},
+		},
 	}
 }
 
@@ -80,9 +155,6 @@ func (d *displayer) Payload() any {
 		return d.openAppSecretsPayload()
 	}
 
-	if d.secrets == nil {
-		return nil
-	}
 	return d.secretsPayload()
 }
 
@@ -136,64 +208,8 @@ func (d *displayer) openAppSecretsFieldTemplate() []format.Field {
 		},
 	}
 
-	// Secret type specific fields
-	switch d.secretType {
-	case secretTypeKV:
-		fields = append(fields, []format.Field{
-			{
-				Name:        "Created At",
-				ValueFormat: "{{ .CreatedAt }}",
-			},
-			{
-				Name:        "Latest Version",
-				ValueFormat: "{{ .LatestVersion }}",
-			},
-			{
-				Name:        "Value",
-				ValueFormat: "{{ .StaticVersion.Value }}",
-			},
-		}...)
-	case secretTypeDynamic:
-		fields = append(fields, []format.Field{
-			{
-				Name:        "Created At",
-				ValueFormat: "{{ .DynamicInstance.CreatedAt }}",
-			},
-			{
-				Name:        "Expires At",
-				ValueFormat: "{{ .DynamicInstance.ExpiresAt }}",
-			},
-			{
-				Name:        "Time-to-Live",
-				ValueFormat: "{{ .DynamicInstance.TTL }}",
-			},
-			{
-				Name:        "Values",
-				ValueFormat: fmt.Sprintf(multiValueSecretFmt, ".DynamicInstance.Values"),
-			},
-		}...)
-	case secretTypeRotating:
-		fields = append(fields, []format.Field{
-			{
-				Name:        "Created At",
-				ValueFormat: "{{ .CreatedAt }}",
-			},
-			{
-				Name:        "Expires At",
-				ValueFormat: "{{ .RotatingVersion.ExpiresAt }}",
-			},
-			{
-				Name:        "Latest Version",
-				ValueFormat: "{{ .LatestVersion }}",
-			},
-			{
-				Name:        "Values",
-				ValueFormat: fmt.Sprintf(multiValueSecretFmt, ".RotatingVersion.Values"),
-			},
-		}...)
-	}
-
-	return fields
+	secretTypeFormatter := d.secretTypeFormatters[d.secretType]
+	return append(fields, secretTypeFormatter.fields()...)
 }
 
 func (d *displayer) secretsPayload() any {
