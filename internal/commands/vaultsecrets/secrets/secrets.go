@@ -48,6 +48,7 @@ func NewCmdSecrets(ctx *cmd.Context) *cmd.Command {
 	cmd.AddChild(NewCmdDelete(ctx, nil))
 	cmd.AddChild(NewCmdList(ctx, nil))
 	cmd.AddChild(NewCmdOpen(ctx, nil))
+	cmd.AddChild(NewCmdRotate(ctx, nil))
 
 	cmd.AddChild(versions.NewCmdVersions(ctx))
 	return cmd
