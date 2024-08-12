@@ -197,31 +197,22 @@ func (d *displayer) openAppSecretsFieldTemplate() []format.Field {
 }
 
 func (d *displayer) secretsPayload() any {
-	if len(d.secrets) > 1 {
-		return d.secrets
-	}
 	if len(d.secrets) == 1 {
 		return d.secrets[0]
 	}
-	return nil
+	return d.secrets
 }
 
 func (d *displayer) previewSecretsPayload() any {
-	if len(d.previewSecrets) > 1 {
-		return d.previewSecrets
-	}
 	if len(d.previewSecrets) == 1 {
 		return d.previewSecrets[0]
 	}
-	return nil
+	return d.previewSecrets
 }
 
 func (d *displayer) openAppSecretsPayload() any {
-	if len(d.openAppSecrets) > 1 {
-		return d.openAppSecrets
-	}
 	if len(d.openAppSecrets) == 1 {
 		return d.openAppSecrets[0]
 	}
-	return nil
+	return d.openAppSecrets
 }
