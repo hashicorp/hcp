@@ -58,10 +58,6 @@ func (d *displayer) SetSecretType(s string) *displayer {
 	return d
 }
 
-func (d *displayer) single() bool {
-	return d.secretType != ""
-}
-
 func (d *displayer) DefaultFormat() format.Format {
 	return d.format
 }
@@ -192,31 +188,31 @@ func (d *displayer) openAppSecretsFieldTemplate() []format.Field {
 }
 
 func (d *displayer) secretsPayload() any {
-	if d.single() {
-		if len(d.secrets) != 1 {
-			return nil
-		}
+	if len(d.secrets) > 1 {
+		return d.secrets
+	}
+	if len(d.secrets) == 1 {
 		return d.secrets[0]
 	}
-	return d.secrets
+	return nil
 }
 
 func (d *displayer) previewSecretsPayload() any {
-	if d.single() {
-		if len(d.previewSecrets) != 1 {
-			return nil
-		}
+	if len(d.previewSecrets) > 1 {
+		return d.previewSecrets
+	}
+	if len(d.previewSecrets) == 1 {
 		return d.previewSecrets[0]
 	}
-	return d.previewSecrets
+	return nil
 }
 
 func (d *displayer) openAppSecretsPayload() any {
-	if d.single() {
-		if len(d.openAppSecrets) != 1 {
-			return nil
-		}
+	if len(d.openAppSecrets) > 1 {
+		return d.openAppSecrets
+	}
+	if len(d.openAppSecrets) == 1 {
 		return d.openAppSecrets[0]
 	}
-	return d.openAppSecrets
+	return nil
 }
