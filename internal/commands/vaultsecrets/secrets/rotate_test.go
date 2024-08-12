@@ -124,7 +124,7 @@ func TestRotateRun(t *testing.T) {
 		{
 			Name:       "Failed: Secret not found",
 			RespErr:    true,
-			ErrMsg:     "[POST] /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secrets/{secret_name}:rotate][404] RotateSecret default  &{Code:5 Details:[] Message:secret not found}",
+			ErrMsg:     "[POST] /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secrets/{secret_name}:rotate][404] RotateSecret}",
 			MockCalled: true,
 		},
 		{
