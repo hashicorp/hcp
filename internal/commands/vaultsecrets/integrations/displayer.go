@@ -173,6 +173,10 @@ func (a *awsDisplayer) FieldTemplates() []format.Field {
 				Name:        "Audience",
 				ValueFormat: "{{ .FederatedWorkloadIdentity.Audience }}",
 			},
+			{
+				Name:        "Role ARN",
+				ValueFormat: "{{ .FederatedWorkloadIdentity.RoleArn }}",
+			},
 		}...)
 	} else {
 		return fields
