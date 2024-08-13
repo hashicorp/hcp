@@ -111,21 +111,28 @@ func TestCreateRun(t *testing.T) {
 			Name:            "Good",
 			IntegrationName: "sample-integration",
 			Input: []byte(`version: 1.0.0
-type: "twilio"
+type: "aws"
 details:
-  account_sid: abc
-  api_key_secret: def
-  api_key_sid: ghi`),
+  audience: abc
+  role_arn: def`),
 		},
 		{
-			Name:            "Missing required field",
+			Name:            "Missing a single required field",
+			IntegrationName: "sample-integration",
+			Input: []byte(`version: 1.0.0
+type: "mongodb-atlas"
+details:
+  public_key: abc`),
+			Error: "missing required field(s) in the config file: [private_key]",
+		},
+		{
+			Name:            "Missing multiple required fields",
 			IntegrationName: "sample-integration",
 			Input: []byte(`version: 1.0.0
 type: "twilio"
 details:
-  account_sid: abc
   api_key_sid: ghi`),
-			Error: "missing required field in the config file: api_key_secret",
+			Error: "missing required field(s) in the config file: [account_sid api_key_secret]",
 		},
 	}
 
@@ -156,21 +163,25 @@ details:
 			}
 
 			if c.Error == "" {
-				vs.EXPECT().CreateTwilioIntegration(&preview_secret_service.CreateTwilioIntegrationParams{
+				vs.EXPECT().CreateAwsIntegration(&preview_secret_service.CreateAwsIntegrationParams{
 					Context:        opts.Ctx,
 					OrganizationID: "123",
 					ProjectID:      "abc",
-					Body: &preview_models.SecretServiceCreateTwilioIntegrationBody{
-						Name:               opts.IntegrationName,
-						TwilioAccountSid:   "abc",
-						TwilioAPIKeySecret: "def",
-						TwilioAPIKeySid:    "ghi",
+					Body: &preview_models.SecretServiceCreateAwsIntegrationBody{
+						Name: opts.IntegrationName,
+						FederatedWorkloadIdentity: &preview_models.Secrets20231128AwsFederatedWorkloadIdentityRequest{
+							Audience: "abc",
+							RoleArn:  "def",
+						},
 					},
-				}, nil).Return(&preview_secret_service.CreateTwilioIntegrationOK{
-					Payload: &preview_models.Secrets20231128CreateTwilioIntegrationResponse{
-						Integration: &preview_models.Secrets20231128TwilioIntegration{
-							Name:             opts.IntegrationName,
-							TwilioAccountSid: "abc",
+				}, nil).Return(&preview_secret_service.CreateAwsIntegrationOK{
+					Payload: &preview_models.Secrets20231128CreateAwsIntegrationResponse{
+						Integration: &preview_models.Secrets20231128AwsIntegration{
+							Name: opts.IntegrationName,
+							FederatedWorkloadIdentity: &preview_models.Secrets20231128AwsFederatedWorkloadIdentityResponse{
+								Audience: "abc",
+								RoleArn:  "def",
+							},
 						},
 					},
 				}, nil).Once()

@@ -120,20 +120,20 @@ func createRun(opts *CreateOpts) error {
 
 	switch i.Type {
 	case Twilio:
-		missingField := validateDetails(i.Details, TwilioKeys)
+		missingFields := validateDetails(i.Details, TwilioKeys)
 
-		if missingField != "" {
-			return fmt.Errorf("missing required field in the config file: %s", missingField)
+		if len(missingFields) > 0 {
+			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 		}
 
 		body := &preview_models.SecretServiceCreateTwilioIntegrationBody{
 			Name:               opts.IntegrationName,
-			TwilioAccountSid:   i.Details["account_sid"],
-			TwilioAPIKeySecret: i.Details["api_key_secret"],
-			TwilioAPIKeySid:    i.Details["api_key_sid"],
+			TwilioAccountSid:   i.Details[TwilioKeys[0]],
+			TwilioAPIKeySecret: i.Details[TwilioKeys[1]],
+			TwilioAPIKeySid:    i.Details[TwilioKeys[2]],
 		}
 
-		resp, err := opts.PreviewClient.CreateTwilioIntegration(&preview_secret_service.CreateTwilioIntegrationParams{
+		_, err := opts.PreviewClient.CreateTwilioIntegration(&preview_secret_service.CreateTwilioIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
@@ -144,23 +144,20 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("failed to create Twilio integration: %w", err)
 		}
 
-		fmt.Fprintln(opts.IO.Err())
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.Integration.Name)
-
 	case MongoDBAtlas:
-		missingField := validateDetails(i.Details, MongoKeys)
+		missingFields := validateDetails(i.Details, MongoKeys)
 
-		if missingField != "" {
-			return fmt.Errorf("missing required field in the config file: %s", missingField)
+		if len(missingFields) > 0 {
+			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 		}
 
 		body := &preview_models.SecretServiceCreateMongoDBAtlasIntegrationBody{
 			Name:                 opts.IntegrationName,
-			MongodbAPIPrivateKey: i.Details["private_key"],
-			MongodbAPIPublicKey:  i.Details["public_key"],
+			MongodbAPIPrivateKey: i.Details[MongoKeys[0]],
+			MongodbAPIPublicKey:  i.Details[MongoKeys[1]],
 		}
 
-		resp, err := opts.PreviewClient.CreateMongoDBAtlasIntegration(&preview_secret_service.CreateMongoDBAtlasIntegrationParams{
+		_, err := opts.PreviewClient.CreateMongoDBAtlasIntegration(&preview_secret_service.CreateMongoDBAtlasIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
@@ -171,25 +168,22 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("failed to create MongoDB Atlas integration: %w", err)
 		}
 
-		fmt.Fprintln(opts.IO.Err())
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.Integration.Name)
-
 	case AWS:
-		missingField := validateDetails(i.Details, AWSKeys)
+		missingFields := validateDetails(i.Details, AWSKeys)
 
-		if missingField != "" {
-			return fmt.Errorf("missing required field in the config file: %s", missingField)
+		if len(missingFields) > 0 {
+			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 		}
 
 		body := &preview_models.SecretServiceCreateAwsIntegrationBody{
 			Name: opts.IntegrationName,
 			FederatedWorkloadIdentity: &preview_models.Secrets20231128AwsFederatedWorkloadIdentityRequest{
-				Audience: i.Details["audience"],
-				RoleArn:  i.Details["role_arn"],
+				Audience: i.Details[AWSKeys[0]],
+				RoleArn:  i.Details[AWSKeys[1]],
 			},
 		}
 
-		resp, err := opts.PreviewClient.CreateAwsIntegration(&preview_secret_service.CreateAwsIntegrationParams{
+		_, err := opts.PreviewClient.CreateAwsIntegration(&preview_secret_service.CreateAwsIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
@@ -200,25 +194,22 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("failed to create AWS integration: %w", err)
 		}
 
-		fmt.Fprintln(opts.IO.Err())
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.Integration.Name)
-
 	case GCP:
-		missingField := validateDetails(i.Details, GCPKeys)
+		missingFields := validateDetails(i.Details, GCPKeys)
 
-		if missingField != "" {
-			return fmt.Errorf("missing required field in the config file: %s", missingField)
+		if len(missingFields) > 0 {
+			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 		}
 
 		body := &preview_models.SecretServiceCreateGcpIntegrationBody{
 			Name: opts.IntegrationName,
 			FederatedWorkloadIdentity: &preview_models.Secrets20231128GcpFederatedWorkloadIdentityRequest{
-				Audience:            i.Details["audience"],
-				ServiceAccountEmail: i.Details["service_account_email"],
+				Audience:            i.Details[GCPKeys[0]],
+				ServiceAccountEmail: i.Details[GCPKeys[1]],
 			},
 		}
 
-		resp, err := opts.PreviewClient.CreateGcpIntegration(&preview_secret_service.CreateGcpIntegrationParams{
+		_, err := opts.PreviewClient.CreateGcpIntegration(&preview_secret_service.CreateGcpIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
@@ -228,21 +219,22 @@ func createRun(opts *CreateOpts) error {
 		if err != nil {
 			return fmt.Errorf("failed to create GCP integration: %w", err)
 		}
-
-		fmt.Fprintln(opts.IO.Err())
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.Integration.Name)
 	}
+
+	fmt.Fprintln(opts.IO.Err())
+	fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.IntegrationName)
 
 	return nil
 }
 
-func validateDetails(details map[string]string, requiredKeys []string) string {
+func validateDetails(details map[string]string, requiredKeys []string) []string {
 	detailsKeys := maps.Keys(details)
+	var missingKeys []string
 
 	for _, r := range requiredKeys {
 		if !slices.Contains(detailsKeys, r) {
-			return r
+			missingKeys = append(missingKeys, r)
 		}
 	}
-	return ""
+	return missingKeys
 }
