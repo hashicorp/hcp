@@ -94,5 +94,7 @@ func readRun(opts *ReadOpts) error {
 	if err != nil {
 		return fmt.Errorf("failed to read the secret %q: %w", opts.SecretName, err)
 	}
-	return opts.Output.Display(newDisplayer(true).PreviewSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty))
+
+	displayer := newDisplayer().PreviewSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty)
+	return opts.Output.Display(displayer)
 }

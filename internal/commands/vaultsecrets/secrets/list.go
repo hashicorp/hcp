@@ -96,5 +96,5 @@ func listRun(opts *ListOpts) error {
 		next := resp.Payload.Pagination.NextPageToken
 		req.PaginationNextPageToken = &next
 	}
-	return opts.Output.Display(newDisplayer(false).PreviewSecrets(secrets...))
+	return opts.Output.Display(newDisplayer().PreviewSecrets(secrets...))
 }
