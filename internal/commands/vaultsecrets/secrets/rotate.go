@@ -97,6 +97,6 @@ func rotateRun(opts *RotateOpts) error {
 		return fmt.Errorf("failed to rotate the secret %q: %w", opts.SecretName, err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Successfully rotated secret with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
+	fmt.Fprintf(opts.IO.Err(), "%s Successfully scheduled rotation of secret with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
 	return nil
 }

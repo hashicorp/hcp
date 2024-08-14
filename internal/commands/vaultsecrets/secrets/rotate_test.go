@@ -128,7 +128,7 @@ func TestRotateRun(t *testing.T) {
 			MockCalled: true,
 		},
 		{
-			Name:       "Success: Rotate secret's metadata",
+			Name:       "Success: Rotate secret",
 			RespErr:    false,
 			MockCalled: true,
 		},
@@ -175,7 +175,7 @@ func TestRotateRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Equal(io.Error.String(), fmt.Sprintf("✓ Successfully rotated secret with name %q\n", opts.SecretName))
+			r.Equal(io.Error.String(), fmt.Sprintf("✓ Successfully scheduled rotation of secret with name %q\n", opts.SecretName))
 		})
 	}
 }
