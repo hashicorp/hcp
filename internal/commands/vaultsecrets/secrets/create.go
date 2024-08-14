@@ -202,10 +202,10 @@ func createRun(opts *CreateOpts) error {
 
 		switch sc.Type {
 		case integrations.Twilio:
-			missingField := validateDetails(sc.Details, TwilioKeys)
+			missingFields := validateDetails(sc.Details, TwilioKeys)
 
-			if missingField != "" {
-				return fmt.Errorf("missing required field in the config file: %s", missingField)
+			if len(missingFields) > 0 {
+				return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 			}
 
 			req := preview_secret_service.NewCreateTwilioRotatingSecretParamsWithContext(opts.Ctx)
@@ -214,7 +214,7 @@ func createRun(opts *CreateOpts) error {
 			req.AppName = opts.AppName
 			req.Body = &preview_models.SecretServiceCreateTwilioRotatingSecretBody{
 				RotationIntegrationName: sc.IntegrationName,
-				RotationPolicyName:      rotationPolicies[sc.Details["rotation_policy_name"].(string)],
+				RotationPolicyName:      rotationPolicies[sc.Details[TwilioKeys[0]].(string)],
 				SecretName:              opts.SecretName,
 			}
 
@@ -228,10 +228,10 @@ func createRun(opts *CreateOpts) error {
 			}
 
 		case integrations.MongoDBAtlas:
-			missingField := validateDetails(sc.Details, MongoKeys)
+			missingFields := validateDetails(sc.Details, MongoKeys)
 
-			if missingField != "" {
-				return fmt.Errorf("missing required field in the config file: %s", missingField)
+			if len(missingFields) > 0 {
+				return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 			}
 
 			req := preview_secret_service.NewCreateMongoDBAtlasRotatingSecretParamsWithContext(opts.Ctx)
@@ -272,11 +272,11 @@ func createRun(opts *CreateOpts) error {
 			}
 
 			req.Body = &preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody{
-				MongodbGroupID:          sc.Details["mongodb_group_id"].(string),
+				MongodbGroupID:          sc.Details[MongoKeys[1]].(string),
 				MongodbRoles:            reqRoles,
 				MongodbScopes:           reqScopes,
 				RotationIntegrationName: sc.IntegrationName,
-				RotationPolicyName:      rotationPolicies[sc.Details["rotation_policy_name"].(string)],
+				RotationPolicyName:      rotationPolicies[sc.Details[MongoKeys[0]].(string)],
 				SecretName:              opts.SecretName,
 			}
 			resp, err := opts.PreviewClient.CreateMongoDBAtlasRotatingSecret(req, nil)
@@ -341,13 +341,14 @@ func readPlainTextSecret(opts *CreateOpts) error {
 	return nil
 }
 
-func validateDetails(details map[string]any, requiredKeys []string) string {
+func validateDetails(details map[string]any, requiredKeys []string) []string {
 	detailsKeys := maps.Keys(details)
+	var missingKeys []string
 
 	for _, r := range requiredKeys {
 		if !slices.Contains(detailsKeys, r) {
-			return r
+			missingKeys = append(missingKeys, r)
 		}
 	}
-	return ""
+	return missingKeys
 }
