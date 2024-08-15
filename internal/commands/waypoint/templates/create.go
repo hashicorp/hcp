@@ -191,7 +191,7 @@ func templateCreate(opts *TemplateOpts) error {
 						Name:      opts.TerraformCloudProjectName,
 						ProjectID: opts.TerraformCloudProjectID,
 					},
-					ModuleSource: opts.TerraformNoCodeModuleSource,
+					ModuleSource:    opts.TerraformNoCodeModuleSource,
 					VariableOptions: variables,
 				},
 			},
