@@ -7,16 +7,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
-	"github.com/mitchellh/mapstructure"
-	"gopkg.in/yaml.v3"
 	"io"
 	"os"
 	"slices"
 
+	"github.com/mitchellh/mapstructure"
+	"github.com/posener/complete"
+	"golang.org/x/exp/maps"
+	"gopkg.in/yaml.v3"
+
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -24,8 +27,6 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
-	"github.com/posener/complete"
-	"golang.org/x/exp/maps"
 )
 
 type SecretType string
@@ -143,8 +144,12 @@ type MongoDBScope struct {
 	Type string `mapstructure:"name"`
 }
 
-// There are no Twilio-specific keys
-var MongoDBAtlasRequiredKeys = []string{"mongodb_group_id", "mongodb_roles"}
+var (
+	// There are no Twilio-specific keys
+	MongoDBAtlasRequiredKeys = []string{"mongodb_group_id", "mongodb_roles"}
+	AwsKeys    = []string{"default_ttl", "role_arn"}
+	GcpKeys    = []string{"default_ttl", "service_account_email"}
+)
 
 var rotationPolicies = map[string]string{
 	"30": "built-in:30-days-2-active",
@@ -178,16 +183,15 @@ func createRun(opts *CreateOpts) error {
 			return err
 		}
 	case Rotating:
-		f, err := os.ReadFile(opts.SecretFilePath)
+		sc, err := readConfigFile(opts)
 		if err != nil {
-			return fmt.Errorf("failed to open config file: %w", err)
+			return fmt.Errorf("failed to process config file: %w", err)
 		}
 
 		var sc RotatingSecretConfig
 		err = yaml.Unmarshal(f, &sc)
 		if err != nil {
 			return fmt.Errorf("failed to unmarshal config file: %w", err)
-		}
 
 		missingFields := validateRotatingSecretConfig(sc)
 
@@ -197,6 +201,12 @@ func createRun(opts *CreateOpts) error {
 
 		switch sc.Type {
 		case integrations.Twilio:
+			missingDetails := validateDetails(sc.Details, TwilioKeys)
+
+			if len(missingDetails) > 0 {
+				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
+			}
+
 			req := preview_secret_service.NewCreateTwilioRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
@@ -220,7 +230,7 @@ func createRun(opts *CreateOpts) error {
 			missingDetails := validateDetails(sc.Details, MongoDBAtlasRequiredKeys)
 
 			if len(missingDetails) > 0 {
-				return fmt.Errorf("missing required detail(s) in the config file: %s", missingDetails)
+				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
 			}
 
 			req := preview_secret_service.NewCreateMongoDBAtlasRotatingSecretParamsWithContext(opts.Ctx)
@@ -279,6 +289,70 @@ func createRun(opts *CreateOpts) error {
 				return err
 			}
 		}
+	case Dynamic:
+		sc, err := readConfigFile(opts)
+		if err != nil {
+			return fmt.Errorf("failed to process config file: %w", err)
+		}
+
+		missingFields := validateFields(sc)
+		if len(missingFields) > 0 {
+			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
+		}
+
+		switch sc.Type {
+		case integrations.AWS:
+
+			missingDetails := validateDetails(sc.Details, AwsKeys)
+
+			if len(missingDetails) > 0 {
+				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
+			}
+
+			req := preview_secret_service.NewCreateAwsDynamicSecretParamsWithContext(opts.Ctx)
+			req.OrganizationID = opts.Profile.OrganizationID
+			req.ProjectID = opts.Profile.ProjectID
+			req.AppName = opts.AppName
+			req.Body = &preview_models.SecretServiceCreateAwsDynamicSecretBody{
+				IntegrationName: sc.IntegrationName,
+				DefaultTTL:      sc.Details[AwsKeys[0]].(string),
+				AssumeRole: &preview_models.Secrets20231128AssumeRoleRequest{
+					RoleArn: sc.Details[AwsKeys[1]].(string),
+				},
+				Name: opts.SecretName,
+			}
+
+			_, err := opts.PreviewClient.CreateAwsDynamicSecret(req, nil)
+			if err != nil {
+				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
+			}
+
+		case integrations.GCP:
+
+			missingDetails := validateDetails(sc.Details, GcpKeys)
+
+			if len(missingDetails) > 0 {
+				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
+			}
+
+			req := preview_secret_service.NewCreateGcpDynamicSecretParamsWithContext(opts.Ctx)
+			req.OrganizationID = opts.Profile.OrganizationID
+			req.ProjectID = opts.Profile.ProjectID
+			req.AppName = opts.AppName
+			req.Body = &preview_models.SecretServiceCreateGcpDynamicSecretBody{
+				IntegrationName: sc.IntegrationName,
+				DefaultTTL:      sc.Details[GcpKeys[0]].(string),
+				ServiceAccountImpersonation: &preview_models.Secrets20231128ServiceAccountImpersonationRequest{
+					ServiceAccountEmail: sc.Details[GcpKeys[1]].(string),
+				},
+				Name: opts.SecretName,
+			}
+
+			_, err := opts.PreviewClient.CreateGcpDynamicSecret(req, nil)
+			if err != nil {
+				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
+			}
+		}
 	}
 
 	command := fmt.Sprintf(`$ hcp vault-secrets secrets read %s --app %s`, opts.SecretName, opts.AppName)
@@ -330,6 +404,21 @@ func readPlainTextSecret(opts *CreateOpts) error {
 	}
 	opts.SecretValuePlaintext = string(data)
 	return nil
+}
+
+func readConfigFile(opts *CreateOpts) (SecretConfig, error) {
+	var sc SecretConfig
+	f, err := os.ReadFile(opts.SecretFilePath)
+	if err != nil {
+		return sc, fmt.Errorf("unable to open config file: %w", err)
+	}
+
+	err = yaml.Unmarshal(f, &sc)
+	if err != nil {
+		return sc, fmt.Errorf("unable to unmarshal config file: %w", err)
+	}
+
+	return sc, nil
 }
 
 func validateRotatingSecretConfig(sc RotatingSecretConfig) []string {

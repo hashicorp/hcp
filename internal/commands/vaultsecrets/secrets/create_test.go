@@ -71,9 +71,9 @@ func TestNewCmdCreate(t *testing.T) {
 			},
 		},
 		{
-			Name:    "Good: Rotating secret",
+			Name:    "Good: Dynamic secret",
 			Profile: testProfile,
-			Args:    []string{"test", "--secret-type=rotating"},
+			Args:    []string{"test", "--secret-type=dynamic", "--data-file=DATA_FILE_PATH"},
 			Expect: &CreateOpts{
 				AppName:    testProfile(t).VaultSecrets.AppName,
 				SecretName: "test",
