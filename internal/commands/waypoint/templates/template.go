@@ -31,6 +31,8 @@ type TemplateOpts struct {
 	TerraformCloudProjectName   string
 	TerraformCloudProjectID     string
 
+	VariableOptionsFile string
+
 	// testFunc is used for testing, so that the command can be tested without
 	// using the real API.
 	testFunc func(c *cmd.Command, args []string) error

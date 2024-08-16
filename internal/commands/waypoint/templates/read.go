@@ -4,6 +4,8 @@
 package templates
 
 import (
+	"strings"
+
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -75,6 +77,34 @@ func templateRead(opts *TemplateOpts) error {
 	}
 
 	respPayload := resp.GetPayload()
+	if respPayload.ApplicationTemplate == nil {
+		return errors.Wrapf(err, "%s empty template returned for name %q",
+			opts.IO.ColorScheme().FailureIcon(),
+			opts.Name,
+		)
+	}
+	template := respPayload.ApplicationTemplate
 
-	return opts.Output.Show(respPayload.ApplicationTemplate, format.Pretty)
+	// Create the fields. The fields allow setting the outputting name directly
+	// and the value is a text/template which allows additional formatting.
+
+	// for now we just flatten the Variable Option names
+	var optionNames []string
+	for _, variableOption := range template.VariableOptions {
+		optionNames = append(optionNames, variableOption.Name)
+	}
+	optionNamesStr := strings.Join(optionNames, ", ")
+	projectFields := []format.Field{
+		format.NewField("ID", "{{ .ID }}"),
+		format.NewField("Name", "{{ .Name }}"),
+		format.NewField("Description", "{{ .Description }}"),
+		format.NewField("Labels", "{{ .Labels }}"),
+		format.NewField("Readme Template", "{{ .ReadmeTemplate }}"),
+		format.NewField("Tags", "{{ .Tags}}"),
+		format.NewField("Terraform Nocode Source", "{{ .ModuleSource}}"),
+		format.NewField("Variable Options", optionNamesStr),
+	}
+
+	// Display the created project
+	return opts.Output.Display(format.NewDisplayer(template, format.Pretty, projectFields))
 }
