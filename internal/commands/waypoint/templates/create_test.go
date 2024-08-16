@@ -75,14 +75,13 @@ func TestCmdTemplateCreate(t *testing.T) {
 			Args: []string{
 				"-n=cli-test",
 				"-s", "A template created using the CLI.",
+				"-d", "A template created with the CLI.",
+				"--readme-markdown-template-file", "readme_test.txt",
 				"--tfc-project-id", "prj-abcdefghij",
 				"--tfc-project-name", "test",
 				"--tfc-no-code-module-source", "private/waypoint/waypoint-nocode-module/null",
-				"--tfc-no-code-module-version", "0.0.1",
 				"-l", "cli",
-				"-d", "A template created with the CLI.",
 				"-t", "cli=true",
-				"--readme-markdown-template-file", "readme_test.txt",
 				"--variable-options-file", "variable_options.hcl",
 			},
 			Expect: &TemplateOpts{
@@ -94,9 +93,8 @@ func TestCmdTemplateCreate(t *testing.T) {
 				TerraformNoCodeModuleSource: "private/waypoint/waypoint-nocode-module/null",
 				ReadmeMarkdownTemplateFile:  "readme_test.txt",
 				VariableOptionsFile:         "variable_options.hcl",
-				// VariableOptions:   "variable_options.hcl",
-				Labels: []string{"cli"},
-				Tags:   map[string]string{"cli": "true"},
+				Labels:                      []string{"cli"},
+				Tags:                        map[string]string{"cli": "true"},
 			},
 		},
 	}
