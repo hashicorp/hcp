@@ -302,7 +302,7 @@ func (i *InitOpts) gatherProjectID(detectedProject string) (string, error) {
 	if err != nil {
 		var listErr *project_service.ProjectServiceListDefault
 		if errors.As(err, &listErr) && listErr.IsCode(http.StatusForbidden) && detectedProject != "" {
-			fmt.Fprintf(i.IO.Err(), "%s\n", heredoc.New(i.IO).Mustf(`
+			fmt.Fprintln(i.IO.Err(), heredoc.New(i.IO).Mustf(`
 {{ Color "yellow" "Principal does not have permission to list projects." }}
 
 Using the project the principal was created in:
