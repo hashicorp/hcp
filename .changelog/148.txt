@@ -1,0 +1,3 @@
+```release-note:improvement
+Support loading all variables from Waypoint server in Waypoint agent CLI
+```
