@@ -6,6 +6,7 @@ package agent
 import (
 	"context"
 	"encoding/json"
+	"strings"
 
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/hcl/v2"
@@ -45,6 +46,13 @@ func (e *Executor) Execute(ctx context.Context, opInfo *models.HashicorpCloudWay
 	var hctx hcl.EvalContext
 
 	input := make(map[string]cty.Value)
+	// New ones
+	varInputs := make(map[string]cty.Value)
+	actionInputs := make(map[string]cty.Value)
+	appInputs := make(map[string]cty.Value)
+	appOutputKeys := make(map[string]cty.Value)
+	addOnInputs := make(map[string]cty.Value)
+	addOnOutputKeys := make(map[string]cty.Value)
 
 	if len(opInfo.Body) != 0 {
 
@@ -67,13 +75,65 @@ func (e *Executor) Execute(ctx context.Context, opInfo *models.HashicorpCloudWay
 				// TODO how should we deal with these?
 			}
 		}
+
+		for k, v := range input {
+			parts := strings.Split(k, ".")
+			// Join the rest of the parts back together
+			rest := strings.Join(parts[1:], ".")
+			switch parts[0] {
+			case "var":
+				// - var.<key>
+				varInputs[rest] = v
+			case "action":
+				// - action.<key>
+				actionInputs[rest] = v
+			case "application":
+				if parts[1] == "outputs" {
+					// - application.outputs.<key>
+					// Application outputs
+					outputKey := parts[2]
+					appOutputKeys[outputKey] = v
+				} else {
+					// - application.<key>
+					// Static variables
+					appInputs[rest] = v
+				}
+			case "addon":
+				// - addon.<instance-name>.outputs.<key>
+				if parts[2] == "outputs" {
+					addOnInstName := parts[1]
+					addOnOutputKey := parts[3]
+					addOnOutputKeys[addOnInstName] = cty.ObjectVal(map[string]cty.Value{
+						addOnOutputKey: v,
+					})
+				}
+				// - addon.<instance-name>.<key>
+				// Currently not supported in the server
+				// addOnInputs[rest] = v
+			default:
+				// CLI encountered an unknown input from the server. We ignore it,
+				// because when we parse it in a second it will fail to parse with
+				// as a missing or unknown var.
+			}
+		}
+
+		// Merge all outputs keys
+		appInputs["outputs"] = cty.ObjectVal(appOutputKeys)
+		for k, v := range addOnOutputKeys {
+			addOnInputs[k] = cty.ObjectVal(map[string]cty.Value{
+				"outputs": v,
+			})
+		}
 	}
 
 	hctx.Variables = map[string]cty.Value{
 		"waypoint": cty.ObjectVal(map[string]cty.Value{
 			"run_id": cty.StringVal(opInfo.ActionRunID),
 		}),
-		"var": cty.ObjectVal(input),
+		"var":         cty.ObjectVal(varInputs),
+		"action":      cty.ObjectVal(actionInputs),
+		"addon":       cty.ObjectVal(addOnInputs),
+		"application": cty.ObjectVal(appInputs),
 	}
 
 	op, err := e.Config.Action(opInfo.Group, opInfo.ID, &hctx)

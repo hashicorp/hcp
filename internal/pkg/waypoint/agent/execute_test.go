@@ -115,7 +115,16 @@ func TestExecutor(t *testing.T) {
 		e.Config = cfg
 
 		data, err := json.Marshal(map[string]any{
-			"type": "nerf",
+			"var.type":                              "nerf",
+			"action.name":                           "launch",
+			"application.templateName":              "cool-test-template", // pretend its in an app
+			"application.name":                      "test",
+			"application.outputs.run_id":            "1234",
+			"application.inputs.region":             "us-west-1",
+			"addon.abc123.outputs.database_url":     "http://localhost:5432",
+			"addon.xyz098.outputs.load_balancer_ip": "http://localhost:8080",
+			"var.local_variable":                    "local-value",
+			"var.token":                             "token",
 		})
 		r.NoError(err)
 
@@ -124,7 +133,6 @@ func TestExecutor(t *testing.T) {
 			ID:    "launch",
 			Body:  data,
 		})
-
 		r.NoError(err)
 	})
 
