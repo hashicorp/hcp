@@ -54,7 +54,7 @@ func NewCmdRotate(ctx *cmd.Context, runF func(*RotateOpts) error) *cmd.Command {
 				`),
 			},
 			{
-				Preamble: `Read a secret under a specified Vault Secrets application:`,
+				Preamble: `Rotate a secret under a specified Vault Secrets application:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp vault-secrets secret rotate "test_secret" --app test-app
 				`),
