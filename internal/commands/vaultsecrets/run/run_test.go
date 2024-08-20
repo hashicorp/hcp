@@ -181,12 +181,6 @@ func TestRunRun(t *testing.T) {
 				},
 			},
 		},
-		{
-			Name:    "No Secrets",
-			RespErr: false,
-			ErrMsg:  "no secrets returned from app",
-			Secrets: []*preview_models.Secrets20231128OpenSecret{},
-		},
 	}
 
 	for _, c := range cases {

@@ -142,8 +142,6 @@ func getAllSecretsForEnv(opts *RunOpts) ([]string, error) {
 	secs, err := fetchPaginatedSecrets(opts)
 	if err != nil {
 		return nil, err
-	} else if len(secs) == 0 {
-		return nil, fmt.Errorf("no secrets returned from app")
 	}
 
 	result := os.Environ()
