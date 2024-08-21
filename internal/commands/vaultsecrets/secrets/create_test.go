@@ -200,7 +200,7 @@ type: "twilio"
 rotation_integration_name: "Twil-Int-11"
 details:
   none: "none"`),
-			ErrMsg: "missing required field in the config file: rotation_policy_name",
+			ErrMsg: "missing required field(s) in the config file: [rotation_policy_name]",
 		},
 	}
 
