@@ -261,7 +261,7 @@ func createRun(opts *CreateOpts) error {
 				var scope MongoDBScope
 				decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{WeaklyTypedInput: true, Result: &scope})
 				if err := decoder.Decode(r); err != nil {
-					return fmt.Errorf("unable to decode to a mongodb role")
+					return fmt.Errorf("unable to decode to a mongodb scope")
 				}
 
 				reqScope := &preview_models.Secrets20231128MongoDBScope{
@@ -272,9 +272,11 @@ func createRun(opts *CreateOpts) error {
 			}
 
 			req.Body = &preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody{
-				MongodbGroupID:          sc.Details[MongoKeys[1]].(string),
-				MongodbRoles:            reqRoles,
-				MongodbScopes:           reqScopes,
+				SecretDetails: &preview_models.Secrets20231128MongoDBAtlasSecretDetails{
+					MongodbGroupID: sc.Details[MongoKeys[1]].(string),
+					MongodbRoles:   reqRoles,
+					MongodbScopes:  reqScopes,
+				},
 				RotationIntegrationName: sc.IntegrationName,
 				RotationPolicyName:      rotationPolicies[sc.Details[MongoKeys[0]].(string)],
 				SecretName:              opts.SecretName,
