@@ -176,7 +176,7 @@ func runOp(
 			log.Error("unable to register action as starting", "error", err)
 		} else {
 			defer func() {
-				log.Info("reporting action run ended", "action-run-id", resp.Payload.ActionRunID, "status", status, "status-code", statusCode)
+				log.Info("reporting action run ended", "status", status, "status-code", statusCode)
 
 				_, err = opts.WS.WaypointServiceEndingAction(&waypoint_service.WaypointServiceEndingActionParams{
 					NamespaceID: ns,
