@@ -125,10 +125,11 @@ type CreateOpts struct {
 	Client               secret_service.ClientService
 }
 
-type SecretConfig struct {
+type RotatingSecretConfig struct {
 	Version         string
 	Type            integrations.IntegrationType
 	IntegrationName string `yaml:"rotation_integration_name"`
+	PolicyName      string `yaml:"rotation_policy_name"`
 	Details         map[string]any
 }
 
@@ -144,8 +145,8 @@ type MongoDBScope struct {
 }
 
 var (
-	TwilioKeys = []string{"rotation_policy_name"}
-	MongoKeys  = []string{"rotation_policy_name", "mongodb_group_id"}
+	// There are no Twilio-specific keys
+	MongoKeys = []string{"mongodb_group_id", "mongodb_roles"}
 )
 
 var rotationPolicies = map[string]string{
@@ -186,27 +187,20 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("failed to open config file: %w", err)
 		}
 
-		var sc SecretConfig
+		var sc RotatingSecretConfig
 		err = yaml.Unmarshal(f, &sc)
 		if err != nil {
 			return fmt.Errorf("failed to unmarshal config file: %w", err)
 		}
 
-		if sc.Type == "" || sc.IntegrationName == "" {
-			return fmt.Errorf("missing required field in the config file: type")
-		}
+		missingFields := validateRotatingSecretConfig(sc)
 
-		if sc.IntegrationName == "" {
-			return fmt.Errorf("missing required field in the config file: rotation_integration_name")
+		if len(missingFields) > 0 {
+			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 		}
 
 		switch sc.Type {
 		case integrations.Twilio:
-			missingFields := validateDetails(sc.Details, TwilioKeys)
-
-			if len(missingFields) > 0 {
-				return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
-			}
 
 			req := preview_secret_service.NewCreateTwilioRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
@@ -214,7 +208,7 @@ func createRun(opts *CreateOpts) error {
 			req.AppName = opts.AppName
 			req.Body = &preview_models.SecretServiceCreateTwilioRotatingSecretBody{
 				RotationIntegrationName: sc.IntegrationName,
-				RotationPolicyName:      rotationPolicies[sc.Details[TwilioKeys[0]].(string)],
+				RotationPolicyName:      rotationPolicies[sc.PolicyName],
 				SecretName:              opts.SecretName,
 			}
 
@@ -228,10 +222,10 @@ func createRun(opts *CreateOpts) error {
 			}
 
 		case integrations.MongoDBAtlas:
-			missingFields := validateDetails(sc.Details, MongoKeys)
+			missingDetails := validateDetails(sc.Details, MongoKeys)
 
-			if len(missingFields) > 0 {
-				return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
+			if len(missingDetails) > 0 {
+				return fmt.Errorf("missing required detail(s) in the config file: %s", missingDetails)
 			}
 
 			req := preview_secret_service.NewCreateMongoDBAtlasRotatingSecretParamsWithContext(opts.Ctx)
@@ -341,6 +335,24 @@ func readPlainTextSecret(opts *CreateOpts) error {
 	}
 	opts.SecretValuePlaintext = string(data)
 	return nil
+}
+
+func validateRotatingSecretConfig(sc RotatingSecretConfig) []string {
+	var missingKeys []string
+
+	if sc.Type == "" {
+		missingKeys = append(missingKeys, "type")
+	}
+
+	if sc.IntegrationName == "" {
+		missingKeys = append(missingKeys, "rotation_integration_name")
+	}
+
+	if sc.PolicyName == "" {
+		missingKeys = append(missingKeys, "rotation_policy_name")
+	}
+
+	return missingKeys
 }
 
 func validateDetails(details map[string]any, requiredKeys []string) []string {

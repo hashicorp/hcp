@@ -186,8 +186,7 @@ func TestCreateRun(t *testing.T) {
 			Input: []byte(`version: 1.0.0
 type: "twilio"
 rotation_integration_name: "Twil-Int-11"
-details:
-  rotation_policy_name: "60"`),
+rotation_policy_name: "60"`),
 		},
 		{
 			Name:    "Failed: Missing required rotating secret field",
