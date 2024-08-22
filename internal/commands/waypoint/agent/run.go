@@ -153,14 +153,15 @@ func runOp(
 	exec *agent.Executor,
 	ns string,
 ) {
-
 	var (
 		status     string
 		statusCode int
 	)
 
+	log = log.With("group", ao.Group, "operation", ao.ID, "action-run-id", ao.ActionRunID)
+
 	if ao.ActionRunID != "" {
-		log.Info("reporting action run starting", "action-run-id", ao.ActionRunID)
+		log.Info("reporting action run starting")
 
 		resp, err := opts.WS.WaypointServiceStartingAction(&waypoint_service.WaypointServiceStartingActionParams{
 			NamespaceID: ns,
@@ -175,7 +176,7 @@ func runOp(
 			log.Error("unable to register action as starting", "error", err)
 		} else {
 			defer func() {
-				log.Info("reporting action run ended", "id", resp.Payload.ActionRunID, "status", status, "status-code", statusCode)
+				log.Info("reporting action run ended", "action-run-id", resp.Payload.ActionRunID, "status", status, "status-code", statusCode)
 
 				_, err = opts.WS.WaypointServiceEndingAction(&waypoint_service.WaypointServiceEndingActionParams{
 					NamespaceID: ns,
@@ -199,7 +200,7 @@ func runOp(
 		status = "internal error: " + err.Error()
 		statusCode = 1
 
-		log.Error("error resolving operation", "group", ao.Group, "operation", ao.ID, "error", err)
+		log.Error("error resolving operation", "error", err)
 		return
 	}
 
@@ -207,7 +208,7 @@ func runOp(
 		status = "unknown operation: " + ao.ID
 		statusCode = 127
 
-		log.Error("requested unknown operation", "id", ao.ID)
+		log.Error("requested unknown operation", "status", status, "status-code", statusCode)
 		return
 	}
 
@@ -215,12 +216,12 @@ func runOp(
 	if err != nil {
 		status = "error execution operation: " + err.Error()
 
-		log.Error("error executing operation", "group", ao.Group, "operation", ao.ID, "error", err)
+		log.Error("error executing operation", "error", err)
 		return
 	}
 
 	status = opStat.Status
 	statusCode = opStat.Code
 
-	log.Info("finished operation", "id", ao.ID, "status", status, "status-code", statusCode)
+	log.Info("finished operation")
 }
