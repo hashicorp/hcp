@@ -143,6 +143,11 @@ func TestReadRun(t *testing.T) {
 					Payload: &preview_models.Secrets20231128GetTwilioIntegrationResponse{
 						Integration: &preview_models.Secrets20231128TwilioIntegration{
 							IntegrationName: opts.IntegrationName,
+							Name:            opts.IntegrationName,
+							StaticCredentialDetails: &preview_models.Secrets20231128TwilioStaticCredentialsResponse{
+								AccountSid: "account_sid",
+								APIKeySid:  "api_key_sid",
+							},
 						},
 					},
 				}, nil).Once()
@@ -156,7 +161,7 @@ func TestReadRun(t *testing.T) {
 			}
 
 			r.NoError(err)
-			r.Contains(io.Output.String(), fmt.Sprintf("Integration Name     Account SID\n%s              \n", opts.IntegrationName))
+			r.Contains(io.Output.String(), fmt.Sprintf("Integration Name     Account SID   API Key SID\n%s   account_sid   api_key_sid\n", opts.IntegrationName))
 		})
 	}
 }
