@@ -466,6 +466,80 @@ func (_c *MockClientService_CreateAwsDynamicSecret_Call) RunAndReturn(run func(*
 	return _c
 }
 
+// CreateAwsIAMUserAccessKeyRotatingSecret provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) CreateAwsIAMUserAccessKeyRotatingSecret(params *secret_service.CreateAwsIAMUserAccessKeyRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.CreateAwsIAMUserAccessKeyRotatingSecretOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateAwsIAMUserAccessKeyRotatingSecret")
+	}
+
+	var r0 *secret_service.CreateAwsIAMUserAccessKeyRotatingSecretOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.CreateAwsIAMUserAccessKeyRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.CreateAwsIAMUserAccessKeyRotatingSecretOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.CreateAwsIAMUserAccessKeyRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.CreateAwsIAMUserAccessKeyRotatingSecretOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.CreateAwsIAMUserAccessKeyRotatingSecretOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.CreateAwsIAMUserAccessKeyRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_CreateAwsIAMUserAccessKeyRotatingSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateAwsIAMUserAccessKeyRotatingSecret'
+type MockClientService_CreateAwsIAMUserAccessKeyRotatingSecret_Call struct {
+	*mock.Call
+}
+
+// CreateAwsIAMUserAccessKeyRotatingSecret is a helper method to define mock.On call
+//   - params *secret_service.CreateAwsIAMUserAccessKeyRotatingSecretParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) CreateAwsIAMUserAccessKeyRotatingSecret(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_CreateAwsIAMUserAccessKeyRotatingSecret_Call {
+	return &MockClientService_CreateAwsIAMUserAccessKeyRotatingSecret_Call{Call: _e.mock.On("CreateAwsIAMUserAccessKeyRotatingSecret",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_CreateAwsIAMUserAccessKeyRotatingSecret_Call) Run(run func(params *secret_service.CreateAwsIAMUserAccessKeyRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_CreateAwsIAMUserAccessKeyRotatingSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.CreateAwsIAMUserAccessKeyRotatingSecretParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_CreateAwsIAMUserAccessKeyRotatingSecret_Call) Return(_a0 *secret_service.CreateAwsIAMUserAccessKeyRotatingSecretOK, _a1 error) *MockClientService_CreateAwsIAMUserAccessKeyRotatingSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_CreateAwsIAMUserAccessKeyRotatingSecret_Call) RunAndReturn(run func(*secret_service.CreateAwsIAMUserAccessKeyRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.CreateAwsIAMUserAccessKeyRotatingSecretOK, error)) *MockClientService_CreateAwsIAMUserAccessKeyRotatingSecret_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateAwsIntegration provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) CreateAwsIntegration(params *secret_service.CreateAwsIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.CreateAwsIntegrationOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -906,6 +980,80 @@ func (_c *MockClientService_CreateGcpIntegration_Call) Return(_a0 *secret_servic
 }
 
 func (_c *MockClientService_CreateGcpIntegration_Call) RunAndReturn(run func(*secret_service.CreateGcpIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.CreateGcpIntegrationOK, error)) *MockClientService_CreateGcpIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreateGcpServiceAccountKeyRotatingSecret provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) CreateGcpServiceAccountKeyRotatingSecret(params *secret_service.CreateGcpServiceAccountKeyRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.CreateGcpServiceAccountKeyRotatingSecretOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateGcpServiceAccountKeyRotatingSecret")
+	}
+
+	var r0 *secret_service.CreateGcpServiceAccountKeyRotatingSecretOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.CreateGcpServiceAccountKeyRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.CreateGcpServiceAccountKeyRotatingSecretOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.CreateGcpServiceAccountKeyRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.CreateGcpServiceAccountKeyRotatingSecretOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.CreateGcpServiceAccountKeyRotatingSecretOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.CreateGcpServiceAccountKeyRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_CreateGcpServiceAccountKeyRotatingSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateGcpServiceAccountKeyRotatingSecret'
+type MockClientService_CreateGcpServiceAccountKeyRotatingSecret_Call struct {
+	*mock.Call
+}
+
+// CreateGcpServiceAccountKeyRotatingSecret is a helper method to define mock.On call
+//   - params *secret_service.CreateGcpServiceAccountKeyRotatingSecretParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) CreateGcpServiceAccountKeyRotatingSecret(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_CreateGcpServiceAccountKeyRotatingSecret_Call {
+	return &MockClientService_CreateGcpServiceAccountKeyRotatingSecret_Call{Call: _e.mock.On("CreateGcpServiceAccountKeyRotatingSecret",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_CreateGcpServiceAccountKeyRotatingSecret_Call) Run(run func(params *secret_service.CreateGcpServiceAccountKeyRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_CreateGcpServiceAccountKeyRotatingSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.CreateGcpServiceAccountKeyRotatingSecretParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_CreateGcpServiceAccountKeyRotatingSecret_Call) Return(_a0 *secret_service.CreateGcpServiceAccountKeyRotatingSecretOK, _a1 error) *MockClientService_CreateGcpServiceAccountKeyRotatingSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_CreateGcpServiceAccountKeyRotatingSecret_Call) RunAndReturn(run func(*secret_service.CreateGcpServiceAccountKeyRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.CreateGcpServiceAccountKeyRotatingSecretOK, error)) *MockClientService_CreateGcpServiceAccountKeyRotatingSecret_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2908,6 +3056,80 @@ func (_c *MockClientService_GetAwsDynamicSecret_Call) RunAndReturn(run func(*sec
 	return _c
 }
 
+// GetAwsIAMUserAccessKeyRotatingSecretConfig provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) GetAwsIAMUserAccessKeyRotatingSecretConfig(params *secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAwsIAMUserAccessKeyRotatingSecretConfig")
+	}
+
+	var r0 *secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_GetAwsIAMUserAccessKeyRotatingSecretConfig_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAwsIAMUserAccessKeyRotatingSecretConfig'
+type MockClientService_GetAwsIAMUserAccessKeyRotatingSecretConfig_Call struct {
+	*mock.Call
+}
+
+// GetAwsIAMUserAccessKeyRotatingSecretConfig is a helper method to define mock.On call
+//   - params *secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) GetAwsIAMUserAccessKeyRotatingSecretConfig(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_GetAwsIAMUserAccessKeyRotatingSecretConfig_Call {
+	return &MockClientService_GetAwsIAMUserAccessKeyRotatingSecretConfig_Call{Call: _e.mock.On("GetAwsIAMUserAccessKeyRotatingSecretConfig",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_GetAwsIAMUserAccessKeyRotatingSecretConfig_Call) Run(run func(params *secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_GetAwsIAMUserAccessKeyRotatingSecretConfig_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_GetAwsIAMUserAccessKeyRotatingSecretConfig_Call) Return(_a0 *secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigOK, _a1 error) *MockClientService_GetAwsIAMUserAccessKeyRotatingSecretConfig_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_GetAwsIAMUserAccessKeyRotatingSecretConfig_Call) RunAndReturn(run func(*secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetAwsIAMUserAccessKeyRotatingSecretConfigOK, error)) *MockClientService_GetAwsIAMUserAccessKeyRotatingSecretConfig_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetAwsIntegration provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) GetAwsIntegration(params *secret_service.GetAwsIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.GetAwsIntegrationOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -3056,6 +3278,80 @@ func (_c *MockClientService_GetGatewayPool_Call) RunAndReturn(run func(*secret_s
 	return _c
 }
 
+// GetGatewayPoolCertificate provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) GetGatewayPoolCertificate(params *secret_service.GetGatewayPoolCertificateParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.GetGatewayPoolCertificateOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetGatewayPoolCertificate")
+	}
+
+	var r0 *secret_service.GetGatewayPoolCertificateOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.GetGatewayPoolCertificateParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetGatewayPoolCertificateOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.GetGatewayPoolCertificateParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.GetGatewayPoolCertificateOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.GetGatewayPoolCertificateOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.GetGatewayPoolCertificateParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_GetGatewayPoolCertificate_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetGatewayPoolCertificate'
+type MockClientService_GetGatewayPoolCertificate_Call struct {
+	*mock.Call
+}
+
+// GetGatewayPoolCertificate is a helper method to define mock.On call
+//   - params *secret_service.GetGatewayPoolCertificateParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) GetGatewayPoolCertificate(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_GetGatewayPoolCertificate_Call {
+	return &MockClientService_GetGatewayPoolCertificate_Call{Call: _e.mock.On("GetGatewayPoolCertificate",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_GetGatewayPoolCertificate_Call) Run(run func(params *secret_service.GetGatewayPoolCertificateParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_GetGatewayPoolCertificate_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.GetGatewayPoolCertificateParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_GetGatewayPoolCertificate_Call) Return(_a0 *secret_service.GetGatewayPoolCertificateOK, _a1 error) *MockClientService_GetGatewayPoolCertificate_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_GetGatewayPoolCertificate_Call) RunAndReturn(run func(*secret_service.GetGatewayPoolCertificateParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetGatewayPoolCertificateOK, error)) *MockClientService_GetGatewayPoolCertificate_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetGcpDynamicSecret provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) GetGcpDynamicSecret(params *secret_service.GetGcpDynamicSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.GetGcpDynamicSecretOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -3200,6 +3496,80 @@ func (_c *MockClientService_GetGcpIntegration_Call) Return(_a0 *secret_service.G
 }
 
 func (_c *MockClientService_GetGcpIntegration_Call) RunAndReturn(run func(*secret_service.GetGcpIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetGcpIntegrationOK, error)) *MockClientService_GetGcpIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetGcpServiceAccountKeyRotatingSecretConfig provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) GetGcpServiceAccountKeyRotatingSecretConfig(params *secret_service.GetGcpServiceAccountKeyRotatingSecretConfigParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.GetGcpServiceAccountKeyRotatingSecretConfigOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetGcpServiceAccountKeyRotatingSecretConfig")
+	}
+
+	var r0 *secret_service.GetGcpServiceAccountKeyRotatingSecretConfigOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.GetGcpServiceAccountKeyRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetGcpServiceAccountKeyRotatingSecretConfigOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.GetGcpServiceAccountKeyRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.GetGcpServiceAccountKeyRotatingSecretConfigOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.GetGcpServiceAccountKeyRotatingSecretConfigOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.GetGcpServiceAccountKeyRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_GetGcpServiceAccountKeyRotatingSecretConfig_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetGcpServiceAccountKeyRotatingSecretConfig'
+type MockClientService_GetGcpServiceAccountKeyRotatingSecretConfig_Call struct {
+	*mock.Call
+}
+
+// GetGcpServiceAccountKeyRotatingSecretConfig is a helper method to define mock.On call
+//   - params *secret_service.GetGcpServiceAccountKeyRotatingSecretConfigParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) GetGcpServiceAccountKeyRotatingSecretConfig(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_GetGcpServiceAccountKeyRotatingSecretConfig_Call {
+	return &MockClientService_GetGcpServiceAccountKeyRotatingSecretConfig_Call{Call: _e.mock.On("GetGcpServiceAccountKeyRotatingSecretConfig",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_GetGcpServiceAccountKeyRotatingSecretConfig_Call) Run(run func(params *secret_service.GetGcpServiceAccountKeyRotatingSecretConfigParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_GetGcpServiceAccountKeyRotatingSecretConfig_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.GetGcpServiceAccountKeyRotatingSecretConfigParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_GetGcpServiceAccountKeyRotatingSecretConfig_Call) Return(_a0 *secret_service.GetGcpServiceAccountKeyRotatingSecretConfigOK, _a1 error) *MockClientService_GetGcpServiceAccountKeyRotatingSecretConfig_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_GetGcpServiceAccountKeyRotatingSecretConfig_Call) RunAndReturn(run func(*secret_service.GetGcpServiceAccountKeyRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetGcpServiceAccountKeyRotatingSecretConfigOK, error)) *MockClientService_GetGcpServiceAccountKeyRotatingSecretConfig_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -5975,6 +6345,80 @@ func (_c *MockClientService_UpdateApp_Call) RunAndReturn(run func(*secret_servic
 	return _c
 }
 
+// UpdateAwsIntegration provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) UpdateAwsIntegration(params *secret_service.UpdateAwsIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdateAwsIntegrationOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateAwsIntegration")
+	}
+
+	var r0 *secret_service.UpdateAwsIntegrationOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateAwsIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateAwsIntegrationOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateAwsIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.UpdateAwsIntegrationOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.UpdateAwsIntegrationOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.UpdateAwsIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_UpdateAwsIntegration_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateAwsIntegration'
+type MockClientService_UpdateAwsIntegration_Call struct {
+	*mock.Call
+}
+
+// UpdateAwsIntegration is a helper method to define mock.On call
+//   - params *secret_service.UpdateAwsIntegrationParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) UpdateAwsIntegration(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_UpdateAwsIntegration_Call {
+	return &MockClientService_UpdateAwsIntegration_Call{Call: _e.mock.On("UpdateAwsIntegration",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_UpdateAwsIntegration_Call) Run(run func(params *secret_service.UpdateAwsIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_UpdateAwsIntegration_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.UpdateAwsIntegrationParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_UpdateAwsIntegration_Call) Return(_a0 *secret_service.UpdateAwsIntegrationOK, _a1 error) *MockClientService_UpdateAwsIntegration_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_UpdateAwsIntegration_Call) RunAndReturn(run func(*secret_service.UpdateAwsIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateAwsIntegrationOK, error)) *MockClientService_UpdateAwsIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateGatewayPool provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) UpdateGatewayPool(params *secret_service.UpdateGatewayPoolParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdateGatewayPoolOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -6049,6 +6493,228 @@ func (_c *MockClientService_UpdateGatewayPool_Call) RunAndReturn(run func(*secre
 	return _c
 }
 
+// UpdateGcpIntegration provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) UpdateGcpIntegration(params *secret_service.UpdateGcpIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdateGcpIntegrationOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateGcpIntegration")
+	}
+
+	var r0 *secret_service.UpdateGcpIntegrationOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateGcpIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateGcpIntegrationOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateGcpIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.UpdateGcpIntegrationOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.UpdateGcpIntegrationOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.UpdateGcpIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_UpdateGcpIntegration_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateGcpIntegration'
+type MockClientService_UpdateGcpIntegration_Call struct {
+	*mock.Call
+}
+
+// UpdateGcpIntegration is a helper method to define mock.On call
+//   - params *secret_service.UpdateGcpIntegrationParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) UpdateGcpIntegration(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_UpdateGcpIntegration_Call {
+	return &MockClientService_UpdateGcpIntegration_Call{Call: _e.mock.On("UpdateGcpIntegration",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_UpdateGcpIntegration_Call) Run(run func(params *secret_service.UpdateGcpIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_UpdateGcpIntegration_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.UpdateGcpIntegrationParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_UpdateGcpIntegration_Call) Return(_a0 *secret_service.UpdateGcpIntegrationOK, _a1 error) *MockClientService_UpdateGcpIntegration_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_UpdateGcpIntegration_Call) RunAndReturn(run func(*secret_service.UpdateGcpIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateGcpIntegrationOK, error)) *MockClientService_UpdateGcpIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateMongoDBAtlasIntegration provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) UpdateMongoDBAtlasIntegration(params *secret_service.UpdateMongoDBAtlasIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdateMongoDBAtlasIntegrationOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateMongoDBAtlasIntegration")
+	}
+
+	var r0 *secret_service.UpdateMongoDBAtlasIntegrationOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateMongoDBAtlasIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateMongoDBAtlasIntegrationOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateMongoDBAtlasIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.UpdateMongoDBAtlasIntegrationOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.UpdateMongoDBAtlasIntegrationOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.UpdateMongoDBAtlasIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_UpdateMongoDBAtlasIntegration_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateMongoDBAtlasIntegration'
+type MockClientService_UpdateMongoDBAtlasIntegration_Call struct {
+	*mock.Call
+}
+
+// UpdateMongoDBAtlasIntegration is a helper method to define mock.On call
+//   - params *secret_service.UpdateMongoDBAtlasIntegrationParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) UpdateMongoDBAtlasIntegration(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_UpdateMongoDBAtlasIntegration_Call {
+	return &MockClientService_UpdateMongoDBAtlasIntegration_Call{Call: _e.mock.On("UpdateMongoDBAtlasIntegration",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_UpdateMongoDBAtlasIntegration_Call) Run(run func(params *secret_service.UpdateMongoDBAtlasIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_UpdateMongoDBAtlasIntegration_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.UpdateMongoDBAtlasIntegrationParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_UpdateMongoDBAtlasIntegration_Call) Return(_a0 *secret_service.UpdateMongoDBAtlasIntegrationOK, _a1 error) *MockClientService_UpdateMongoDBAtlasIntegration_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_UpdateMongoDBAtlasIntegration_Call) RunAndReturn(run func(*secret_service.UpdateMongoDBAtlasIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateMongoDBAtlasIntegrationOK, error)) *MockClientService_UpdateMongoDBAtlasIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateMongoDBAtlasRotatingSecret provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) UpdateMongoDBAtlasRotatingSecret(params *secret_service.UpdateMongoDBAtlasRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdateMongoDBAtlasRotatingSecretOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateMongoDBAtlasRotatingSecret")
+	}
+
+	var r0 *secret_service.UpdateMongoDBAtlasRotatingSecretOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateMongoDBAtlasRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateMongoDBAtlasRotatingSecretOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateMongoDBAtlasRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.UpdateMongoDBAtlasRotatingSecretOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.UpdateMongoDBAtlasRotatingSecretOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.UpdateMongoDBAtlasRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_UpdateMongoDBAtlasRotatingSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateMongoDBAtlasRotatingSecret'
+type MockClientService_UpdateMongoDBAtlasRotatingSecret_Call struct {
+	*mock.Call
+}
+
+// UpdateMongoDBAtlasRotatingSecret is a helper method to define mock.On call
+//   - params *secret_service.UpdateMongoDBAtlasRotatingSecretParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) UpdateMongoDBAtlasRotatingSecret(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_UpdateMongoDBAtlasRotatingSecret_Call {
+	return &MockClientService_UpdateMongoDBAtlasRotatingSecret_Call{Call: _e.mock.On("UpdateMongoDBAtlasRotatingSecret",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_UpdateMongoDBAtlasRotatingSecret_Call) Run(run func(params *secret_service.UpdateMongoDBAtlasRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_UpdateMongoDBAtlasRotatingSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.UpdateMongoDBAtlasRotatingSecretParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_UpdateMongoDBAtlasRotatingSecret_Call) Return(_a0 *secret_service.UpdateMongoDBAtlasRotatingSecretOK, _a1 error) *MockClientService_UpdateMongoDBAtlasRotatingSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_UpdateMongoDBAtlasRotatingSecret_Call) RunAndReturn(run func(*secret_service.UpdateMongoDBAtlasRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateMongoDBAtlasRotatingSecretOK, error)) *MockClientService_UpdateMongoDBAtlasRotatingSecret_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateSyncInstallation provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) UpdateSyncInstallation(params *secret_service.UpdateSyncInstallationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdateSyncInstallationOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -6119,6 +6785,154 @@ func (_c *MockClientService_UpdateSyncInstallation_Call) Return(_a0 *secret_serv
 }
 
 func (_c *MockClientService_UpdateSyncInstallation_Call) RunAndReturn(run func(*secret_service.UpdateSyncInstallationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateSyncInstallationOK, error)) *MockClientService_UpdateSyncInstallation_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateTwilioIntegration provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) UpdateTwilioIntegration(params *secret_service.UpdateTwilioIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdateTwilioIntegrationOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateTwilioIntegration")
+	}
+
+	var r0 *secret_service.UpdateTwilioIntegrationOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateTwilioIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateTwilioIntegrationOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateTwilioIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.UpdateTwilioIntegrationOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.UpdateTwilioIntegrationOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.UpdateTwilioIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_UpdateTwilioIntegration_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateTwilioIntegration'
+type MockClientService_UpdateTwilioIntegration_Call struct {
+	*mock.Call
+}
+
+// UpdateTwilioIntegration is a helper method to define mock.On call
+//   - params *secret_service.UpdateTwilioIntegrationParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) UpdateTwilioIntegration(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_UpdateTwilioIntegration_Call {
+	return &MockClientService_UpdateTwilioIntegration_Call{Call: _e.mock.On("UpdateTwilioIntegration",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_UpdateTwilioIntegration_Call) Run(run func(params *secret_service.UpdateTwilioIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_UpdateTwilioIntegration_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.UpdateTwilioIntegrationParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_UpdateTwilioIntegration_Call) Return(_a0 *secret_service.UpdateTwilioIntegrationOK, _a1 error) *MockClientService_UpdateTwilioIntegration_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_UpdateTwilioIntegration_Call) RunAndReturn(run func(*secret_service.UpdateTwilioIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateTwilioIntegrationOK, error)) *MockClientService_UpdateTwilioIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateTwilioRotatingSecret provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) UpdateTwilioRotatingSecret(params *secret_service.UpdateTwilioRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdateTwilioRotatingSecretOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateTwilioRotatingSecret")
+	}
+
+	var r0 *secret_service.UpdateTwilioRotatingSecretOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateTwilioRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateTwilioRotatingSecretOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateTwilioRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.UpdateTwilioRotatingSecretOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.UpdateTwilioRotatingSecretOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.UpdateTwilioRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_UpdateTwilioRotatingSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateTwilioRotatingSecret'
+type MockClientService_UpdateTwilioRotatingSecret_Call struct {
+	*mock.Call
+}
+
+// UpdateTwilioRotatingSecret is a helper method to define mock.On call
+//   - params *secret_service.UpdateTwilioRotatingSecretParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) UpdateTwilioRotatingSecret(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_UpdateTwilioRotatingSecret_Call {
+	return &MockClientService_UpdateTwilioRotatingSecret_Call{Call: _e.mock.On("UpdateTwilioRotatingSecret",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_UpdateTwilioRotatingSecret_Call) Run(run func(params *secret_service.UpdateTwilioRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_UpdateTwilioRotatingSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.UpdateTwilioRotatingSecretParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_UpdateTwilioRotatingSecret_Call) Return(_a0 *secret_service.UpdateTwilioRotatingSecretOK, _a1 error) *MockClientService_UpdateTwilioRotatingSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_UpdateTwilioRotatingSecret_Call) RunAndReturn(run func(*secret_service.UpdateTwilioRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateTwilioRotatingSecretOK, error)) *MockClientService_UpdateTwilioRotatingSecret_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -89,11 +89,10 @@ func deleteRun(opts *DeleteOpts) error {
 	switch opts.Type {
 	case Twilio:
 		_, err := opts.PreviewClient.DeleteTwilioIntegration(&preview_secret_service.DeleteTwilioIntegrationParams{
-			Context:         opts.Ctx,
-			ProjectID:       opts.Profile.ProjectID,
-			OrganizationID:  opts.Profile.OrganizationID,
-			IntegrationName: opts.IntegrationName,
-			Name:            &opts.IntegrationName,
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+			Name:           opts.IntegrationName,
 		}, nil)
 		if err != nil {
 			return fmt.Errorf("failed to delete integration: %w", err)
@@ -104,11 +103,10 @@ func deleteRun(opts *DeleteOpts) error {
 
 	case MongoDBAtlas:
 		_, err := opts.PreviewClient.DeleteMongoDBAtlasIntegration(&preview_secret_service.DeleteMongoDBAtlasIntegrationParams{
-			Context:         opts.Ctx,
-			ProjectID:       opts.Profile.ProjectID,
-			OrganizationID:  opts.Profile.OrganizationID,
-			IntegrationName: opts.IntegrationName,
-			Name:            &opts.IntegrationName,
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+			Name:           opts.IntegrationName,
 		}, nil)
 		if err != nil {
 			return fmt.Errorf("failed to delete integration: %w", err)
