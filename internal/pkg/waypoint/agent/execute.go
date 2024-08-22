@@ -6,6 +6,8 @@ package agent
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"strings"
 
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/hcl/v2"
@@ -42,12 +44,12 @@ func (e *Executor) IsAvailable(opInfo *models.HashicorpCloudWaypointAgentOperati
 }
 
 func (e *Executor) Execute(ctx context.Context, opInfo *models.HashicorpCloudWaypointAgentOperation) (OperationStatus, error) {
-	var hctx hcl.EvalContext
-
-	input := make(map[string]cty.Value)
+	var (
+		hctx   hcl.EvalContext
+		varMap map[string]any
+	)
 
 	if len(opInfo.Body) != 0 {
-
 		var rawInput map[string]any
 
 		err := json.Unmarshal(opInfo.Body, &rawInput)
@@ -55,26 +57,26 @@ func (e *Executor) Execute(ctx context.Context, opInfo *models.HashicorpCloudWay
 			return errStatus, err
 		}
 
-		for k, v := range rawInput {
-			switch sv := v.(type) {
-			case float64:
-				input[k] = cty.NumberFloatVal(sv)
-			case string:
-				input[k] = cty.StringVal(sv)
-			case bool:
-				input[k] = cty.BoolVal(sv)
-			default:
-				// TODO how should we deal with these?
-			}
+		varMap, err = buildVariableMap(rawInput)
+		if err != nil {
+			return errStatus, err
 		}
+	} else {
+		varMap = make(map[string]any)
 	}
 
-	hctx.Variables = map[string]cty.Value{
-		"waypoint": cty.ObjectVal(map[string]cty.Value{
-			"run_id": cty.StringVal(opInfo.ActionRunID),
-		}),
-		"var": cty.ObjectVal(input),
+	// NOTE(briancain): This might overwrite any waypoint varibles if we ever
+	// decided to set those on the server. Additionally, it might make more sense
+	// to include this `waypoint.run_id` as a variable set by the server in the
+	// future.
+	varMap["waypoint"] = map[string]any{
+		"run_id": opInfo.ActionRunID,
 	}
+	_, ctyMap := anyToCty(varMap)
+
+	// Set all variables from the server on the HCL context so we can parse the
+	// agent config if any interpolated variables are defined
+	hctx.Variables = ctyMap
 
 	op, err := e.Config.Action(opInfo.Group, opInfo.ID, &hctx)
 	if err != nil {
@@ -82,4 +84,62 @@ func (e *Executor) Execute(ctx context.Context, opInfo *models.HashicorpCloudWay
 	}
 
 	return op.Run(ctx, e.Log)
+}
+
+// buildVariableMap takes a map of string any values where the keys are expected
+// to be dot separated and builds a nested map of the values. This format can
+// then be used by anyToCty to walk the map structure and build a map of cty
+// values that HCL understands and can use to parse a config.
+func buildVariableMap(rawInput map[string]any) (map[string]any, error) {
+	ret := make(map[string]any)
+
+	for k, v := range rawInput {
+		parts := strings.Split(k, ".")
+		cur := ret
+
+		for _, p := range parts[:len(parts)-1] {
+			if curVal, ok := cur[p]; ok {
+				curMap, ok := curVal.(map[string]any)
+				if ok {
+					cur = curMap
+				} else {
+					return nil, errors.Errorf("invalid input key %s %v", k, curVal)
+				}
+			} else {
+				curMap := make(map[string]any)
+				cur[p] = curMap
+				cur = curMap
+			}
+		}
+
+		cur[parts[len(parts)-1]] = v
+	}
+
+	return ret, nil
+}
+
+// anyToCty takes a map of string any values and converts them to cty values
+// that HCL understands. This function will walk the map and convert the values
+// to cty values that HCL can use to parse a config.
+func anyToCty(objMap map[string]any) (cty.Value, map[string]cty.Value) {
+	obj := make(map[string]cty.Value)
+
+	for k, v := range objMap {
+		switch sv := v.(type) {
+		case map[string]any:
+			// Recuse and walk the map for its children
+			obj[k], _ = anyToCty(sv)
+		case float64:
+			obj[k] = cty.NumberFloatVal(sv)
+		case bool:
+			obj[k] = cty.BoolVal(sv)
+		case string:
+			obj[k] = cty.StringVal(sv)
+		default:
+			// Unhandled var type
+			obj[k] = cty.StringVal(fmt.Sprintf("%v", v))
+		}
+	}
+
+	return cty.ObjectVal(obj), obj
 }
