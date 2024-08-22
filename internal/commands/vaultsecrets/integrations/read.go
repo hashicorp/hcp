@@ -89,10 +89,10 @@ func readRun(opts *ReadOpts) error {
 	switch opts.Type {
 	case Twilio:
 		resp, err := opts.PreviewClient.GetTwilioIntegration(&preview_secret_service.GetTwilioIntegrationParams{
-			Context:         opts.Ctx,
-			ProjectID:       opts.Profile.ProjectID,
-			OrganizationID:  opts.Profile.OrganizationID,
-			IntegrationName: opts.IntegrationName,
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+			Name:           opts.IntegrationName,
 		}, nil)
 		if err != nil {
 			return fmt.Errorf("failed to read integration: %w", err)
@@ -102,10 +102,10 @@ func readRun(opts *ReadOpts) error {
 
 	case MongoDBAtlas:
 		resp, err := opts.PreviewClient.GetMongoDBAtlasIntegration(&preview_secret_service.GetMongoDBAtlasIntegrationParams{
-			Context:         opts.Ctx,
-			ProjectID:       opts.Profile.ProjectID,
-			OrganizationID:  opts.Profile.OrganizationID,
-			IntegrationName: opts.IntegrationName,
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+			Name:           opts.IntegrationName,
 		}, nil)
 		if err != nil {
 			return fmt.Errorf("failed to read integration: %w", err)

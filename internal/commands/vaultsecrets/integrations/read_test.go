@@ -135,15 +135,14 @@ func TestReadRun(t *testing.T) {
 				vs.EXPECT().GetTwilioIntegration(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 			} else {
 				vs.EXPECT().GetTwilioIntegration(&preview_secret_service.GetTwilioIntegrationParams{
-					OrganizationID:  "123",
-					ProjectID:       "abc",
-					IntegrationName: opts.IntegrationName,
-					Context:         opts.Ctx,
+					OrganizationID: "123",
+					ProjectID:      "abc",
+					Name:           opts.IntegrationName,
+					Context:        opts.Ctx,
 				}, nil).Return(&preview_secret_service.GetTwilioIntegrationOK{
 					Payload: &preview_models.Secrets20231128GetTwilioIntegrationResponse{
 						Integration: &preview_models.Secrets20231128TwilioIntegration{
-							IntegrationName: opts.IntegrationName,
-							Name:            opts.IntegrationName,
+							Name: opts.IntegrationName,
 							StaticCredentialDetails: &preview_models.Secrets20231128TwilioStaticCredentialsResponse{
 								AccountSid: "account_sid",
 								APIKeySid:  "api_key_sid",
