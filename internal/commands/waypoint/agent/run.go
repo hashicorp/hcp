@@ -63,6 +63,12 @@ func NewCmdRun(ctx *cmd.Context) *cmd.Command {
 var agentRunDuration = 60 * time.Second
 
 func agentRun(log hclog.Logger, opts *RunOpts) error {
+	// Only set level to info if not in debug mode
+	if !log.IsDebug() {
+		// Give log.Info level feedback to user when they run the agent CLI
+		log.SetLevel(hclog.Info)
+	}
+
 	cfg, err := agent.ParseConfigFile(opts.ConfigPath)
 	if err != nil {
 		return err
