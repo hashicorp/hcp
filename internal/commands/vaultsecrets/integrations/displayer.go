@@ -44,15 +44,26 @@ func (t *twilioDisplayer) previewTwilioIntegrationsPayload() any {
 }
 
 func (t *twilioDisplayer) FieldTemplates() []format.Field {
-	return []format.Field{
+	fields := []format.Field{
 		{
 			Name:        "Integration Name",
-			ValueFormat: "{{ .IntegrationName }}",
+			ValueFormat: "{{ .Name }}",
 		},
-		{
-			Name:        "Account SID",
-			ValueFormat: "{{ .TwilioAccountSid }}",
-		},
+	}
+
+	if t.single {
+		return append(fields, []format.Field{
+			{
+				Name:        "Account SID",
+				ValueFormat: "{{ .StaticCredentialDetails.AccountSid }}",
+			},
+			{
+				Name:        "API Key SID",
+				ValueFormat: "{{ .StaticCredentialDetails.APIKeySid }}",
+			},
+		}...)
+	} else {
+		return fields
 	}
 }
 
@@ -93,14 +104,185 @@ func (m *mongodbDisplayer) previewMongoDBIntegrationsPayload() any {
 }
 
 func (m *mongodbDisplayer) FieldTemplates() []format.Field {
+	fields := []format.Field{
+		{
+			Name:        "Integration Name",
+			ValueFormat: "{{ .Name }}",
+		},
+	}
+
+	if m.single {
+		return append(fields, []format.Field{
+			{
+				Name:        "API Public Key",
+				ValueFormat: "{{ .StaticCredentialDetails.APIPublicKey }}",
+			},
+		}...)
+	} else {
+		return fields
+	}
+}
+
+type awsDisplayer struct {
+	previewAwsIntegrations []*preview_models.Secrets20231128AwsIntegration
+
+	single bool
+}
+
+func newAwsDisplayer(single bool, integrations ...*preview_models.Secrets20231128AwsIntegration) *awsDisplayer {
+	return &awsDisplayer{
+		previewAwsIntegrations: integrations,
+		single:                 single,
+	}
+}
+
+func (a *awsDisplayer) DefaultFormat() format.Format {
+	return format.Table
+}
+
+func (a *awsDisplayer) Payload() any {
+
+	if a.previewAwsIntegrations != nil {
+		return a.previewAwsIntegrationsPayload()
+	}
+
+	return nil
+}
+
+func (a *awsDisplayer) previewAwsIntegrationsPayload() any {
+	if a.single {
+		if len(a.previewAwsIntegrations) != 1 {
+			return nil
+		}
+		return a.previewAwsIntegrations[0]
+	}
+	return a.previewAwsIntegrations
+}
+
+func (a *awsDisplayer) FieldTemplates() []format.Field {
+	fields := []format.Field{
+		{
+			Name:        "Integration Name",
+			ValueFormat: "{{ .Name }}",
+		},
+	}
+
+	if a.single {
+		return append(fields, []format.Field{
+			{
+				Name:        "Audience",
+				ValueFormat: "{{ .FederatedWorkloadIdentity.Audience }}",
+			},
+			{
+				Name:        "Role ARN",
+				ValueFormat: "{{ .FederatedWorkloadIdentity.RoleArn }}",
+			},
+		}...)
+	} else {
+		return fields
+	}
+}
+
+type gcpDisplayer struct {
+	previewGcpIntegrations []*preview_models.Secrets20231128GcpIntegration
+
+	single bool
+}
+
+func newGcpDisplayer(single bool, integrations ...*preview_models.Secrets20231128GcpIntegration) *gcpDisplayer {
+	return &gcpDisplayer{
+		previewGcpIntegrations: integrations,
+		single:                 single,
+	}
+}
+
+func (g *gcpDisplayer) DefaultFormat() format.Format {
+	return format.Table
+}
+
+func (g *gcpDisplayer) Payload() any {
+
+	if g.previewGcpIntegrations != nil {
+		return g.previewGcpIntegrationsPayload()
+	}
+
+	return nil
+}
+
+func (g *gcpDisplayer) previewGcpIntegrationsPayload() any {
+	if g.single {
+		if len(g.previewGcpIntegrations) != 1 {
+			return nil
+		}
+		return g.previewGcpIntegrations[0]
+	}
+	return g.previewGcpIntegrations
+}
+
+func (g *gcpDisplayer) FieldTemplates() []format.Field {
+	fields := []format.Field{
+		{
+			Name:        "Integration Name",
+			ValueFormat: "{{ .Name }}",
+		},
+	}
+
+	if g.single {
+		return append(fields, []format.Field{
+			{
+				Name:        "Audience",
+				ValueFormat: "{{ .FederatedWorkloadIdentity.Audience }}",
+			},
+			{
+				Name:        "Audience",
+				ValueFormat: "{{ .FederatedWorkloadIdentity.ServiceAccountEmail }}",
+			},
+		}...)
+	} else {
+		return fields
+	}
+}
+
+type genericDisplayer struct {
+	integrations []*preview_models.Secrets20231128Integration
+
+	single bool
+}
+
+func newGenericDisplayer(single bool, integrations ...*preview_models.Secrets20231128Integration) *genericDisplayer {
+	return &genericDisplayer{
+		integrations: integrations,
+		single:       single,
+	}
+}
+
+func (g *genericDisplayer) DefaultFormat() format.Format {
+	return format.Table
+}
+
+func (g *genericDisplayer) Payload() any {
+	if g.integrations != nil {
+		return g.integrationsPayload()
+	}
+
+	return nil
+}
+
+func (g *genericDisplayer) integrationsPayload() any {
+	if g.single {
+		if len(g.integrations) != 1 {
+			return nil
+		}
+		return g.integrations[0]
+	}
+	return g.integrations
+}
+
+func (g *genericDisplayer) FieldTemplates() []format.Field {
 	return []format.Field{
 		{
 			Name:        "Integration Name",
-			ValueFormat: "{{ .IntegrationName }}",
-		},
-		{
-			Name:        "API Public Key",
-			ValueFormat: "{{ .MongodbAPIPublicKey }}",
+			ValueFormat: "{{ .Name }}",
 		},
 	}
 }
