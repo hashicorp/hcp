@@ -133,6 +133,12 @@ type RotatingSecretConfig struct {
 	Details         map[string]any
 }
 
+type DynamicSecretConfig struct {
+	Version    string
+	Type       integrations.IntegrationType
+	DefaultTtl string `yaml:"default_ttl"`
+}
+
 type MongoDBRole struct {
 	RoleName       string `mapstructure:"role_name"`
 	DatabaseName   string `mapstructure:"database_name"`
@@ -147,8 +153,8 @@ type MongoDBScope struct {
 var (
 	// There are no Twilio-specific keys
 	MongoDBAtlasRequiredKeys = []string{"mongodb_group_id", "mongodb_roles"}
-	AwsKeys    = []string{"default_ttl", "role_arn"}
-	GcpKeys    = []string{"default_ttl", "service_account_email"}
+	AwsKeys                  = []string{"default_ttl", "role_arn"}
+	GcpKeys                  = []string{"default_ttl", "service_account_email"}
 )
 
 var rotationPolicies = map[string]string{
@@ -188,11 +194,6 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("failed to process config file: %w", err)
 		}
 
-		var sc RotatingSecretConfig
-		err = yaml.Unmarshal(f, &sc)
-		if err != nil {
-			return fmt.Errorf("failed to unmarshal config file: %w", err)
-
 		missingFields := validateRotatingSecretConfig(sc)
 
 		if len(missingFields) > 0 {
@@ -201,12 +202,6 @@ func createRun(opts *CreateOpts) error {
 
 		switch sc.Type {
 		case integrations.Twilio:
-			missingDetails := validateDetails(sc.Details, TwilioKeys)
-
-			if len(missingDetails) > 0 {
-				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
-			}
-
 			req := preview_secret_service.NewCreateTwilioRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
@@ -295,7 +290,7 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("failed to process config file: %w", err)
 		}
 
-		missingFields := validateFields(sc)
+		missingFields := validateDynamicSecretConfig(sc)
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 		}
@@ -406,8 +401,8 @@ func readPlainTextSecret(opts *CreateOpts) error {
 	return nil
 }
 
-func readConfigFile(opts *CreateOpts) (SecretConfig, error) {
-	var sc SecretConfig
+func readConfigFile(opts *CreateOpts) (RotatingSecretConfig, error) {
+	var sc RotatingSecretConfig
 	f, err := os.ReadFile(opts.SecretFilePath)
 	if err != nil {
 		return sc, fmt.Errorf("unable to open config file: %w", err)
@@ -434,6 +429,16 @@ func validateRotatingSecretConfig(sc RotatingSecretConfig) []string {
 
 	if sc.PolicyName == "" {
 		missingKeys = append(missingKeys, "rotation_policy_name")
+	}
+
+	return missingKeys
+}
+
+func validateDynamicSecretConfig(sc DynamicSecretConfig) []string {
+	var missingKeys []string
+
+	if sc.DefaultTtl == "" {
+		missingKeys = append(missingKeys, "default_ttl")
 	}
 
 	return missingKeys
