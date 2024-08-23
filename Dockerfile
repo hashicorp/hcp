@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: BUSL-1.1
 
 ## Dev DOCKERFILE ##
-FROM alpine:3.19 as dev
+FROM alpine:3.20 as dev
 COPY bin/hcp /bin/hcp
 RUN apk --no-cache upgrade && apk --no-cache add \
 	bash \
@@ -14,7 +14,7 @@ RUN touch ~/.bashrc && hcp --autocomplete-install
 CMD ["/bin/bash"]
 
 ## DOCKERHUB DOCKERFILE ##
-FROM alpine:3.19 as release
+FROM alpine:3.20 as release
 
 ARG BIN_NAME
 ARG NAME=hcp
