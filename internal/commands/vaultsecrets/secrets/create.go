@@ -146,7 +146,7 @@ type MongoDBScope struct {
 
 var (
 	// There are no Twilio-specific keys
-	MongoKeys = []string{"mongodb_group_id", "mongodb_roles"}
+	MongoDBAtlasRequiredKeys = []string{"mongodb_group_id", "mongodb_roles"}
 )
 
 var rotationPolicies = map[string]string{
@@ -222,7 +222,7 @@ func createRun(opts *CreateOpts) error {
 			}
 
 		case integrations.MongoDBAtlas:
-			missingDetails := validateDetails(sc.Details, MongoKeys)
+			missingDetails := validateDetails(sc.Details, MongoDBAtlasRequiredKeys)
 
 			if len(missingDetails) > 0 {
 				return fmt.Errorf("missing required detail(s) in the config file: %s", missingDetails)
@@ -267,12 +267,12 @@ func createRun(opts *CreateOpts) error {
 
 			req.Body = &preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody{
 				SecretDetails: &preview_models.Secrets20231128MongoDBAtlasSecretDetails{
-					MongodbGroupID: sc.Details[MongoKeys[1]].(string),
+					MongodbGroupID: sc.Details[MongoDBAtlasRequiredKeys[1]].(string),
 					MongodbRoles:   reqRoles,
 					MongodbScopes:  reqScopes,
 				},
 				RotationIntegrationName: sc.IntegrationName,
-				RotationPolicyName:      rotationPolicies[sc.Details[MongoKeys[0]].(string)],
+				RotationPolicyName:      rotationPolicies[sc.Details[MongoDBAtlasRequiredKeys[0]].(string)],
 				SecretName:              opts.SecretName,
 			}
 			resp, err := opts.PreviewClient.CreateMongoDBAtlasRotatingSecret(req, nil)
