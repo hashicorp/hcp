@@ -9,7 +9,7 @@ RUN apk --no-cache upgrade && apk --no-cache add \
 	curl \
 	jq \
 	nano \
-	vim
+	vim=9.1.0678-r0 # https://security.alpinelinux.org/vuln/CVE-2024-43374
 RUN touch ~/.bashrc && hcp --autocomplete-install
 CMD ["/bin/bash"]
 
@@ -38,7 +38,7 @@ RUN apk --no-cache upgrade && apk --no-cache add \
 	curl \
 	jq \
 	nano \
-	vim
+	vim=9.1.0678-r0 # https://security.alpinelinux.org/vuln/CVE-2024-43374
 RUN touch ~/.bashrc
 RUN hcp --autocomplete-install
 CMD ["/bin/bash"]
