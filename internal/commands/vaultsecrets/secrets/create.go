@@ -9,9 +9,17 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
+
+	"github.com/mitchellh/mapstructure"
+	"github.com/posener/complete"
+	"golang.org/x/exp/maps"
+	"gopkg.in/yaml.v3"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -19,7 +27,14 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
-	"github.com/posener/complete"
+)
+
+type SecretType string
+
+const (
+	Static   SecretType = "static"
+	Rotating SecretType = "rotating"
+	Dynamic  SecretType = "dynamic"
 )
 
 func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
@@ -67,10 +82,17 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 					DisplayValue: "DATA_FILE_PATH",
 					Description:  "File path to read secret data from. Set this to '-' to read the secret data from stdin.",
 					Value:        flagvalue.Simple("", &opts.SecretFilePath),
+					Required:     true,
 					Autocomplete: complete.PredictOr(
 						complete.PredictFiles("*"),
 						complete.PredictSet("-"),
 					),
+				},
+				{
+					Name:         "secret-type",
+					DisplayValue: "SECRET_TYPE",
+					Description:  "The type of secret to create: static, rotating, or dynamic.",
+					Value:        flagvalue.Simple("", &opts.Type),
 				},
 			},
 		},
@@ -98,35 +120,173 @@ type CreateOpts struct {
 	SecretName           string
 	SecretValuePlaintext string
 	SecretFilePath       string
+	Type                 SecretType
 	PreviewClient        preview_secret_service.ClientService
 	Client               secret_service.ClientService
 }
 
+type RotatingSecretConfig struct {
+	Version         string
+	Type            integrations.IntegrationType
+	IntegrationName string `yaml:"rotation_integration_name"`
+	PolicyName      string `yaml:"rotation_policy_name"`
+	Details         map[string]any
+}
+
+type MongoDBRole struct {
+	RoleName       string `mapstructure:"role_name"`
+	DatabaseName   string `mapstructure:"database_name"`
+	CollectionName string `mapstructure:"collection_name"`
+}
+
+type MongoDBScope struct {
+	Name string `mapstructure:"type"`
+	Type string `mapstructure:"name"`
+}
+
+var (
+	// There are no Twilio-specific keys
+	MongoDBAtlasRequiredKeys = []string{"mongodb_group_id", "mongodb_roles"}
+)
+
+var rotationPolicies = map[string]string{
+	"30": "built-in:30-days-2-active",
+	"60": "built-in:60-days-2-active",
+	"90": "built-in:90-days-2-active",
+}
+
 func createRun(opts *CreateOpts) error {
-	if err := readPlainTextSecret(opts); err != nil {
-		return err
+
+	switch opts.Type {
+	case Static, "":
+		if err := readPlainTextSecret(opts); err != nil {
+			return err
+		}
+
+		req := secret_service.NewCreateAppKVSecretParamsWithContext(opts.Ctx)
+		req.LocationOrganizationID = opts.Profile.OrganizationID
+		req.LocationProjectID = opts.Profile.ProjectID
+		req.AppName = opts.AppName
+
+		req.Body = secret_service.CreateAppKVSecretBody{
+			Name:  opts.SecretName,
+			Value: opts.SecretValuePlaintext,
+		}
+
+		resp, err := opts.Client.CreateAppKVSecret(req, nil)
+		if err != nil {
+			return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
+		}
+
+		if err := opts.Output.Display(newDisplayer().Secrets(resp.Payload.Secret)); err != nil {
+			return err
+		}
+	case Rotating:
+		f, err := os.ReadFile(opts.SecretFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to open config file: %w", err)
+		}
+
+		var sc RotatingSecretConfig
+		err = yaml.Unmarshal(f, &sc)
+		if err != nil {
+			return fmt.Errorf("failed to unmarshal config file: %w", err)
+		}
+
+		missingFields := validateRotatingSecretConfig(sc)
+
+		if len(missingFields) > 0 {
+			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
+		}
+
+		switch sc.Type {
+		case integrations.Twilio:
+
+			req := preview_secret_service.NewCreateTwilioRotatingSecretParamsWithContext(opts.Ctx)
+			req.OrganizationID = opts.Profile.OrganizationID
+			req.ProjectID = opts.Profile.ProjectID
+			req.AppName = opts.AppName
+			req.Body = &preview_models.SecretServiceCreateTwilioRotatingSecretBody{
+				RotationIntegrationName: sc.IntegrationName,
+				RotationPolicyName:      rotationPolicies[sc.PolicyName],
+				SecretName:              opts.SecretName,
+			}
+
+			resp, err := opts.PreviewClient.CreateTwilioRotatingSecret(req, nil)
+			if err != nil {
+				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
+			}
+
+			if err := opts.Output.Display(newRotatingSecretsDisplayer(true).PreviewRotatingSecrets(resp.Payload.Config)); err != nil {
+				return err
+			}
+
+		case integrations.MongoDBAtlas:
+			missingDetails := validateDetails(sc.Details, MongoDBAtlasRequiredKeys)
+
+			if len(missingDetails) > 0 {
+				return fmt.Errorf("missing required detail(s) in the config file: %s", missingDetails)
+			}
+
+			req := preview_secret_service.NewCreateMongoDBAtlasRotatingSecretParamsWithContext(opts.Ctx)
+			req.OrganizationID = opts.Profile.OrganizationID
+			req.ProjectID = opts.Profile.ProjectID
+
+			roles := sc.Details["mongodb_roles"].([]interface{})
+			var reqRoles []*preview_models.Secrets20231128MongoDBRole
+			for _, r := range roles {
+				var role MongoDBRole
+				decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{WeaklyTypedInput: true, Result: &role})
+				if err := decoder.Decode(r); err != nil {
+					return fmt.Errorf("unable to decode to a mongodb role")
+				}
+
+				reqRole := &preview_models.Secrets20231128MongoDBRole{
+					CollectionName: role.CollectionName,
+					RoleName:       role.RoleName,
+					DatabaseName:   role.DatabaseName,
+				}
+				reqRoles = append(reqRoles, reqRole)
+			}
+
+			scopes := sc.Details["mongodb_scopes"].([]interface{})
+			var reqScopes []*preview_models.Secrets20231128MongoDBScope
+			for _, r := range scopes {
+				var scope MongoDBScope
+				decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{WeaklyTypedInput: true, Result: &scope})
+				if err := decoder.Decode(r); err != nil {
+					return fmt.Errorf("unable to decode to a mongodb scope")
+				}
+
+				reqScope := &preview_models.Secrets20231128MongoDBScope{
+					Name: scope.Name,
+					Type: scope.Type,
+				}
+				reqScopes = append(reqScopes, reqScope)
+			}
+
+			req.Body = &preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody{
+				SecretDetails: &preview_models.Secrets20231128MongoDBAtlasSecretDetails{
+					MongodbGroupID: sc.Details[MongoDBAtlasRequiredKeys[1]].(string),
+					MongodbRoles:   reqRoles,
+					MongodbScopes:  reqScopes,
+				},
+				RotationIntegrationName: sc.IntegrationName,
+				RotationPolicyName:      rotationPolicies[sc.Details[MongoDBAtlasRequiredKeys[0]].(string)],
+				SecretName:              opts.SecretName,
+			}
+			resp, err := opts.PreviewClient.CreateMongoDBAtlasRotatingSecret(req, nil)
+			if err != nil {
+				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
+			}
+
+			if err := opts.Output.Display(newRotatingSecretsDisplayer(true).PreviewRotatingSecrets(resp.Payload.Config)); err != nil {
+				return err
+			}
+		}
 	}
 
-	req := secret_service.NewCreateAppKVSecretParamsWithContext(opts.Ctx)
-	req.LocationOrganizationID = opts.Profile.OrganizationID
-	req.LocationProjectID = opts.Profile.ProjectID
-	req.AppName = opts.AppName
-
-	req.Body = secret_service.CreateAppKVSecretBody{
-		Name:  opts.SecretName,
-		Value: opts.SecretValuePlaintext,
-	}
-
-	resp, err := opts.Client.CreateAppKVSecret(req, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
-	}
-
-	if err := opts.Output.Display(newDisplayer().Secrets(resp.Payload.Secret)); err != nil {
-		return err
-	}
-
-	command := fmt.Sprintf(`$ hcp vault-secrets secrets read %s --app %s`, opts.SecretName, req.AppName)
+	command := fmt.Sprintf(`$ hcp vault-secrets secrets read %s --app %s`, opts.SecretName, opts.AppName)
 	fmt.Fprintln(opts.IO.Err())
 	fmt.Fprintf(opts.IO.Err(), "%s Successfully created secret with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.SecretName)
 	fmt.Fprintln(opts.IO.Err())
@@ -175,4 +335,34 @@ func readPlainTextSecret(opts *CreateOpts) error {
 	}
 	opts.SecretValuePlaintext = string(data)
 	return nil
+}
+
+func validateRotatingSecretConfig(sc RotatingSecretConfig) []string {
+	var missingKeys []string
+
+	if sc.Type == "" {
+		missingKeys = append(missingKeys, "type")
+	}
+
+	if sc.IntegrationName == "" {
+		missingKeys = append(missingKeys, "rotation_integration_name")
+	}
+
+	if sc.PolicyName == "" {
+		missingKeys = append(missingKeys, "rotation_policy_name")
+	}
+
+	return missingKeys
+}
+
+func validateDetails(details map[string]any, requiredKeys []string) []string {
+	detailsKeys := maps.Keys(details)
+	var missingKeys []string
+
+	for _, r := range requiredKeys {
+		if !slices.Contains(detailsKeys, r) {
+			missingKeys = append(missingKeys, r)
+		}
+	}
+	return missingKeys
 }

@@ -133,11 +133,10 @@ func TestDeleteRun(t *testing.T) {
 				vs.EXPECT().DeleteTwilioIntegration(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 			} else {
 				vs.EXPECT().DeleteTwilioIntegration(&preview_secret_service.DeleteTwilioIntegrationParams{
-					OrganizationID:  "123",
-					ProjectID:       "abc",
-					IntegrationName: opts.IntegrationName,
-					Name:            &opts.IntegrationName,
-					Context:         opts.Ctx,
+					OrganizationID: "123",
+					ProjectID:      "abc",
+					Name:           opts.IntegrationName,
+					Context:        opts.Ctx,
 				}, nil).Return(&preview_secret_service.DeleteTwilioIntegrationOK{}, nil).Once()
 			}
 

@@ -232,3 +232,53 @@ func (d *displayer) openAppSecretsPayload() any {
 	}
 	return d.openAppSecrets
 }
+
+type rotatingSecretsDisplayer struct {
+	previewRotatingSecrets []*preview_models.Secrets20231128RotatingSecretConfig
+	single                 bool
+
+	format format.Format
+}
+
+func newRotatingSecretsDisplayer(single bool) *rotatingSecretsDisplayer {
+	return &rotatingSecretsDisplayer{
+		single: single,
+		format: format.Table,
+	}
+}
+
+func (r *rotatingSecretsDisplayer) PreviewRotatingSecrets(secrets ...*preview_models.Secrets20231128RotatingSecretConfig) *rotatingSecretsDisplayer {
+	r.previewRotatingSecrets = secrets
+	return r
+}
+
+func (r *rotatingSecretsDisplayer) DefaultFormat() format.Format {
+	return r.format
+}
+
+func (r *rotatingSecretsDisplayer) Payload() any {
+	if r.single {
+		if len(r.previewRotatingSecrets) != 1 {
+			return nil
+		}
+		return r.previewRotatingSecrets[0]
+	}
+	return r.previewRotatingSecrets
+}
+
+func (r *rotatingSecretsDisplayer) FieldTemplates() []format.Field {
+	return []format.Field{
+		{
+			Name:        "Secret Name",
+			ValueFormat: "{{ .SecretName }}",
+		},
+		{
+			Name:        " Rotation Integration",
+			ValueFormat: "{{ .RotationIntegrationName }}",
+		},
+		{
+			Name:        " Rotation Policy",
+			ValueFormat: "{{ .RotationPolicyName }}",
+		},
+	}
+}

@@ -127,10 +127,12 @@ func createRun(opts *CreateOpts) error {
 		}
 
 		body := &preview_models.SecretServiceCreateTwilioIntegrationBody{
-			Name:               opts.IntegrationName,
-			TwilioAccountSid:   i.Details[TwilioKeys[0]],
-			TwilioAPIKeySecret: i.Details[TwilioKeys[1]],
-			TwilioAPIKeySid:    i.Details[TwilioKeys[2]],
+			Name: opts.IntegrationName,
+			StaticCredentialDetails: &preview_models.Secrets20231128TwilioStaticCredentialsRequest{
+				AccountSid:   i.Details[TwilioKeys[0]],
+				APIKeySecret: i.Details[TwilioKeys[1]],
+				APIKeySid:    i.Details[TwilioKeys[2]],
+			},
 		}
 
 		_, err := opts.PreviewClient.CreateTwilioIntegration(&preview_secret_service.CreateTwilioIntegrationParams{
@@ -152,9 +154,11 @@ func createRun(opts *CreateOpts) error {
 		}
 
 		body := &preview_models.SecretServiceCreateMongoDBAtlasIntegrationBody{
-			Name:                 opts.IntegrationName,
-			MongodbAPIPrivateKey: i.Details[MongoKeys[0]],
-			MongodbAPIPublicKey:  i.Details[MongoKeys[1]],
+			Name: opts.IntegrationName,
+			StaticCredentialDetails: &preview_models.Secrets20231128MongoDBAtlasStaticCredentialsRequest{
+				APIPrivateKey: i.Details[MongoKeys[0]],
+				APIPublicKey:  i.Details[MongoKeys[1]],
+			},
 		}
 
 		_, err := opts.PreviewClient.CreateMongoDBAtlasIntegration(&preview_secret_service.CreateMongoDBAtlasIntegrationParams{
