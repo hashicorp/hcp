@@ -143,7 +143,7 @@ func TestCreateRun(t *testing.T) {
 		Input            []byte
 	}{
 		{
-			Name:   "Failed: Read via stdin as hypen not supplied for --data-file flag",
+			Name:   "Failed: Read via stdin as hyphen not supplied for --data-file flag",
 			ErrMsg: "data file path is required",
 		},
 		{
@@ -223,6 +223,15 @@ rotation_integration_name: "Aws-Int-12"
 details: 
   default_ttl: "30"
   role_arn: "ra"`),
+		},
+		{
+			Name:    "Failed: Unsupported secret type",
+			RespErr: true,
+			AugmentOpts: func(o *CreateOpts) {
+				o.Type = "random"
+			},
+			Input:  []byte{},
+			ErrMsg: "\"random\" is an unsupported secret type; \"static\", \"rotating\", \"dynamic\" are available types",
 		},
 	}
 

@@ -283,7 +283,11 @@ func createRun(opts *CreateOpts) error {
 			if err := opts.Output.Display(newRotatingSecretsDisplayer(true).PreviewRotatingSecrets(resp.Payload.Config)); err != nil {
 				return err
 			}
+
+		default:
+			return fmt.Errorf("unsupported rotating secret provider type")
 		}
+
 	case Dynamic:
 		sc, err := readConfigFile(opts)
 		if err != nil {
@@ -348,7 +352,13 @@ func createRun(opts *CreateOpts) error {
 			if err != nil {
 				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 			}
+
+		default:
+			return fmt.Errorf("unsupported dynamic secret provider type")
 		}
+
+	default:
+		return fmt.Errorf("%q is an unsupported secret type; \"static\", \"rotating\", \"dynamic\" are available types", opts.Type)
 	}
 
 	command := fmt.Sprintf(`$ hcp vault-secrets secrets read %s --app %s`, opts.SecretName, opts.AppName)
