@@ -28,6 +28,13 @@ func NewCmdPrintAccessToken(ctx *cmd.Context) *cmd.Command {
 				Preamble: "To print the access token:",
 				Command:  "$ hcp auth print-access-token",
 			},
+			{
+				Preamble: "To use the access token when curling an API:",
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				$ curl https://api.cloud.hashicorp.com/iam/2019-12-10/caller-identity \
+				  --header "Authorization: Bearer $(hcp auth print-access-token)"
+				  `),
+			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {
 			hcpCfg, err := auth.GetHCPConfig(hcpconf.WithoutBrowserLogin())
