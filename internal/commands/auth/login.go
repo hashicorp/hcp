@@ -76,6 +76,10 @@ func NewCmdLogin(ctx *cmd.Context) *cmd.Command {
 				Command:  "$ hcp auth login",
 			},
 			{
+				Preamble: "Login interactively without opening the default browser:",
+				Command:  "$ hcp auth login --default-browser=false",
+			},
+			{
 				Preamble: "Login using service principal credentials:",
 				Command:  "$ hcp auth login --client-id=spID --client-secret=spSecret",
 			},
@@ -108,6 +112,11 @@ func NewCmdLogin(ctx *cmd.Context) *cmd.Command {
 				`),
 					Value:        flagvalue.Simple("", &opts.CredentialFile),
 					Autocomplete: complete.PredictFiles("*.json"),
+				},
+				{
+					Name:        "default-browser",
+					Description: "Whether to open the default browser for interactive login.",
+					Value:       flagvalue.Simple(true, &opts.DefaultBrowser),
 				},
 			},
 		},
@@ -151,6 +160,10 @@ type LoginOpts struct {
 	// principal credentials.
 	ClientID     string
 	ClientSecret string
+
+	// DefaultBrowser is used to determine if the default browser should be
+	// opened for interactive login.
+	DefaultBrowser bool
 }
 
 func (o *LoginOpts) Validate() error {
@@ -185,6 +198,12 @@ func loginRun(opts *LoginOpts) error {
 		storeCredFile = true
 	} else {
 		options = append(options, hcpconf.FromEnv())
+	}
+
+	// Don't open the default browser if requested.
+	fmt.Println(opts.DefaultBrowser)
+	if opts.DefaultBrowser {
+		options = append(options, hcpconf.WithoutOpenDefaultBrowser())
 	}
 
 	// Get a HCP config
