@@ -97,6 +97,10 @@ github.com/hashicorp/hcl/v2 v2.19.1 h1://i05Jqznmb2EXqa39Nsvyan2o5XyMowW5fnCKW5R
 github.com/hashicorp/hcl/v2 v2.19.1/go.mod h1:ThLC89FV4p9MPW804KVbe/cEXoQ8NZEh+JtMeeGErHE=
 github.com/hashicorp/hcp-sdk-go v0.104.0 h1:uKAgAzXdjb+JgLgoT0Ta1/N/NEYTyCBHZUrknhJsBsQ=
 github.com/hashicorp/hcp-sdk-go v0.104.0/go.mod h1:vQ4fzdL1AmhIAbCw+4zmFe5Hbpajj3NvRWkJoVuxmAk=
+github.com/hashicorp/hcp-sdk-go v0.108.0 h1:MgP7vGTx5A34l9HpktvQSY4nNfwCBpIXRJhJCHCxcyQ=
+github.com/hashicorp/hcp-sdk-go v0.108.0/go.mod h1:vQ4fzdL1AmhIAbCw+4zmFe5Hbpajj3NvRWkJoVuxmAk=
+github.com/hashicorp/hcp-sdk-go v0.109.0 h1:fCXP3nh9ytQL21Tp7evbeyG3EaDp21bEdIQWbwov+nQ=
+github.com/hashicorp/hcp-sdk-go v0.109.0/go.mod h1:vQ4fzdL1AmhIAbCw+4zmFe5Hbpajj3NvRWkJoVuxmAk=
 github.com/huandu/xstrings v1.3.1/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
 github.com/huandu/xstrings v1.3.2/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
 github.com/huandu/xstrings v1.3.3/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
