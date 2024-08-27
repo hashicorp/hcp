@@ -125,18 +125,12 @@ type CreateOpts struct {
 	Client               secret_service.ClientService
 }
 
-type RotatingSecretConfig struct {
+type SecretConfig struct {
 	Version         string
 	Type            integrations.IntegrationType
 	IntegrationName string `yaml:"integration_name"`
 	PolicyName      string `yaml:"rotation_policy_name"`
 	Details         map[string]any
-}
-
-type DynamicSecretConfig struct {
-	Version    string
-	Type       integrations.IntegrationType
-	DefaultTtl string `yaml:"default_ttl"`
 }
 
 type MongoDBRole struct {
@@ -151,10 +145,10 @@ type MongoDBScope struct {
 }
 
 var (
-	// There are no Twilio-specific keys
-	MongoDBAtlasRequiredKeys = []string{"mongodb_group_id", "mongodb_roles"}
-	AwsKeys                  = []string{"default_ttl", "role_arn"}
-	GcpKeys                  = []string{"default_ttl", "service_account_email"}
+	TwilioRequiredKeys       = []string{"rotation_policy_name"}
+	MongoDBAtlasRequiredKeys = []string{"rotation_policy_name", "mongodb_group_id", "mongodb_roles"}
+	AwsRequiredKeys          = []string{"default_ttl", "role_arn"}
+	GcpRequiredKeys          = []string{"default_ttl", "service_account_email"}
 )
 
 var rotationPolicies = map[string]string{
@@ -194,7 +188,7 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("failed to process config file: %w", err)
 		}
 
-		missingFields := validateRotatingSecretConfig(sc)
+		missingFields := validateSecretConfig(sc)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
@@ -202,6 +196,12 @@ func createRun(opts *CreateOpts) error {
 
 		switch sc.Type {
 		case integrations.Twilio:
+			missingDetails := validateDetails(sc.Details, TwilioRequiredKeys)
+
+			if len(missingDetails) > 0 {
+				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
+			}
+
 			req := preview_secret_service.NewCreateTwilioRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
@@ -290,7 +290,8 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("failed to process config file: %w", err)
 		}
 
-		missingFields := validateDynamicSecretConfig(sc)
+		missingFields := validateSecretConfig(sc)
+
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 		}
@@ -298,7 +299,7 @@ func createRun(opts *CreateOpts) error {
 		switch sc.Type {
 		case integrations.AWS:
 
-			missingDetails := validateDetails(sc.Details, AwsKeys)
+			missingDetails := validateDetails(sc.Details, AwsRequiredKeys)
 
 			if len(missingDetails) > 0 {
 				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
@@ -310,9 +311,9 @@ func createRun(opts *CreateOpts) error {
 			req.AppName = opts.AppName
 			req.Body = &preview_models.SecretServiceCreateAwsDynamicSecretBody{
 				IntegrationName: sc.IntegrationName,
-				DefaultTTL:      sc.Details[AwsKeys[0]].(string),
+				DefaultTTL:      sc.Details[AwsRequiredKeys[0]].(string),
 				AssumeRole: &preview_models.Secrets20231128AssumeRoleRequest{
-					RoleArn: sc.Details[AwsKeys[1]].(string),
+					RoleArn: sc.Details[AwsRequiredKeys[1]].(string),
 				},
 				Name: opts.SecretName,
 			}
@@ -324,7 +325,7 @@ func createRun(opts *CreateOpts) error {
 
 		case integrations.GCP:
 
-			missingDetails := validateDetails(sc.Details, GcpKeys)
+			missingDetails := validateDetails(sc.Details, GcpRequiredKeys)
 
 			if len(missingDetails) > 0 {
 				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
@@ -336,9 +337,9 @@ func createRun(opts *CreateOpts) error {
 			req.AppName = opts.AppName
 			req.Body = &preview_models.SecretServiceCreateGcpDynamicSecretBody{
 				IntegrationName: sc.IntegrationName,
-				DefaultTTL:      sc.Details[GcpKeys[0]].(string),
+				DefaultTTL:      sc.Details[GcpRequiredKeys[0]].(string),
 				ServiceAccountImpersonation: &preview_models.Secrets20231128ServiceAccountImpersonationRequest{
-					ServiceAccountEmail: sc.Details[GcpKeys[1]].(string),
+					ServiceAccountEmail: sc.Details[GcpRequiredKeys[1]].(string),
 				},
 				Name: opts.SecretName,
 			}
@@ -401,8 +402,9 @@ func readPlainTextSecret(opts *CreateOpts) error {
 	return nil
 }
 
-func readConfigFile(opts *CreateOpts) (RotatingSecretConfig, error) {
-	var sc RotatingSecretConfig
+func readConfigFile(opts *CreateOpts) (SecretConfig, error) {
+	var sc SecretConfig
+
 	f, err := os.ReadFile(opts.SecretFilePath)
 	if err != nil {
 		return sc, fmt.Errorf("unable to open config file: %w", err)
@@ -416,7 +418,7 @@ func readConfigFile(opts *CreateOpts) (RotatingSecretConfig, error) {
 	return sc, nil
 }
 
-func validateRotatingSecretConfig(sc RotatingSecretConfig) []string {
+func validateSecretConfig(sc SecretConfig) []string {
 	var missingKeys []string
 
 	if sc.Type == "" {
@@ -425,20 +427,6 @@ func validateRotatingSecretConfig(sc RotatingSecretConfig) []string {
 
 	if sc.IntegrationName == "" {
 		missingKeys = append(missingKeys, "integration_name")
-	}
-
-	if sc.PolicyName == "" {
-		missingKeys = append(missingKeys, "rotation_policy_name")
-	}
-
-	return missingKeys
-}
-
-func validateDynamicSecretConfig(sc DynamicSecretConfig) []string {
-	var missingKeys []string
-
-	if sc.DefaultTtl == "" {
-		missingKeys = append(missingKeys, "default_ttl")
 	}
 
 	return missingKeys
