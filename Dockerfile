@@ -6,10 +6,8 @@ FROM alpine:3.20 as dev
 COPY bin/hcp /bin/hcp
 RUN apk --no-cache upgrade && apk --no-cache add \
 	bash \
-	curl \
 	jq \
-	nano \
-	vim=9.1.0678-r0 # https://security.alpinelinux.org/vuln/CVE-2024-43374
+	nano
 RUN touch ~/.bashrc && hcp --autocomplete-install
 CMD ["/bin/bash"]
 
@@ -35,10 +33,8 @@ LABEL name="HCP CLI" \
 COPY dist/$TARGETOS/$TARGETARCH/$BIN_NAME /bin/
 RUN apk --no-cache upgrade && apk --no-cache add \
 	bash \
-	curl \
 	jq \
-	nano \
-	vim=9.1.0678-r0 # https://security.alpinelinux.org/vuln/CVE-2024-43374
+	nano
 RUN touch ~/.bashrc
 RUN hcp --autocomplete-install
 CMD ["/bin/bash"]
