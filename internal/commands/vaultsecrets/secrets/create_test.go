@@ -199,7 +199,7 @@ rotation_policy_name: "60"`),
 		},
 		{
 			Name:    "Failed: Missing required rotating secret field",
-			RespErr: false,
+			RespErr: true,
 			AugmentOpts: func(o *CreateOpts) {
 				o.Type = Rotating
 			},
@@ -208,7 +208,21 @@ type: "twilio"
 integration_name: "Twil-Int-11"
 details:
   none: "none"`),
-			ErrMsg: "missing required field(s) in the config file: [rotation_policy_name]",
+			ErrMsg: "missing required field(s) in the config file details: [rotation_policy_name]",
+		},
+		{
+			Name:    "Success: Create an Aws dynamic secret",
+			RespErr: false,
+			AugmentOpts: func(o *CreateOpts) {
+				o.Type = Dynamic
+			},
+			MockCalled: true,
+			Input: []byte(`version: 1.0.0
+type: "aws"
+rotation_integration_name: "Aws-Int-12"
+details: 
+  default_ttl: "30"
+  role_arn: "ra"`),
 		},
 	}
 
@@ -246,7 +260,7 @@ details:
 				c.AugmentOpts(opts)
 			}
 
-			if opts.Type == Rotating {
+			if opts.Type == Rotating || opts.Type == Dynamic {
 				tempDir := t.TempDir()
 				f, err := os.Create(filepath.Join(tempDir, "config.yaml"))
 				r.NoError(err)
@@ -309,6 +323,39 @@ details:
 									IntegrationName:    "Twil-Int-11",
 									RotationPolicyName: "built-in:60-days-2-active",
 									SecretName:         opts.SecretName,
+								},
+							},
+						}, nil).Once()
+					}
+				}
+			} else if opts.Type == Dynamic {
+				if c.MockCalled {
+					if c.RespErr {
+						pvs.EXPECT().CreateAwsDynamicSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+					} else {
+						pvs.EXPECT().CreateAwsDynamicSecret(&preview_secret_service.CreateAwsDynamicSecretParams{
+							OrganizationID: testProfile(t).OrganizationID,
+							ProjectID:      testProfile(t).ProjectID,
+							AppName:        testProfile(t).VaultSecrets.AppName,
+							Body: &preview_models.SecretServiceCreateAwsDynamicSecretBody{
+								IntegrationName: "Aws-Int-12",
+								Name:            opts.SecretName,
+								DefaultTTL:      "30",
+								AssumeRole: &preview_models.Secrets20231128AssumeRoleRequest{
+									RoleArn: "ra",
+								},
+							},
+							Context: opts.Ctx,
+						}, mock.Anything).Return(&preview_secret_service.CreateAwsDynamicSecretOK{
+							Payload: &preview_models.Secrets20231128CreateAwsDynamicSecretResponse{
+								Secret: &preview_models.Secrets20231128AwsDynamicSecret{
+									AssumeRole: &preview_models.Secrets20231128AssumeRoleResponse{
+										RoleArn: "ra",
+									},
+									DefaultTTL:      "30",
+									CreatedAt:       dt,
+									IntegrationName: "Aws-Int-12",
+									Name:            opts.SecretName,
 								},
 							},
 						}, nil).Once()
