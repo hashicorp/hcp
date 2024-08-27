@@ -29,14 +29,6 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
 
-type SecretType string
-
-const (
-	Static   SecretType = "static"
-	Rotating SecretType = "rotating"
-	Dynamic  SecretType = "dynamic"
-)
-
 func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 	opts := &CreateOpts{
 		Ctx:           ctx.ShutdownCtx,
@@ -51,7 +43,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		Name:      "create",
 		ShortHelp: "Create a new static secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create" }} command creates a new static secret under a Vault Secrets application.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create" }} command creates a new static, rotating, or dynamic secret under a Vault Secrets application.
 		`),
 		Examples: []cmd.Example{
 			{
@@ -120,7 +112,7 @@ type CreateOpts struct {
 	SecretName           string
 	SecretValuePlaintext string
 	SecretFilePath       string
-	Type                 SecretType
+	Type                 string
 	PreviewClient        preview_secret_service.ClientService
 	Client               secret_service.ClientService
 }
@@ -159,7 +151,7 @@ var rotationPolicies = map[string]string{
 
 func createRun(opts *CreateOpts) error {
 	switch opts.Type {
-	case Static, "":
+	case secretTypeKV, "":
 		if err := readPlainTextSecret(opts); err != nil {
 			return err
 		}
@@ -182,7 +174,7 @@ func createRun(opts *CreateOpts) error {
 		if err := opts.Output.Display(newDisplayer().Secrets(resp.Payload.Secret)); err != nil {
 			return err
 		}
-	case Rotating:
+	case secretTypeRotating:
 		sc, err := readConfigFile(opts)
 		if err != nil {
 			return fmt.Errorf("failed to process config file: %w", err)
@@ -232,7 +224,7 @@ func createRun(opts *CreateOpts) error {
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 
-			roles := sc.Details["mongodb_roles"].([]interface{})
+			roles := sc.Details["mongodb_roles"].([]any)
 			var reqRoles []*preview_models.Secrets20231128MongoDBRole
 			for _, r := range roles {
 				var role MongoDBRole
@@ -249,7 +241,7 @@ func createRun(opts *CreateOpts) error {
 				reqRoles = append(reqRoles, reqRole)
 			}
 
-			scopes := sc.Details["mongodb_scopes"].([]interface{})
+			scopes := sc.Details["mongodb_scopes"].([]any)
 			var reqScopes []*preview_models.Secrets20231128MongoDBScope
 			for _, r := range scopes {
 				var scope MongoDBScope
@@ -288,7 +280,7 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("unsupported rotating secret provider type")
 		}
 
-	case Dynamic:
+	case secretTypeDynamic:
 		sc, err := readConfigFile(opts)
 		if err != nil {
 			return fmt.Errorf("failed to process config file: %w", err)
