@@ -153,7 +153,7 @@ func TestCreateRun(t *testing.T) {
 			RespErr:          true,
 			AugmentOpts: func(o *CreateOpts) {
 				o.SecretFilePath = "-"
-				o.Type = Static
+				o.Type = secretTypeKV
 			},
 			ErrMsg: "secret value cannot be empty",
 		},
@@ -162,7 +162,7 @@ func TestCreateRun(t *testing.T) {
 			ReadViaStdin: true,
 			AugmentOpts: func(o *CreateOpts) {
 				o.SecretFilePath = "-"
-				o.Type = Static
+				o.Type = secretTypeKV
 			},
 			MockCalled: true,
 		},
@@ -172,7 +172,7 @@ func TestCreateRun(t *testing.T) {
 			ErrMsg:  "[POST /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secret/kv][429] CreateAppKVSecret default  &{Code:8 Details:[] Message:maximum number of secret versions reached}",
 			AugmentOpts: func(o *CreateOpts) {
 				o.SecretValuePlaintext = testSecretValue
-				o.Type = Static
+				o.Type = secretTypeKV
 			},
 			MockCalled: true,
 		},
@@ -181,7 +181,7 @@ func TestCreateRun(t *testing.T) {
 			RespErr: false,
 			AugmentOpts: func(o *CreateOpts) {
 				o.SecretValuePlaintext = testSecretValue
-				o.Type = Static
+				o.Type = secretTypeKV
 			},
 			MockCalled: true,
 		},
@@ -189,19 +189,20 @@ func TestCreateRun(t *testing.T) {
 			Name:    "Success: Create a Twilio rotating secret",
 			RespErr: false,
 			AugmentOpts: func(o *CreateOpts) {
-				o.Type = Rotating
+				o.Type = secretTypeRotating
 			},
 			MockCalled: true,
 			Input: []byte(`version: 1.0.0
 type: "twilio"
 integration_name: "Twil-Int-11"
-rotation_policy_name: "60"`),
+details: 
+  rotation_policy_name: "60"`),
 		},
 		{
 			Name:    "Failed: Missing required rotating secret field",
 			RespErr: true,
 			AugmentOpts: func(o *CreateOpts) {
-				o.Type = Rotating
+				o.Type = secretTypeRotating
 			},
 			Input: []byte(`version: 1.0.0
 type: "twilio"
@@ -214,12 +215,12 @@ details:
 			Name:    "Success: Create an Aws dynamic secret",
 			RespErr: false,
 			AugmentOpts: func(o *CreateOpts) {
-				o.Type = Dynamic
+				o.Type = secretTypeDynamic
 			},
 			MockCalled: true,
 			Input: []byte(`version: 1.0.0
 type: "aws"
-rotation_integration_name: "Aws-Int-12"
+integration_name: "Aws-Int-12"
 details: 
   default_ttl: "30"
   role_arn: "ra"`),
@@ -269,7 +270,7 @@ details:
 				c.AugmentOpts(opts)
 			}
 
-			if opts.Type == Rotating || opts.Type == Dynamic {
+			if opts.Type == secretTypeRotating || opts.Type == secretTypeDynamic {
 				tempDir := t.TempDir()
 				f, err := os.Create(filepath.Join(tempDir, "config.yaml"))
 				r.NoError(err)
@@ -279,7 +280,7 @@ details:
 			}
 
 			dt := strfmt.NewDateTime()
-			if opts.Type == Static {
+			if opts.Type == secretTypeKV {
 				if c.MockCalled {
 					if c.RespErr {
 						vs.EXPECT().CreateAppKVSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
@@ -309,7 +310,7 @@ details:
 						}, nil).Once()
 					}
 				}
-			} else if opts.Type == Rotating {
+			} else if opts.Type == secretTypeRotating {
 				if c.MockCalled {
 					if c.RespErr {
 						pvs.EXPECT().CreateTwilioRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
@@ -337,7 +338,7 @@ details:
 						}, nil).Once()
 					}
 				}
-			} else if opts.Type == Dynamic {
+			} else if opts.Type == secretTypeDynamic {
 				if c.MockCalled {
 					if c.RespErr {
 						pvs.EXPECT().CreateAwsDynamicSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
