@@ -1,0 +1,6 @@
+```release-note:security
+Address vulnerabilities for docker image
+- CVE-2024-7264 curl
+- CVE-2024-43374 vim
+Removed both dependencies from image build
+```
