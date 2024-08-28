@@ -1,0 +1,3 @@
+```release-note:bug
+security: address vulnerabilities for docker image CVE-2024-7264 (curl) and CVE-2024-43374 (vim)
+```

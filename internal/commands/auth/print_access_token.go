@@ -17,7 +17,7 @@ func NewCmdPrintAccessToken(ctx *cmd.Context) *cmd.Command {
 		Name:      "print-access-token",
 		ShortHelp: "Print the access token for the authenticated account.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp auth print-access-token" }} command 
+		The {{ template "mdCodeOrBold" "hcp auth print-access-token" }} command
 		prints an access token for the currently authenticated account.
 
 		The output of this command can be used to set the {{ template "mdCodeOrBold"
