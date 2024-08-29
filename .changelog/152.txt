@@ -1,0 +1,3 @@
+```release-note:bug
+security: address vulnerability for docker image CVE-2024-43790 / CVE-2024-43802 (vim)
+```
