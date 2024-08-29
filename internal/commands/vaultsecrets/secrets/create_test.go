@@ -185,7 +185,7 @@ func TestCreateRun(t *testing.T) {
 			MockCalled: true,
 			Input: []byte(`version: 1.0.0
 type: "twilio"
-rotation_integration_name: "Twil-Int-11"
+integration_name: "Twil-Int-11"
 rotation_policy_name: "60"`),
 		},
 		{
@@ -196,7 +196,7 @@ rotation_policy_name: "60"`),
 			},
 			Input: []byte(`version: 1.0.0
 type: "twilio"
-rotation_integration_name: "Twil-Int-11"
+integration_name: "Twil-Int-11"
 details:
   none: "none"`),
 			ErrMsg: "missing required field(s) in the config file: [rotation_policy_name]",
