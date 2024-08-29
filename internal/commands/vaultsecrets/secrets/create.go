@@ -136,10 +136,14 @@ type MongoDBScope struct {
 	Type string `mapstructure:"name"`
 }
 
+type AwsAssumeRole struct {
+	RoleArn string `mapstructure:"role_arn"`
+}
+
 var (
 	TwilioRequiredKeys       = []string{"rotation_policy_name"}
 	MongoDBAtlasRequiredKeys = []string{"rotation_policy_name", "mongodb_group_id", "mongodb_roles"}
-	AwsRequiredKeys          = []string{"default_ttl", "role_arn"}
+	AwsRequiredKeys          = []string{"default_ttl", "assume_role"}
 	GcpRequiredKeys          = []string{"default_ttl", "service_account_email"}
 )
 
@@ -301,6 +305,12 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
 			}
 
+			var role AwsAssumeRole
+			decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{WeaklyTypedInput: true, Result: &role})
+			if err := decoder.Decode(sc.Details[AwsRequiredKeys[1]].(any)); err != nil {
+				return fmt.Errorf("unable to decode aws assume_role")
+			}
+
 			req := preview_secret_service.NewCreateAwsDynamicSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
@@ -309,7 +319,7 @@ func createRun(opts *CreateOpts) error {
 				IntegrationName: sc.IntegrationName,
 				DefaultTTL:      sc.Details[AwsRequiredKeys[0]].(string),
 				AssumeRole: &preview_models.Secrets20231128AssumeRoleRequest{
-					RoleArn: sc.Details[AwsRequiredKeys[1]].(string),
+					RoleArn: role.RoleArn,
 				},
 				Name: opts.SecretName,
 			}

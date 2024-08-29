@@ -223,7 +223,8 @@ type: "aws"
 integration_name: "Aws-Int-12"
 details: 
   default_ttl: "3600s"
-  role_arn: "ra"`),
+  assume_role:
+    role_arn: "ra"`),
 		},
 		{
 			Name:    "Failed: Unsupported secret type",
@@ -350,7 +351,7 @@ details:
 							Body: &preview_models.SecretServiceCreateAwsDynamicSecretBody{
 								IntegrationName: "Aws-Int-12",
 								Name:            opts.SecretName,
-								DefaultTTL:      "30",
+								DefaultTTL:      "3600s",
 								AssumeRole: &preview_models.Secrets20231128AssumeRoleRequest{
 									RoleArn: "ra",
 								},
@@ -362,7 +363,7 @@ details:
 									AssumeRole: &preview_models.Secrets20231128AssumeRoleResponse{
 										RoleArn: "ra",
 									},
-									DefaultTTL:      "30",
+									DefaultTTL:      "3600s",
 									CreatedAt:       dt,
 									IntegrationName: "Aws-Int-12",
 									Name:            opts.SecretName,
