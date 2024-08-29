@@ -144,10 +144,8 @@ type MongoDBScope struct {
 	Type string `mapstructure:"name"`
 }
 
-var (
-	// There are no Twilio-specific keys
-	MongoDBAtlasRequiredKeys = []string{"mongodb_group_id", "mongodb_roles"}
-)
+// There are no Twilio-specific keys
+var MongoDBAtlasRequiredKeys = []string{"mongodb_group_id", "mongodb_roles"}
 
 var rotationPolicies = map[string]string{
 	"30": "built-in:30-days-2-active",
@@ -156,7 +154,6 @@ var rotationPolicies = map[string]string{
 }
 
 func createRun(opts *CreateOpts) error {
-
 	switch opts.Type {
 	case Static, "":
 		if err := readPlainTextSecret(opts); err != nil {
@@ -207,9 +204,9 @@ func createRun(opts *CreateOpts) error {
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 			req.Body = &preview_models.SecretServiceCreateTwilioRotatingSecretBody{
-				RotationIntegrationName: sc.IntegrationName,
-				RotationPolicyName:      rotationPolicies[sc.PolicyName],
-				SecretName:              opts.SecretName,
+				IntegrationName:    sc.IntegrationName,
+				RotationPolicyName: rotationPolicies[sc.PolicyName],
+				SecretName:         opts.SecretName,
 			}
 
 			resp, err := opts.PreviewClient.CreateTwilioRotatingSecret(req, nil)
@@ -271,9 +268,9 @@ func createRun(opts *CreateOpts) error {
 					MongodbRoles:   reqRoles,
 					MongodbScopes:  reqScopes,
 				},
-				RotationIntegrationName: sc.IntegrationName,
-				RotationPolicyName:      rotationPolicies[sc.Details[MongoDBAtlasRequiredKeys[0]].(string)],
-				SecretName:              opts.SecretName,
+				IntegrationName:    sc.IntegrationName,
+				RotationPolicyName: rotationPolicies[sc.Details[MongoDBAtlasRequiredKeys[0]].(string)],
+				SecretName:         opts.SecretName,
 			}
 			resp, err := opts.PreviewClient.CreateMongoDBAtlasRotatingSecret(req, nil)
 			if err != nil {

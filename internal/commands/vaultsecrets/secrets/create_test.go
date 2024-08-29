@@ -287,19 +287,19 @@ details:
 							ProjectID:      testProfile(t).ProjectID,
 							AppName:        testProfile(t).VaultSecrets.AppName,
 							Body: &preview_models.SecretServiceCreateTwilioRotatingSecretBody{
-								SecretName:              opts.SecretName,
-								RotationIntegrationName: "Twil-Int-11",
-								RotationPolicyName:      "built-in:60-days-2-active",
+								SecretName:         opts.SecretName,
+								IntegrationName:    "Twil-Int-11",
+								RotationPolicyName: "built-in:60-days-2-active",
 							},
 							Context: opts.Ctx,
 						}, mock.Anything).Return(&preview_secret_service.CreateTwilioRotatingSecretOK{
 							Payload: &preview_models.Secrets20231128CreateTwilioRotatingSecretResponse{
 								Config: &preview_models.Secrets20231128RotatingSecretConfig{
-									AppName:                 opts.AppName,
-									CreatedAt:               dt,
-									RotationIntegrationName: "Twil-Int-11",
-									RotationPolicyName:      "built-in:60-days-2-active",
-									SecretName:              opts.SecretName,
+									AppName:            opts.AppName,
+									CreatedAt:          dt,
+									IntegrationName:    "Twil-Int-11",
+									RotationPolicyName: "built-in:60-days-2-active",
+									SecretName:         opts.SecretName,
 								},
 							},
 						}, nil).Once()
