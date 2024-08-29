@@ -222,7 +222,7 @@ details:
 type: "aws"
 integration_name: "Aws-Int-12"
 details: 
-  default_ttl: "30"
+  default_ttl: "3600s"
   role_arn: "ra"`),
 		},
 		{

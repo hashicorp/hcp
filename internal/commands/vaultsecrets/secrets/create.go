@@ -314,6 +314,9 @@ func createRun(opts *CreateOpts) error {
 				Name: opts.SecretName,
 			}
 
+			//var sb preview_models.SecretServiceCreateAwsDynamicSecretBody
+			//err := sb.UnmarshalBinary([]byte{})
+
 			_, err := opts.PreviewClient.CreateAwsDynamicSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
