@@ -128,7 +128,7 @@ type CreateOpts struct {
 type RotatingSecretConfig struct {
 	Version         string
 	Type            integrations.IntegrationType
-	IntegrationName string `yaml:"rotation_integration_name"`
+	IntegrationName string `yaml:"integration_name"`
 	PolicyName      string `yaml:"rotation_policy_name"`
 	Details         map[string]any
 }
@@ -342,7 +342,7 @@ func validateRotatingSecretConfig(sc RotatingSecretConfig) []string {
 	}
 
 	if sc.IntegrationName == "" {
-		missingKeys = append(missingKeys, "rotation_integration_name")
+		missingKeys = append(missingKeys, "integration_name")
 	}
 
 	if sc.PolicyName == "" {
