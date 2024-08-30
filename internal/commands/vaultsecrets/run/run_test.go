@@ -104,19 +104,17 @@ func TestRunRun(t *testing.T) {
 		RespErr         bool
 		ErrMsg          string
 		IOErrorContains string
-		MockCalled      bool
+		PaginatedResp   bool
 	}{
 		{
-			Name:       "Failed: Secret not found",
-			RespErr:    true,
-			Secrets:    nil,
-			ErrMsg:     "[GET /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secrets:open][403]",
-			MockCalled: true,
+			Name:    "Failed: Secret not found",
+			RespErr: true,
+			Secrets: nil,
+			ErrMsg:  "[GET /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secrets:open][403]",
 		},
 		{
-			Name:       "Success",
-			RespErr:    false,
-			MockCalled: true,
+			Name:    "Success",
+			RespErr: false,
 			Secrets: []*preview_models.Secrets20231128OpenSecret{
 				{
 					Name:          "static",
@@ -139,7 +137,6 @@ func TestRunRun(t *testing.T) {
 		{
 			Name:            "Collide",
 			RespErr:         false,
-			MockCalled:      true,
 			ErrMsg:          "multiple secrets map to the same environment variable",
 			IOErrorContains: "ERROR: \"static_collision\" [static], \"static\" [rotating] map to the same environment variable \"STATIC_COLLISION\"",
 			Secrets: []*preview_models.Secrets20231128OpenSecret{
@@ -158,6 +155,29 @@ func TestRunRun(t *testing.T) {
 					RotatingVersion: &preview_models.Secrets20231128OpenSecretRotatingVersion{
 						Values: map[string]string{"collision": ""},
 					},
+				},
+			},
+		},
+		{
+			Name:          "Paginated",
+			PaginatedResp: true,
+			RespErr:       false,
+			Secrets: []*preview_models.Secrets20231128OpenSecret{
+				{
+					Name:          "static_1",
+					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
+				},
+				{
+					Name:          "static_2",
+					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
+				},
+				{
+					Name:          "static_3",
+					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
+				},
+				{
+					Name:          "static_4",
+					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
 				},
 			},
 		},
@@ -182,21 +202,51 @@ func TestRunRun(t *testing.T) {
 				Command:       []string{"echo \"Testing\""},
 			}
 
-			if c.MockCalled {
-				if c.RespErr {
-					vs.EXPECT().OpenAppSecrets(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
-				} else {
-					vs.EXPECT().OpenAppSecrets(&preview_secret_service.OpenAppSecretsParams{
-						OrganizationID: testProfile(t).OrganizationID,
-						ProjectID:      testProfile(t).ProjectID,
-						AppName:        testProfile(t).VaultSecrets.AppName,
-						Context:        opts.Ctx,
-					}, nil).Return(&preview_secret_service.OpenAppSecretsOK{
-						Payload: &preview_models.Secrets20231128OpenAppSecretsResponse{
-							Secrets: c.Secrets,
+			if c.RespErr {
+				vs.EXPECT().OpenAppSecrets(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+			} else if c.PaginatedResp {
+				paginationNextPageToken := "next_page_token"
+
+				// expect first request to be missing the page token
+				// provide half the secrets and a NextPageToken
+				vs.EXPECT().OpenAppSecrets(&preview_secret_service.OpenAppSecretsParams{
+					OrganizationID: testProfile(t).OrganizationID,
+					ProjectID:      testProfile(t).ProjectID,
+					AppName:        testProfile(t).VaultSecrets.AppName,
+					Context:        opts.Ctx,
+				}, mock.Anything).Return(&preview_secret_service.OpenAppSecretsOK{
+					Payload: &preview_models.Secrets20231128OpenAppSecretsResponse{
+						Secrets: c.Secrets[:len(c.Secrets)/2],
+						Pagination: &preview_models.CommonPaginationResponse{
+							NextPageToken: paginationNextPageToken,
 						},
-					}, nil).Once()
-				}
+					},
+				}, nil).Once()
+
+				// expect second request to have a page token
+				// provide later half of the secrets
+				vs.EXPECT().OpenAppSecrets(&preview_secret_service.OpenAppSecretsParams{
+					OrganizationID:          testProfile(t).OrganizationID,
+					ProjectID:               testProfile(t).ProjectID,
+					AppName:                 testProfile(t).VaultSecrets.AppName,
+					Context:                 opts.Ctx,
+					PaginationNextPageToken: &paginationNextPageToken,
+				}, mock.Anything).Return(&preview_secret_service.OpenAppSecretsOK{
+					Payload: &preview_models.Secrets20231128OpenAppSecretsResponse{
+						Secrets: c.Secrets[len(c.Secrets)/2:],
+					},
+				}, nil).Once()
+			} else {
+				vs.EXPECT().OpenAppSecrets(&preview_secret_service.OpenAppSecretsParams{
+					OrganizationID: testProfile(t).OrganizationID,
+					ProjectID:      testProfile(t).ProjectID,
+					AppName:        testProfile(t).VaultSecrets.AppName,
+					Context:        opts.Ctx,
+				}, nil).Return(&preview_secret_service.OpenAppSecretsOK{
+					Payload: &preview_models.Secrets20231128OpenAppSecretsResponse{
+						Secrets: c.Secrets,
+					},
+				}, nil).Once()
 			}
 
 			// Run the command

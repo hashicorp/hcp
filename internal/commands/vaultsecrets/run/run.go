@@ -139,12 +139,7 @@ func runRun(opts *RunOpts) (err error) {
 }
 
 func getAllSecretsForEnv(opts *RunOpts) ([]string, error) {
-	params := preview_secret_service.NewOpenAppSecretsParamsWithContext(opts.Ctx)
-	params.OrganizationID = opts.Profile.OrganizationID
-	params.ProjectID = opts.Profile.ProjectID
-	params.AppName = opts.AppName
-
-	res, err := opts.PreviewClient.OpenAppSecrets(params, nil)
+	secs, err := fetchPaginatedSecrets(opts)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +147,7 @@ func getAllSecretsForEnv(opts *RunOpts) ([]string, error) {
 	result := os.Environ()
 	collisions := make(map[string][]*models.Secrets20231128OpenSecret, 0)
 
-	for _, secret := range res.Payload.Secrets {
+	for _, secret := range secs {
 		// we need to append results in case of duplicates we want secrets to override
 		switch {
 		case secret.RotatingVersion != nil:
@@ -223,4 +218,29 @@ func setupChildProcess(ctx context.Context, command []string, envVars []string) 
 	cmdCtx.Env = envVars
 
 	return cmdCtx
+}
+
+func fetchPaginatedSecrets(opts *RunOpts) ([]*models.Secrets20231128OpenSecret, error) {
+	params := preview_secret_service.NewOpenAppSecretsParamsWithContext(opts.Ctx)
+	params.OrganizationID = opts.Profile.OrganizationID
+	params.ProjectID = opts.Profile.ProjectID
+	params.AppName = opts.AppName
+
+	var secrets []*models.Secrets20231128OpenSecret
+	for {
+		resp, err := opts.PreviewClient.OpenAppSecrets(params, nil)
+		if err != nil {
+			return nil, fmt.Errorf("failed to open app secrets: %w", err)
+		}
+
+		secrets = append(secrets, resp.Payload.Secrets...)
+		if resp.Payload.Pagination == nil || resp.Payload.Pagination.NextPageToken == "" {
+			break
+		}
+
+		next := resp.Payload.Pagination.NextPageToken
+		params.PaginationNextPageToken = &next
+	}
+
+	return secrets, nil
 }

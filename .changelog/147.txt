@@ -1,0 +1,3 @@
+```release-note:bug
+include all secrets from paginated respoonses when invoking `hcp vs run` command
+```
