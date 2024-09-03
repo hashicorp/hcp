@@ -140,11 +140,15 @@ type AwsAssumeRole struct {
 	RoleArn string `mapstructure:"role_arn"`
 }
 
+type GcpServiceAccount struct {
+	ServiceAccountEmail string `mapstructure:"service_account_email"`
+}
+
 var (
 	TwilioRequiredKeys       = []string{"rotation_policy_name"}
 	MongoDBAtlasRequiredKeys = []string{"rotation_policy_name", "mongodb_group_id", "mongodb_roles"}
 	AwsRequiredKeys          = []string{"default_ttl", "assume_role"}
-	GcpRequiredKeys          = []string{"default_ttl", "service_account_email"}
+	GcpRequiredKeys          = []string{"default_ttl", "service_account_impersonation"}
 )
 
 var rotationPolicies = map[string]string{
@@ -337,6 +341,12 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
 			}
 
+			var account GcpServiceAccount
+			decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{WeaklyTypedInput: true, Result: &account})
+			if err := decoder.Decode(sc.Details[GcpRequiredKeys[1]].(any)); err != nil {
+				return fmt.Errorf("unable to decode gcp service_account_impersonation")
+			}
+
 			req := preview_secret_service.NewCreateGcpDynamicSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
@@ -345,7 +355,7 @@ func createRun(opts *CreateOpts) error {
 				IntegrationName: sc.IntegrationName,
 				DefaultTTL:      sc.Details[GcpRequiredKeys[0]].(string),
 				ServiceAccountImpersonation: &preview_models.Secrets20231128ServiceAccountImpersonationRequest{
-					ServiceAccountEmail: sc.Details[GcpRequiredKeys[1]].(string),
+					ServiceAccountEmail: account.ServiceAccountEmail,
 				},
 				Name: opts.SecretName,
 			}
