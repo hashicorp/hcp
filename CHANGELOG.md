@@ -1,3 +1,26 @@
+## 0.5.0 (September 3, 2024)
+
+FEATURES:
+
+* vault-secrets: CRUD operations for vault-secrets gateway pools [[GH-131](https://github.com/hashicorp/hcp/issues/131)]
+
+IMPROVEMENTS:
+
+* Support loading all variables from Waypoint server in Waypoint agent CLI [[GH-148](https://github.com/hashicorp/hcp/issues/148)]
+* Waypoint Templates: Add support for creating/updating Waypoint Templates with Variables [[GH-130](https://github.com/hashicorp/hcp/issues/130)]
+* vault-secrets: Enhances dynamic secrets output [[GH-129](https://github.com/hashicorp/hcp/issues/129)]
+* vault-secrets: adding list gateway pools gateways command to vault-secrets gateway-pools [[GH-133](https://github.com/hashicorp/hcp/issues/133)]
+* vault-secrets: improving vault-secrets gateway-pools read to include associated integrations [[GH-132](https://github.com/hashicorp/hcp/issues/132)]
+* vault-secrets: storing credentials and config files for gateway create [[GH-135](https://github.com/hashicorp/hcp/issues/135)]
+* waypoint: Remove module version flag from templates and add-on definitions commands. Remove module source from update commands. [[GH-118](https://github.com/hashicorp/hcp/issues/118)]
+
+BUG FIXES:
+
+* include all secrets from paginated respoonses when invoking `hcp vs run` command [[GH-147](https://github.com/hashicorp/hcp/issues/147)]
+* security: address vulnerabilities for docker image CVE-2024-7264 (curl) and CVE-2024-43374 (vim) [[GH-151](https://github.com/hashicorp/hcp/issues/151)]
+* security: address vulnerability for docker image CVE-2024-43790 / CVE-2024-43802 (vim) [[GH-152](https://github.com/hashicorp/hcp/issues/152)]
+* vault-secrets: issue an error if formatted secret names collide during a run command [[GH-127](https://github.com/hashicorp/hcp/issues/127)]
+
 ## 0.4.0 (June 25, 2024)
 
 FEATURES:
