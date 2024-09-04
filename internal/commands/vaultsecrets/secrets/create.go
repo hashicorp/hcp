@@ -310,7 +310,7 @@ func createRun(opts *CreateOpts) error {
 
 			var role AwsAssumeRole
 			decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{WeaklyTypedInput: true, Result: &role})
-			if err := decoder.Decode(sc.Details[AwsRequiredKeys[1]].(any)); err != nil {
+			if err := decoder.Decode(sc.Details[AwsRequiredKeys[1]]); err != nil {
 				return fmt.Errorf("unable to decode aws assume_role")
 			}
 
@@ -327,7 +327,7 @@ func createRun(opts *CreateOpts) error {
 				Name: opts.SecretName,
 			}
 
-			_, err := opts.PreviewClient.CreateAwsDynamicSecret(req, nil)
+			_, err = opts.PreviewClient.CreateAwsDynamicSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 			}
@@ -342,7 +342,7 @@ func createRun(opts *CreateOpts) error {
 
 			var account GcpServiceAccount
 			decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{WeaklyTypedInput: true, Result: &account})
-			if err := decoder.Decode(sc.Details[GcpRequiredKeys[1]].(any)); err != nil {
+			if err := decoder.Decode(sc.Details[GcpRequiredKeys[1]]); err != nil {
 				return fmt.Errorf("unable to decode gcp service_account_impersonation")
 			}
 
