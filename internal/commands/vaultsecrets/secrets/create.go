@@ -121,7 +121,6 @@ type SecretConfig struct {
 	Version         string
 	Type            integrations.IntegrationType
 	IntegrationName string `yaml:"integration_name"`
-	PolicyName      string `yaml:"rotation_policy_name"`
 	Details         map[string]any
 }
 
@@ -208,7 +207,7 @@ func createRun(opts *CreateOpts) error {
 			req.AppName = opts.AppName
 			req.Body = &preview_models.SecretServiceCreateTwilioRotatingSecretBody{
 				IntegrationName:    sc.IntegrationName,
-				RotationPolicyName: rotationPolicies[sc.PolicyName],
+				RotationPolicyName: rotationPolicies[sc.Details[TwilioRequiredKeys[0]].(string)],
 				SecretName:         opts.SecretName,
 			}
 
