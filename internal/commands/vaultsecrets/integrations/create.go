@@ -6,12 +6,9 @@ package integrations
 import (
 	"context"
 	"fmt"
-	"os"
 	"slices"
 
-	"golang.org/x/exp/maps"
-	"gopkg.in/yaml.v3"
-
+	"github.com/hashicorp/hcl/v2/hclsimple"
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
@@ -21,6 +18,7 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"golang.org/x/exp/maps"
 )
 
 type CreateOpts struct {
@@ -56,7 +54,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 			{
 				Preamble: `Create a new Vault Secrets integration:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
-				$ hcp vault-secrets integrations create sample-integration --config-file=path-to-file/config.yaml
+				$ hcp vault-secrets integrations create sample-integration --config-file=path-to-file/config.hcl
 				`),
 			},
 		},
@@ -93,9 +91,8 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 }
 
 type IntegrationConfig struct {
-	Version string
-	Type    IntegrationType
-	Details map[string]string
+	Type    IntegrationType   `hcl:"type"`
+	Details map[string]string `hcl:"details"`
 }
 
 var (
@@ -106,16 +103,9 @@ var (
 )
 
 func createRun(opts *CreateOpts) error {
-	// Open the file
-	f, err := os.ReadFile(opts.ConfigFilePath)
-	if err != nil {
-		return fmt.Errorf("failed to open config file: %w", err)
-	}
-
 	var i IntegrationConfig
-	err = yaml.Unmarshal(f, &i)
-	if err != nil {
-		return fmt.Errorf("failed to unmarshal config file: %w", err)
+	if err := hclsimple.DecodeFile(opts.ConfigFilePath, nil, &i); err != nil {
+		return fmt.Errorf("failed to decode config file: %w", err)
 	}
 
 	switch i.Type {
@@ -132,6 +122,9 @@ func createRun(opts *CreateOpts) error {
 				AccountSid:   i.Details[TwilioKeys[0]],
 				APIKeySecret: i.Details[TwilioKeys[1]],
 				APIKeySid:    i.Details[TwilioKeys[2]],
+			},
+			Capabilities: []*preview_models.Secrets20231128Capability{
+				preview_models.Secrets20231128CapabilityROTATION.Pointer(),
 			},
 		}
 
@@ -159,6 +152,9 @@ func createRun(opts *CreateOpts) error {
 				APIPrivateKey: i.Details[MongoKeys[0]],
 				APIPublicKey:  i.Details[MongoKeys[1]],
 			},
+			Capabilities: []*preview_models.Secrets20231128Capability{
+				preview_models.Secrets20231128CapabilityROTATION.Pointer(),
+			},
 		}
 
 		_, err := opts.PreviewClient.CreateMongoDBAtlasIntegration(&preview_secret_service.CreateMongoDBAtlasIntegrationParams{
@@ -185,6 +181,9 @@ func createRun(opts *CreateOpts) error {
 				Audience: i.Details[AWSKeys[0]],
 				RoleArn:  i.Details[AWSKeys[1]],
 			},
+			Capabilities: []*preview_models.Secrets20231128Capability{
+				preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
+			},
 		}
 
 		_, err := opts.PreviewClient.CreateAwsIntegration(&preview_secret_service.CreateAwsIntegrationParams{
@@ -210,6 +209,9 @@ func createRun(opts *CreateOpts) error {
 			FederatedWorkloadIdentity: &preview_models.Secrets20231128GcpFederatedWorkloadIdentityRequest{
 				Audience:            i.Details[GCPKeys[0]],
 				ServiceAccountEmail: i.Details[GCPKeys[1]],
+			},
+			Capabilities: []*preview_models.Secrets20231128Capability{
+				preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
 			},
 		}
 

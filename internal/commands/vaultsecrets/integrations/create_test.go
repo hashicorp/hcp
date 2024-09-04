@@ -110,28 +110,28 @@ func TestCreateRun(t *testing.T) {
 		{
 			Name:            "Good",
 			IntegrationName: "sample-integration",
-			Input: []byte(`version: 1.0.0
-type: "aws"
-details:
-  audience: abc
-  role_arn: def`),
+			Input: []byte(`type = "aws"
+details = {
+  "audience" = "abc",
+  "role_arn" = "def"
+}`),
 		},
 		{
 			Name:            "Missing a single required field",
 			IntegrationName: "sample-integration",
-			Input: []byte(`version: 1.0.0
-type: "mongodb-atlas"
-details:
-  public_key: abc`),
+			Input: []byte(`type = "mongodb-atlas"
+details = {
+  "public_key" = "abc"
+}`),
 			Error: "missing required field(s) in the config file: [private_key]",
 		},
 		{
 			Name:            "Missing multiple required fields",
 			IntegrationName: "sample-integration",
-			Input: []byte(`version: 1.0.0
-type: "twilio"
-details:
-  api_key_sid: ghi`),
+			Input: []byte(`type = "twilio"
+details = {
+  "api_key_sid" = "ghi"
+}`),
 			Error: "missing required field(s) in the config file: [account_sid api_key_secret]",
 		},
 	}
@@ -144,7 +144,7 @@ details:
 			r := require.New(t)
 
 			tempDir := t.TempDir()
-			f, err := os.Create(filepath.Join(tempDir, "config.yaml"))
+			f, err := os.Create(filepath.Join(tempDir, "config.hcl"))
 			r.NoError(err)
 			_, err = f.Write(c.Input)
 			r.NoError(err)
@@ -173,6 +173,9 @@ details:
 							Audience: "abc",
 							RoleArn:  "def",
 						},
+						Capabilities: []*preview_models.Secrets20231128Capability{
+							preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
+						},
 					},
 				}, nil).Return(&preview_secret_service.CreateAwsIntegrationOK{
 					Payload: &preview_models.Secrets20231128CreateAwsIntegrationResponse{
@@ -181,6 +184,9 @@ details:
 							FederatedWorkloadIdentity: &preview_models.Secrets20231128AwsFederatedWorkloadIdentityResponse{
 								Audience: "abc",
 								RoleArn:  "def",
+							},
+							Capabilities: []*preview_models.Secrets20231128Capability{
+								preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
 							},
 						},
 					},
