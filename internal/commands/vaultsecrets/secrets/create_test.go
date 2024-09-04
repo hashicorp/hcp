@@ -70,6 +70,15 @@ func TestNewCmdCreate(t *testing.T) {
 				SecretName: "test",
 			},
 		},
+		{
+			Name:    "Good: Dynamic secret",
+			Profile: testProfile,
+			Args:    []string{"test", "--secret-type=dynamic", "--data-file=DATA_FILE_PATH"},
+			Expect: &CreateOpts{
+				AppName:    testProfile(t).VaultSecrets.AppName,
+				SecretName: "test",
+			},
+		},
 	}
 
 	for _, c := range cases {
@@ -134,7 +143,7 @@ func TestCreateRun(t *testing.T) {
 		Input            []byte
 	}{
 		{
-			Name:   "Failed: Read via stdin as hypen not supplied for --data-file flag",
+			Name:   "Failed: Read via stdin as hyphen not supplied for --data-file flag",
 			ErrMsg: "data file path is required",
 		},
 		{
@@ -144,7 +153,7 @@ func TestCreateRun(t *testing.T) {
 			RespErr:          true,
 			AugmentOpts: func(o *CreateOpts) {
 				o.SecretFilePath = "-"
-				o.Type = Static
+				o.Type = secretTypeKV
 			},
 			ErrMsg: "secret value cannot be empty",
 		},
@@ -153,7 +162,7 @@ func TestCreateRun(t *testing.T) {
 			ReadViaStdin: true,
 			AugmentOpts: func(o *CreateOpts) {
 				o.SecretFilePath = "-"
-				o.Type = Static
+				o.Type = secretTypeKV
 			},
 			MockCalled: true,
 		},
@@ -163,7 +172,7 @@ func TestCreateRun(t *testing.T) {
 			ErrMsg:  "[POST /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secret/kv][429] CreateAppKVSecret default  &{Code:8 Details:[] Message:maximum number of secret versions reached}",
 			AugmentOpts: func(o *CreateOpts) {
 				o.SecretValuePlaintext = testSecretValue
-				o.Type = Static
+				o.Type = secretTypeKV
 			},
 			MockCalled: true,
 		},
@@ -172,7 +181,7 @@ func TestCreateRun(t *testing.T) {
 			RespErr: false,
 			AugmentOpts: func(o *CreateOpts) {
 				o.SecretValuePlaintext = testSecretValue
-				o.Type = Static
+				o.Type = secretTypeKV
 			},
 			MockCalled: true,
 		},
@@ -180,26 +189,51 @@ func TestCreateRun(t *testing.T) {
 			Name:    "Success: Create a Twilio rotating secret",
 			RespErr: false,
 			AugmentOpts: func(o *CreateOpts) {
-				o.Type = Rotating
+				o.Type = secretTypeRotating
 			},
 			MockCalled: true,
 			Input: []byte(`version: 1.0.0
 type: "twilio"
 integration_name: "Twil-Int-11"
-rotation_policy_name: "60"`),
+details: 
+  rotation_policy_name: "60"`),
 		},
 		{
 			Name:    "Failed: Missing required rotating secret field",
-			RespErr: false,
+			RespErr: true,
 			AugmentOpts: func(o *CreateOpts) {
-				o.Type = Rotating
+				o.Type = secretTypeRotating
 			},
 			Input: []byte(`version: 1.0.0
 type: "twilio"
 integration_name: "Twil-Int-11"
 details:
   none: "none"`),
-			ErrMsg: "missing required field(s) in the config file: [rotation_policy_name]",
+			ErrMsg: "missing required field(s) in the config file details: [rotation_policy_name]",
+		},
+		{
+			Name:    "Success: Create an Aws dynamic secret",
+			RespErr: false,
+			AugmentOpts: func(o *CreateOpts) {
+				o.Type = secretTypeDynamic
+			},
+			MockCalled: true,
+			Input: []byte(`version: 1.0.0
+type: "aws"
+integration_name: "Aws-Int-12"
+details: 
+  default_ttl: "3600s"
+  assume_role:
+    role_arn: "ra"`),
+		},
+		{
+			Name:    "Failed: Unsupported secret type",
+			RespErr: true,
+			AugmentOpts: func(o *CreateOpts) {
+				o.Type = "random"
+			},
+			Input:  []byte{},
+			ErrMsg: "\"random\" is an unsupported secret type; \"static\", \"rotating\", \"dynamic\" are available types",
 		},
 	}
 
@@ -237,7 +271,7 @@ details:
 				c.AugmentOpts(opts)
 			}
 
-			if opts.Type == Rotating {
+			if opts.Type == secretTypeRotating || opts.Type == secretTypeDynamic {
 				tempDir := t.TempDir()
 				f, err := os.Create(filepath.Join(tempDir, "config.yaml"))
 				r.NoError(err)
@@ -247,7 +281,7 @@ details:
 			}
 
 			dt := strfmt.NewDateTime()
-			if opts.Type == Static {
+			if opts.Type == secretTypeKV {
 				if c.MockCalled {
 					if c.RespErr {
 						vs.EXPECT().CreateAppKVSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
@@ -277,7 +311,7 @@ details:
 						}, nil).Once()
 					}
 				}
-			} else if opts.Type == Rotating {
+			} else if opts.Type == secretTypeRotating {
 				if c.MockCalled {
 					if c.RespErr {
 						pvs.EXPECT().CreateTwilioRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
@@ -300,6 +334,39 @@ details:
 									IntegrationName:    "Twil-Int-11",
 									RotationPolicyName: "built-in:60-days-2-active",
 									SecretName:         opts.SecretName,
+								},
+							},
+						}, nil).Once()
+					}
+				}
+			} else if opts.Type == secretTypeDynamic {
+				if c.MockCalled {
+					if c.RespErr {
+						pvs.EXPECT().CreateAwsDynamicSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+					} else {
+						pvs.EXPECT().CreateAwsDynamicSecret(&preview_secret_service.CreateAwsDynamicSecretParams{
+							OrganizationID: testProfile(t).OrganizationID,
+							ProjectID:      testProfile(t).ProjectID,
+							AppName:        testProfile(t).VaultSecrets.AppName,
+							Body: &preview_models.SecretServiceCreateAwsDynamicSecretBody{
+								IntegrationName: "Aws-Int-12",
+								Name:            opts.SecretName,
+								DefaultTTL:      "3600s",
+								AssumeRole: &preview_models.Secrets20231128AssumeRoleRequest{
+									RoleArn: "ra",
+								},
+							},
+							Context: opts.Ctx,
+						}, mock.Anything).Return(&preview_secret_service.CreateAwsDynamicSecretOK{
+							Payload: &preview_models.Secrets20231128CreateAwsDynamicSecretResponse{
+								Secret: &preview_models.Secrets20231128AwsDynamicSecret{
+									AssumeRole: &preview_models.Secrets20231128AssumeRoleResponse{
+										RoleArn: "ra",
+									},
+									DefaultTTL:      "3600s",
+									CreatedAt:       dt,
+									IntegrationName: "Aws-Int-12",
+									Name:            opts.SecretName,
 								},
 							},
 						}, nil).Once()

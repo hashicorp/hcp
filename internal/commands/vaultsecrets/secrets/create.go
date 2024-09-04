@@ -29,14 +29,6 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
 
-type SecretType string
-
-const (
-	Static   SecretType = "static"
-	Rotating SecretType = "rotating"
-	Dynamic  SecretType = "dynamic"
-)
-
 func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 	opts := &CreateOpts{
 		Ctx:           ctx.ShutdownCtx,
@@ -51,7 +43,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		Name:      "create",
 		ShortHelp: "Create a new static secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create" }} command creates a new static secret under a Vault Secrets application.
+		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create" }} command creates a new static, rotating, or dynamic secret under a Vault Secrets application.
 		`),
 		Examples: []cmd.Example{
 			{
@@ -120,16 +112,15 @@ type CreateOpts struct {
 	SecretName           string
 	SecretValuePlaintext string
 	SecretFilePath       string
-	Type                 SecretType
+	Type                 string
 	PreviewClient        preview_secret_service.ClientService
 	Client               secret_service.ClientService
 }
 
-type RotatingSecretConfig struct {
+type SecretConfig struct {
 	Version         string
 	Type            integrations.IntegrationType
 	IntegrationName string `yaml:"integration_name"`
-	PolicyName      string `yaml:"rotation_policy_name"`
 	Details         map[string]any
 }
 
@@ -144,8 +135,20 @@ type MongoDBScope struct {
 	Type string `mapstructure:"name"`
 }
 
-// There are no Twilio-specific keys
-var MongoDBAtlasRequiredKeys = []string{"mongodb_group_id", "mongodb_roles"}
+type AwsAssumeRole struct {
+	RoleArn string `mapstructure:"role_arn"`
+}
+
+type GcpServiceAccount struct {
+	ServiceAccountEmail string `mapstructure:"service_account_email"`
+}
+
+var (
+	TwilioRequiredKeys       = []string{"rotation_policy_name"}
+	MongoDBAtlasRequiredKeys = []string{"rotation_policy_name", "mongodb_group_id", "mongodb_roles"}
+	AwsRequiredKeys          = []string{"default_ttl", "assume_role"}
+	GcpRequiredKeys          = []string{"default_ttl", "service_account_impersonation"}
+)
 
 var rotationPolicies = map[string]string{
 	"30": "built-in:30-days-2-active",
@@ -155,7 +158,7 @@ var rotationPolicies = map[string]string{
 
 func createRun(opts *CreateOpts) error {
 	switch opts.Type {
-	case Static, "":
+	case secretTypeKV, "":
 		if err := readPlainTextSecret(opts); err != nil {
 			return err
 		}
@@ -178,19 +181,13 @@ func createRun(opts *CreateOpts) error {
 		if err := opts.Output.Display(newDisplayer().Secrets(resp.Payload.Secret)); err != nil {
 			return err
 		}
-	case Rotating:
-		f, err := os.ReadFile(opts.SecretFilePath)
+	case secretTypeRotating:
+		sc, err := readConfigFile(opts)
 		if err != nil {
-			return fmt.Errorf("failed to open config file: %w", err)
+			return fmt.Errorf("failed to process config file: %w", err)
 		}
 
-		var sc RotatingSecretConfig
-		err = yaml.Unmarshal(f, &sc)
-		if err != nil {
-			return fmt.Errorf("failed to unmarshal config file: %w", err)
-		}
-
-		missingFields := validateRotatingSecretConfig(sc)
+		missingFields := validateSecretConfig(sc)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
@@ -198,6 +195,11 @@ func createRun(opts *CreateOpts) error {
 
 		switch sc.Type {
 		case integrations.Twilio:
+			missingDetails := validateDetails(sc.Details, TwilioRequiredKeys)
+
+			if len(missingDetails) > 0 {
+				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
+			}
 
 			req := preview_secret_service.NewCreateTwilioRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
@@ -205,7 +207,7 @@ func createRun(opts *CreateOpts) error {
 			req.AppName = opts.AppName
 			req.Body = &preview_models.SecretServiceCreateTwilioRotatingSecretBody{
 				IntegrationName:    sc.IntegrationName,
-				RotationPolicyName: rotationPolicies[sc.PolicyName],
+				RotationPolicyName: rotationPolicies[sc.Details[TwilioRequiredKeys[0]].(string)],
 				SecretName:         opts.SecretName,
 			}
 
@@ -222,14 +224,14 @@ func createRun(opts *CreateOpts) error {
 			missingDetails := validateDetails(sc.Details, MongoDBAtlasRequiredKeys)
 
 			if len(missingDetails) > 0 {
-				return fmt.Errorf("missing required detail(s) in the config file: %s", missingDetails)
+				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
 			}
 
 			req := preview_secret_service.NewCreateMongoDBAtlasRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 
-			roles := sc.Details["mongodb_roles"].([]interface{})
+			roles := sc.Details["mongodb_roles"].([]any)
 			var reqRoles []*preview_models.Secrets20231128MongoDBRole
 			for _, r := range roles {
 				var role MongoDBRole
@@ -246,7 +248,7 @@ func createRun(opts *CreateOpts) error {
 				reqRoles = append(reqRoles, reqRole)
 			}
 
-			scopes := sc.Details["mongodb_scopes"].([]interface{})
+			scopes := sc.Details["mongodb_scopes"].([]any)
 			var reqScopes []*preview_models.Secrets20231128MongoDBScope
 			for _, r := range scopes {
 				var scope MongoDBScope
@@ -280,7 +282,94 @@ func createRun(opts *CreateOpts) error {
 			if err := opts.Output.Display(newRotatingSecretsDisplayer(true).PreviewRotatingSecrets(resp.Payload.Config)); err != nil {
 				return err
 			}
+
+		default:
+			return fmt.Errorf("unsupported rotating secret provider type")
 		}
+
+	case secretTypeDynamic:
+		sc, err := readConfigFile(opts)
+		if err != nil {
+			return fmt.Errorf("failed to process config file: %w", err)
+		}
+
+		missingFields := validateSecretConfig(sc)
+
+		if len(missingFields) > 0 {
+			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
+		}
+
+		switch sc.Type {
+		case integrations.AWS:
+
+			missingDetails := validateDetails(sc.Details, AwsRequiredKeys)
+
+			if len(missingDetails) > 0 {
+				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
+			}
+
+			var role AwsAssumeRole
+			decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{WeaklyTypedInput: true, Result: &role})
+			if err := decoder.Decode(sc.Details[AwsRequiredKeys[1]]); err != nil {
+				return fmt.Errorf("unable to decode aws assume_role")
+			}
+
+			req := preview_secret_service.NewCreateAwsDynamicSecretParamsWithContext(opts.Ctx)
+			req.OrganizationID = opts.Profile.OrganizationID
+			req.ProjectID = opts.Profile.ProjectID
+			req.AppName = opts.AppName
+			req.Body = &preview_models.SecretServiceCreateAwsDynamicSecretBody{
+				IntegrationName: sc.IntegrationName,
+				DefaultTTL:      sc.Details[AwsRequiredKeys[0]].(string),
+				AssumeRole: &preview_models.Secrets20231128AssumeRoleRequest{
+					RoleArn: role.RoleArn,
+				},
+				Name: opts.SecretName,
+			}
+
+			_, err = opts.PreviewClient.CreateAwsDynamicSecret(req, nil)
+			if err != nil {
+				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
+			}
+
+		case integrations.GCP:
+
+			missingDetails := validateDetails(sc.Details, GcpRequiredKeys)
+
+			if len(missingDetails) > 0 {
+				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
+			}
+
+			var account GcpServiceAccount
+			decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{WeaklyTypedInput: true, Result: &account})
+			if err := decoder.Decode(sc.Details[GcpRequiredKeys[1]]); err != nil {
+				return fmt.Errorf("unable to decode gcp service_account_impersonation")
+			}
+
+			req := preview_secret_service.NewCreateGcpDynamicSecretParamsWithContext(opts.Ctx)
+			req.OrganizationID = opts.Profile.OrganizationID
+			req.ProjectID = opts.Profile.ProjectID
+			req.AppName = opts.AppName
+			req.Body = &preview_models.SecretServiceCreateGcpDynamicSecretBody{
+				IntegrationName: sc.IntegrationName,
+				DefaultTTL:      sc.Details[GcpRequiredKeys[0]].(string),
+				ServiceAccountImpersonation: &preview_models.Secrets20231128ServiceAccountImpersonationRequest{
+					ServiceAccountEmail: account.ServiceAccountEmail,
+				},
+				Name: opts.SecretName,
+			}
+
+			_, err := opts.PreviewClient.CreateGcpDynamicSecret(req, nil)
+			if err != nil {
+				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
+			}
+
+		default:
+			return fmt.Errorf("unsupported dynamic secret provider type")
+		}
+
+	default:
+		return fmt.Errorf("%q is an unsupported secret type; \"static\", \"rotating\", \"dynamic\" are available types", opts.Type)
 	}
 
 	command := fmt.Sprintf(`$ hcp vault-secrets secrets read %s --app %s`, opts.SecretName, opts.AppName)
@@ -334,7 +423,23 @@ func readPlainTextSecret(opts *CreateOpts) error {
 	return nil
 }
 
-func validateRotatingSecretConfig(sc RotatingSecretConfig) []string {
+func readConfigFile(opts *CreateOpts) (SecretConfig, error) {
+	var sc SecretConfig
+
+	f, err := os.ReadFile(opts.SecretFilePath)
+	if err != nil {
+		return sc, fmt.Errorf("unable to open config file: %w", err)
+	}
+
+	err = yaml.Unmarshal(f, &sc)
+	if err != nil {
+		return sc, fmt.Errorf("unable to unmarshal config file: %w", err)
+	}
+
+	return sc, nil
+}
+
+func validateSecretConfig(sc SecretConfig) []string {
 	var missingKeys []string
 
 	if sc.Type == "" {
@@ -343,10 +448,6 @@ func validateRotatingSecretConfig(sc RotatingSecretConfig) []string {
 
 	if sc.IntegrationName == "" {
 		missingKeys = append(missingKeys, "integration_name")
-	}
-
-	if sc.PolicyName == "" {
-		missingKeys = append(missingKeys, "rotation_policy_name")
 	}
 
 	return missingKeys
