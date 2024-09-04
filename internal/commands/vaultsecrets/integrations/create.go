@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"slices"
 
+	"golang.org/x/exp/maps"
+
 	"github.com/hashicorp/hcl/v2/hclsimple"
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
@@ -18,7 +20,6 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
-	"golang.org/x/exp/maps"
 )
 
 type CreateOpts struct {
