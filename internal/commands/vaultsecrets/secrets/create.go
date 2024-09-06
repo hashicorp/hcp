@@ -7,14 +7,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/hashicorp/hcl/v2/hclsimple"
+	"github.com/zclconf/go-cty/cty"
 	"io"
 	"os"
 	"slices"
-
-	"github.com/mitchellh/mapstructure"
-	"github.com/posener/complete"
-	"golang.org/x/exp/maps"
-	"gopkg.in/yaml.v3"
 
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
@@ -27,6 +24,9 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"github.com/mitchellh/mapstructure"
+	"github.com/posener/complete"
+	"golang.org/x/exp/maps"
 )
 
 func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
@@ -47,7 +47,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Create a new secret in the Vault Secrets application on your active profile:`,
+				Preamble: `Create a new static secret in the Vault Secrets application on your active profile:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp vault-secrets secrets create secret_1 --data-file=tmp/secrets1.txt
 				`),
@@ -56,6 +56,12 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 				Preamble: `Create a new secret in a Vault Secrets application by piping the plaintext secret from a command output:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
 				$ echo -n "my super secret" | hcp vault-secrets secrets create secret_2 --data-file=-
+				`),
+			},
+			{
+				Preamble: `Create a new rotating secret in the Vault Secrets application on your active profile:`,
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				$ hcp vault-secrets secrets create secret_1 --secret-type=rotating --data-file=path/to/file/config.hcl
 				`),
 			},
 		},
@@ -117,11 +123,16 @@ type CreateOpts struct {
 	Client               secret_service.ClientService
 }
 
+type SecretConfigZ struct {
+	Type            integrations.IntegrationType `hcl:"type"`
+	IntegrationName string                       `hcl:"integration_name"`
+	Details         map[string]string            `hcl:"details"`
+}
+
 type SecretConfig struct {
-	Version         string
-	Type            integrations.IntegrationType
-	IntegrationName string `yaml:"integration_name"`
-	Details         map[string]any
+	Type            integrations.IntegrationType `hcl:"type"`
+	IntegrationName string                       `hcl:"integration_name"`
+	Details         map[string]cty.Value         `hcl:"details"`
 }
 
 type MongoDBRole struct {
@@ -201,13 +212,21 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
 			}
 
+			//for detail, value := range sc.Details {
+			//
+			//	//for _, key := range TwilioRequiredKeys {
+			//	//	if detail
+			//	//}
+			//	value.AsString()
+			//}
+
 			req := preview_secret_service.NewCreateTwilioRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 			req.Body = &preview_models.SecretServiceCreateTwilioRotatingSecretBody{
 				IntegrationName:    sc.IntegrationName,
-				RotationPolicyName: rotationPolicies[sc.Details[TwilioRequiredKeys[0]].(string)],
+				RotationPolicyName: rotationPolicies[sc.Details[TwilioRequiredKeys[0]].AsString()],
 				SecretName:         opts.SecretName,
 			}
 
@@ -231,7 +250,7 @@ func createRun(opts *CreateOpts) error {
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 
-			roles := sc.Details["mongodb_roles"].([]any)
+			roles := sc.Details["mongodb_roles"].AsValueSlice()
 			var reqRoles []*preview_models.Secrets20231128MongoDBRole
 			for _, r := range roles {
 				var role MongoDBRole
@@ -248,7 +267,7 @@ func createRun(opts *CreateOpts) error {
 				reqRoles = append(reqRoles, reqRole)
 			}
 
-			scopes := sc.Details["mongodb_scopes"].([]any)
+			scopes := sc.Details["mongodb_scopes"].AsValueSlice()
 			var reqScopes []*preview_models.Secrets20231128MongoDBScope
 			for _, r := range scopes {
 				var scope MongoDBScope
@@ -266,12 +285,12 @@ func createRun(opts *CreateOpts) error {
 
 			req.Body = &preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody{
 				SecretDetails: &preview_models.Secrets20231128MongoDBAtlasSecretDetails{
-					MongodbGroupID: sc.Details[MongoDBAtlasRequiredKeys[1]].(string),
+					MongodbGroupID: sc.Details[MongoDBAtlasRequiredKeys[1]].AsString(),
 					MongodbRoles:   reqRoles,
 					MongodbScopes:  reqScopes,
 				},
 				IntegrationName:    sc.IntegrationName,
-				RotationPolicyName: rotationPolicies[sc.Details[MongoDBAtlasRequiredKeys[0]].(string)],
+				RotationPolicyName: rotationPolicies[sc.Details[MongoDBAtlasRequiredKeys[0]].AsString()],
 				SecretName:         opts.SecretName,
 			}
 			resp, err := opts.PreviewClient.CreateMongoDBAtlasRotatingSecret(req, nil)
@@ -320,7 +339,7 @@ func createRun(opts *CreateOpts) error {
 			req.AppName = opts.AppName
 			req.Body = &preview_models.SecretServiceCreateAwsDynamicSecretBody{
 				IntegrationName: sc.IntegrationName,
-				DefaultTTL:      sc.Details[AwsRequiredKeys[0]].(string),
+				DefaultTTL:      sc.Details[AwsRequiredKeys[0]].AsString(),
 				AssumeRole: &preview_models.Secrets20231128AssumeRoleRequest{
 					RoleArn: role.RoleArn,
 				},
@@ -352,7 +371,7 @@ func createRun(opts *CreateOpts) error {
 			req.AppName = opts.AppName
 			req.Body = &preview_models.SecretServiceCreateGcpDynamicSecretBody{
 				IntegrationName: sc.IntegrationName,
-				DefaultTTL:      sc.Details[GcpRequiredKeys[0]].(string),
+				DefaultTTL:      sc.Details[GcpRequiredKeys[0]].AsString(),
 				ServiceAccountImpersonation: &preview_models.Secrets20231128ServiceAccountImpersonationRequest{
 					ServiceAccountEmail: account.ServiceAccountEmail,
 				},
@@ -425,16 +444,19 @@ func readPlainTextSecret(opts *CreateOpts) error {
 
 func readConfigFile(opts *CreateOpts) (SecretConfig, error) {
 	var sc SecretConfig
+	//var scz SecretConfigZ
 
-	f, err := os.ReadFile(opts.SecretFilePath)
-	if err != nil {
-		return sc, fmt.Errorf("unable to open config file: %w", err)
+	if err := hclsimple.DecodeFile(opts.SecretFilePath, nil, &sc); err != nil {
+		return sc, fmt.Errorf("failed to decode config file: %w", err)
 	}
 
-	err = yaml.Unmarshal(f, &sc)
-	if err != nil {
-		return sc, fmt.Errorf("unable to unmarshal config file: %w", err)
-	}
+	//if err := hclsimple.DecodeFile(opts.SecretFilePath, nil, &scz); err != nil {
+	//	return sc, fmt.Errorf("failed to decode config file: %w", err)
+	//}
+
+	//fmt.Println("SCZ type: ", scz.Type)
+	//fmt.Println("SCZ type: ", scz.IntegrationName)
+	//fmt.Println("SCZ type: ", scz.Details)
 
 	return sc, nil
 }
@@ -453,7 +475,7 @@ func validateSecretConfig(sc SecretConfig) []string {
 	return missingKeys
 }
 
-func validateDetails(details map[string]any, requiredKeys []string) []string {
+func validateDetails(details map[string]cty.Value, requiredKeys []string) []string {
 	detailsKeys := maps.Keys(details)
 	var missingKeys []string
 
@@ -464,3 +486,26 @@ func validateDetails(details map[string]any, requiredKeys []string) []string {
 	}
 	return missingKeys
 }
+
+//func ctyToType(objMap map[string]cty.Value) (map[string]any) {
+//	obj := make(map[string]any)
+//
+//	for k, v := range objMap {
+//		switch sv := v. {
+//		case map[string]any:
+//			// Recuse and walk the map for its children
+//			obj[k], _ = anyToCty(sv)
+//		case float64:
+//			obj[k] = cty.NumberFloatVal(sv)
+//		case bool:
+//			obj[k] = cty.BoolVal(sv)
+//		case string:
+//			obj[k] = cty.StringVal(sv)
+//		default:
+//			// Unhandled var type
+//			obj[k] = cty.StringVal(fmt.Sprintf("%v", v))
+//		}
+//	}
+//
+//	return cty.ObjectVal(obj), obj
+//}

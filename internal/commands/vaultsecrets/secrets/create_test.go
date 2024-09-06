@@ -192,11 +192,11 @@ func TestCreateRun(t *testing.T) {
 				o.Type = secretTypeRotating
 			},
 			MockCalled: true,
-			Input: []byte(`version: 1.0.0
-type: "twilio"
-integration_name: "Twil-Int-11"
-details: 
-  rotation_policy_name: "60"`),
+			Input: []byte(`type = "twilio"
+integration_name = "Twil-Int-11"
+details = { 
+  "rotation_policy_name": "60"
+}`),
 		},
 		{
 			Name:    "Failed: Missing required rotating secret field",
@@ -204,11 +204,11 @@ details:
 			AugmentOpts: func(o *CreateOpts) {
 				o.Type = secretTypeRotating
 			},
-			Input: []byte(`version: 1.0.0
-type: "twilio"
-integration_name: "Twil-Int-11"
-details:
-  none: "none"`),
+			Input: []byte(`type = "twilio"
+integration_name = "Twil-Int-11"
+details = { 
+  "none": "none"
+}`),
 			ErrMsg: "missing required field(s) in the config file details: [rotation_policy_name]",
 		},
 		{
@@ -218,13 +218,16 @@ details:
 				o.Type = secretTypeDynamic
 			},
 			MockCalled: true,
-			Input: []byte(`version: 1.0.0
-type: "aws"
-integration_name: "Aws-Int-12"
-details: 
-  default_ttl: "3600s"
-  assume_role:
-    role_arn: "ra"`),
+			Input: []byte(`type = "aws"
+integration_name = "Aws-Int-12"
+
+details = {
+  "default_ttl" = "3600s"
+
+  "assume_role" = {
+    "role_arn" = "ra"
+  }
+}`),
 		},
 		{
 			Name:    "Failed: Unsupported secret type",
@@ -273,7 +276,7 @@ details:
 
 			if opts.Type == secretTypeRotating || opts.Type == secretTypeDynamic {
 				tempDir := t.TempDir()
-				f, err := os.Create(filepath.Join(tempDir, "config.yaml"))
+				f, err := os.Create(filepath.Join(tempDir, "config.hcl"))
 				r.NoError(err)
 				_, err = f.Write(c.Input)
 				r.NoError(err)
