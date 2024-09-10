@@ -44,8 +44,10 @@ LABEL name="HCP CLI" \
       release=${PRODUCT_REVISION} \
       revision=${PRODUCT_REVISION} \
       summary="The hcp CLI allows interaction with the HashiCorp Cloud Platform." \
-      description="The hcp CLI allows interaction with the HashiCorp Cloud Platform using the command-line."
+      description="The hcp CLI allows interaction with the HashiCorp Cloud Platform using the command-line." \
+	  org.opencontainers.image.licenses="MPL-2.0"
 
+COPY LICENSE /usr/share/doc/$NAME/LICENSE.txt
 COPY dist/$TARGETOS/$TARGETARCH/$BIN_NAME /bin/
 RUN hcp --autocomplete-install
 

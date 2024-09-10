@@ -101,6 +101,13 @@ jobs:
           instructions: |
             make crt-build
 
+      - name: Copy license file
+        env:
+          LICENSE_DIR: ".release/linux/package/usr/share/doc/${{ env.PKG_NAME }}"
+        run: |
+          mkdir -p "$LICENSE_DIR"
+          cp LICENSE "$LICENSE_DIR/LICENSE.txt"
+
       - name: Package
         if: ${{ matrix.goos == 'linux' }}
         uses: hashicorp/actions-packaging-linux@v1
@@ -118,6 +125,7 @@ jobs:
           rpm_depends: "openssl"
           postinstall: .release/linux/postinst
           preremove: .release/linux/prerm
+          config_dir: ".release/linux/package/"
 
       - name: Set Package Names
         if: ${{ matrix.goos == 'linux' }}
