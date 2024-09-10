@@ -9,6 +9,10 @@ MOCKERY_OUTPUT_DIRS=internal/pkg/api/mocks internal/commands/auth/mocks internal
 MOCKERY_OUTPUT_FILES=internal/pkg/api/iampolicy/mock_setter.go \
 					 internal/pkg/api/iampolicy/mock_resource_updater.go
 
+# TARGET_DIR is set by actions-go-build (https://github.com/hashicorp/actions-go-build?tab=readme-ov-file#environment-variables)
+# if the build target is being invoked outside of the build.yml, we need to set this to something sensible
+TARGET_DIR?=/usr/share/doc/hcp
+
 default: help
 
 .PHONY: docs/gen
@@ -118,6 +122,7 @@ docker/dev: go/build
 crt-build:
 	CGO_ENABLED=0 go build -o ${BIN_PATH} -trimpath -buildvcs=false \
     	-ldflags "-X github.com/hashicorp/hcp/version.GitCommit=${PRODUCT_REVISION}"
+	@cp $(CURDIR)/LICENSE $(TARGET_DIR)/LICENSE.txt
 
 HELP_FORMAT="    \033[36m%-25s\033[0m %s\n"
 .PHONY: help
