@@ -158,7 +158,7 @@ func createRun(opts *CreateOpts) error {
 			return err
 		}
 	case secretTypeRotating:
-		secretConfig, internalConfig, err := readConfigFile(opts)
+		secretConfig, internalConfig, err := readConfigFile(opts.SecretFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to process config file: %w", err)
 		}
@@ -236,7 +236,7 @@ func createRun(opts *CreateOpts) error {
 		}
 
 	case secretTypeDynamic:
-		secretConfig, internalConfig, err := readConfigFile(opts)
+		secretConfig, internalConfig, err := readConfigFile(opts.SecretFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to process config file: %w", err)
 		}
@@ -358,13 +358,13 @@ func readPlainTextSecret(opts *CreateOpts) error {
 	return nil
 }
 
-func readConfigFile(opts *CreateOpts) (SecretConfig, secretConfigInternal, error) {
+func readConfigFile(filePath string) (SecretConfig, secretConfigInternal, error) {
 	var (
 		secretConfig   SecretConfig
 		internalConfig secretConfigInternal
 	)
 
-	if err := hclsimple.DecodeFile(opts.SecretFilePath, nil, &secretConfig); err != nil {
+	if err := hclsimple.DecodeFile(filePath, nil, &secretConfig); err != nil {
 		return secretConfig, internalConfig, fmt.Errorf("failed to decode config file: %w", err)
 	}
 
@@ -382,6 +382,8 @@ func ctyValueToMap(value cty.Value) (map[string]any, error) {
 	for k, v := range value.AsValueMap() {
 		if v.Type() == cty.String {
 			fieldsMap[k] = v.AsString()
+		} else if v.Type() == cty.Bool {
+			fieldsMap[k] = v.True()
 		} else if v.Type().IsObjectType() {
 			nestedMap, err := ctyValueToMap(v)
 			if err != nil {
