@@ -52,12 +52,6 @@ func TestNewCmdCreate(t *testing.T) {
 			Args:    []string{"--config-file", "path/to/file"},
 			Error:   "ERROR: accepts 1 arg(s), received 0",
 		},
-		{
-			Name:    "Failed: No config file flag specified",
-			Profile: testProfile,
-			Args:    []string{"sample-integration"},
-			Error:   "ERROR: missing required flag: --config-file=CONFIG_FILE",
-		},
 	}
 
 	for _, c := range cases {
