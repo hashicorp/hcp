@@ -399,15 +399,15 @@ func ctyValueToMap(value cty.Value) (map[string]any, error) {
 			}
 			varMapNow[k] = nestedMap
 		} else if v.Type().IsTupleType() {
-			var roles []map[string]any
+			var items []map[string]any
 			for _, val := range v.AsValueSlice() {
 				nestedMap, err := ctyValueToMap(val)
 				if err != nil {
 					return nil, err
 				}
-				roles = append(roles, nestedMap)
+				items = append(items, nestedMap)
 			}
-			varMapNow[k] = roles
+			varMapNow[k] = items
 		} else {
 			return nil, fmt.Errorf("found unsupported value type")
 		}
