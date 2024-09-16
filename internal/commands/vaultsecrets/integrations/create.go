@@ -6,10 +6,10 @@ package integrations
 import (
 	"context"
 	"fmt"
-	"github.com/manifoldco/promptui"
 	"io"
 	"slices"
 
+	"github.com/manifoldco/promptui"
 	"golang.org/x/exp/maps"
 
 	"github.com/hashicorp/hcl/v2/hclsimple"
@@ -284,7 +284,7 @@ func promptUserForConfig(opts *CreateOpts) (IntegrationConfig, error) {
 
 		input, err := fieldPrompt.Run()
 		if err != nil {
-			return config, fmt.Errorf("Prompt for field %s failed %v\n", field, err)
+			return config, fmt.Errorf("prompt for field %s failed: %w", field, err)
 		}
 
 		fieldValues[field] = input
