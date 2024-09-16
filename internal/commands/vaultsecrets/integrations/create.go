@@ -6,6 +6,8 @@ package integrations
 import (
 	"context"
 	"fmt"
+	"github.com/manifoldco/promptui"
+	"io"
 	"slices"
 
 	"golang.org/x/exp/maps"
@@ -74,7 +76,6 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 					DisplayValue: "CONFIG_FILE",
 					Description:  "File path to read integration config data.",
 					Value:        flagvalue.Simple("", &opts.ConfigFilePath),
-					Required:     true,
 				},
 			},
 		},
@@ -103,15 +104,33 @@ var (
 	GCPKeys    = []string{"audience", "service_account_email"}
 )
 
+var providerToRequiredFields = map[string][]string{
+	string(Twilio):       TwilioKeys,
+	string(MongoDBAtlas): MongoKeys,
+	string(AWS):          AWSKeys,
+	string(GCP):          GCPKeys,
+}
+
 func createRun(opts *CreateOpts) error {
-	var i IntegrationConfig
-	if err := hclsimple.DecodeFile(opts.ConfigFilePath, nil, &i); err != nil {
-		return fmt.Errorf("failed to decode config file: %w", err)
+	var (
+		ic  IntegrationConfig
+		err error
+	)
+
+	if opts.ConfigFilePath == "" {
+		ic, err = promptUserForConfig(opts)
+		if err != nil {
+			return fmt.Errorf("failed to create integration via cli prompt: %w", err)
+		}
+	} else {
+		if err = hclsimple.DecodeFile(opts.ConfigFilePath, nil, &ic); err != nil {
+			return fmt.Errorf("failed to decode config file: %w", err)
+		}
 	}
 
-	switch i.Type {
+	switch ic.Type {
 	case Twilio:
-		missingFields := validateDetails(i.Details, TwilioKeys)
+		missingFields := validateDetails(ic.Details, TwilioKeys)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
@@ -120,9 +139,9 @@ func createRun(opts *CreateOpts) error {
 		body := &preview_models.SecretServiceCreateTwilioIntegrationBody{
 			Name: opts.IntegrationName,
 			StaticCredentialDetails: &preview_models.Secrets20231128TwilioStaticCredentialsRequest{
-				AccountSid:   i.Details[TwilioKeys[0]],
-				APIKeySecret: i.Details[TwilioKeys[1]],
-				APIKeySid:    i.Details[TwilioKeys[2]],
+				AccountSid:   ic.Details[TwilioKeys[0]],
+				APIKeySecret: ic.Details[TwilioKeys[1]],
+				APIKeySid:    ic.Details[TwilioKeys[2]],
 			},
 			Capabilities: []*preview_models.Secrets20231128Capability{
 				preview_models.Secrets20231128CapabilityROTATION.Pointer(),
@@ -141,7 +160,7 @@ func createRun(opts *CreateOpts) error {
 		}
 
 	case MongoDBAtlas:
-		missingFields := validateDetails(i.Details, MongoKeys)
+		missingFields := validateDetails(ic.Details, MongoKeys)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
@@ -150,8 +169,8 @@ func createRun(opts *CreateOpts) error {
 		body := &preview_models.SecretServiceCreateMongoDBAtlasIntegrationBody{
 			Name: opts.IntegrationName,
 			StaticCredentialDetails: &preview_models.Secrets20231128MongoDBAtlasStaticCredentialsRequest{
-				APIPrivateKey: i.Details[MongoKeys[0]],
-				APIPublicKey:  i.Details[MongoKeys[1]],
+				APIPrivateKey: ic.Details[MongoKeys[0]],
+				APIPublicKey:  ic.Details[MongoKeys[1]],
 			},
 			Capabilities: []*preview_models.Secrets20231128Capability{
 				preview_models.Secrets20231128CapabilityROTATION.Pointer(),
@@ -170,7 +189,7 @@ func createRun(opts *CreateOpts) error {
 		}
 
 	case AWS:
-		missingFields := validateDetails(i.Details, AWSKeys)
+		missingFields := validateDetails(ic.Details, AWSKeys)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
@@ -179,8 +198,8 @@ func createRun(opts *CreateOpts) error {
 		body := &preview_models.SecretServiceCreateAwsIntegrationBody{
 			Name: opts.IntegrationName,
 			FederatedWorkloadIdentity: &preview_models.Secrets20231128AwsFederatedWorkloadIdentityRequest{
-				Audience: i.Details[AWSKeys[0]],
-				RoleArn:  i.Details[AWSKeys[1]],
+				Audience: ic.Details[AWSKeys[0]],
+				RoleArn:  ic.Details[AWSKeys[1]],
 			},
 			Capabilities: []*preview_models.Secrets20231128Capability{
 				preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
@@ -199,7 +218,7 @@ func createRun(opts *CreateOpts) error {
 		}
 
 	case GCP:
-		missingFields := validateDetails(i.Details, GCPKeys)
+		missingFields := validateDetails(ic.Details, GCPKeys)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
@@ -208,8 +227,8 @@ func createRun(opts *CreateOpts) error {
 		body := &preview_models.SecretServiceCreateGcpIntegrationBody{
 			Name: opts.IntegrationName,
 			FederatedWorkloadIdentity: &preview_models.Secrets20231128GcpFederatedWorkloadIdentityRequest{
-				Audience:            i.Details[GCPKeys[0]],
-				ServiceAccountEmail: i.Details[GCPKeys[1]],
+				Audience:            ic.Details[GCPKeys[0]],
+				ServiceAccountEmail: ic.Details[GCPKeys[1]],
 			},
 			Capabilities: []*preview_models.Secrets20231128Capability{
 				preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
@@ -232,6 +251,47 @@ func createRun(opts *CreateOpts) error {
 	fmt.Fprintf(opts.IO.Err(), "%s Successfully created integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.IntegrationName)
 
 	return nil
+}
+
+func promptUserForConfig(opts *CreateOpts) (IntegrationConfig, error) {
+	var config IntegrationConfig
+
+	if !opts.IO.CanPrompt() {
+		return config, fmt.Errorf("unable to creative integration interactively")
+	}
+
+	providerPrompt := promptui.Select{
+		Label:  "Please select the provider you would like to configure",
+		Items:  maps.Keys(providerToRequiredFields),
+		Stdin:  io.NopCloser(opts.IO.In()),
+		Stdout: iostreams.NopWriteCloser(opts.IO.Err()),
+	}
+
+	_, provider, err := providerPrompt.Run()
+	if err != nil {
+		return config, fmt.Errorf("provider selection prompt failed: %w", err)
+	}
+
+	config.Type = IntegrationType(provider)
+
+	var fieldPrompt promptui.Prompt
+	fieldValues := make(map[string]string)
+	for _, field := range providerToRequiredFields[provider] {
+		fieldPrompt = promptui.Prompt{
+			Label: field,
+			Mask:  '*',
+		}
+
+		input, err := fieldPrompt.Run()
+		if err != nil {
+			return config, fmt.Errorf("Prompt for field %s failed %v\n", field, err)
+		}
+
+		fieldValues[field] = input
+	}
+
+	config.Details = fieldValues
+	return config, err
 }
 
 func validateDetails(details map[string]string, requiredKeys []string) []string {
