@@ -122,7 +122,7 @@ type CreateOpts struct {
 	Client               secret_service.ClientService
 }
 
-type DetailsInternal struct {
+type detailsInternal struct {
 	Details map[string]any
 }
 
@@ -364,10 +364,10 @@ func readPlainTextSecret(opts *CreateOpts) error {
 	return nil
 }
 
-func readConfigFile(opts *CreateOpts) (SecretConfig, DetailsInternal, error) {
+func readConfigFile(opts *CreateOpts) (SecretConfig, detailsInternal, error) {
 	var (
 		sc SecretConfig
-		di DetailsInternal
+		di detailsInternal
 	)
 
 	if err := hclsimple.DecodeFile(opts.SecretFilePath, nil, &sc); err != nil {
