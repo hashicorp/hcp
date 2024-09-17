@@ -257,7 +257,7 @@ func promptUserForConfig(opts *CreateOpts) (IntegrationConfig, error) {
 	var config IntegrationConfig
 
 	if !opts.IO.CanPrompt() {
-		return config, fmt.Errorf("unable to creative integration interactively")
+		return config, fmt.Errorf("unable to create integration interactively")
 	}
 
 	providerPrompt := promptui.Select{
