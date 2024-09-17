@@ -122,7 +122,7 @@ type CreateOpts struct {
 	Client               secret_service.ClientService
 }
 
-type detailsInternal struct {
+type secretConfigInternal struct {
 	Details map[string]any
 }
 
@@ -130,12 +130,6 @@ type SecretConfig struct {
 	Type            integrations.IntegrationType `hcl:"type"`
 	IntegrationName string                       `hcl:"integration_name"`
 	Details         cty.Value                    `hcl:"details"`
-}
-
-var rotationPolicies = map[string]string{
-	"30": "built-in:30-days-2-active",
-	"60": "built-in:60-days-2-active",
-	"90": "built-in:90-days-2-active",
 }
 
 func createRun(opts *CreateOpts) error {
@@ -164,18 +158,18 @@ func createRun(opts *CreateOpts) error {
 			return err
 		}
 	case secretTypeRotating:
-		sc, di, err := readConfigFile(opts)
+		secretConfig, internalConfig, err := readConfigFile(opts)
 		if err != nil {
 			return fmt.Errorf("failed to process config file: %w", err)
 		}
 
-		missingFields := validateSecretConfig(sc)
+		missingFields := validateSecretConfig(secretConfig)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 		}
 
-		switch sc.Type {
+		switch secretConfig.Type {
 		case integrations.Twilio:
 			req := preview_secret_service.NewCreateTwilioRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
@@ -183,7 +177,7 @@ func createRun(opts *CreateOpts) error {
 			req.AppName = opts.AppName
 
 			var twilioBody preview_models.SecretServiceCreateTwilioRotatingSecretBody
-			detailBytes, err := json.Marshal(di.Details)
+			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
@@ -193,7 +187,7 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			twilioBody.IntegrationName = sc.IntegrationName
+			twilioBody.IntegrationName = secretConfig.IntegrationName
 			twilioBody.SecretName = opts.SecretName
 			req.Body = &twilioBody
 
@@ -214,7 +208,7 @@ func createRun(opts *CreateOpts) error {
 			req.AppName = opts.AppName
 
 			var mongoDBBody preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody
-			detailBytes, err := json.Marshal(di.Details)
+			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
@@ -224,7 +218,7 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			mongoDBBody.IntegrationName = sc.IntegrationName
+			mongoDBBody.IntegrationName = secretConfig.IntegrationName
 			mongoDBBody.SecretName = opts.SecretName
 			req.Body = &mongoDBBody
 
@@ -242,17 +236,17 @@ func createRun(opts *CreateOpts) error {
 		}
 
 	case secretTypeDynamic:
-		sc, di, err := readConfigFile(opts)
+		secretConfig, internalConfig, err := readConfigFile(opts)
 		if err != nil {
 			return fmt.Errorf("failed to process config file: %w", err)
 		}
-		missingFields := validateSecretConfig(sc)
+		missingFields := validateSecretConfig(secretConfig)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 		}
 
-		switch sc.Type {
+		switch secretConfig.Type {
 		case integrations.AWS:
 			req := preview_secret_service.NewCreateAwsDynamicSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
@@ -260,7 +254,7 @@ func createRun(opts *CreateOpts) error {
 			req.AppName = opts.AppName
 
 			var awsBody preview_models.SecretServiceCreateAwsDynamicSecretBody
-			detailBytes, err := json.Marshal(di.Details)
+			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
@@ -270,7 +264,7 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			awsBody.IntegrationName = sc.IntegrationName
+			awsBody.IntegrationName = secretConfig.IntegrationName
 			awsBody.Name = opts.SecretName
 			req.Body = &awsBody
 
@@ -286,7 +280,7 @@ func createRun(opts *CreateOpts) error {
 			req.AppName = opts.AppName
 
 			var gcpBody preview_models.SecretServiceCreateGcpDynamicSecretBody
-			detailBytes, err := json.Marshal(di.Details)
+			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
@@ -296,7 +290,7 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			gcpBody.IntegrationName = sc.IntegrationName
+			gcpBody.IntegrationName = secretConfig.IntegrationName
 			gcpBody.Name = opts.SecretName
 			req.Body = &gcpBody
 
@@ -364,40 +358,36 @@ func readPlainTextSecret(opts *CreateOpts) error {
 	return nil
 }
 
-func readConfigFile(opts *CreateOpts) (SecretConfig, detailsInternal, error) {
+func readConfigFile(opts *CreateOpts) (SecretConfig, secretConfigInternal, error) {
 	var (
-		sc SecretConfig
-		di detailsInternal
+		secretConfig   SecretConfig
+		internalConfig secretConfigInternal
 	)
 
-	if err := hclsimple.DecodeFile(opts.SecretFilePath, nil, &sc); err != nil {
-		return sc, di, fmt.Errorf("failed to decode config file: %w", err)
+	if err := hclsimple.DecodeFile(opts.SecretFilePath, nil, &secretConfig); err != nil {
+		return secretConfig, internalConfig, fmt.Errorf("failed to decode config file: %w", err)
 	}
 
-	detailsMap, err := ctyValueToMap(sc.Details)
+	detailsMap, err := ctyValueToMap(secretConfig.Details)
 	if err != nil {
-		return sc, di, err
+		return secretConfig, internalConfig, err
 	}
-	di.Details = detailsMap
+	internalConfig.Details = detailsMap
 
-	return sc, di, nil
+	return secretConfig, internalConfig, nil
 }
 
 func ctyValueToMap(value cty.Value) (map[string]any, error) {
-	varMapNow := make(map[string]any)
+	fieldsMap := make(map[string]any)
 	for k, v := range value.AsValueMap() {
 		if v.Type() == cty.String {
-			if k == "rotation_policy_name" {
-				varMapNow[k] = rotationPolicies[v.AsString()]
-			} else {
-				varMapNow[k] = v.AsString()
-			}
+			fieldsMap[k] = v.AsString()
 		} else if v.Type().IsObjectType() {
 			nestedMap, err := ctyValueToMap(v)
 			if err != nil {
 				return nil, err
 			}
-			varMapNow[k] = nestedMap
+			fieldsMap[k] = nestedMap
 		} else if v.Type().IsTupleType() {
 			var items []map[string]any
 			for _, val := range v.AsValueSlice() {
@@ -407,23 +397,23 @@ func ctyValueToMap(value cty.Value) (map[string]any, error) {
 				}
 				items = append(items, nestedMap)
 			}
-			varMapNow[k] = items
+			fieldsMap[k] = items
 		} else {
 			return nil, fmt.Errorf("found unsupported value type")
 		}
 	}
 
-	return varMapNow, nil
+	return fieldsMap, nil
 }
 
-func validateSecretConfig(sc SecretConfig) []string {
+func validateSecretConfig(secretConfig SecretConfig) []string {
 	var missingKeys []string
 
-	if sc.Type == "" {
+	if secretConfig.Type == "" {
 		missingKeys = append(missingKeys, "type")
 	}
 
-	if sc.IntegrationName == "" {
+	if secretConfig.IntegrationName == "" {
 		missingKeys = append(missingKeys, "integration_name")
 	}
 
