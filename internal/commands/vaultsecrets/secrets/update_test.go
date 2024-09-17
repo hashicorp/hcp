@@ -150,7 +150,7 @@ func TestUpdateRun(t *testing.T) {
 			Input: []byte(`type = "mongodb-atlas"
 details = {
   rotate_on_update = true
-  rotation_policy_name = "60"
+  rotation_policy_name = "built-in:60-days-2-active"
   secret_details = {
     mongodb_group_id = "mbdgi"
     mongodb_roles = [{

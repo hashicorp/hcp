@@ -238,29 +238,29 @@ func updateRun(opts *UpdateOpts) error {
 	return nil
 }
 
-func readUpdateConfigFile(filePath string) (SecretUpdateConfig, DetailsInternal, error) {
+func readUpdateConfigFile(filePath string) (SecretUpdateConfig, secretConfigInternal, error) {
 	var (
-		sc SecretUpdateConfig
-		di DetailsInternal
+		secretConfig   SecretUpdateConfig
+		internalConfig secretConfigInternal
 	)
 
-	if err := hclsimple.DecodeFile(filePath, nil, &sc); err != nil {
-		return sc, di, fmt.Errorf("failed to decode config file: %w", err)
+	if err := hclsimple.DecodeFile(filePath, nil, &secretConfig); err != nil {
+		return secretConfig, internalConfig, fmt.Errorf("failed to decode config file: %w", err)
 	}
 
-	detailsMap, err := ctyValueToMap(sc.Details)
+	detailsMap, err := ctyValueToMap(secretConfig.Details)
 	if err != nil {
-		return sc, di, err
+		return secretConfig, internalConfig, err
 	}
-	di.Details = detailsMap
+	internalConfig.Details = detailsMap
 
-	return sc, di, nil
+	return secretConfig, internalConfig, nil
 }
 
-func validateSecretUpdateConfig(sc SecretUpdateConfig) []string {
+func validateSecretUpdateConfig(secretConfig SecretUpdateConfig) []string {
 	var missingKeys []string
 
-	if sc.Type == "" {
+	if secretConfig.Type == "" {
 		missingKeys = append(missingKeys, "type")
 	}
 
