@@ -112,18 +112,18 @@ type SecretUpdateConfig struct {
 func updateRun(opts *UpdateOpts) error {
 	switch opts.Type {
 	case secretTypeRotating:
-		sc, di, err := readUpdateConfigFile(opts.SecretFilePath)
+		secretConfig, internalConfig, err := readUpdateConfigFile(opts.SecretFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to process config file: %w", err)
 		}
 
-		missingFields := validateSecretUpdateConfig(sc)
+		missingFields := validateSecretUpdateConfig(secretConfig)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 		}
 
-		switch sc.Type {
+		switch secretConfig.Type {
 		case integrations.Twilio:
 			req := preview_secret_service.NewUpdateTwilioRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
@@ -132,7 +132,7 @@ func updateRun(opts *UpdateOpts) error {
 			req.SecretName = opts.SecretName
 
 			var twilioBody preview_models.SecretServiceUpdateTwilioRotatingSecretBody
-			detailBytes, err := json.Marshal(di.Details)
+			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
@@ -160,7 +160,7 @@ func updateRun(opts *UpdateOpts) error {
 			req.SecretName = opts.SecretName
 
 			var mongoDBBody preview_models.SecretServiceUpdateMongoDBAtlasRotatingSecretBody
-			detailBytes, err := json.Marshal(di.Details)
+			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
@@ -187,7 +187,7 @@ func updateRun(opts *UpdateOpts) error {
 			req.AppName = opts.AppName
 
 			var awsBody preview_models.SecretServiceUpdateAwsIAMUserAccessKeyRotatingSecretBody
-			detailBytes, err := json.Marshal(di.Details)
+			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
@@ -211,7 +211,7 @@ func updateRun(opts *UpdateOpts) error {
 			req.AppName = opts.AppName
 
 			var gcpBody preview_models.SecretServiceUpdateGcpServiceAccountKeyRotatingSecretBody
-			detailBytes, err := json.Marshal(di.Details)
+			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
