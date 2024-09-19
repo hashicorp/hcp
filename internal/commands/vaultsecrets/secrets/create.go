@@ -5,17 +5,16 @@ package secrets
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"os"
-	"slices"
 
-	"github.com/mitchellh/mapstructure"
 	"github.com/posener/complete"
-	"golang.org/x/exp/maps"
-	"gopkg.in/yaml.v3"
+	"github.com/zclconf/go-cty/cty"
 
+	"github.com/hashicorp/hcl/v2/hclsimple"
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
@@ -47,7 +46,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		`),
 		Examples: []cmd.Example{
 			{
-				Preamble: `Create a new secret in the Vault Secrets application on your active profile:`,
+				Preamble: `Create a new static secret in the Vault Secrets application on your active profile:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp vault-secrets secrets create secret_1 --data-file=tmp/secrets1.txt
 				`),
@@ -56,6 +55,12 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 				Preamble: `Create a new secret in a Vault Secrets application by piping the plaintext secret from a command output:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithNoWrap()).Must(`
 				$ echo -n "my super secret" | hcp vault-secrets secrets create secret_2 --data-file=-
+				`),
+			},
+			{
+				Preamble: `Create a new rotating secret in the Vault Secrets application on your active profile:`,
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				$ hcp vault-secrets secrets create secret_1 --secret-type=rotating --data-file=path/to/file/config.hcl
 				`),
 			},
 		},
@@ -117,43 +122,14 @@ type CreateOpts struct {
 	Client               secret_service.ClientService
 }
 
+type secretConfigInternal struct {
+	Details map[string]any
+}
+
 type SecretConfig struct {
-	Version         string
-	Type            integrations.IntegrationType
-	IntegrationName string `yaml:"integration_name"`
-	Details         map[string]any
-}
-
-type MongoDBRole struct {
-	RoleName       string `mapstructure:"role_name"`
-	DatabaseName   string `mapstructure:"database_name"`
-	CollectionName string `mapstructure:"collection_name"`
-}
-
-type MongoDBScope struct {
-	Name string `mapstructure:"type"`
-	Type string `mapstructure:"name"`
-}
-
-type AwsAssumeRole struct {
-	RoleArn string `mapstructure:"role_arn"`
-}
-
-type GcpServiceAccount struct {
-	ServiceAccountEmail string `mapstructure:"service_account_email"`
-}
-
-var (
-	TwilioRequiredKeys       = []string{"rotation_policy_name"}
-	MongoDBAtlasRequiredKeys = []string{"rotation_policy_name", "mongodb_group_id", "mongodb_roles"}
-	AwsRequiredKeys          = []string{"default_ttl", "assume_role"}
-	GcpRequiredKeys          = []string{"default_ttl", "service_account_impersonation"}
-)
-
-var rotationPolicies = map[string]string{
-	"30": "built-in:30-days-2-active",
-	"60": "built-in:60-days-2-active",
-	"90": "built-in:90-days-2-active",
+	Type            integrations.IntegrationType `hcl:"type"`
+	IntegrationName string                       `hcl:"integration_name"`
+	Details         cty.Value                    `hcl:"details"`
 }
 
 func createRun(opts *CreateOpts) error {
@@ -182,34 +158,38 @@ func createRun(opts *CreateOpts) error {
 			return err
 		}
 	case secretTypeRotating:
-		sc, err := readConfigFile(opts)
+		secretConfig, internalConfig, err := readConfigFile(opts)
 		if err != nil {
 			return fmt.Errorf("failed to process config file: %w", err)
 		}
 
-		missingFields := validateSecretConfig(sc)
+		missingFields := validateSecretConfig(secretConfig)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 		}
 
-		switch sc.Type {
+		switch secretConfig.Type {
 		case integrations.Twilio:
-			missingDetails := validateDetails(sc.Details, TwilioRequiredKeys)
-
-			if len(missingDetails) > 0 {
-				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
-			}
-
 			req := preview_secret_service.NewCreateTwilioRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
-			req.Body = &preview_models.SecretServiceCreateTwilioRotatingSecretBody{
-				IntegrationName:    sc.IntegrationName,
-				RotationPolicyName: rotationPolicies[sc.Details[TwilioRequiredKeys[0]].(string)],
-				SecretName:         opts.SecretName,
+
+			var twilioBody preview_models.SecretServiceCreateTwilioRotatingSecretBody
+			detailBytes, err := json.Marshal(internalConfig.Details)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
 			}
+
+			err = twilioBody.UnmarshalBinary(detailBytes)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
+			}
+
+			twilioBody.IntegrationName = secretConfig.IntegrationName
+			twilioBody.SecretName = opts.SecretName
+			req.Body = &twilioBody
 
 			resp, err := opts.PreviewClient.CreateTwilioRotatingSecret(req, nil)
 			if err != nil {
@@ -221,59 +201,27 @@ func createRun(opts *CreateOpts) error {
 			}
 
 		case integrations.MongoDBAtlas:
-			missingDetails := validateDetails(sc.Details, MongoDBAtlasRequiredKeys)
-
-			if len(missingDetails) > 0 {
-				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
-			}
 
 			req := preview_secret_service.NewCreateMongoDBAtlasRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
+			req.AppName = opts.AppName
 
-			roles := sc.Details["mongodb_roles"].([]any)
-			var reqRoles []*preview_models.Secrets20231128MongoDBRole
-			for _, r := range roles {
-				var role MongoDBRole
-				decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{WeaklyTypedInput: true, Result: &role})
-				if err := decoder.Decode(r); err != nil {
-					return fmt.Errorf("unable to decode to a mongodb role")
-				}
-
-				reqRole := &preview_models.Secrets20231128MongoDBRole{
-					CollectionName: role.CollectionName,
-					RoleName:       role.RoleName,
-					DatabaseName:   role.DatabaseName,
-				}
-				reqRoles = append(reqRoles, reqRole)
+			var mongoDBBody preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody
+			detailBytes, err := json.Marshal(internalConfig.Details)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			scopes := sc.Details["mongodb_scopes"].([]any)
-			var reqScopes []*preview_models.Secrets20231128MongoDBScope
-			for _, r := range scopes {
-				var scope MongoDBScope
-				decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{WeaklyTypedInput: true, Result: &scope})
-				if err := decoder.Decode(r); err != nil {
-					return fmt.Errorf("unable to decode to a mongodb scope")
-				}
-
-				reqScope := &preview_models.Secrets20231128MongoDBScope{
-					Name: scope.Name,
-					Type: scope.Type,
-				}
-				reqScopes = append(reqScopes, reqScope)
+			err = mongoDBBody.UnmarshalBinary(detailBytes)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			req.Body = &preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody{
-				SecretDetails: &preview_models.Secrets20231128MongoDBAtlasSecretDetails{
-					MongodbGroupID: sc.Details[MongoDBAtlasRequiredKeys[1]].(string),
-					MongodbRoles:   reqRoles,
-					MongodbScopes:  reqScopes,
-				},
-				IntegrationName:    sc.IntegrationName,
-				RotationPolicyName: rotationPolicies[sc.Details[MongoDBAtlasRequiredKeys[0]].(string)],
-				SecretName:         opts.SecretName,
-			}
+			mongoDBBody.IntegrationName = secretConfig.IntegrationName
+			mongoDBBody.SecretName = opts.SecretName
+			req.Body = &mongoDBBody
+
 			resp, err := opts.PreviewClient.CreateMongoDBAtlasRotatingSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
@@ -288,44 +236,37 @@ func createRun(opts *CreateOpts) error {
 		}
 
 	case secretTypeDynamic:
-		sc, err := readConfigFile(opts)
+		secretConfig, internalConfig, err := readConfigFile(opts)
 		if err != nil {
 			return fmt.Errorf("failed to process config file: %w", err)
 		}
-
-		missingFields := validateSecretConfig(sc)
+		missingFields := validateSecretConfig(secretConfig)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 		}
 
-		switch sc.Type {
+		switch secretConfig.Type {
 		case integrations.AWS:
-
-			missingDetails := validateDetails(sc.Details, AwsRequiredKeys)
-
-			if len(missingDetails) > 0 {
-				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
-			}
-
-			var role AwsAssumeRole
-			decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{WeaklyTypedInput: true, Result: &role})
-			if err := decoder.Decode(sc.Details[AwsRequiredKeys[1]]); err != nil {
-				return fmt.Errorf("unable to decode aws assume_role")
-			}
-
 			req := preview_secret_service.NewCreateAwsDynamicSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
-			req.Body = &preview_models.SecretServiceCreateAwsDynamicSecretBody{
-				IntegrationName: sc.IntegrationName,
-				DefaultTTL:      sc.Details[AwsRequiredKeys[0]].(string),
-				AssumeRole: &preview_models.Secrets20231128AssumeRoleRequest{
-					RoleArn: role.RoleArn,
-				},
-				Name: opts.SecretName,
+
+			var awsBody preview_models.SecretServiceCreateAwsDynamicSecretBody
+			detailBytes, err := json.Marshal(internalConfig.Details)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
 			}
+
+			err = awsBody.UnmarshalBinary(detailBytes)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
+			}
+
+			awsBody.IntegrationName = secretConfig.IntegrationName
+			awsBody.Name = opts.SecretName
+			req.Body = &awsBody
 
 			_, err = opts.PreviewClient.CreateAwsDynamicSecret(req, nil)
 			if err != nil {
@@ -333,33 +274,27 @@ func createRun(opts *CreateOpts) error {
 			}
 
 		case integrations.GCP:
-
-			missingDetails := validateDetails(sc.Details, GcpRequiredKeys)
-
-			if len(missingDetails) > 0 {
-				return fmt.Errorf("missing required field(s) in the config file details: %s", missingDetails)
-			}
-
-			var account GcpServiceAccount
-			decoder, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{WeaklyTypedInput: true, Result: &account})
-			if err := decoder.Decode(sc.Details[GcpRequiredKeys[1]]); err != nil {
-				return fmt.Errorf("unable to decode gcp service_account_impersonation")
-			}
-
 			req := preview_secret_service.NewCreateGcpDynamicSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
-			req.Body = &preview_models.SecretServiceCreateGcpDynamicSecretBody{
-				IntegrationName: sc.IntegrationName,
-				DefaultTTL:      sc.Details[GcpRequiredKeys[0]].(string),
-				ServiceAccountImpersonation: &preview_models.Secrets20231128ServiceAccountImpersonationRequest{
-					ServiceAccountEmail: account.ServiceAccountEmail,
-				},
-				Name: opts.SecretName,
+
+			var gcpBody preview_models.SecretServiceCreateGcpDynamicSecretBody
+			detailBytes, err := json.Marshal(internalConfig.Details)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			_, err := opts.PreviewClient.CreateGcpDynamicSecret(req, nil)
+			err = gcpBody.UnmarshalBinary(detailBytes)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
+			}
+
+			gcpBody.IntegrationName = secretConfig.IntegrationName
+			gcpBody.Name = opts.SecretName
+			req.Body = &gcpBody
+
+			_, err = opts.PreviewClient.CreateGcpDynamicSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 			}
@@ -423,44 +358,64 @@ func readPlainTextSecret(opts *CreateOpts) error {
 	return nil
 }
 
-func readConfigFile(opts *CreateOpts) (SecretConfig, error) {
-	var sc SecretConfig
+func readConfigFile(opts *CreateOpts) (SecretConfig, secretConfigInternal, error) {
+	var (
+		secretConfig   SecretConfig
+		internalConfig secretConfigInternal
+	)
 
-	f, err := os.ReadFile(opts.SecretFilePath)
-	if err != nil {
-		return sc, fmt.Errorf("unable to open config file: %w", err)
+	if err := hclsimple.DecodeFile(opts.SecretFilePath, nil, &secretConfig); err != nil {
+		return secretConfig, internalConfig, fmt.Errorf("failed to decode config file: %w", err)
 	}
 
-	err = yaml.Unmarshal(f, &sc)
+	detailsMap, err := ctyValueToMap(secretConfig.Details)
 	if err != nil {
-		return sc, fmt.Errorf("unable to unmarshal config file: %w", err)
+		return secretConfig, internalConfig, err
 	}
+	internalConfig.Details = detailsMap
 
-	return sc, nil
+	return secretConfig, internalConfig, nil
 }
 
-func validateSecretConfig(sc SecretConfig) []string {
+func ctyValueToMap(value cty.Value) (map[string]any, error) {
+	fieldsMap := make(map[string]any)
+	for k, v := range value.AsValueMap() {
+		if v.Type() == cty.String {
+			fieldsMap[k] = v.AsString()
+		} else if v.Type().IsObjectType() {
+			nestedMap, err := ctyValueToMap(v)
+			if err != nil {
+				return nil, err
+			}
+			fieldsMap[k] = nestedMap
+		} else if v.Type().IsTupleType() {
+			var items []map[string]any
+			for _, val := range v.AsValueSlice() {
+				nestedMap, err := ctyValueToMap(val)
+				if err != nil {
+					return nil, err
+				}
+				items = append(items, nestedMap)
+			}
+			fieldsMap[k] = items
+		} else {
+			return nil, fmt.Errorf("found unsupported value type")
+		}
+	}
+
+	return fieldsMap, nil
+}
+
+func validateSecretConfig(secretConfig SecretConfig) []string {
 	var missingKeys []string
 
-	if sc.Type == "" {
+	if secretConfig.Type == "" {
 		missingKeys = append(missingKeys, "type")
 	}
 
-	if sc.IntegrationName == "" {
+	if secretConfig.IntegrationName == "" {
 		missingKeys = append(missingKeys, "integration_name")
 	}
 
-	return missingKeys
-}
-
-func validateDetails(details map[string]any, requiredKeys []string) []string {
-	detailsKeys := maps.Keys(details)
-	var missingKeys []string
-
-	for _, r := range requiredKeys {
-		if !slices.Contains(detailsKeys, r) {
-			missingKeys = append(missingKeys, r)
-		}
-	}
 	return missingKeys
 }

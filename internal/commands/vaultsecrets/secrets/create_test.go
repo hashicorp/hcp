@@ -186,30 +186,30 @@ func TestCreateRun(t *testing.T) {
 			MockCalled: true,
 		},
 		{
-			Name:    "Success: Create a Twilio rotating secret",
+			Name:    "Success: Create a MongoDB rotating secret",
 			RespErr: false,
 			AugmentOpts: func(o *CreateOpts) {
 				o.Type = secretTypeRotating
 			},
 			MockCalled: true,
-			Input: []byte(`version: 1.0.0
-type: "twilio"
-integration_name: "Twil-Int-11"
-details: 
-  rotation_policy_name: "60"`),
-		},
-		{
-			Name:    "Failed: Missing required rotating secret field",
-			RespErr: true,
-			AugmentOpts: func(o *CreateOpts) {
-				o.Type = secretTypeRotating
-			},
-			Input: []byte(`version: 1.0.0
-type: "twilio"
-integration_name: "Twil-Int-11"
-details:
-  none: "none"`),
-			ErrMsg: "missing required field(s) in the config file details: [rotation_policy_name]",
+			Input: []byte(`type = "mongodb-atlas"
+integration_name = "mongo-db-integration"
+details = {
+  rotation_policy_name: "built-in:60-days-2-active"
+  secret_details = {
+    mongodb_group_id = "mbdgi"
+    mongodb_roles = [{
+      "role_name" = "rn1"
+      "database_name" = "dn1"
+      "collection_name" = "cn1"
+    },
+	{
+	  "role_name" = "rn2"
+	  "database_name" = "dn2"
+	  "collection_name" = "cn2"
+	}]
+  }
+}`),
 		},
 		{
 			Name:    "Success: Create an Aws dynamic secret",
@@ -218,13 +218,17 @@ details:
 				o.Type = secretTypeDynamic
 			},
 			MockCalled: true,
-			Input: []byte(`version: 1.0.0
-type: "aws"
-integration_name: "Aws-Int-12"
-details: 
-  default_ttl: "3600s"
-  assume_role:
-    role_arn: "ra"`),
+			Input: []byte(`type = "aws"
+
+integration_name = "Aws-Int-12"
+
+details = {
+  "default_ttl" = "3600s"
+
+  "assume_role" = {
+    "role_arn" = "ra"
+  }
+}`),
 		},
 		{
 			Name:    "Failed: Unsupported secret type",
@@ -273,7 +277,7 @@ details:
 
 			if opts.Type == secretTypeRotating || opts.Type == secretTypeDynamic {
 				tempDir := t.TempDir()
-				f, err := os.Create(filepath.Join(tempDir, "config.yaml"))
+				f, err := os.Create(filepath.Join(tempDir, "config.hcl"))
 				r.NoError(err)
 				_, err = f.Write(c.Input)
 				r.NoError(err)
@@ -314,24 +318,39 @@ details:
 			} else if opts.Type == secretTypeRotating {
 				if c.MockCalled {
 					if c.RespErr {
-						pvs.EXPECT().CreateTwilioRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+						pvs.EXPECT().CreateMongoDBAtlasRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 					} else {
-						pvs.EXPECT().CreateTwilioRotatingSecret(&preview_secret_service.CreateTwilioRotatingSecretParams{
+						pvs.EXPECT().CreateMongoDBAtlasRotatingSecret(&preview_secret_service.CreateMongoDBAtlasRotatingSecretParams{
 							OrganizationID: testProfile(t).OrganizationID,
 							ProjectID:      testProfile(t).ProjectID,
 							AppName:        testProfile(t).VaultSecrets.AppName,
-							Body: &preview_models.SecretServiceCreateTwilioRotatingSecretBody{
+							Body: &preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody{
 								SecretName:         opts.SecretName,
-								IntegrationName:    "Twil-Int-11",
+								IntegrationName:    "mongo-db-integration",
 								RotationPolicyName: "built-in:60-days-2-active",
+								SecretDetails: &preview_models.Secrets20231128MongoDBAtlasSecretDetails{
+									MongodbGroupID: "mbdgi",
+									MongodbRoles: []*preview_models.Secrets20231128MongoDBRole{
+										{
+											RoleName:       "rn1",
+											DatabaseName:   "dn1",
+											CollectionName: "cn1",
+										},
+										{
+											RoleName:       "rn2",
+											DatabaseName:   "dn2",
+											CollectionName: "cn2",
+										},
+									},
+								},
 							},
 							Context: opts.Ctx,
-						}, mock.Anything).Return(&preview_secret_service.CreateTwilioRotatingSecretOK{
-							Payload: &preview_models.Secrets20231128CreateTwilioRotatingSecretResponse{
+						}, mock.Anything).Return(&preview_secret_service.CreateMongoDBAtlasRotatingSecretOK{
+							Payload: &preview_models.Secrets20231128CreateMongoDBAtlasRotatingSecretResponse{
 								Config: &preview_models.Secrets20231128RotatingSecretConfig{
 									AppName:            opts.AppName,
 									CreatedAt:          dt,
-									IntegrationName:    "Twil-Int-11",
+									IntegrationName:    "mongo-db-integration",
 									RotationPolicyName: "built-in:60-days-2-active",
 									SecretName:         opts.SecretName,
 								},
