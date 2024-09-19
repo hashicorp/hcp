@@ -195,7 +195,7 @@ func TestCreateRun(t *testing.T) {
 			Input: []byte(`type = "mongodb-atlas"
 integration_name = "mongo-db-integration"
 details = {
-  rotation_policy_name: "built-in:60-days-2-active"
+  rotation_policy_name = "built-in:60-days-2-active"
   secret_details = {
     mongodb_group_id = "mbdgi"
     mongodb_roles = [{
