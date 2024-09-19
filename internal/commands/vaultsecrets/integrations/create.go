@@ -113,24 +113,24 @@ var providerToRequiredFields = map[string][]string{
 
 func createRun(opts *CreateOpts) error {
 	var (
-		ic  IntegrationConfig
-		err error
+		config IntegrationConfig
+		err    error
 	)
 
 	if opts.ConfigFilePath == "" {
-		ic, err = promptUserForConfig(opts)
+		config, err = promptUserForConfig(opts)
 		if err != nil {
 			return fmt.Errorf("failed to create integration via cli prompt: %w", err)
 		}
 	} else {
-		if err = hclsimple.DecodeFile(opts.ConfigFilePath, nil, &ic); err != nil {
+		if err = hclsimple.DecodeFile(opts.ConfigFilePath, nil, &config); err != nil {
 			return fmt.Errorf("failed to decode config file: %w", err)
 		}
 	}
 
-	switch ic.Type {
+	switch config.Type {
 	case Twilio:
-		missingFields := validateDetails(ic.Details, TwilioKeys)
+		missingFields := validateDetails(config.Details, TwilioKeys)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
@@ -139,9 +139,9 @@ func createRun(opts *CreateOpts) error {
 		body := &preview_models.SecretServiceCreateTwilioIntegrationBody{
 			Name: opts.IntegrationName,
 			StaticCredentialDetails: &preview_models.Secrets20231128TwilioStaticCredentialsRequest{
-				AccountSid:   ic.Details[TwilioKeys[0]],
-				APIKeySecret: ic.Details[TwilioKeys[1]],
-				APIKeySid:    ic.Details[TwilioKeys[2]],
+				AccountSid:   config.Details[TwilioKeys[0]],
+				APIKeySecret: config.Details[TwilioKeys[1]],
+				APIKeySid:    config.Details[TwilioKeys[2]],
 			},
 			Capabilities: []*preview_models.Secrets20231128Capability{
 				preview_models.Secrets20231128CapabilityROTATION.Pointer(),
@@ -160,7 +160,7 @@ func createRun(opts *CreateOpts) error {
 		}
 
 	case MongoDBAtlas:
-		missingFields := validateDetails(ic.Details, MongoKeys)
+		missingFields := validateDetails(config.Details, MongoKeys)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
@@ -169,8 +169,8 @@ func createRun(opts *CreateOpts) error {
 		body := &preview_models.SecretServiceCreateMongoDBAtlasIntegrationBody{
 			Name: opts.IntegrationName,
 			StaticCredentialDetails: &preview_models.Secrets20231128MongoDBAtlasStaticCredentialsRequest{
-				APIPrivateKey: ic.Details[MongoKeys[0]],
-				APIPublicKey:  ic.Details[MongoKeys[1]],
+				APIPrivateKey: config.Details[MongoKeys[0]],
+				APIPublicKey:  config.Details[MongoKeys[1]],
 			},
 			Capabilities: []*preview_models.Secrets20231128Capability{
 				preview_models.Secrets20231128CapabilityROTATION.Pointer(),
@@ -189,7 +189,7 @@ func createRun(opts *CreateOpts) error {
 		}
 
 	case AWS:
-		missingFields := validateDetails(ic.Details, AWSKeys)
+		missingFields := validateDetails(config.Details, AWSKeys)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
@@ -198,8 +198,8 @@ func createRun(opts *CreateOpts) error {
 		body := &preview_models.SecretServiceCreateAwsIntegrationBody{
 			Name: opts.IntegrationName,
 			FederatedWorkloadIdentity: &preview_models.Secrets20231128AwsFederatedWorkloadIdentityRequest{
-				Audience: ic.Details[AWSKeys[0]],
-				RoleArn:  ic.Details[AWSKeys[1]],
+				Audience: config.Details[AWSKeys[0]],
+				RoleArn:  config.Details[AWSKeys[1]],
 			},
 			Capabilities: []*preview_models.Secrets20231128Capability{
 				preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
@@ -218,7 +218,7 @@ func createRun(opts *CreateOpts) error {
 		}
 
 	case GCP:
-		missingFields := validateDetails(ic.Details, GCPKeys)
+		missingFields := validateDetails(config.Details, GCPKeys)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
@@ -227,8 +227,8 @@ func createRun(opts *CreateOpts) error {
 		body := &preview_models.SecretServiceCreateGcpIntegrationBody{
 			Name: opts.IntegrationName,
 			FederatedWorkloadIdentity: &preview_models.Secrets20231128GcpFederatedWorkloadIdentityRequest{
-				Audience:            ic.Details[GCPKeys[0]],
-				ServiceAccountEmail: ic.Details[GCPKeys[1]],
+				Audience:            config.Details[GCPKeys[0]],
+				ServiceAccountEmail: config.Details[GCPKeys[1]],
 			},
 			Capabilities: []*preview_models.Secrets20231128Capability{
 				preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
