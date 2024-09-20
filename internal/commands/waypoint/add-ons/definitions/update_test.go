@@ -51,6 +51,8 @@ func TestCmdAddOnDefinitionUpdate(t *testing.T) {
 				"-l", "cli",
 				"-d", "An add-on definition created with the CLI.",
 				"--readme-markdown-template-file", "readme_test.txt",
+				"--tf-execution-mode", "agent",
+				"--tf-agent-pool-id", "pool-abc123",
 			},
 			Expect: &AddOnDefinitionOpts{
 				Name:                       "cli-test",
@@ -60,6 +62,8 @@ func TestCmdAddOnDefinitionUpdate(t *testing.T) {
 				TerraformCloudProjectName:  "test",
 				Labels:                     []string{"cli"},
 				ReadmeMarkdownTemplateFile: "readme_test.txt",
+				TerraformExecutionMode:     "agent",
+				TerraformAgentPoolID:       "pool-abc123",
 			},
 		},
 	}

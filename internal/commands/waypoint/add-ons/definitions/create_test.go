@@ -53,6 +53,8 @@ func TestCmdAddOnDefinitionCreate(t *testing.T) {
 				"-l", "cli",
 				"-d", "An add-on definition created with the CLI.",
 				"--readme-markdown-template-file", "readme_test.txt",
+				"--tf-execution-mode", "agent",
+				"--tf-agent-pool-id", "pool-abc123",
 			},
 			Expect: &AddOnDefinitionOpts{
 				Name:                        "cli-test",
@@ -63,6 +65,8 @@ func TestCmdAddOnDefinitionCreate(t *testing.T) {
 				TerraformNoCodeModuleSource: "private/waypoint/waypoint-nocode-module/null",
 				Labels:                      []string{"cli"},
 				ReadmeMarkdownTemplateFile:  "readme_test.txt",
+				TerraformExecutionMode:      "agent",
+				TerraformAgentPoolID:        "pool-abc123",
 			},
 		},
 	}
