@@ -121,7 +121,7 @@ $ hcp waypoint templates create -n=my-template \
 				{
 					Name:         "tfc-project-id",
 					DisplayValue: "TFC_PROJECT_ID",
-					Description: "The ID of the Terraform Cloud project where" +
+					Description: "The ID of the HCP Terraform project where" +
 						" applications using this template will be created.",
 					Value:    flagvalue.Simple("", &opts.TerraformCloudProjectID),
 					Required: true,
@@ -131,6 +131,21 @@ $ hcp waypoint templates create -n=my-template \
 					DisplayValue: "VARIABLE_OPTIONS_FILE",
 					Description:  "The file containing the HCL definition of Variable Options.",
 					Value:        flagvalue.Simple("", &opts.VariableOptionsFile),
+				},
+				{
+					Name:         "tf-execution-mode",
+					DisplayValue: "TF_EXECUTION_MODE",
+					Description: "The execution mode of the HCP Terraform " +
+						"workspaces for applications using this template.",
+					Value: flagvalue.Simple("remote", &opts.TerraformExecutionMode),
+				},
+				{
+					Name:         "tf-agent-pool-id",
+					DisplayValue: "TF_AGENT_POOL_ID",
+					Description: "The ID of the Terraform agent pool to use for " +
+						"running Terraform operations. This is only applicable " +
+						"when the execution mode is set to 'agent'.",
+					Value: flagvalue.Simple("", &opts.TerraformAgentPoolID),
 				},
 			},
 		},
@@ -193,6 +208,8 @@ func templateCreate(opts *TemplateOpts) error {
 					},
 					ModuleSource:    opts.TerraformNoCodeModuleSource,
 					VariableOptions: variables,
+					TfExecutionMode: opts.TerraformExecutionMode,
+					TfAgentPoolID:   opts.TerraformAgentPoolID,
 				},
 			},
 			Context: opts.Ctx,

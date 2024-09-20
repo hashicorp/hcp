@@ -102,6 +102,8 @@ func templateRead(opts *TemplateOpts) error {
 		format.NewField("Readme Template", "{{ .ReadmeTemplate }}"),
 		format.NewField("Tags", "{{ .Tags}}"),
 		format.NewField("Terraform Nocode Source", "{{ .ModuleSource}}"),
+		format.NewField("Execution Mode", "{{ .TfExecutionMode}}"),
+		format.NewField("Agent Pool ID", "{{ .TfAgentPoolID}}"),
 		format.NewField("Variable Options", optionNamesStr),
 	}
 
