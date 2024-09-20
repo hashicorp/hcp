@@ -139,7 +139,7 @@ func updateRun(opts *UpdateOpts) error {
 
 			err = twilioBody.UnmarshalBinary(detailBytes)
 			if err != nil {
-				return fmt.Errorf("error marshaling details config: %w", err)
+				return fmt.Errorf("error unmarshaling details config: %w", err)
 			}
 			req.Body = &twilioBody
 
@@ -167,7 +167,7 @@ func updateRun(opts *UpdateOpts) error {
 
 			err = mongoDBBody.UnmarshalBinary(detailBytes)
 			if err != nil {
-				return fmt.Errorf("error marshaling details config: %w", err)
+				return fmt.Errorf("error unmarshaling details config: %w", err)
 			}
 			req.Body = &mongoDBBody
 
@@ -185,6 +185,7 @@ func updateRun(opts *UpdateOpts) error {
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
+			req.Name = opts.SecretName
 
 			var awsBody preview_models.SecretServiceUpdateAwsIAMUserAccessKeyRotatingSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
@@ -194,7 +195,7 @@ func updateRun(opts *UpdateOpts) error {
 
 			err = awsBody.UnmarshalBinary(detailBytes)
 			if err != nil {
-				return fmt.Errorf("error marshaling details config: %w", err)
+				return fmt.Errorf("error unmarshaling details config: %w", err)
 			}
 
 			req.Body = &awsBody
@@ -209,6 +210,7 @@ func updateRun(opts *UpdateOpts) error {
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
+			req.Name = opts.SecretName
 
 			var gcpBody preview_models.SecretServiceUpdateGcpServiceAccountKeyRotatingSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
@@ -218,12 +220,76 @@ func updateRun(opts *UpdateOpts) error {
 
 			err = gcpBody.UnmarshalBinary(detailBytes)
 			if err != nil {
-				return fmt.Errorf("error marshaling details config: %w", err)
+				return fmt.Errorf("error unmarshaling details config: %w", err)
 			}
 
 			req.Body = &gcpBody
 
 			_, err = opts.PreviewClient.UpdateGcpServiceAccountKeyRotatingSecret(req, nil)
+			if err != nil {
+				return fmt.Errorf("failed to update secret with name %q: %w", opts.SecretName, err)
+			}
+		}
+
+	case secretTypeDynamic:
+		secretConfig, internalConfig, err := readUpdateConfigFile(opts.SecretFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to process config file: %w", err)
+		}
+
+		missingFields := validateSecretUpdateConfig(secretConfig)
+
+		if len(missingFields) > 0 {
+			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
+		}
+
+		switch secretConfig.Type {
+		case integrations.AWS:
+			req := preview_secret_service.NewUpdateAwsDynamicSecretParamsWithContext(opts.Ctx)
+			req.OrganizationID = opts.Profile.OrganizationID
+			req.ProjectID = opts.Profile.ProjectID
+			req.AppName = opts.AppName
+			req.Name = opts.SecretName
+
+			var awsBody preview_models.SecretServiceUpdateAwsDynamicSecretBody
+			detailBytes, err := json.Marshal(internalConfig.Details)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
+			}
+
+			err = awsBody.UnmarshalBinary(detailBytes)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling details config: %w", err)
+			}
+
+			req.Body = &awsBody
+
+			_, err = opts.PreviewClient.UpdateAwsDynamicSecret(req, nil)
+			if err != nil {
+				return fmt.Errorf("failed to update secret with name %q: %w", opts.SecretName, err)
+			}
+
+		case integrations.GCP:
+			req := preview_secret_service.NewUpdateGcpDynamicSecretParamsWithContext(opts.Ctx)
+			req.OrganizationID = opts.Profile.OrganizationID
+			req.ProjectID = opts.Profile.ProjectID
+			req.AppName = opts.AppName
+			req.Name = opts.SecretName
+
+			var gcpBody preview_models.SecretServiceUpdateGcpDynamicSecretBody
+			detailBytes, err := json.Marshal(internalConfig.Details)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
+			}
+
+			err = gcpBody.UnmarshalBinary(detailBytes)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling details config: %w", err)
+			}
+
+			req.Body = &gcpBody
+
+			_, err = opts.PreviewClient.UpdateGcpDynamicSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to update secret with name %q: %w", opts.SecretName, err)
 			}

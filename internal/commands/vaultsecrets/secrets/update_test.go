@@ -167,6 +167,41 @@ details = {
 }`),
 		},
 		{
+			Name:    "Success: Update an Aws dynamic secret",
+			RespErr: false,
+			AugmentOpts: func(o *UpdateOpts) {
+				o.Type = secretTypeDynamic
+			},
+			MockCalled: true,
+			Input: []byte(`type = "aws"
+
+details = {
+  "default_ttl" = "3600s"
+
+  "assume_role" = {
+    "role_arn" = "ra2"
+  }
+}`),
+		},
+		{
+			Name:    "Failed: Unable to update integration name of a secret",
+			RespErr: true,
+			AugmentOpts: func(o *UpdateOpts) {
+				o.Type = secretTypeDynamic
+			},
+			ErrMsg: "Unsupported argument; An argument named \"integration_name\" is not expected here",
+			Input: []byte(`type = "aws"
+integration_name = "Aws-Int-12"
+
+details = {
+  "default_ttl" = "3600s"
+
+  "assume_role" = {
+    "role_arn" = "ra2"
+  }
+}`),
+		},
+		{
 			Name:    "Failed: Unsupported secret type",
 			RespErr: true,
 			AugmentOpts: func(o *UpdateOpts) {
@@ -220,46 +255,79 @@ details = {
 			opts.SecretFilePath = f.Name()
 
 			dt := strfmt.NewDateTime()
-			if c.MockCalled {
-				if c.RespErr {
-					pvs.EXPECT().UpdateMongoDBAtlasRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
-				} else {
-					pvs.EXPECT().UpdateMongoDBAtlasRotatingSecret(&preview_secret_service.UpdateMongoDBAtlasRotatingSecretParams{
-						OrganizationID: testProfile(t).OrganizationID,
-						ProjectID:      testProfile(t).ProjectID,
-						AppName:        testProfile(t).VaultSecrets.AppName,
-						SecretName:     "test_secret",
-						Body: &preview_models.SecretServiceUpdateMongoDBAtlasRotatingSecretBody{
-							RotateOnUpdate:     true,
-							RotationPolicyName: "built-in:60-days-2-active",
-							SecretDetails: &preview_models.Secrets20231128MongoDBAtlasSecretDetails{
-								MongodbGroupID: "mbdgi",
-								MongodbRoles: []*preview_models.Secrets20231128MongoDBRole{
-									{
-										RoleName:       "rn1",
-										DatabaseName:   "dn1",
-										CollectionName: "cn1",
-									},
-									{
-										RoleName:       "rn2",
-										DatabaseName:   "dn2",
-										CollectionName: "cn2",
+			if opts.Type == secretTypeRotating {
+				if c.MockCalled {
+					if c.RespErr {
+						pvs.EXPECT().UpdateMongoDBAtlasRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+					} else {
+						pvs.EXPECT().UpdateMongoDBAtlasRotatingSecret(&preview_secret_service.UpdateMongoDBAtlasRotatingSecretParams{
+							OrganizationID: testProfile(t).OrganizationID,
+							ProjectID:      testProfile(t).ProjectID,
+							AppName:        testProfile(t).VaultSecrets.AppName,
+							SecretName:     "test_secret",
+							Body: &preview_models.SecretServiceUpdateMongoDBAtlasRotatingSecretBody{
+								RotateOnUpdate:     true,
+								RotationPolicyName: "built-in:60-days-2-active",
+								SecretDetails: &preview_models.Secrets20231128MongoDBAtlasSecretDetails{
+									MongodbGroupID: "mbdgi",
+									MongodbRoles: []*preview_models.Secrets20231128MongoDBRole{
+										{
+											RoleName:       "rn1",
+											DatabaseName:   "dn1",
+											CollectionName: "cn1",
+										},
+										{
+											RoleName:       "rn2",
+											DatabaseName:   "dn2",
+											CollectionName: "cn2",
+										},
 									},
 								},
 							},
-						},
-						Context: opts.Ctx,
-					}, mock.Anything).Return(&preview_secret_service.UpdateMongoDBAtlasRotatingSecretOK{
-						Payload: &preview_models.Secrets20231128UpdateMongoDBAtlasRotatingSecretResponse{
-							Config: &preview_models.Secrets20231128RotatingSecretConfig{
-								AppName:            opts.AppName,
-								CreatedAt:          dt,
-								IntegrationName:    "mongo-db-integration",
-								RotationPolicyName: "built-in:60-days-2-active",
-								SecretName:         opts.SecretName,
+							Context: opts.Ctx,
+						}, mock.Anything).Return(&preview_secret_service.UpdateMongoDBAtlasRotatingSecretOK{
+							Payload: &preview_models.Secrets20231128UpdateMongoDBAtlasRotatingSecretResponse{
+								Config: &preview_models.Secrets20231128RotatingSecretConfig{
+									AppName:            opts.AppName,
+									CreatedAt:          dt,
+									IntegrationName:    "mongo-db-integration",
+									RotationPolicyName: "built-in:60-days-2-active",
+									SecretName:         opts.SecretName,
+								},
 							},
-						},
-					}, nil).Once()
+						}, nil).Once()
+					}
+				}
+			} else if opts.Type == secretTypeDynamic {
+				if c.MockCalled {
+					if c.RespErr {
+						pvs.EXPECT().UpdateAwsDynamicSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+					} else {
+						pvs.EXPECT().UpdateAwsDynamicSecret(&preview_secret_service.UpdateAwsDynamicSecretParams{
+							OrganizationID: testProfile(t).OrganizationID,
+							ProjectID:      testProfile(t).ProjectID,
+							AppName:        testProfile(t).VaultSecrets.AppName,
+							Body: &preview_models.SecretServiceUpdateAwsDynamicSecretBody{
+								DefaultTTL: "3600s",
+								AssumeRole: &preview_models.Secrets20231128AssumeRoleRequest{
+									RoleArn: "ra2",
+								},
+							},
+							Context: opts.Ctx,
+						}, mock.Anything).Return(&preview_secret_service.UpdateAwsDynamicSecretOK{
+							Payload: &preview_models.Secrets20231128UpdateAwsDynamicSecretResponse{
+								Secret: &preview_models.Secrets20231128AwsDynamicSecret{
+									AssumeRole: &preview_models.Secrets20231128AssumeRoleResponse{
+										RoleArn: "ra2",
+									},
+									DefaultTTL:      "3600s",
+									CreatedAt:       dt,
+									IntegrationName: "Aws-Int-12",
+									Name:            opts.SecretName,
+								},
+							},
+						}, nil).Once()
+					}
 				}
 			}
 
