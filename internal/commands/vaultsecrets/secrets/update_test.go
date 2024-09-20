@@ -307,6 +307,7 @@ details = {
 							OrganizationID: testProfile(t).OrganizationID,
 							ProjectID:      testProfile(t).ProjectID,
 							AppName:        testProfile(t).VaultSecrets.AppName,
+							Name:           opts.SecretName,
 							Body: &preview_models.SecretServiceUpdateAwsDynamicSecretBody{
 								DefaultTTL: "3600s",
 								AssumeRole: &preview_models.Secrets20231128AssumeRoleRequest{
