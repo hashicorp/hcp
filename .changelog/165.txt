@@ -1,0 +1,3 @@
+```release-note:improvement
+Waypoint: Action sequence numbers are now reported on agent run completion
+```
