@@ -368,44 +368,13 @@ func readConfigFile(filePath string) (SecretConfig, secretConfigInternal, error)
 		return secretConfig, internalConfig, fmt.Errorf("failed to decode config file: %w", err)
 	}
 
-	detailsMap, err := ctyValueToMap(secretConfig.Details)
+	detailsMap, err := integrations.CtyValueToMap(secretConfig.Details)
 	if err != nil {
 		return secretConfig, internalConfig, err
 	}
 	internalConfig.Details = detailsMap
 
 	return secretConfig, internalConfig, nil
-}
-
-func ctyValueToMap(value cty.Value) (map[string]any, error) {
-	fieldsMap := make(map[string]any)
-	for k, v := range value.AsValueMap() {
-		if v.Type() == cty.String {
-			fieldsMap[k] = v.AsString()
-		} else if v.Type() == cty.Bool {
-			fieldsMap[k] = v.True()
-		} else if v.Type().IsObjectType() {
-			nestedMap, err := ctyValueToMap(v)
-			if err != nil {
-				return nil, err
-			}
-			fieldsMap[k] = nestedMap
-		} else if v.Type().IsTupleType() {
-			var items []map[string]any
-			for _, val := range v.AsValueSlice() {
-				nestedMap, err := ctyValueToMap(val)
-				if err != nil {
-					return nil, err
-				}
-				items = append(items, nestedMap)
-			}
-			fieldsMap[k] = items
-		} else {
-			return nil, fmt.Errorf("found unsupported value type")
-		}
-	}
-
-	return fieldsMap, nil
 }
 
 func validateSecretConfig(secretConfig SecretConfig) []string {
