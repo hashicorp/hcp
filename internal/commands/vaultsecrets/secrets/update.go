@@ -248,7 +248,7 @@ func readUpdateConfigFile(filePath string) (SecretUpdateConfig, secretConfigInte
 		return secretConfig, internalConfig, fmt.Errorf("failed to decode config file: %w", err)
 	}
 
-	detailsMap, err := ctyValueToMap(secretConfig.Details)
+	detailsMap, err := integrations.CtyValueToMap(secretConfig.Details)
 	if err != nil {
 		return secretConfig, internalConfig, err
 	}

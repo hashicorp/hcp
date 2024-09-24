@@ -5,11 +5,12 @@ package integrations
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
-	"slices"
 
 	"github.com/manifoldco/promptui"
+	"github.com/zclconf/go-cty/cty"
 	"golang.org/x/exp/maps"
 
 	"github.com/hashicorp/hcl/v2/hclsimple"
@@ -92,16 +93,20 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 	return cmd
 }
 
+type integrationConfigInternal struct {
+	Details map[string]any
+}
+
 type IntegrationConfig struct {
-	Type    IntegrationType   `hcl:"type"`
-	Details map[string]string `hcl:"details"`
+	Type    IntegrationType `hcl:"type"`
+	Details cty.Value       `hcl:"details"`
 }
 
 var (
 	TwilioKeys = []string{"account_sid", "api_key_secret", "api_key_sid"}
 	MongoKeys  = []string{"private_key", "public_key"}
-	AWSKeys    = []string{"audience", "role_arn"}
-	GCPKeys    = []string{"audience", "service_account_email"}
+	AWSKeys    = []string{"access_keys", "federated_workload_identity"}
+	GCPKeys    = []string{"service_account_key", "federated_workload_identity"}
 )
 
 var providerToRequiredFields = map[string][]string{
@@ -111,14 +116,25 @@ var providerToRequiredFields = map[string][]string{
 	string(GCP):          GCPKeys,
 }
 
+var awsAuthMethodsToReqKeys = map[string][]string{
+	"federated_workload_identity": {"audience", "role_arn"},
+	"access_keys":                 {"access_key_id", "secret_access_key"},
+}
+
+var gcpAuthMethodsToReqKeys = map[string][]string{
+	"federated_workload_identity": {"audience", "service_account_email"},
+	"service_account_key":         {"credentials"},
+}
+
 func createRun(opts *CreateOpts) error {
 	var (
-		config IntegrationConfig
-		err    error
+		config         IntegrationConfig
+		internalConfig integrationConfigInternal
+		err            error
 	)
 
 	if opts.ConfigFilePath == "" {
-		config, err = promptUserForConfig(opts)
+		config, internalConfig, err = promptUserForConfig(opts)
 		if err != nil {
 			return fmt.Errorf("failed to create integration via cli prompt: %w", err)
 		}
@@ -126,121 +142,117 @@ func createRun(opts *CreateOpts) error {
 		if err = hclsimple.DecodeFile(opts.ConfigFilePath, nil, &config); err != nil {
 			return fmt.Errorf("failed to decode config file: %w", err)
 		}
+
+		detailsMap, err := CtyValueToMap(config.Details)
+		if err != nil {
+			return fmt.Errorf("failed to process config file: %w", err)
+		}
+		internalConfig.Details = detailsMap
 	}
 
 	switch config.Type {
 	case Twilio:
-		missingFields := validateDetails(config.Details, TwilioKeys)
+		req := preview_secret_service.NewCreateTwilioIntegrationParamsWithContext(opts.Ctx)
+		req.OrganizationID = opts.Profile.OrganizationID
+		req.ProjectID = opts.Profile.ProjectID
 
-		if len(missingFields) > 0 {
-			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
+		var twilioBody preview_models.SecretServiceCreateTwilioIntegrationBody
+		detailBytes, err := json.Marshal(internalConfig.Details)
+		if err != nil {
+			return fmt.Errorf("error marshaling details config: %w", err)
 		}
 
-		body := &preview_models.SecretServiceCreateTwilioIntegrationBody{
-			Name: opts.IntegrationName,
-			StaticCredentialDetails: &preview_models.Secrets20231128TwilioStaticCredentialsRequest{
-				AccountSid:   config.Details[TwilioKeys[0]],
-				APIKeySecret: config.Details[TwilioKeys[1]],
-				APIKeySid:    config.Details[TwilioKeys[2]],
-			},
-			Capabilities: []*preview_models.Secrets20231128Capability{
-				preview_models.Secrets20231128CapabilityROTATION.Pointer(),
-			},
+		err = twilioBody.UnmarshalBinary(detailBytes)
+		if err != nil {
+			return fmt.Errorf("error marshaling details config: %w", err)
 		}
+		req.Body = &twilioBody
+		req.Body.Capabilities = []*preview_models.Secrets20231128Capability{
+			preview_models.Secrets20231128CapabilityROTATION.Pointer(),
+		}
+		req.Body.Name = opts.IntegrationName
 
-		_, err := opts.PreviewClient.CreateTwilioIntegration(&preview_secret_service.CreateTwilioIntegrationParams{
-			Context:        opts.Ctx,
-			ProjectID:      opts.Profile.ProjectID,
-			OrganizationID: opts.Profile.OrganizationID,
-			Body:           body,
-		}, nil)
-
+		_, err = opts.PreviewClient.CreateTwilioIntegration(req, nil)
 		if err != nil {
 			return fmt.Errorf("failed to create Twilio integration: %w", err)
 		}
 
 	case MongoDBAtlas:
-		missingFields := validateDetails(config.Details, MongoKeys)
+		req := preview_secret_service.NewCreateMongoDBAtlasIntegrationParamsWithContext(opts.Ctx)
+		req.OrganizationID = opts.Profile.OrganizationID
+		req.ProjectID = opts.Profile.ProjectID
 
-		if len(missingFields) > 0 {
-			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
+		var mongoDBBody preview_models.SecretServiceCreateMongoDBAtlasIntegrationBody
+		detailBytes, err := json.Marshal(internalConfig.Details)
+		if err != nil {
+			return fmt.Errorf("error marshaling details config: %w", err)
 		}
 
-		body := &preview_models.SecretServiceCreateMongoDBAtlasIntegrationBody{
-			Name: opts.IntegrationName,
-			StaticCredentialDetails: &preview_models.Secrets20231128MongoDBAtlasStaticCredentialsRequest{
-				APIPrivateKey: config.Details[MongoKeys[0]],
-				APIPublicKey:  config.Details[MongoKeys[1]],
-			},
-			Capabilities: []*preview_models.Secrets20231128Capability{
-				preview_models.Secrets20231128CapabilityROTATION.Pointer(),
-			},
+		err = mongoDBBody.UnmarshalBinary(detailBytes)
+		if err != nil {
+			return fmt.Errorf("error marshaling details config: %w", err)
 		}
+		req.Body = &mongoDBBody
+		req.Body.Capabilities = []*preview_models.Secrets20231128Capability{
+			preview_models.Secrets20231128CapabilityROTATION.Pointer(),
+		}
+		req.Body.Name = opts.IntegrationName
 
-		_, err := opts.PreviewClient.CreateMongoDBAtlasIntegration(&preview_secret_service.CreateMongoDBAtlasIntegrationParams{
-			Context:        opts.Ctx,
-			ProjectID:      opts.Profile.ProjectID,
-			OrganizationID: opts.Profile.OrganizationID,
-			Body:           body,
-		}, nil)
+		_, err = opts.PreviewClient.CreateMongoDBAtlasIntegration(req, nil)
 
 		if err != nil {
 			return fmt.Errorf("failed to create MongoDB Atlas integration: %w", err)
 		}
 
 	case AWS:
-		missingFields := validateDetails(config.Details, AWSKeys)
+		req := preview_secret_service.NewCreateAwsIntegrationParamsWithContext(opts.Ctx)
+		req.OrganizationID = opts.Profile.OrganizationID
+		req.ProjectID = opts.Profile.ProjectID
 
-		if len(missingFields) > 0 {
-			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
+		var awsBody preview_models.SecretServiceCreateAwsIntegrationBody
+		detailBytes, err := json.Marshal(internalConfig.Details)
+		if err != nil {
+			return fmt.Errorf("error marshaling details config: %w", err)
 		}
 
-		body := &preview_models.SecretServiceCreateAwsIntegrationBody{
-			Name: opts.IntegrationName,
-			FederatedWorkloadIdentity: &preview_models.Secrets20231128AwsFederatedWorkloadIdentityRequest{
-				Audience: config.Details[AWSKeys[0]],
-				RoleArn:  config.Details[AWSKeys[1]],
-			},
-			Capabilities: []*preview_models.Secrets20231128Capability{
-				preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
-			},
+		err = awsBody.UnmarshalBinary(detailBytes)
+		if err != nil {
+			return fmt.Errorf("error marshaling details config: %w", err)
 		}
+		req.Body = &awsBody
+		req.Body.Capabilities = []*preview_models.Secrets20231128Capability{
+			preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
+		}
+		req.Body.Name = opts.IntegrationName
 
-		_, err := opts.PreviewClient.CreateAwsIntegration(&preview_secret_service.CreateAwsIntegrationParams{
-			Context:        opts.Ctx,
-			ProjectID:      opts.Profile.ProjectID,
-			OrganizationID: opts.Profile.OrganizationID,
-			Body:           body,
-		}, nil)
+		_, err = opts.PreviewClient.CreateAwsIntegration(req, nil)
 
 		if err != nil {
 			return fmt.Errorf("failed to create AWS integration: %w", err)
 		}
 
 	case GCP:
-		missingFields := validateDetails(config.Details, GCPKeys)
+		req := preview_secret_service.NewCreateGcpIntegrationParamsWithContext(opts.Ctx)
+		req.OrganizationID = opts.Profile.OrganizationID
+		req.ProjectID = opts.Profile.ProjectID
 
-		if len(missingFields) > 0 {
-			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
+		var gcpBody preview_models.SecretServiceCreateGcpIntegrationBody
+		detailBytes, err := json.Marshal(internalConfig.Details)
+		if err != nil {
+			return fmt.Errorf("error marshaling details config: %w", err)
 		}
 
-		body := &preview_models.SecretServiceCreateGcpIntegrationBody{
-			Name: opts.IntegrationName,
-			FederatedWorkloadIdentity: &preview_models.Secrets20231128GcpFederatedWorkloadIdentityRequest{
-				Audience:            config.Details[GCPKeys[0]],
-				ServiceAccountEmail: config.Details[GCPKeys[1]],
-			},
-			Capabilities: []*preview_models.Secrets20231128Capability{
-				preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
-			},
+		err = gcpBody.UnmarshalBinary(detailBytes)
+		if err != nil {
+			return fmt.Errorf("error marshaling details config: %w", err)
 		}
+		req.Body = &gcpBody
+		req.Body.Capabilities = []*preview_models.Secrets20231128Capability{
+			preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
+		}
+		req.Body.Name = opts.IntegrationName
 
-		_, err := opts.PreviewClient.CreateGcpIntegration(&preview_secret_service.CreateGcpIntegrationParams{
-			Context:        opts.Ctx,
-			ProjectID:      opts.Profile.ProjectID,
-			OrganizationID: opts.Profile.OrganizationID,
-			Body:           body,
-		}, nil)
+		_, err = opts.PreviewClient.CreateGcpIntegration(req, nil)
 
 		if err != nil {
 			return fmt.Errorf("failed to create GCP integration: %w", err)
@@ -253,11 +265,14 @@ func createRun(opts *CreateOpts) error {
 	return nil
 }
 
-func promptUserForConfig(opts *CreateOpts) (IntegrationConfig, error) {
-	var config IntegrationConfig
+func promptUserForConfig(opts *CreateOpts) (IntegrationConfig, integrationConfigInternal, error) {
+	var (
+		config         IntegrationConfig
+		internalConfig integrationConfigInternal
+	)
 
 	if !opts.IO.CanPrompt() {
-		return config, fmt.Errorf("unable to create integration interactively")
+		return config, internalConfig, fmt.Errorf("unable to create integration interactively")
 	}
 
 	providerPrompt := promptui.Select{
@@ -269,14 +284,49 @@ func promptUserForConfig(opts *CreateOpts) (IntegrationConfig, error) {
 
 	_, provider, err := providerPrompt.Run()
 	if err != nil {
-		return config, fmt.Errorf("provider selection prompt failed: %w", err)
+		return config, internalConfig, fmt.Errorf("provider selection prompt failed: %w", err)
 	}
-
 	config.Type = IntegrationType(provider)
 
+	var (
+		fields     []string
+		authMethod string
+	)
+	if config.Type == AWS {
+		authPrompt := promptui.Select{
+			Label:  "Please select an authentication method",
+			Items:  providerToRequiredFields[provider],
+			Stdin:  io.NopCloser(opts.IO.In()),
+			Stdout: iostreams.NopWriteCloser(opts.IO.Err()),
+		}
+
+		_, authMethod, err = authPrompt.Run()
+		if err != nil {
+			return config, internalConfig, fmt.Errorf("authentication method selection prompt failed: %w", err)
+		}
+
+		fields = awsAuthMethodsToReqKeys[authMethod]
+	} else if config.Type == GCP {
+		authPrompt := promptui.Select{
+			Label:  "Please select an authentication method",
+			Items:  providerToRequiredFields[provider],
+			Stdin:  io.NopCloser(opts.IO.In()),
+			Stdout: iostreams.NopWriteCloser(opts.IO.Err()),
+		}
+
+		_, authMethod, err = authPrompt.Run()
+		if err != nil {
+			return config, internalConfig, fmt.Errorf("authentication method selection prompt failed: %w", err)
+		}
+		fields = gcpAuthMethodsToReqKeys[authMethod]
+
+	} else {
+		fields = providerToRequiredFields[provider]
+	}
+
 	var fieldPrompt promptui.Prompt
-	fieldValues := make(map[string]string)
-	for _, field := range providerToRequiredFields[provider] {
+	fieldValues := make(map[string]any)
+	for _, field := range fields {
 		fieldPrompt = promptui.Prompt{
 			Label: field,
 			Mask:  '*',
@@ -284,24 +334,48 @@ func promptUserForConfig(opts *CreateOpts) (IntegrationConfig, error) {
 
 		input, err := fieldPrompt.Run()
 		if err != nil {
-			return config, fmt.Errorf("prompt for field %s failed: %w", field, err)
+			return config, internalConfig, fmt.Errorf("prompt for field %s failed: %w", field, err)
 		}
 
 		fieldValues[field] = input
 	}
 
-	config.Details = fieldValues
-	return config, err
+	if config.Type == AWS || config.Type == GCP {
+		internalConfig.Details = map[string]any{authMethod: fieldValues}
+		return config, internalConfig, err
+	}
+
+	internalConfig.Details = fieldValues
+	return config, internalConfig, err
 }
 
-func validateDetails(details map[string]string, requiredKeys []string) []string {
-	detailsKeys := maps.Keys(details)
-	var missingKeys []string
-
-	for _, r := range requiredKeys {
-		if !slices.Contains(detailsKeys, r) {
-			missingKeys = append(missingKeys, r)
+func CtyValueToMap(value cty.Value) (map[string]any, error) {
+	fieldsMap := make(map[string]any)
+	for k, v := range value.AsValueMap() {
+		if v.Type() == cty.String {
+			fieldsMap[k] = v.AsString()
+		} else if v.Type() == cty.Bool {
+			fieldsMap[k] = v.True()
+		} else if v.Type().IsObjectType() {
+			nestedMap, err := CtyValueToMap(v)
+			if err != nil {
+				return nil, err
+			}
+			fieldsMap[k] = nestedMap
+		} else if v.Type().IsTupleType() {
+			var items []map[string]any
+			for _, val := range v.AsValueSlice() {
+				nestedMap, err := CtyValueToMap(val)
+				if err != nil {
+					return nil, err
+				}
+				items = append(items, nestedMap)
+			}
+			fieldsMap[k] = items
+		} else {
+			return nil, fmt.Errorf("found unsupported value type")
 		}
 	}
-	return missingKeys
+
+	return fieldsMap, nil
 }
