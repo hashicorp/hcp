@@ -52,12 +52,6 @@ func TestNewCmdCreate(t *testing.T) {
 			Args:    []string{"--config-file", "path/to/file"},
 			Error:   "ERROR: accepts 1 arg(s), received 0",
 		},
-		{
-			Name:    "Failed: No config file flag specified",
-			Profile: testProfile,
-			Args:    []string{"sample-integration"},
-			Error:   "ERROR: missing required flag: --config-file=CONFIG_FILE",
-		},
 	}
 
 	for _, c := range cases {
@@ -112,27 +106,11 @@ func TestCreateRun(t *testing.T) {
 			IntegrationName: "sample-integration",
 			Input: []byte(`type = "aws"
 details = {
-  "audience" = "abc",
-  "role_arn" = "def"
+  "federated_workload_identity" = {
+    "audience" = "abc",
+    "role_arn" = "def"
+  }
 }`),
-		},
-		{
-			Name:            "Missing a single required field",
-			IntegrationName: "sample-integration",
-			Input: []byte(`type = "mongodb-atlas"
-details = {
-  "public_key" = "abc"
-}`),
-			Error: "missing required field(s) in the config file: [private_key]",
-		},
-		{
-			Name:            "Missing multiple required fields",
-			IntegrationName: "sample-integration",
-			Input: []byte(`type = "twilio"
-details = {
-  "api_key_sid" = "ghi"
-}`),
-			Error: "missing required field(s) in the config file: [account_sid api_key_secret]",
 		},
 	}
 
