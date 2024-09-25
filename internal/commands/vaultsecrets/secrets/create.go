@@ -231,6 +231,58 @@ func createRun(opts *CreateOpts) error {
 				return err
 			}
 
+		case integrations.AWS:
+			req := preview_secret_service.NewCreateAwsIAMUserAccessKeyRotatingSecretParamsWithContext(opts.Ctx)
+			req.OrganizationID = opts.Profile.OrganizationID
+			req.ProjectID = opts.Profile.ProjectID
+			req.AppName = opts.AppName
+
+			var awsBody preview_models.SecretServiceCreateAwsIAMUserAccessKeyRotatingSecretBody
+			detailBytes, err := json.Marshal(internalConfig.Details)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
+			}
+
+			err = awsBody.UnmarshalBinary(detailBytes)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
+			}
+
+			awsBody.IntegrationName = secretConfig.IntegrationName
+			awsBody.Name = opts.SecretName
+			req.Body = &awsBody
+
+			_, err = opts.PreviewClient.CreateAwsIAMUserAccessKeyRotatingSecret(req, nil)
+			if err != nil {
+				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
+			}
+
+		case integrations.GCP:
+			req := preview_secret_service.NewCreateGcpServiceAccountKeyRotatingSecretParamsWithContext(opts.Ctx)
+			req.OrganizationID = opts.Profile.OrganizationID
+			req.ProjectID = opts.Profile.ProjectID
+			req.AppName = opts.AppName
+
+			var gcpBody preview_models.SecretServiceCreateGcpServiceAccountKeyRotatingSecretBody
+			detailBytes, err := json.Marshal(internalConfig.Details)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
+			}
+
+			err = gcpBody.UnmarshalBinary(detailBytes)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
+			}
+
+			gcpBody.IntegrationName = secretConfig.IntegrationName
+			gcpBody.Name = opts.SecretName
+			req.Body = &gcpBody
+
+			_, err = opts.PreviewClient.CreateGcpServiceAccountKeyRotatingSecret(req, nil)
+			if err != nil {
+				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
+			}
+
 		default:
 			return fmt.Errorf("unsupported rotating secret provider type")
 		}
