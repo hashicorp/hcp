@@ -4643,6 +4643,80 @@ func (_c *MockClientService_UpdateApp_Call) RunAndReturn(run func(*secret_servic
 	return _c
 }
 
+// UpdateAwsDynamicSecret provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) UpdateAwsDynamicSecret(params *secret_service.UpdateAwsDynamicSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdateAwsDynamicSecretOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateAwsDynamicSecret")
+	}
+
+	var r0 *secret_service.UpdateAwsDynamicSecretOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateAwsDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateAwsDynamicSecretOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateAwsDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.UpdateAwsDynamicSecretOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.UpdateAwsDynamicSecretOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.UpdateAwsDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_UpdateAwsDynamicSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateAwsDynamicSecret'
+type MockClientService_UpdateAwsDynamicSecret_Call struct {
+	*mock.Call
+}
+
+// UpdateAwsDynamicSecret is a helper method to define mock.On call
+//   - params *secret_service.UpdateAwsDynamicSecretParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) UpdateAwsDynamicSecret(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_UpdateAwsDynamicSecret_Call {
+	return &MockClientService_UpdateAwsDynamicSecret_Call{Call: _e.mock.On("UpdateAwsDynamicSecret",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_UpdateAwsDynamicSecret_Call) Run(run func(params *secret_service.UpdateAwsDynamicSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_UpdateAwsDynamicSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.UpdateAwsDynamicSecretParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_UpdateAwsDynamicSecret_Call) Return(_a0 *secret_service.UpdateAwsDynamicSecretOK, _a1 error) *MockClientService_UpdateAwsDynamicSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_UpdateAwsDynamicSecret_Call) RunAndReturn(run func(*secret_service.UpdateAwsDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateAwsDynamicSecretOK, error)) *MockClientService_UpdateAwsDynamicSecret_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateAwsIAMUserAccessKeyRotatingSecret provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) UpdateAwsIAMUserAccessKeyRotatingSecret(params *secret_service.UpdateAwsIAMUserAccessKeyRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdateAwsIAMUserAccessKeyRotatingSecretOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -4861,6 +4935,80 @@ func (_c *MockClientService_UpdateGatewayPool_Call) Return(_a0 *secret_service.U
 }
 
 func (_c *MockClientService_UpdateGatewayPool_Call) RunAndReturn(run func(*secret_service.UpdateGatewayPoolParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateGatewayPoolOK, error)) *MockClientService_UpdateGatewayPool_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateGcpDynamicSecret provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) UpdateGcpDynamicSecret(params *secret_service.UpdateGcpDynamicSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdateGcpDynamicSecretOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateGcpDynamicSecret")
+	}
+
+	var r0 *secret_service.UpdateGcpDynamicSecretOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateGcpDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateGcpDynamicSecretOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateGcpDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.UpdateGcpDynamicSecretOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.UpdateGcpDynamicSecretOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.UpdateGcpDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_UpdateGcpDynamicSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateGcpDynamicSecret'
+type MockClientService_UpdateGcpDynamicSecret_Call struct {
+	*mock.Call
+}
+
+// UpdateGcpDynamicSecret is a helper method to define mock.On call
+//   - params *secret_service.UpdateGcpDynamicSecretParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) UpdateGcpDynamicSecret(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_UpdateGcpDynamicSecret_Call {
+	return &MockClientService_UpdateGcpDynamicSecret_Call{Call: _e.mock.On("UpdateGcpDynamicSecret",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_UpdateGcpDynamicSecret_Call) Run(run func(params *secret_service.UpdateGcpDynamicSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_UpdateGcpDynamicSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.UpdateGcpDynamicSecretParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_UpdateGcpDynamicSecret_Call) Return(_a0 *secret_service.UpdateGcpDynamicSecretOK, _a1 error) *MockClientService_UpdateGcpDynamicSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_UpdateGcpDynamicSecret_Call) RunAndReturn(run func(*secret_service.UpdateGcpDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateGcpDynamicSecretOK, error)) *MockClientService_UpdateGcpDynamicSecret_Call {
 	_c.Call.Return(run)
 	return _c
 }
