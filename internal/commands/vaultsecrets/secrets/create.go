@@ -8,6 +8,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/manifoldco/promptui"
+	"golang.org/x/exp/maps"
 	"io"
 	"os"
 
@@ -40,7 +42,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "create",
-		ShortHelp: "Create a new static secret.",
+		ShortHelp: "Create a new secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create" }} command creates a new static, rotating, or dynamic secret under a Vault Secrets application.
 		The configuration for creating your rotating or dynamic secret will be read from the provided HCL config file. The following fields are required in the config 
@@ -80,9 +82,8 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 				{
 					Name:         "data-file",
 					DisplayValue: "DATA_FILE_PATH",
-					Description:  "File path to read secret data from. Set this to '-' to read the secret data from stdin.",
+					Description:  "File path to read secret data from. Set this to '-' to read the secret data from stdin for a static secret.",
 					Value:        flagvalue.Simple("", &opts.SecretFilePath),
-					Required:     true,
 					Autocomplete: complete.PredictOr(
 						complete.PredictFiles("*"),
 						complete.PredictSet("-"),
@@ -135,6 +136,13 @@ type SecretConfig struct {
 	Details         cty.Value                    `hcl:"details"`
 }
 
+var (
+	twilioRotatingSecretConfig = map[string]any{
+		"integration_name":     "",
+		"rotation_policy_name": "",
+	}
+)
+
 func createRun(opts *CreateOpts) error {
 	switch opts.Type {
 	case secretTypeKV, "":
@@ -161,6 +169,23 @@ func createRun(opts *CreateOpts) error {
 			return err
 		}
 	case secretTypeRotating:
+		var (
+			config         SecretConfig
+			internalConfig secretConfigInternal
+			err            error
+		)
+
+		if opts.SecretFilePath == "" {
+			config, internalConfig, err = promptUserForConfig(opts)
+			if err != nil {
+				return fmt.Errorf("failed to create integration via cli prompt: %w", err)
+			}
+		}
+
+		fmt.Println("Config: ", config)
+		fmt.Println("Internal Config: ", internalConfig)
+		return fmt.Errorf("done here")
+
 		secretConfig, internalConfig, err := readConfigFile(opts.SecretFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to process config file: %w", err)
@@ -444,4 +469,65 @@ func validateSecretConfig(secretConfig SecretConfig) []string {
 	}
 
 	return missingKeys
+}
+
+var availableRotatingSecretProviders = map[string]map[string]any{
+	string(integrations.Twilio): twilioRotatingSecretConfig,
+	//string(integrations.MongoDBAtlas): MongoKeys,
+	//string(integrations.AWS):          AWSKeys,
+	//string(integrations.GCP):          GCPKeys,
+}
+
+//var availableDynamicSecretProviders = map[string]map[string]any{
+//	string(Twilio):       TwilioKeys,
+//	string(MongoDBAtlas): MongoKeys,
+//	string(AWS):          AWSKeys,
+//	string(GCP):          GCPKeys,
+//}
+
+func promptUserForConfig(opts *CreateOpts) (SecretConfig, secretConfigInternal, error) {
+	var (
+		config         SecretConfig
+		internalConfig secretConfigInternal
+		err            error
+	)
+
+	if !opts.IO.CanPrompt() {
+		return config, internalConfig, fmt.Errorf("unable to create secret interactively")
+	}
+
+	providerPrompt := promptui.Select{
+		Label:  "Please select the provider you would like to configure",
+		Items:  maps.Keys(availableRotatingSecretProviders),
+		Stdin:  io.NopCloser(opts.IO.In()),
+		Stdout: iostreams.NopWriteCloser(opts.IO.Err()),
+	}
+
+	_, provider, err := providerPrompt.Run()
+	if err != nil {
+		return config, internalConfig, fmt.Errorf("provider selection prompt failed: %w", err)
+	}
+	config.Type = integrations.IntegrationType(provider)
+
+	var (
+		fieldPrompt promptui.Prompt
+		//fieldValues map[string]any
+	)
+	fieldValues := make(map[string]any)
+	for _, field := range maps.Keys(availableRotatingSecretProviders[provider]) {
+		fieldPrompt = promptui.Prompt{
+			Label: field,
+			Mask:  '*',
+		}
+
+		input, err := fieldPrompt.Run()
+		if err != nil {
+			return config, internalConfig, fmt.Errorf("prompt for field %s failed: %w", field, err)
+		}
+
+		fieldValues[field] = input
+	}
+
+	internalConfig.Details = fieldValues
+	return config, internalConfig, err
 }
