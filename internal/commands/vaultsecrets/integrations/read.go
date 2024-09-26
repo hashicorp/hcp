@@ -87,6 +87,19 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 
 func readRun(opts *ReadOpts) error {
 	switch opts.Type {
+	case "":
+		resp, err := opts.PreviewClient.GetIntegration(&preview_secret_service.GetIntegrationParams{
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+			Name:           opts.IntegrationName,
+		}, nil)
+		if err != nil {
+			return fmt.Errorf("failed to read integration: %w", err)
+		}
+
+		return opts.Output.Display(newGenericDisplayer(true, resp.Payload.Integration))
+
 	case Twilio:
 		resp, err := opts.PreviewClient.GetTwilioIntegration(&preview_secret_service.GetTwilioIntegrationParams{
 			Context:        opts.Ctx,
@@ -112,6 +125,32 @@ func readRun(opts *ReadOpts) error {
 		}
 
 		return opts.Output.Display(newMongoDBDisplayer(true, resp.Payload.Integration))
+
+	case AWS:
+		resp, err := opts.PreviewClient.GetAwsIntegration(&preview_secret_service.GetAwsIntegrationParams{
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+			Name:           opts.IntegrationName,
+		}, nil)
+		if err != nil {
+			return fmt.Errorf("failed to read integration: %w", err)
+		}
+
+		return opts.Output.Display(newAwsDisplayer(true, resp.Payload.Integration))
+
+	case GCP:
+		resp, err := opts.PreviewClient.GetGcpIntegration(&preview_secret_service.GetGcpIntegrationParams{
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+			Name:           opts.IntegrationName,
+		}, nil)
+		if err != nil {
+			return fmt.Errorf("failed to read integration: %w", err)
+		}
+
+		return opts.Output.Display(newGcpDisplayer(true, resp.Payload.Integration))
 
 	default:
 		return fmt.Errorf("not a valid integration type")
