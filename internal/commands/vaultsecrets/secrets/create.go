@@ -64,9 +64,15 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 				`),
 			},
 			{
-				Preamble: `Create a new rotating secret in the Vault Secrets application on your active profile:`,
+				Preamble: `Create a new rotating secret on your active profile from a config file:`,
 				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
 				$ hcp vault-secrets secrets create secret_1 --secret-type=rotating --data-file=path/to/file/config.hcl
+				`),
+			},
+			{
+				Preamble: `Create a new dynamic secret interactively on your active profile:`,
+				Command: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
+				$ hcp vault-secrets secrets create secret_1 --secret-type=dynamic
 				`),
 			},
 		},
