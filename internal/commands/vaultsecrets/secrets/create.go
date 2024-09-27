@@ -12,6 +12,7 @@ import (
 	"golang.org/x/exp/maps"
 	"io"
 	"os"
+	"reflect"
 
 	"github.com/posener/complete"
 	"github.com/zclconf/go-cty/cty"
@@ -131,15 +132,67 @@ type secretConfigInternal struct {
 }
 
 type SecretConfig struct {
-	Type            integrations.IntegrationType `hcl:"type"`
-	IntegrationName string                       `hcl:"integration_name"`
-	Details         cty.Value                    `hcl:"details"`
+	Type    integrations.IntegrationType `hcl:"type"`
+	Details cty.Value                    `hcl:"details"`
 }
 
 var (
 	twilioRotatingSecretConfig = map[string]any{
 		"integration_name":     "",
 		"rotation_policy_name": "",
+	}
+
+	mongoDBAtlasRotatingSecretConfig = map[string]any{
+		"integration_name": "",
+		"secret_details": map[string]any{
+			"mongodb_roles": []map[string]string{
+				{
+					"collection_name": "",
+					"database_name":   "",
+					"role_name":       "",
+				},
+			},
+			"mongodb_scopes": []map[string]string{
+				{
+					"name": "",
+					"type": "",
+				},
+			},
+			"mongodb_group_id": "",
+		},
+		"rotation_policy_name": "",
+	}
+
+	awsRotatingSecretConfig = map[string]any{
+		"integration_name":     "",
+		"rotation_policy_name": "",
+		"aws_iam_user_access_key_params": map[string]any{
+			"username": "",
+		},
+	}
+
+	gcpRotatingSecretConfig = map[string]any{
+		"integration_name":     "",
+		"rotation_policy_name": "",
+		"gcp_service_account_key_params": map[string]any{
+			"service_account_email": "",
+		},
+	}
+
+	awsDynamicSecretConfig = map[string]any{
+		"integration_name": "",
+		"default_ttl":      "",
+		"assume_role": map[string]any{
+			"role_arn": "",
+		},
+	}
+
+	gcpDynamicSecretConfig = map[string]any{
+		"integration_name": "",
+		"default_ttl":      "",
+		"service_account_impersonation": map[string]any{
+			"service_account_email": "",
+		},
 	}
 )
 
@@ -180,24 +233,20 @@ func createRun(opts *CreateOpts) error {
 			if err != nil {
 				return fmt.Errorf("failed to create integration via cli prompt: %w", err)
 			}
+		} else {
+			config, internalConfig, err = readConfigFile(opts.SecretFilePath)
+			if err != nil {
+				return fmt.Errorf("failed to process config file: %w", err)
+			}
 		}
 
-		fmt.Println("Config: ", config)
-		fmt.Println("Internal Config: ", internalConfig)
-		return fmt.Errorf("done here")
-
-		secretConfig, internalConfig, err := readConfigFile(opts.SecretFilePath)
-		if err != nil {
-			return fmt.Errorf("failed to process config file: %w", err)
-		}
-
-		missingFields := validateSecretConfig(secretConfig)
+		missingFields := validateSecretConfig(config)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 		}
 
-		switch secretConfig.Type {
+		switch config.Type {
 		case integrations.Twilio:
 			req := preview_secret_service.NewCreateTwilioRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
@@ -215,7 +264,6 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			twilioBody.IntegrationName = secretConfig.IntegrationName
 			twilioBody.SecretName = opts.SecretName
 			req.Body = &twilioBody
 
@@ -246,7 +294,6 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			mongoDBBody.IntegrationName = secretConfig.IntegrationName
 			mongoDBBody.SecretName = opts.SecretName
 			req.Body = &mongoDBBody
 
@@ -276,7 +323,6 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			awsBody.IntegrationName = secretConfig.IntegrationName
 			awsBody.Name = opts.SecretName
 			req.Body = &awsBody
 
@@ -302,7 +348,6 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			gcpBody.IntegrationName = secretConfig.IntegrationName
 			gcpBody.Name = opts.SecretName
 			req.Body = &gcpBody
 
@@ -316,17 +361,31 @@ func createRun(opts *CreateOpts) error {
 		}
 
 	case secretTypeDynamic:
-		secretConfig, internalConfig, err := readConfigFile(opts.SecretFilePath)
-		if err != nil {
-			return fmt.Errorf("failed to process config file: %w", err)
+		var (
+			config         SecretConfig
+			internalConfig secretConfigInternal
+			err            error
+		)
+
+		if opts.SecretFilePath == "" {
+			config, internalConfig, err = promptUserForConfig(opts)
+			if err != nil {
+				return fmt.Errorf("failed to create integration via cli prompt: %w", err)
+			}
+		} else {
+			config, internalConfig, err = readConfigFile(opts.SecretFilePath)
+			if err != nil {
+				return fmt.Errorf("failed to process config file: %w", err)
+			}
 		}
-		missingFields := validateSecretConfig(secretConfig)
+
+		missingFields := validateSecretConfig(config)
 
 		if len(missingFields) > 0 {
 			return fmt.Errorf("missing required field(s) in the config file: %s", missingFields)
 		}
 
-		switch secretConfig.Type {
+		switch config.Type {
 		case integrations.AWS:
 			req := preview_secret_service.NewCreateAwsDynamicSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
@@ -344,7 +403,7 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			awsBody.IntegrationName = secretConfig.IntegrationName
+			//awsBody.IntegrationName = secretConfig.IntegrationName
 			awsBody.Name = opts.SecretName
 			req.Body = &awsBody
 
@@ -370,7 +429,7 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			gcpBody.IntegrationName = secretConfig.IntegrationName
+			//gcpBody.IntegrationName = secretConfig.IntegrationName
 			gcpBody.Name = opts.SecretName
 			req.Body = &gcpBody
 
@@ -464,41 +523,45 @@ func validateSecretConfig(secretConfig SecretConfig) []string {
 		missingKeys = append(missingKeys, "type")
 	}
 
-	if secretConfig.IntegrationName == "" {
-		missingKeys = append(missingKeys, "integration_name")
-	}
-
 	return missingKeys
 }
 
 var availableRotatingSecretProviders = map[string]map[string]any{
-	string(integrations.Twilio): twilioRotatingSecretConfig,
-	//string(integrations.MongoDBAtlas): MongoKeys,
-	//string(integrations.AWS):          AWSKeys,
-	//string(integrations.GCP):          GCPKeys,
+	string(integrations.Twilio):       twilioRotatingSecretConfig,
+	string(integrations.MongoDBAtlas): mongoDBAtlasRotatingSecretConfig,
+	string(integrations.AWS):          awsRotatingSecretConfig,
+	string(integrations.GCP):          gcpRotatingSecretConfig,
 }
 
-//var availableDynamicSecretProviders = map[string]map[string]any{
-//	string(Twilio):       TwilioKeys,
-//	string(MongoDBAtlas): MongoKeys,
-//	string(AWS):          AWSKeys,
-//	string(GCP):          GCPKeys,
-//}
+var availableDynamicSecretProviders = map[string]map[string]any{
+	string(integrations.AWS): awsDynamicSecretConfig,
+	string(integrations.GCP): gcpDynamicSecretConfig,
+}
 
 func promptUserForConfig(opts *CreateOpts) (SecretConfig, secretConfigInternal, error) {
 	var (
 		config         SecretConfig
 		internalConfig secretConfigInternal
 		err            error
+		providerFields map[string]map[string]any
+		items          []string
 	)
 
 	if !opts.IO.CanPrompt() {
 		return config, internalConfig, fmt.Errorf("unable to create secret interactively")
 	}
 
+	if opts.Type == secretTypeDynamic {
+		providerFields = availableDynamicSecretProviders
+		items = maps.Keys(providerFields)
+	} else if opts.Type == secretTypeRotating {
+		providerFields = availableRotatingSecretProviders
+		items = maps.Keys(providerFields)
+	}
+
 	providerPrompt := promptui.Select{
 		Label:  "Please select the provider you would like to configure",
-		Items:  maps.Keys(availableRotatingSecretProviders),
+		Items:  items,
 		Stdin:  io.NopCloser(opts.IO.In()),
 		Stdout: iostreams.NopWriteCloser(opts.IO.Err()),
 	}
@@ -509,25 +572,75 @@ func promptUserForConfig(opts *CreateOpts) (SecretConfig, secretConfigInternal, 
 	}
 	config.Type = integrations.IntegrationType(provider)
 
-	var (
-		fieldPrompt promptui.Prompt
-		//fieldValues map[string]any
-	)
-	fieldValues := make(map[string]any)
-	for _, field := range maps.Keys(availableRotatingSecretProviders[provider]) {
-		fieldPrompt = promptui.Prompt{
-			Label: field,
-			Mask:  '*',
-		}
-
-		input, err := fieldPrompt.Run()
-		if err != nil {
-			return config, internalConfig, fmt.Errorf("prompt for field %s failed: %w", field, err)
-		}
-
-		fieldValues[field] = input
+	fieldValues, err := populateFieldValues(providerFields[provider], opts)
+	if err != nil {
+		return config, internalConfig, err
 	}
 
 	internalConfig.Details = fieldValues
 	return config, internalConfig, err
+}
+
+func populateFieldValues(fieldMap map[string]any, opts *CreateOpts) (map[string]any, error) {
+	var fieldPrompt promptui.Prompt
+	fieldsMap := make(map[string]any)
+
+	for _, field := range maps.Keys(fieldMap) {
+		value := fieldMap[field]
+		switch reflect.ValueOf(value).Kind() {
+		case reflect.String:
+			fieldPrompt = promptui.Prompt{
+				Label: field,
+				Mask:  '*',
+			}
+
+			input, err := fieldPrompt.Run()
+			if err != nil {
+				return fieldsMap, fmt.Errorf("prompt for field %s failed: %w", field, err)
+			}
+
+			fieldsMap[field] = input
+		case reflect.Map:
+			nestedMap, err := populateFieldValues(value.(map[string]any), opts)
+			if err != nil {
+				return nil, err
+			}
+			fieldsMap[field] = nestedMap
+		case reflect.Slice:
+			var (
+				sliceItems []map[string]any
+			)
+			nestedMap := make(map[string]any)
+			valueSlice := value.([]map[string]string)
+
+			for proceed := true; proceed; proceed = promptForAdditionalField(field, opts) {
+
+				for _, nestedField := range maps.Keys(valueSlice[0]) {
+					fieldPrompt = promptui.Prompt{
+						Label: "Enter " + any(nestedField).(string) + " for " + field,
+						Mask:  '*',
+					}
+
+					input, err := fieldPrompt.Run()
+					if err != nil {
+						return fieldsMap, fmt.Errorf("prompt for field %s failed: %w", field, err)
+					}
+
+					nestedMap[any(nestedField).(string)] = input
+				}
+				sliceItems = append(sliceItems, nestedMap)
+				fieldsMap[field] = sliceItems
+			}
+		}
+	}
+	return fieldsMap, nil
+}
+
+func promptForAdditionalField(field string, opts *CreateOpts) bool {
+	proceed, err := opts.IO.PromptConfirm("Would you like to add configuration for another " + field + "?")
+	if err != nil {
+		return false
+	}
+
+	return proceed
 }
