@@ -8,14 +8,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/manifoldco/promptui"
-	"golang.org/x/exp/maps"
 	"io"
 	"os"
 	"reflect"
 
+	"github.com/manifoldco/promptui"
 	"github.com/posener/complete"
 	"github.com/zclconf/go-cty/cty"
+	"golang.org/x/exp/maps"
 
 	"github.com/hashicorp/hcl/v2/hclsimple"
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
@@ -403,7 +403,6 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			//awsBody.IntegrationName = secretConfig.IntegrationName
 			awsBody.Name = opts.SecretName
 			req.Body = &awsBody
 
@@ -429,7 +428,6 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			//gcpBody.IntegrationName = secretConfig.IntegrationName
 			gcpBody.Name = opts.SecretName
 			req.Body = &gcpBody
 

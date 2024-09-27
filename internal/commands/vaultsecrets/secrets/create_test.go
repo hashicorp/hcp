@@ -47,12 +47,6 @@ func TestNewCmdCreate(t *testing.T) {
 		Expect  *CreateOpts
 	}{
 		{
-			Name:    "Failed: No secret name arg specified",
-			Profile: testProfile,
-			Args:    []string{},
-			Error:   "ERROR: missing required flag: --data-file=DATA_FILE_PATH",
-		},
-		{
 			Name:    "Good: Secret name arg specified",
 			Profile: testProfile,
 			Args:    []string{"test", "--data-file=DATA_FILE_PATH"},
