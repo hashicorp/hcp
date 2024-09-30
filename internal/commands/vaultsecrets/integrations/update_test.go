@@ -6,6 +6,9 @@ package integrations
 import (
 	"context"
 	"fmt"
+	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"os"
 	"path/filepath"
 	"testing"
@@ -13,16 +16,13 @@ import (
 	"github.com/go-openapi/runtime/client"
 	"github.com/stretchr/testify/require"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
 
-func TestNewCmdCreate(t *testing.T) {
+func TestNewCmdUpdate(t *testing.T) {
 	t.Parallel()
 
 	testProfile := func(t *testing.T) *profile.Profile {
@@ -35,13 +35,13 @@ func TestNewCmdCreate(t *testing.T) {
 		Args    []string
 		Profile func(t *testing.T) *profile.Profile
 		Error   string
-		Expect  *CreateOpts
+		Expect  *UpdateOpts
 	}{
 		{
 			Name:    "Good",
 			Profile: testProfile,
 			Args:    []string{"sample-integration", "--config-file", "path/to/file"},
-			Expect: &CreateOpts{
+			Expect: &UpdateOpts{
 				IntegrationName: "sample-integration",
 				ConfigFilePath:  "path/to/file",
 			},
@@ -51,6 +51,12 @@ func TestNewCmdCreate(t *testing.T) {
 			Profile: testProfile,
 			Args:    []string{"--config-file", "path/to/file"},
 			Error:   "ERROR: accepts 1 arg(s), received 0",
+		},
+		{
+			Name:    "Failed: No secret name arg specified",
+			Profile: testProfile,
+			Args:    []string{"sample-integration"},
+			Error:   "ERROR: missing required flag: --config-file=CONFIG_FILE",
 		},
 	}
 
@@ -70,8 +76,8 @@ func TestNewCmdCreate(t *testing.T) {
 				ShutdownCtx: context.Background(),
 			}
 
-			var gotOpts *CreateOpts
-			createCmd := NewCmdCreate(ctx, func(o *CreateOpts) error {
+			var gotOpts *UpdateOpts
+			createCmd := NewCmdUpdate(ctx, func(o *UpdateOpts) error {
 				gotOpts = o
 				return nil
 			})
@@ -92,7 +98,7 @@ func TestNewCmdCreate(t *testing.T) {
 	}
 }
 
-func TestCreateRun(t *testing.T) {
+func TestUpdateRun(t *testing.T) {
 	t.Parallel()
 
 	cases := []struct {
@@ -112,7 +118,7 @@ details = {
   }
 
   "capabilities" = [
-	"DYNAMIC"
+	"ROTATION", "DYNAMIC"
   ]
 }`),
 		},
@@ -134,7 +140,7 @@ details = {
 			io := iostreams.Test()
 			vs := mock_preview_secret_service.NewMockClientService(t)
 
-			opts := &CreateOpts{
+			opts := &UpdateOpts{
 				Ctx:             context.Background(),
 				Profile:         profile.TestProfile(t).SetOrgID("123").SetProjectID("abc"),
 				IO:              io,
@@ -145,22 +151,23 @@ details = {
 			}
 
 			if c.Error == "" {
-				vs.EXPECT().CreateAwsIntegration(&preview_secret_service.CreateAwsIntegrationParams{
+				vs.EXPECT().UpdateAwsIntegration(&preview_secret_service.UpdateAwsIntegrationParams{
 					Context:        opts.Ctx,
 					OrganizationID: "123",
 					ProjectID:      "abc",
-					Body: &preview_models.SecretServiceCreateAwsIntegrationBody{
-						Name: opts.IntegrationName,
+					Name:           opts.IntegrationName,
+					Body: &preview_models.SecretServiceUpdateAwsIntegrationBody{
 						FederatedWorkloadIdentity: &preview_models.Secrets20231128AwsFederatedWorkloadIdentityRequest{
 							Audience: "abc",
 							RoleArn:  "def",
 						},
 						Capabilities: []*preview_models.Secrets20231128Capability{
+							preview_models.Secrets20231128CapabilityROTATION.Pointer(),
 							preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
 						},
 					},
-				}, nil).Return(&preview_secret_service.CreateAwsIntegrationOK{
-					Payload: &preview_models.Secrets20231128CreateAwsIntegrationResponse{
+				}, nil).Return(&preview_secret_service.UpdateAwsIntegrationOK{
+					Payload: &preview_models.Secrets20231128UpdateAwsIntegrationResponse{
 						Integration: &preview_models.Secrets20231128AwsIntegration{
 							Name: opts.IntegrationName,
 							FederatedWorkloadIdentity: &preview_models.Secrets20231128AwsFederatedWorkloadIdentityResponse{
@@ -168,6 +175,7 @@ details = {
 								RoleArn:  "def",
 							},
 							Capabilities: []*preview_models.Secrets20231128Capability{
+								preview_models.Secrets20231128CapabilityROTATION.Pointer(),
 								preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
 							},
 						},
@@ -176,14 +184,14 @@ details = {
 			}
 
 			// Run the command
-			err = createRun(opts)
+			err = updateRun(opts)
 			if c.Error != "" {
 				r.ErrorContains(err, c.Error)
 				return
 			}
 
 			r.NoError(err)
-			r.Contains(io.Error.String(), fmt.Sprintf("✓ Successfully created integration with name %q\n", opts.IntegrationName))
+			r.Contains(io.Error.String(), fmt.Sprintf("✓ Successfully updated integration with name %q\n", opts.IntegrationName))
 		})
 	}
 }
