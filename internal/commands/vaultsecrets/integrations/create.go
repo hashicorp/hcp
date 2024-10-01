@@ -167,9 +167,6 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("error marshaling details config: %w", err)
 		}
 		req.Body = &twilioBody
-		req.Body.Capabilities = []*preview_models.Secrets20231128Capability{
-			preview_models.Secrets20231128CapabilityROTATION.Pointer(),
-		}
 		req.Body.Name = opts.IntegrationName
 
 		_, err = opts.PreviewClient.CreateTwilioIntegration(req, nil)
@@ -193,9 +190,6 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("error marshaling details config: %w", err)
 		}
 		req.Body = &mongoDBBody
-		req.Body.Capabilities = []*preview_models.Secrets20231128Capability{
-			preview_models.Secrets20231128CapabilityROTATION.Pointer(),
-		}
 		req.Body.Name = opts.IntegrationName
 
 		_, err = opts.PreviewClient.CreateMongoDBAtlasIntegration(req, nil)
@@ -220,9 +214,6 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("error marshaling details config: %w", err)
 		}
 		req.Body = &awsBody
-		req.Body.Capabilities = []*preview_models.Secrets20231128Capability{
-			preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
-		}
 		req.Body.Name = opts.IntegrationName
 
 		_, err = opts.PreviewClient.CreateAwsIntegration(req, nil)
@@ -247,9 +238,6 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("error marshaling details config: %w", err)
 		}
 		req.Body = &gcpBody
-		req.Body.Capabilities = []*preview_models.Secrets20231128Capability{
-			preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
-		}
 		req.Body.Name = opts.IntegrationName
 
 		_, err = opts.PreviewClient.CreateGcpIntegration(req, nil)
@@ -363,15 +351,25 @@ func CtyValueToMap(value cty.Value) (map[string]any, error) {
 			}
 			fieldsMap[k] = nestedMap
 		} else if v.Type().IsTupleType() {
-			var items []map[string]any
-			for _, val := range v.AsValueSlice() {
-				nestedMap, err := CtyValueToMap(val)
-				if err != nil {
-					return nil, err
+			// Check the type of the first element in the slice
+			// (we will assume all other elements in slice are of the same type)
+			if v.AsValueSlice()[0].Type() == cty.String {
+				var items []string
+				for _, val := range v.AsValueSlice() {
+					items = append(items, val.AsString())
 				}
-				items = append(items, nestedMap)
+				fieldsMap[k] = items
+			} else {
+				var items []map[string]any
+				for _, val := range v.AsValueSlice() {
+					nestedMap, err := CtyValueToMap(val)
+					if err != nil {
+						return nil, err
+					}
+					items = append(items, nestedMap)
+				}
+				fieldsMap[k] = items
 			}
-			fieldsMap[k] = items
 		} else {
 			return nil, fmt.Errorf("found unsupported value type")
 		}
