@@ -234,7 +234,7 @@ func (g *gcpDisplayer) FieldTemplates() []format.Field {
 				ValueFormat: "{{ .FederatedWorkloadIdentity.Audience }}",
 			},
 			{
-				Name:        "Audience",
+				Name:        "Service Account Email",
 				ValueFormat: "{{ .FederatedWorkloadIdentity.ServiceAccountEmail }}",
 			},
 		}...)
@@ -283,6 +283,14 @@ func (g *genericDisplayer) FieldTemplates() []format.Field {
 		{
 			Name:        "Integration Name",
 			ValueFormat: "{{ .Name }}",
+		},
+		{
+			Name:        "Provider",
+			ValueFormat: "{{ .Provider }}",
+		},
+		{
+			Name:        "Created",
+			ValueFormat: "{{ .CreatedAt }}",
 		},
 	}
 }
