@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp/internal/commands/waypoint/internal"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -92,6 +93,12 @@ $ hcp waypoint add-ons definitions update -n=my-add-on-definition \
 					Value:        flagvalue.Simple("", &opts.TerraformCloudProjectID),
 				},
 				{
+					Name:         "variable-options-file",
+					DisplayValue: "VARIABLE_OPTIONS_FILE",
+					Description:  "The file containing the HCL definition of Variable Options.",
+					Value:        flagvalue.Simple("", &opts.VariableOptionsFile),
+				},
+				{
 					Name:         "tfc-project-name",
 					DisplayValue: "TFC_PROJECT_NAME",
 					Description:  "The Terraform Cloud project name.",
@@ -136,6 +143,19 @@ func addOnDefinitionUpdate(opts *AddOnDefinitionOpts) error {
 		}
 	}
 
+	// read variable options file and parse hcl
+	var variables []*models.HashicorpCloudWaypointTFModuleVariable
+	if opts.VariableOptionsFile != "" {
+		vars, err := internal.ParseVariableOptionsFile(opts.VariableOptionsFile)
+		if err != nil {
+			return errors.Wrapf(err, "%s failed to read Variable Options hcl file %q",
+				opts.IO.ColorScheme().FailureIcon(),
+				opts.VariableOptionsFile,
+			)
+		}
+		variables = vars
+	}
+
 	_, err = opts.WS.WaypointServiceUpdateAddOnDefinition2(
 		&waypoint_service.WaypointServiceUpdateAddOnDefinition2Params{
 			NamespaceID:                 ns.ID,
@@ -152,6 +172,7 @@ func addOnDefinitionUpdate(opts *AddOnDefinitionOpts) error {
 				},
 				TfExecutionMode: opts.TerraformExecutionMode,
 				TfAgentPoolID:   opts.TerraformAgentPoolID,
+				VariableOptions: variables,
 			},
 		}, nil,
 	)
