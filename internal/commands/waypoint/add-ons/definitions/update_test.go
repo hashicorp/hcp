@@ -53,6 +53,7 @@ func TestCmdAddOnDefinitionUpdate(t *testing.T) {
 				"--readme-markdown-template-file", "readme_test.txt",
 				"--tf-execution-mode", "agent",
 				"--tf-agent-pool-id", "pool-abc123",
+				"--variable-options-file", "vars.hcl",
 			},
 			Expect: &AddOnDefinitionOpts{
 				Name:                       "cli-test",
@@ -64,6 +65,7 @@ func TestCmdAddOnDefinitionUpdate(t *testing.T) {
 				ReadmeMarkdownTemplateFile: "readme_test.txt",
 				TerraformExecutionMode:     "agent",
 				TerraformAgentPoolID:       "pool-abc123",
+				VariableOptionsFile:        "vars.hcl",
 			},
 		},
 	}
@@ -103,8 +105,10 @@ func TestCmdAddOnDefinitionUpdate(t *testing.T) {
 				r.Equal(c.Expect.TerraformCloudProjectName, aodOpts.TerraformCloudProjectName)
 				r.Equal(c.Expect.Labels, aodOpts.Labels)
 				r.Equal(c.Expect.ReadmeMarkdownTemplateFile, aodOpts.ReadmeMarkdownTemplateFile)
+				r.Equal(c.Expect.TerraformExecutionMode, aodOpts.TerraformExecutionMode)
+				r.Equal(c.Expect.TerraformAgentPoolID, aodOpts.TerraformAgentPoolID)
+				r.Equal(c.Expect.VariableOptionsFile, aodOpts.VariableOptionsFile)
 			}
 		})
-
 	}
 }
