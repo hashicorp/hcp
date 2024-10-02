@@ -24,6 +24,8 @@ type AddOnDefinitionOpts struct {
 	TerraformExecutionMode      string
 	TerraformAgentPoolID        string
 
+	VariableOptionsFile string
+
 	// testFunc is used for testing, so that the command can be tested without
 	// using the real API.
 	testFunc func(c *cmd.Command, args []string) error
