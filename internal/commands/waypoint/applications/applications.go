@@ -17,6 +17,9 @@ type ApplicationOpts struct {
 	ActionConfigNames  []string
 	ReadmeMarkdownFile string
 
+	Variables     map[string]string
+	VariablesFile string
+
 	testFunc func(c *cmd.Command, args []string) error
 }
 
