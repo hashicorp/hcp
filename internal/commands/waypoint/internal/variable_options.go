@@ -24,7 +24,6 @@ func ParseVariableOptionsFile(path string) ([]*models.HashicorpCloudWaypointTFMo
 // # Example contents of a vars.hcl file
 //
 //	variable_option "string_variable" {
-//	  type = "string"
 //	  options = [
 //	    "a string value",
 //	  ]
@@ -32,7 +31,6 @@ func ParseVariableOptionsFile(path string) ([]*models.HashicorpCloudWaypointTFMo
 //	}
 //
 //	variable_option "misc_variable" {
-//	  type = "string"
 //	  options = [
 //	    "another string value",
 //	  ]
@@ -53,7 +51,6 @@ func parseVariableOptions(filename string, input []byte) ([]*models.HashicorpClo
 		for _, v := range hc.VariableOptions {
 			variables = append(variables, &models.HashicorpCloudWaypointTFModuleVariable{
 				Name:         v.Name,
-				VariableType: v.Type,
 				Options:      v.Options,
 				UserEditable: v.UserEditable,
 			})
@@ -64,7 +61,6 @@ func parseVariableOptions(filename string, input []byte) ([]*models.HashicorpClo
 
 type hclVariableOption struct {
 	Name         string   `hcl:",label"`
-	Type         string   `hcl:"type"`
 	Options      []string `hcl:"options"`
 	UserEditable bool     `hcl:"user_editable,optional"`
 }
