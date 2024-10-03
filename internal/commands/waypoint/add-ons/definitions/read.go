@@ -4,6 +4,8 @@
 package definitions
 
 import (
+	"strings"
+
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -82,7 +84,11 @@ func addOnDefinitionRead(opts *AddOnDefinitionOpts) error {
 		)
 	}
 	addOnDef := getRespPayload.AddOnDefinition
-
+	var optionNames []string
+	for _, option := range addOnDef.VariableOptions {
+		optionNames = append(optionNames, option.Name)
+	}
+	optionNamesStr := strings.Join(optionNames, ", ")
 	fields := []format.Field{
 		format.NewField("ID", "{{ .ID }}"),
 		format.NewField("Name", "{{ .Name }}"),
@@ -93,6 +99,7 @@ func addOnDefinitionRead(opts *AddOnDefinitionOpts) error {
 		format.NewField("Module Source", "{{ .ModuleSource }}"),
 		format.NewField("Execution Mode", "{{ .TfExecutionMode }}"),
 		format.NewField("Agent Pool ID", "{{ .TfAgentPoolID }}"),
+		format.NewField("Variable Options", optionNamesStr),
 	}
 
 	return opts.Output.Display(format.NewDisplayer(addOnDef, format.Pretty, fields))
