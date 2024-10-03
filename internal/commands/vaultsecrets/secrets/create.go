@@ -43,7 +43,9 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		ShortHelp: "Create a new static secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets create" }} command creates a new static, rotating, or dynamic secret under a Vault Secrets application.
-		For rotating and dynamic secrets, the following fields are required in the config file: [type integration_name details].
+		The configuration for creating your rotating or dynamic secret will be read from the provided HCL config file. The following fields are required in the config 
+		file: [type integration_name details]. For help populating the details for a dynamic or rotating secret, please refer to the 
+		{{ Link "API reference documentation" "https://developer.hashicorp.com/hcp/api-docs/vault-secrets/2023-11-28" }}.
 		`),
 		Examples: []cmd.Example{
 			{

@@ -49,7 +49,9 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 		ShortHelp: "Update an integration.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets integrations update" }} command updates a Vault Secrets integration.
-		The following fields are required: [type details].
+		The configuration for updating your integration will be read from the provided HCL config file. The following fields are 
+		required: [type details]. For help populating the details for an integration type, please refer to the 
+		{{ Link "API reference documentation" "https://developer.hashicorp.com/hcp/api-docs/vault-secrets/2023-11-28" }}.
 		`),
 		Examples: []cmd.Example{
 			{
