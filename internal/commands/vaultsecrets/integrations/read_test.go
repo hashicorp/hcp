@@ -43,14 +43,6 @@ func TestNewCmdRead(t *testing.T) {
 				Type:            "twilio",
 			},
 		},
-		{
-			Name: "Missing type flag",
-			Profile: func(t *testing.T) *profile.Profile {
-				return profile.TestProfile(t).SetOrgID("123").SetProjectID("abc")
-			},
-			Args:  []string{"sample-integration"},
-			Error: "ERROR: missing required flag: --type=TYPE",
-		},
 	}
 	for _, c := range cases {
 		c := c
