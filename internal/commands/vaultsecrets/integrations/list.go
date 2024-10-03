@@ -42,9 +42,10 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "list",
 		ShortHelp: "List Vault Secrets integrations.",
-		LongHelp: heredoc.New(ctx.IO).Must(`
+		LongHelp: heredoc.New(ctx.IO).Must(fmt.Sprintf(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets integrations list" }} command lists Vault Secrets generic integrations.
-		`),
+		The optional {{ template "mdCodeOrBold" "--type" }} flag may be any of the following: %v
+		`, IntegrationProviders)),
 		Examples: []cmd.Example{
 			{
 				Preamble: `List twilio integrations:`,
@@ -86,6 +87,7 @@ func listRun(opts *ListOpts) error {
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
+			Capabilities:   []string{"ROTATION", "DYNAMIC"},
 		}
 		for {
 			resp, err := opts.PreviewClient.ListIntegrations(params, nil)
@@ -180,7 +182,7 @@ func listRun(opts *ListOpts) error {
 			next := resp.Payload.Pagination.NextPageToken
 			params.PaginationNextPageToken = &next
 		}
-		return opts.Output.Display(newAwsDisplayer(false, integrations...))
+		return opts.Output.Display(newAwsDisplayer(false, false, integrations...))
 
 	case GCP:
 		var integrations []*preview_models.Secrets20231128GcpIntegration
@@ -205,7 +207,7 @@ func listRun(opts *ListOpts) error {
 			next := resp.Payload.Pagination.NextPageToken
 			params.PaginationNextPageToken = &next
 		}
-		return opts.Output.Display(newGcpDisplayer(false, integrations...))
+		return opts.Output.Display(newGcpDisplayer(false, false, integrations...))
 
 	default:
 		return fmt.Errorf("not a valid integration type")

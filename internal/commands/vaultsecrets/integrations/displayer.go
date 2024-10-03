@@ -126,13 +126,15 @@ func (m *mongodbDisplayer) FieldTemplates() []format.Field {
 type awsDisplayer struct {
 	previewAwsIntegrations []*preview_models.Secrets20231128AwsIntegration
 
-	single bool
+	single                    bool
+	federatedWorkloadIdentity bool
 }
 
-func newAwsDisplayer(single bool, integrations ...*preview_models.Secrets20231128AwsIntegration) *awsDisplayer {
+func newAwsDisplayer(single bool, federatedWorkloadIdentity bool, integrations ...*preview_models.Secrets20231128AwsIntegration) *awsDisplayer {
 	return &awsDisplayer{
-		previewAwsIntegrations: integrations,
-		single:                 single,
+		previewAwsIntegrations:    integrations,
+		single:                    single,
+		federatedWorkloadIdentity: federatedWorkloadIdentity,
 	}
 }
 
@@ -166,8 +168,11 @@ func (a *awsDisplayer) FieldTemplates() []format.Field {
 			ValueFormat: "{{ .Name }}",
 		},
 	}
+	if !a.single {
+		return fields
+	}
 
-	if a.single {
+	if a.federatedWorkloadIdentity {
 		return append(fields, []format.Field{
 			{
 				Name:        "Audience",
@@ -178,21 +183,29 @@ func (a *awsDisplayer) FieldTemplates() []format.Field {
 				ValueFormat: "{{ .FederatedWorkloadIdentity.RoleArn }}",
 			},
 		}...)
+
 	} else {
-		return fields
+		return append(fields, []format.Field{
+			{
+				Name:        "Access Key ID",
+				ValueFormat: "{{ .AccessKeys.AccessKeyID }}",
+			},
+		}...)
 	}
 }
 
 type gcpDisplayer struct {
 	previewGcpIntegrations []*preview_models.Secrets20231128GcpIntegration
 
-	single bool
+	single                    bool
+	federatedWorkloadIdentity bool
 }
 
-func newGcpDisplayer(single bool, integrations ...*preview_models.Secrets20231128GcpIntegration) *gcpDisplayer {
+func newGcpDisplayer(single bool, federatedWorkloadIdentity bool, integrations ...*preview_models.Secrets20231128GcpIntegration) *gcpDisplayer {
 	return &gcpDisplayer{
-		previewGcpIntegrations: integrations,
-		single:                 single,
+		previewGcpIntegrations:    integrations,
+		single:                    single,
+		federatedWorkloadIdentity: federatedWorkloadIdentity,
 	}
 }
 
@@ -226,20 +239,32 @@ func (g *gcpDisplayer) FieldTemplates() []format.Field {
 			ValueFormat: "{{ .Name }}",
 		},
 	}
+	if !g.single {
+		return fields
+	}
 
-	if g.single {
+	if g.federatedWorkloadIdentity {
 		return append(fields, []format.Field{
 			{
 				Name:        "Audience",
 				ValueFormat: "{{ .FederatedWorkloadIdentity.Audience }}",
 			},
 			{
-				Name:        "Audience",
+				Name:        "Service Account Email",
 				ValueFormat: "{{ .FederatedWorkloadIdentity.ServiceAccountEmail }}",
 			},
 		}...)
 	} else {
-		return fields
+		return append(fields, []format.Field{
+			{
+				Name:        "Client Email",
+				ValueFormat: "{{ .ServiceAccountKey.ClientEmail }}",
+			},
+			{
+				Name:        "Project ID",
+				ValueFormat: "{{ .ServiceAccountKey.ProjectID }}",
+			},
+		}...)
 	}
 }
 
@@ -283,6 +308,14 @@ func (g *genericDisplayer) FieldTemplates() []format.Field {
 		{
 			Name:        "Integration Name",
 			ValueFormat: "{{ .Name }}",
+		},
+		{
+			Name:        "Provider",
+			ValueFormat: "{{ .Provider }}",
+		},
+		{
+			Name:        "Created",
+			ValueFormat: "{{ .CreatedAt }}",
 		},
 	}
 }
