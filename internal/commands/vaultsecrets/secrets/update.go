@@ -52,7 +52,9 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 		ShortHelp: "Update an existing secret.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
       The {{ template "mdCodeOrBold" "hcp vault-secrets secrets update" }} command updates an existing rotating or dynamic secret under a Vault Secrets application.
-	  The following fields are required in the config file: [type details].
+	  The configuration for updating your rotating or dynamic secret will be read from the provided HCL config file. The following fields are required in the config 
+	  file: [type details]. For help populating the details for a dynamic or rotating secret, please refer to the 
+	  {{ Link "API reference documentation" "https://developer.hashicorp.com/hcp/api-docs/vault-secrets/2023-11-28" }}.
       `),
 		Examples: []cmd.Example{
 			{

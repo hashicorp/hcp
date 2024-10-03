@@ -56,7 +56,10 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets integrations create" }} command creates a new Vault Secrets integration.
 		When the {{ template "mdCodeOrBold" "--config-file" }} flag is specified, the configuration for your integration will be read
-		from the provided HCL config file. The following fields are required: [type details]. When the {{ template "mdCodeOrBold" "--config-file" }} 
+		from the provided HCL config file. The following fields are required: [type details]. For help populating the details for an 
+		integration type, please refer to the 
+		{{ Link "API reference documentation" "https://developer.hashicorp.com/hcp/api-docs/vault-secrets/2023-11-28" }}.
+		When the {{ template "mdCodeOrBold" "--config-file" }} 
 		flag is not specified, you will be prompted to create the integration interactively.
 		`),
 		Examples: []cmd.Example{
