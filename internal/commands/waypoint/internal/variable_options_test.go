@@ -18,7 +18,6 @@ func Test_VariableOptionsFileParse(t *testing.T) {
 
 		hcl := `
           variable_option "string_variable" {
-            type = "string"
             options = [
               "a string value",
             ]
@@ -30,7 +29,6 @@ func Test_VariableOptionsFileParse(t *testing.T) {
 		r.NoError(err)
 		r.Equal(1, len(variableInputs))
 		r.Equal("string_variable", variableInputs[0].Name)
-		r.Equal("string", variableInputs[0].VariableType)
 		r.Equal(false, variableInputs[0].UserEditable)
 	})
 
@@ -41,7 +39,6 @@ func Test_VariableOptionsFileParse(t *testing.T) {
 
 		hcl := `
           variable_option "string_variable" {
-            type = "string"
             options = [
               "a string value",
         		"another string value",
@@ -65,7 +62,6 @@ func Test_VariableOptionsFileParse(t *testing.T) {
 
 		hcl := `
 variable_option "string_variable" {
-  type = "string"
   options = [
     "a string value",
 		"another",
@@ -74,7 +70,6 @@ variable_option "string_variable" {
 }
 
 variable_option "misc_variable" {
-  type = "int"
   options = [
     8,
 		2,
@@ -92,7 +87,6 @@ variable_option "misc_variable" {
 
 		r.Equal("misc_variable", variableInputs[1].Name)
 		r.Equal(2, len(variableInputs[1].Options))
-		r.Equal("int", variableInputs[1].VariableType)
 		r.Equal(false, variableInputs[1].UserEditable)
 	})
 
@@ -102,12 +96,7 @@ variable_option "misc_variable" {
 		r := require.New(t)
 
 		hcl := `
-variable_option "" {
-  options = [
-    8,
-		2,
-  ]
-}
+variable_option "" {}
 `
 
 		_, err := parseVariableOptions("blah.hcl", []byte(hcl))
