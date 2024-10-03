@@ -42,9 +42,10 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 	cmd := &cmd.Command{
 		Name:      "delete",
 		ShortHelp: "Delete a Vault Secrets integration.",
-		LongHelp: heredoc.New(ctx.IO).Must(`
+		LongHelp: heredoc.New(ctx.IO).Must(fmt.Sprintf(`
       The {{ template "mdCodeOrBold" "hcp vault-secrets integrations delete" }} command deletes a Vault Secrets integration.
-      `),
+      The required {{ template "mdCodeOrBold" "--type" }} flag may be any of the following: %v
+      `, IntegrationProviders)),
 		Examples: []cmd.Example{
 			{
 				Preamble: `Delete an integration:`,

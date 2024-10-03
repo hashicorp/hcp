@@ -37,6 +37,8 @@ type CreateOpts struct {
 	Client          secret_service.ClientService
 }
 
+var IntegrationProviders = maps.Keys(providerToRequiredFields)
+
 func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 	opts := &CreateOpts{
 		Ctx:     ctx.ShutdownCtx,
@@ -53,6 +55,9 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		ShortHelp: "Create a new integration.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets integrations create" }} command creates a new Vault Secrets integration.
+		When the {{ template "mdCodeOrBold" "--config-file" }} flag is specified, the configuration for your integration will be read
+		from the provided HCL config file. The following fields are required: [type details]. When the {{ template "mdCodeOrBold" "--config-file" }} 
+		flag is not specified, you will be prompted to create the integration interactively.
 		`),
 		Examples: []cmd.Example{
 			{
@@ -265,7 +270,7 @@ func promptUserForConfig(opts *CreateOpts) (IntegrationConfig, integrationConfig
 
 	providerPrompt := promptui.Select{
 		Label:  "Please select the provider you would like to configure",
-		Items:  maps.Keys(providerToRequiredFields),
+		Items:  IntegrationProviders,
 		Stdin:  io.NopCloser(opts.IO.In()),
 		Stdout: iostreams.NopWriteCloser(opts.IO.Err()),
 	}

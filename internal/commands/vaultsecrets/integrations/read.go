@@ -68,7 +68,6 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 					DisplayValue: "TYPE",
 					Description:  "The type of the integration to read.",
 					Value:        flagvalue.Simple("", &opts.Type),
-					Required:     true,
 				},
 			},
 		},
@@ -137,7 +136,7 @@ func readRun(opts *ReadOpts) error {
 			return fmt.Errorf("failed to read integration: %w", err)
 		}
 
-		return opts.Output.Display(newAwsDisplayer(true, resp.Payload.Integration))
+		return opts.Output.Display(newAwsDisplayer(true, resp.Payload.Integration.FederatedWorkloadIdentity != nil, resp.Payload.Integration))
 
 	case GCP:
 		resp, err := opts.PreviewClient.GetGcpIntegration(&preview_secret_service.GetGcpIntegrationParams{
@@ -150,7 +149,7 @@ func readRun(opts *ReadOpts) error {
 			return fmt.Errorf("failed to read integration: %w", err)
 		}
 
-		return opts.Output.Display(newGcpDisplayer(true, resp.Payload.Integration))
+		return opts.Output.Display(newGcpDisplayer(true, resp.Payload.Integration.FederatedWorkloadIdentity != nil, resp.Payload.Integration))
 
 	default:
 		return fmt.Errorf("not a valid integration type")

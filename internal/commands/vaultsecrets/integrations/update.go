@@ -49,6 +49,7 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 		ShortHelp: "Update an integration.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets integrations update" }} command updates a Vault Secrets integration.
+		The following fields are required: [type details].
 		`),
 		Examples: []cmd.Example{
 			{
