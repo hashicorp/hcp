@@ -1,0 +1,3 @@
+```release-note:feature
+vault-secrets: Add support for managing vault-secrets integrations and rotating/dynamic secrets
+```
