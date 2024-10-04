@@ -178,7 +178,7 @@ func loginRun(opts *LoginOpts) error {
 	var storeCredFile bool
 	options := []hcpconf.HCPConfigOption{hcpconf.WithoutLogging()}
 	if opts.CredentialFile != "" {
-		options = append(options, hcpconf.WithCredentialFilePath(opts.CredentialFile))
+		options = append(options, hcpconf.FromEnv(), hcpconf.WithCredentialFilePath(opts.CredentialFile))
 		storeCredFile = true
 	} else if opts.ClientID != "" {
 		options = append(options, hcpconf.WithClientCredentials(opts.ClientID, opts.ClientSecret))
