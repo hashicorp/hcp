@@ -11,24 +11,23 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
-
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
 	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
 	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/stretchr/testify/mock"
+
+	"github.com/go-openapi/runtime/client"
+	"github.com/stretchr/testify/require"
+
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
 
-func TestNewCmdCreate(t *testing.T) {
+func TestNewCmdUpdate(t *testing.T) {
 	t.Parallel()
 
 	testProfile := func(t *testing.T) *profile.Profile {
@@ -44,7 +43,7 @@ func TestNewCmdCreate(t *testing.T) {
 		Args    []string
 		Profile func(t *testing.T) *profile.Profile
 		Error   string
-		Expect  *CreateOpts
+		Expect  *UpdateOpts
 	}{
 		{
 			Name:    "Failed: No secret name arg specified",
@@ -56,7 +55,7 @@ func TestNewCmdCreate(t *testing.T) {
 			Name:    "Good: Secret name arg specified",
 			Profile: testProfile,
 			Args:    []string{"test", "--data-file=DATA_FILE_PATH"},
-			Expect: &CreateOpts{
+			Expect: &UpdateOpts{
 				AppName:    testProfile(t).VaultSecrets.AppName,
 				SecretName: "test",
 			},
@@ -65,7 +64,7 @@ func TestNewCmdCreate(t *testing.T) {
 			Name:    "Good: Rotating secret",
 			Profile: testProfile,
 			Args:    []string{"test", "--secret-type=rotating", "--data-file=DATA_FILE_PATH"},
-			Expect: &CreateOpts{
+			Expect: &UpdateOpts{
 				AppName:    testProfile(t).VaultSecrets.AppName,
 				SecretName: "test",
 			},
@@ -74,7 +73,7 @@ func TestNewCmdCreate(t *testing.T) {
 			Name:    "Good: Dynamic secret",
 			Profile: testProfile,
 			Args:    []string{"test", "--secret-type=dynamic", "--data-file=DATA_FILE_PATH"},
-			Expect: &CreateOpts{
+			Expect: &UpdateOpts{
 				AppName:    testProfile(t).VaultSecrets.AppName,
 				SecretName: "test",
 			},
@@ -97,15 +96,15 @@ func TestNewCmdCreate(t *testing.T) {
 				ShutdownCtx: context.Background(),
 			}
 
-			var gotOpts *CreateOpts
-			createCmd := NewCmdCreate(ctx, func(o *CreateOpts) error {
+			var gotOpts *UpdateOpts
+			updateCmd := NewCmdUpdate(ctx, func(o *UpdateOpts) error {
 				gotOpts = o
 				gotOpts.AppName = "test-app"
 				return nil
 			})
-			createCmd.SetIO(io)
+			updateCmd.SetIO(io)
 
-			code := createCmd.Run(c.Args)
+			code := updateCmd.Run(c.Args)
 			if c.Error != "" {
 				r.NotZero(code)
 				r.Contains(io.Error.String(), c.Error)
@@ -120,7 +119,7 @@ func TestNewCmdCreate(t *testing.T) {
 	}
 }
 
-func TestCreateRun(t *testing.T) {
+func TestUpdateRun(t *testing.T) {
 	t.Parallel()
 
 	testProfile := func(t *testing.T) *profile.Profile {
@@ -130,7 +129,6 @@ func TestCreateRun(t *testing.T) {
 		}
 		return tp
 	}
-	testSecretValue := "my super secret value"
 
 	cases := []struct {
 		Name             string
@@ -139,62 +137,19 @@ func TestCreateRun(t *testing.T) {
 		EmptySecretValue bool
 		ErrMsg           string
 		MockCalled       bool
-		AugmentOpts      func(*CreateOpts)
+		AugmentOpts      func(opts *UpdateOpts)
 		Input            []byte
 	}{
 		{
-			Name:   "Failed: Read via stdin as hyphen not supplied for --data-file flag",
-			ErrMsg: "data file path is required",
-		},
-		{
-			Name:             "Failed: Read empty secret value via stdin",
-			EmptySecretValue: true,
-			ReadViaStdin:     true,
-			RespErr:          true,
-			AugmentOpts: func(o *CreateOpts) {
-				o.SecretFilePath = "-"
-				o.Type = secretTypeKV
-			},
-			ErrMsg: "secret value cannot be empty",
-		},
-		{
-			Name:         "Success: Create secret via stdin",
-			ReadViaStdin: true,
-			AugmentOpts: func(o *CreateOpts) {
-				o.SecretFilePath = "-"
-				o.Type = secretTypeKV
-			},
-			MockCalled: true,
-		},
-		{
-			Name:    "Failed: Max secret versions reached",
-			RespErr: true,
-			ErrMsg:  "[POST /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secret/kv][429] CreateAppKVSecret default  &{Code:8 Details:[] Message:maximum number of secret versions reached}",
-			AugmentOpts: func(o *CreateOpts) {
-				o.SecretValuePlaintext = testSecretValue
-				o.Type = secretTypeKV
-			},
-			MockCalled: true,
-		},
-		{
-			Name:    "Success: Created secret",
+			Name:    "Success: Update a MongoDB rotating secret",
 			RespErr: false,
-			AugmentOpts: func(o *CreateOpts) {
-				o.SecretValuePlaintext = testSecretValue
-				o.Type = secretTypeKV
-			},
-			MockCalled: true,
-		},
-		{
-			Name:    "Success: Create a MongoDB rotating secret",
-			RespErr: false,
-			AugmentOpts: func(o *CreateOpts) {
+			AugmentOpts: func(o *UpdateOpts) {
 				o.Type = secretTypeRotating
 			},
 			MockCalled: true,
 			Input: []byte(`type = "mongodb-atlas"
-integration_name = "mongo-db-integration"
 details = {
+  rotate_on_update = true
   rotation_policy_name = "built-in:60-days-2-active"
   secret_details = {
     mongodb_group_id = "mbdgi"
@@ -212,32 +167,57 @@ details = {
 }`),
 		},
 		{
-			Name:    "Success: Create an Aws dynamic secret",
+			Name:    "Success: Update an Aws dynamic secret",
 			RespErr: false,
-			AugmentOpts: func(o *CreateOpts) {
+			AugmentOpts: func(o *UpdateOpts) {
 				o.Type = secretTypeDynamic
 			},
 			MockCalled: true,
 			Input: []byte(`type = "aws"
 
+details = {
+  "default_ttl" = "3600s"
+
+  "assume_role" = {
+    "role_arn" = "ra2"
+  }
+}`),
+		},
+		{
+			Name:    "Failed: Unable to update integration name of a secret",
+			RespErr: true,
+			AugmentOpts: func(o *UpdateOpts) {
+				o.Type = secretTypeDynamic
+			},
+			ErrMsg: "Unsupported argument; An argument named \"integration_name\" is not expected here",
+			Input: []byte(`type = "aws"
 integration_name = "Aws-Int-12"
 
 details = {
   "default_ttl" = "3600s"
 
   "assume_role" = {
-    "role_arn" = "ra"
+    "role_arn" = "ra2"
   }
 }`),
 		},
 		{
 			Name:    "Failed: Unsupported secret type",
 			RespErr: true,
-			AugmentOpts: func(o *CreateOpts) {
+			AugmentOpts: func(o *UpdateOpts) {
 				o.Type = "random"
 			},
 			Input:  []byte{},
-			ErrMsg: "\"random\" is an unsupported secret type; \"static\", \"rotating\", \"dynamic\" are available types",
+			ErrMsg: "\"random\" is an unsupported secret type; \"rotating\" and \"dynamic\" are available types",
+		},
+		{
+			Name:    "Failed: Unsupported static secret type",
+			RespErr: true,
+			AugmentOpts: func(o *UpdateOpts) {
+				o.Type = secretTypeKV
+			},
+			Input:  []byte{},
+			ErrMsg: "\"kv\" is an unsupported secret type; \"rotating\" and \"dynamic\" are available types",
 		},
 	}
 
@@ -248,19 +228,11 @@ details = {
 			r := require.New(t)
 
 			io := iostreams.Test()
-			if c.ReadViaStdin {
-				io.InputTTY = true
-				io.ErrorTTY = true
 
-				if !c.EmptySecretValue {
-					_, err := io.Input.WriteString(testSecretValue)
-					r.NoError(err)
-				}
-			}
 			vs := mock_secret_service.NewMockClientService(t)
 			pvs := mock_preview_secret_service.NewMockClientService(t)
 
-			opts := &CreateOpts{
+			opts := &UpdateOpts{
 				Ctx:           context.Background(),
 				IO:            io,
 				Profile:       testProfile(t),
@@ -275,58 +247,26 @@ details = {
 				c.AugmentOpts(opts)
 			}
 
-			if opts.Type == secretTypeRotating || opts.Type == secretTypeDynamic {
-				tempDir := t.TempDir()
-				f, err := os.Create(filepath.Join(tempDir, "config.hcl"))
-				r.NoError(err)
-				_, err = f.Write(c.Input)
-				r.NoError(err)
-				opts.SecretFilePath = f.Name()
-			}
+			tempDir := t.TempDir()
+			f, err := os.Create(filepath.Join(tempDir, "config.hcl"))
+			r.NoError(err)
+			_, err = f.Write(c.Input)
+			r.NoError(err)
+			opts.SecretFilePath = f.Name()
 
 			dt := strfmt.NewDateTime()
-			if opts.Type == secretTypeKV {
+			if opts.Type == secretTypeRotating {
 				if c.MockCalled {
 					if c.RespErr {
-						vs.EXPECT().CreateAppKVSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+						pvs.EXPECT().UpdateMongoDBAtlasRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 					} else {
-						vs.EXPECT().CreateAppKVSecret(&secret_service.CreateAppKVSecretParams{
-							LocationOrganizationID: testProfile(t).OrganizationID,
-							LocationProjectID:      testProfile(t).ProjectID,
-							AppName:                testProfile(t).VaultSecrets.AppName,
-							Body: secret_service.CreateAppKVSecretBody{
-								Name:  opts.SecretName,
-								Value: testSecretValue,
-							},
-							Context: opts.Ctx,
-						}, mock.Anything).Return(&secret_service.CreateAppKVSecretOK{
-							Payload: &models.Secrets20230613CreateAppKVSecretResponse{
-								Secret: &models.Secrets20230613Secret{
-									Name:      opts.SecretName,
-									CreatedAt: dt,
-									Version: &models.Secrets20230613SecretVersion{
-										Version:   "2",
-										CreatedAt: dt,
-										Type:      "kv",
-									},
-									LatestVersion: "2",
-								},
-							},
-						}, nil).Once()
-					}
-				}
-			} else if opts.Type == secretTypeRotating {
-				if c.MockCalled {
-					if c.RespErr {
-						pvs.EXPECT().CreateMongoDBAtlasRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
-					} else {
-						pvs.EXPECT().CreateMongoDBAtlasRotatingSecret(&preview_secret_service.CreateMongoDBAtlasRotatingSecretParams{
+						pvs.EXPECT().UpdateMongoDBAtlasRotatingSecret(&preview_secret_service.UpdateMongoDBAtlasRotatingSecretParams{
 							OrganizationID: testProfile(t).OrganizationID,
 							ProjectID:      testProfile(t).ProjectID,
 							AppName:        testProfile(t).VaultSecrets.AppName,
-							Body: &preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody{
-								SecretName:         opts.SecretName,
-								IntegrationName:    "mongo-db-integration",
+							SecretName:     "test_secret",
+							Body: &preview_models.SecretServiceUpdateMongoDBAtlasRotatingSecretBody{
+								RotateOnUpdate:     true,
 								RotationPolicyName: "built-in:60-days-2-active",
 								SecretDetails: &preview_models.Secrets20231128MongoDBAtlasSecretDetails{
 									MongodbGroupID: "mbdgi",
@@ -345,8 +285,8 @@ details = {
 								},
 							},
 							Context: opts.Ctx,
-						}, mock.Anything).Return(&preview_secret_service.CreateMongoDBAtlasRotatingSecretOK{
-							Payload: &preview_models.Secrets20231128CreateMongoDBAtlasRotatingSecretResponse{
+						}, mock.Anything).Return(&preview_secret_service.UpdateMongoDBAtlasRotatingSecretOK{
+							Payload: &preview_models.Secrets20231128UpdateMongoDBAtlasRotatingSecretResponse{
 								Config: &preview_models.Secrets20231128RotatingSecretConfig{
 									AppName:            opts.AppName,
 									CreatedAt:          dt,
@@ -361,26 +301,25 @@ details = {
 			} else if opts.Type == secretTypeDynamic {
 				if c.MockCalled {
 					if c.RespErr {
-						pvs.EXPECT().CreateAwsDynamicSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+						pvs.EXPECT().UpdateAwsDynamicSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 					} else {
-						pvs.EXPECT().CreateAwsDynamicSecret(&preview_secret_service.CreateAwsDynamicSecretParams{
+						pvs.EXPECT().UpdateAwsDynamicSecret(&preview_secret_service.UpdateAwsDynamicSecretParams{
 							OrganizationID: testProfile(t).OrganizationID,
 							ProjectID:      testProfile(t).ProjectID,
 							AppName:        testProfile(t).VaultSecrets.AppName,
-							Body: &preview_models.SecretServiceCreateAwsDynamicSecretBody{
-								IntegrationName: "Aws-Int-12",
-								Name:            opts.SecretName,
-								DefaultTTL:      "3600s",
+							Name:           opts.SecretName,
+							Body: &preview_models.SecretServiceUpdateAwsDynamicSecretBody{
+								DefaultTTL: "3600s",
 								AssumeRole: &preview_models.Secrets20231128AssumeRoleRequest{
-									RoleArn: "ra",
+									RoleArn: "ra2",
 								},
 							},
 							Context: opts.Ctx,
-						}, mock.Anything).Return(&preview_secret_service.CreateAwsDynamicSecretOK{
-							Payload: &preview_models.Secrets20231128CreateAwsDynamicSecretResponse{
+						}, mock.Anything).Return(&preview_secret_service.UpdateAwsDynamicSecretOK{
+							Payload: &preview_models.Secrets20231128UpdateAwsDynamicSecretResponse{
 								Secret: &preview_models.Secrets20231128AwsDynamicSecret{
 									AssumeRole: &preview_models.Secrets20231128AssumeRoleResponse{
-										RoleArn: "ra",
+										RoleArn: "ra2",
 									},
 									DefaultTTL:      "3600s",
 									CreatedAt:       dt,
@@ -394,14 +333,15 @@ details = {
 			}
 
 			// Run the command
-			err := createRun(opts)
+			err = updateRun(opts)
 			if c.ErrMsg != "" {
 				r.Contains(err.Error(), c.ErrMsg)
 				return
 			}
 
 			r.NoError(err)
-			r.Contains(io.Error.String(), fmt.Sprintf("✓ Successfully created secret with name %q\n", opts.SecretName))
+			r.Contains(io.Error.String(), fmt.Sprintf("✓ Successfully updated secret with name %q\n", opts.SecretName))
 		})
 	}
+
 }
