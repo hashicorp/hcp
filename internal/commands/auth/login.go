@@ -109,6 +109,12 @@ func NewCmdLogin(ctx *cmd.Context) *cmd.Command {
 					Value:        flagvalue.Simple("", &opts.CredentialFile),
 					Autocomplete: complete.PredictFiles("*.json"),
 				},
+				{
+					Name:         "open-default-browser",
+					DisplayValue: "true",
+					Description:  "Use the default browser to authenticate. If set to false, the default browser will not opened automatically.",
+					Value:        flagvalue.Simple(true, &opts.OpenDefaultBrowser),
+				},
 			},
 		},
 		RunF: func(c *cmd.Command, args []string) error {
@@ -151,6 +157,9 @@ type LoginOpts struct {
 	// principal credentials.
 	ClientID     string
 	ClientSecret string
+
+	// OpenDefaultBrowser is used to determine if the default browser should be opened.
+	OpenDefaultBrowser bool
 }
 
 func (o *LoginOpts) Validate() error {
@@ -185,6 +194,11 @@ func loginRun(opts *LoginOpts) error {
 		storeCredFile = true
 	} else {
 		options = append(options, hcpconf.FromEnv())
+	}
+
+	// Don't open the default browser if requested.
+	if !opts.OpenDefaultBrowser {
+		options = append(options, hcpconf.WithoutOpenDefaultBrowser())
 	}
 
 	// Get a HCP config
