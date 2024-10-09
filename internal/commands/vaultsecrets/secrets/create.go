@@ -637,7 +637,7 @@ func populateFieldValues(providerFields map[string]any, opts *CreateOpts) (map[s
 				for _, nestedField := range maps.Keys(valueSlice[0]) {
 					label := any(nestedField).(string)
 					if slices.Contains(optionalFields, nestedField) {
-						label = label + " (optional)"
+						label += " (optional)"
 					}
 
 					fieldPrompt = promptui.Prompt{
