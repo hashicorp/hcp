@@ -11,6 +11,7 @@ import (
 	"io"
 	"os"
 	"reflect"
+	"slices"
 
 	"github.com/manifoldco/promptui"
 	"github.com/posener/complete"
@@ -143,12 +144,12 @@ type SecretConfig struct {
 }
 
 var (
-	twilioRotatingSecretConfig = map[string]any{
+	twilioRotatingSecretTemplate = map[string]any{
 		"integration_name":     "",
 		"rotation_policy_name": "",
 	}
 
-	mongoDBAtlasRotatingSecretConfig = map[string]any{
+	mongoDBAtlasRotatingSecretTemplate = map[string]any{
 		"integration_name": "",
 		"secret_details": map[string]any{
 			"mongodb_roles": []map[string]string{
@@ -169,7 +170,7 @@ var (
 		"rotation_policy_name": "",
 	}
 
-	awsRotatingSecretConfig = map[string]any{
+	awsRotatingSecretTemplate = map[string]any{
 		"integration_name":     "",
 		"rotation_policy_name": "",
 		"aws_iam_user_access_key_params": map[string]any{
@@ -177,7 +178,7 @@ var (
 		},
 	}
 
-	gcpRotatingSecretConfig = map[string]any{
+	gcpRotatingSecretTemplate = map[string]any{
 		"integration_name":     "",
 		"rotation_policy_name": "",
 		"gcp_service_account_key_params": map[string]any{
@@ -185,7 +186,7 @@ var (
 		},
 	}
 
-	awsDynamicSecretConfig = map[string]any{
+	awsDynamicSecretTemplate = map[string]any{
 		"integration_name": "",
 		"default_ttl":      "",
 		"assume_role": map[string]any{
@@ -193,13 +194,15 @@ var (
 		},
 	}
 
-	gcpDynamicSecretConfig = map[string]any{
+	gcpDynamicSecretTemplate = map[string]any{
 		"integration_name": "",
 		"default_ttl":      "",
 		"service_account_impersonation": map[string]any{
 			"service_account_email": "",
 		},
 	}
+
+	optionalFields = []string{"mongodb_scopes", "collection_name"}
 )
 
 func createRun(opts *CreateOpts) error {
@@ -531,15 +534,15 @@ func validateSecretConfig(secretConfig SecretConfig) []string {
 }
 
 var availableRotatingSecretProviders = map[string]map[string]any{
-	string(integrations.Twilio):       twilioRotatingSecretConfig,
-	string(integrations.MongoDBAtlas): mongoDBAtlasRotatingSecretConfig,
-	string(integrations.AWS):          awsRotatingSecretConfig,
-	string(integrations.GCP):          gcpRotatingSecretConfig,
+	string(integrations.Twilio):       twilioRotatingSecretTemplate,
+	string(integrations.MongoDBAtlas): mongoDBAtlasRotatingSecretTemplate,
+	string(integrations.AWS):          awsRotatingSecretTemplate,
+	string(integrations.GCP):          gcpRotatingSecretTemplate,
 }
 
 var availableDynamicSecretProviders = map[string]map[string]any{
-	string(integrations.AWS): awsDynamicSecretConfig,
-	string(integrations.GCP): gcpDynamicSecretConfig,
+	string(integrations.AWS): awsDynamicSecretTemplate,
+	string(integrations.GCP): gcpDynamicSecretTemplate,
 }
 
 func promptUserForConfig(opts *CreateOpts) (SecretConfig, secretConfigInternal, error) {
@@ -578,29 +581,34 @@ func promptUserForConfig(opts *CreateOpts) (SecretConfig, secretConfigInternal, 
 
 	fieldValues, err := populateFieldValues(providerFields[provider], opts)
 	if err != nil {
-		return config, internalConfig, err
+		return SecretConfig{}, secretConfigInternal{}, err
 	}
 
 	internalConfig.Details = fieldValues
-	return config, internalConfig, err
+
+	return config, internalConfig, nil
 }
 
-func populateFieldValues(fieldMap map[string]any, opts *CreateOpts) (map[string]any, error) {
+func populateFieldValues(providerFields map[string]any, opts *CreateOpts) (map[string]any, error) {
 	var fieldPrompt promptui.Prompt
 	fieldsMap := make(map[string]any)
 
-	for _, field := range maps.Keys(fieldMap) {
-		value := fieldMap[field]
+	for field, value := range providerFields {
 		switch reflect.ValueOf(value).Kind() {
 		case reflect.String:
+			label := field
+			if slices.Contains(optionalFields, field) {
+				label = field + " (optional)"
+			}
+
 			fieldPrompt = promptui.Prompt{
-				Label: field,
+				Label: label,
 				Mask:  '*',
 			}
 
 			input, err := fieldPrompt.Run()
 			if err != nil {
-				return fieldsMap, fmt.Errorf("prompt for field %s failed: %w", field, err)
+				return nil, fmt.Errorf("prompt for field %s failed: %w", field, err)
 			}
 
 			fieldsMap[field] = input
@@ -611,23 +619,32 @@ func populateFieldValues(fieldMap map[string]any, opts *CreateOpts) (map[string]
 			}
 			fieldsMap[field] = nestedMap
 		case reflect.Slice:
-			var (
-				sliceItems []map[string]any
-			)
+			var sliceItems []map[string]any
 			nestedMap := make(map[string]any)
 			valueSlice := value.([]map[string]string)
 
-			for proceed := true; proceed; proceed = promptForAdditionalField(field, opts) {
+			ok := true
+
+			if slices.Contains(optionalFields, field) {
+				ok = promptForOptionalField(field, opts)
+			}
+
+			for proceed := ok; proceed; proceed = promptForAdditionalField(field, opts) {
 
 				for _, nestedField := range maps.Keys(valueSlice[0]) {
+					label := any(nestedField).(string)
+					if slices.Contains(optionalFields, nestedField) {
+						label = label + " (optional)"
+					}
+
 					fieldPrompt = promptui.Prompt{
-						Label: "Enter " + any(nestedField).(string) + " for " + field,
+						Label: "Enter " + label + " for " + field,
 						Mask:  '*',
 					}
 
 					input, err := fieldPrompt.Run()
 					if err != nil {
-						return fieldsMap, fmt.Errorf("prompt for field %s failed: %w", field, err)
+						return nil, fmt.Errorf("prompt for field %s failed: %w", field, err)
 					}
 
 					nestedMap[any(nestedField).(string)] = input
@@ -637,11 +654,21 @@ func populateFieldValues(fieldMap map[string]any, opts *CreateOpts) (map[string]
 			}
 		}
 	}
+
 	return fieldsMap, nil
 }
 
 func promptForAdditionalField(field string, opts *CreateOpts) bool {
 	proceed, err := opts.IO.PromptConfirm("Would you like to add configuration for another " + field + "?")
+	if err != nil {
+		return false
+	}
+
+	return proceed
+}
+
+func promptForOptionalField(field string, opts *CreateOpts) bool {
+	proceed, err := opts.IO.PromptConfirm(field + " is optional. Would you like to configure " + field + "?")
 	if err != nil {
 		return false
 	}
