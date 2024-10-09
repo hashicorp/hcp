@@ -631,6 +631,9 @@ func populateFieldValues(providerFields map[string]any, opts *CreateOpts) (map[s
 
 			for proceed := ok; proceed; proceed = promptForAdditionalField(field, opts) {
 
+				// Since the valueSlice here is hardcoded in the provider field templates, we know there is
+				// only a map at the first index of the slice. So instead of iterating through the slice,
+				// let's just grab the first index and iterative over the key/value pairs in that map.
 				for _, nestedField := range maps.Keys(valueSlice[0]) {
 					label := any(nestedField).(string)
 					if slices.Contains(optionalFields, nestedField) {
