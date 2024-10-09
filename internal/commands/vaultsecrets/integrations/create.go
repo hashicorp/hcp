@@ -253,6 +253,9 @@ func createRun(opts *CreateOpts) error {
 		if err != nil {
 			return fmt.Errorf("failed to create GCP integration: %w", err)
 		}
+
+	default:
+		return fmt.Errorf("unsupported integration provider type")
 	}
 
 	fmt.Fprintln(opts.IO.Err())

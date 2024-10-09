@@ -47,12 +47,6 @@ func TestNewCmdCreate(t *testing.T) {
 		Expect  *CreateOpts
 	}{
 		{
-			Name:    "Failed: No secret name arg specified",
-			Profile: testProfile,
-			Args:    []string{},
-			Error:   "ERROR: missing required flag: --data-file=DATA_FILE_PATH",
-		},
-		{
 			Name:    "Good: Secret name arg specified",
 			Profile: testProfile,
 			Args:    []string{"test", "--data-file=DATA_FILE_PATH"},
@@ -193,8 +187,8 @@ func TestCreateRun(t *testing.T) {
 			},
 			MockCalled: true,
 			Input: []byte(`type = "mongodb-atlas"
-integration_name = "mongo-db-integration"
 details = {
+  integration_name = "mongo-db-integration"
   rotation_policy_name = "built-in:60-days-2-active"
   secret_details = {
     mongodb_group_id = "mbdgi"
@@ -220,9 +214,8 @@ details = {
 			MockCalled: true,
 			Input: []byte(`type = "aws"
 
-integration_name = "Aws-Int-12"
-
 details = {
+  "integration_name" = "Aws-Int-12"
   "default_ttl" = "3600s"
 
   "assume_role" = {
@@ -275,7 +268,7 @@ details = {
 				c.AugmentOpts(opts)
 			}
 
-			if opts.Type == secretTypeRotating || opts.Type == secretTypeDynamic {
+			if (opts.Type == secretTypeRotating || opts.Type == secretTypeDynamic) && c.Input != nil {
 				tempDir := t.TempDir()
 				f, err := os.Create(filepath.Join(tempDir, "config.hcl"))
 				r.NoError(err)
