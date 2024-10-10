@@ -1,3 +1,10 @@
+## 0.6.0 (October 10, 2024)
+
+FEATURES:
+
+* vault-secrets: Add support for creating rotating and dynamic secrets interactively [[GH-167](https://github.com/hashicorp/hcp/issues/167)]
+* vault-secrets: Add support for managing vault-secrets integrations and rotating/dynamic secrets [[GH-176](https://github.com/hashicorp/hcp/issues/176)]
+
 ## 0.5.0 (September 3, 2024)
 
 FEATURES:
