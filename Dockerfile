@@ -10,8 +10,7 @@ RUN apk --no-cache upgrade && apk --no-cache add \
 	nano
 
 ## No patch for vulnerabilities in alpine, downloading fixed versions from edge
-RUN apk --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main --no-cache add \
-  curl=8.9.1-r1
+RUN apk --no-cache add curl
   # Vim temporarily removed as there is no available patch on edge yet, although it is fixed in version > 9.1.0697
   # https://pkgs.alpinelinux.org/packages?name=vim&branch=edge&repo=&arch=&maintainer=
   # https://security.alpinelinux.org/vuln/CVE-2024-43802
