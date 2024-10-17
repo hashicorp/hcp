@@ -269,8 +269,8 @@ func (r *rotatingSecretsDisplayer) Payload() any {
 func (r *rotatingSecretsDisplayer) FieldTemplates() []format.Field {
 	return []format.Field{
 		{
-			Name:        "Secret Name",
-			ValueFormat: "{{ .SecretName }}",
+			Name:        "Name",
+			ValueFormat: "{{ .Name }}",
 		},
 		{
 			Name:        " Integration Name",
