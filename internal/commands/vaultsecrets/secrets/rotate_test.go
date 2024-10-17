@@ -161,7 +161,7 @@ func TestRotateRun(t *testing.T) {
 						OrganizationID: testProfile(t).OrganizationID,
 						ProjectID:      testProfile(t).ProjectID,
 						AppName:        testProfile(t).VaultSecrets.AppName,
-						SecretName:     opts.SecretName,
+						Name:           opts.SecretName,
 						Context:        opts.Ctx,
 					}, mock.Anything).Return(&preview_secret_service.RotateSecretOK{}, nil).Once()
 				}

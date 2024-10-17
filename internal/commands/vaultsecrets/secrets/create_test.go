@@ -318,7 +318,7 @@ details = {
 							ProjectID:      testProfile(t).ProjectID,
 							AppName:        testProfile(t).VaultSecrets.AppName,
 							Body: &preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody{
-								SecretName:         opts.SecretName,
+								Name:               opts.SecretName,
 								IntegrationName:    "mongo-db-integration",
 								RotationPolicyName: "built-in:60-days-2-active",
 								SecretDetails: &preview_models.Secrets20231128MongoDBAtlasSecretDetails{
@@ -345,7 +345,7 @@ details = {
 									CreatedAt:          dt,
 									IntegrationName:    "mongo-db-integration",
 									RotationPolicyName: "built-in:60-days-2-active",
-									SecretName:         opts.SecretName,
+									Name:               opts.SecretName,
 								},
 							},
 						}, nil).Once()

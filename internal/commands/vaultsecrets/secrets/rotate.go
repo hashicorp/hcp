@@ -89,7 +89,7 @@ func rotateRun(opts *RotateOpts) error {
 		OrganizationID: opts.Profile.OrganizationID,
 		ProjectID:      opts.Profile.ProjectID,
 		AppName:        opts.AppName,
-		SecretName:     opts.SecretName,
+		Name:           opts.SecretName,
 	}
 
 	_, err := opts.PreviewClient.RotateSecret(params, nil)
