@@ -269,7 +269,7 @@ func (r *rotatingSecretsDisplayer) Payload() any {
 func (r *rotatingSecretsDisplayer) FieldTemplates() []format.Field {
 	return []format.Field{
 		{
-			Name:        "Name",
+			Name:        "Secret Name",
 			ValueFormat: "{{ .Name }}",
 		},
 		{
