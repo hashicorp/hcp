@@ -1,0 +1,3 @@
+```release-note:improvement
+vault-secrets: Update vault-secrets rotating secrets from `secret_name` to `name` usage
+```

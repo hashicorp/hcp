@@ -135,7 +135,7 @@ func updateRun(opts *UpdateOpts) error {
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
-			req.SecretName = opts.SecretName
+			req.Name = opts.SecretName
 
 			var twilioBody preview_models.SecretServiceUpdateTwilioRotatingSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
@@ -163,7 +163,7 @@ func updateRun(opts *UpdateOpts) error {
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
-			req.SecretName = opts.SecretName
+			req.Name = opts.SecretName
 
 			var mongoDBBody preview_models.SecretServiceUpdateMongoDBAtlasRotatingSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)

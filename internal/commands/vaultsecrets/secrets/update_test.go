@@ -264,7 +264,7 @@ details = {
 							OrganizationID: testProfile(t).OrganizationID,
 							ProjectID:      testProfile(t).ProjectID,
 							AppName:        testProfile(t).VaultSecrets.AppName,
-							SecretName:     "test_secret",
+							Name:           "test_secret",
 							Body: &preview_models.SecretServiceUpdateMongoDBAtlasRotatingSecretBody{
 								RotateOnUpdate:     true,
 								RotationPolicyName: "built-in:60-days-2-active",

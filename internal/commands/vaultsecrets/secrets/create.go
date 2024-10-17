@@ -273,7 +273,7 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			twilioBody.SecretName = opts.SecretName
+			twilioBody.Name = opts.SecretName
 			req.Body = &twilioBody
 
 			resp, err := opts.PreviewClient.CreateTwilioRotatingSecret(req, nil)
@@ -303,7 +303,7 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("error marshaling details config: %w", err)
 			}
 
-			mongoDBBody.SecretName = opts.SecretName
+			mongoDBBody.Name = opts.SecretName
 			req.Body = &mongoDBBody
 
 			resp, err := opts.PreviewClient.CreateMongoDBAtlasRotatingSecret(req, nil)

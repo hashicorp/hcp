@@ -270,7 +270,7 @@ func (r *rotatingSecretsDisplayer) FieldTemplates() []format.Field {
 	return []format.Field{
 		{
 			Name:        "Secret Name",
-			ValueFormat: "{{ .SecretName }}",
+			ValueFormat: "{{ .Name }}",
 		},
 		{
 			Name:        " Integration Name",
