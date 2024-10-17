@@ -8,6 +8,7 @@ import (
 
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp/internal/commands/waypoint/internal"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -64,6 +65,27 @@ $ hcp waypoint add-ons create -n=my-addon -a=my-application -d=my-addon-definiti
 					Value:        flagvalue.Simple("", &opts.ApplicationName),
 					Required:     true,
 				},
+				{
+					Name:         "var",
+					DisplayValue: "KEY=VALUE",
+					Description: "A variable to be used in the application. The" +
+						" flag can be repeated to specify multiple variables. " +
+						"Variables specified with the flag will override " +
+						"variables specified in a file.",
+					Value:      flagvalue.SimpleMap(nil, &opts.Variables),
+					Required:   false,
+					Repeatable: true,
+				},
+				{
+					Name:         "var-file",
+					DisplayValue: "FILE",
+					Description: "A file containing variables to be used in the " +
+						"application. The file should be in HCL format Variables" +
+						" in the file will be overridden by variables specified" +
+						" with the --var flag.",
+					Value:    flagvalue.Simple("", &opts.VariablesFile),
+					Required: false,
+				},
 			},
 		},
 	}
@@ -77,6 +99,43 @@ func addOnCreate(opts *AddOnOpts) error {
 		return err
 	}
 
+	// Variable Processing
+
+	// a map is used with the key being the variable name, so that
+	// flags can override file values.
+	ivs := make(map[string]*models.HashicorpCloudWaypointInputVariable)
+	if opts.VariablesFile != "" {
+		variables, err := internal.ParseInputVariablesFile(opts.VariablesFile)
+		if err != nil {
+			return errors.Wrapf(err, "%s failed to parse input variables file %q",
+				opts.IO.ColorScheme().FailureIcon(),
+				opts.VariablesFile,
+			)
+		}
+		for _, v := range variables {
+			ivs[v.Name] = &models.HashicorpCloudWaypointInputVariable{
+				Name:  v.Name,
+				Value: v.Value,
+			}
+		}
+	}
+
+	// Flags are processed second, so that they can override file values.
+	// Flags take precedence over file values.
+	for k, v := range opts.Variables {
+		ivs[k] = &models.HashicorpCloudWaypointInputVariable{
+			Name:  k,
+			Value: v,
+		}
+	}
+
+	var vars []*models.HashicorpCloudWaypointInputVariable
+	for _, v := range ivs {
+		vars = append(vars, v)
+	}
+
+	// End Variable Processing
+
 	_, err = opts.WS.WaypointServiceCreateAddOn(
 		&waypoint_service.WaypointServiceCreateAddOnParams{
 			NamespaceID: ns.ID,
@@ -88,7 +147,8 @@ func addOnCreate(opts *AddOnOpts) error {
 				Definition: &models.HashicorpCloudWaypointRefAddOnDefinition{
 					Name: opts.AddOnDefinitionName,
 				},
-				Name: opts.Name,
+				Name:      opts.Name,
+				Variables: vars,
 			},
 		}, nil)
 	if err != nil {

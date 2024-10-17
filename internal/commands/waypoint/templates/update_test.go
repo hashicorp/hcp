@@ -54,6 +54,8 @@ func TestCmdTemplateUpdate(t *testing.T) {
 				"-d", "A template created with the CLI.",
 				"-t", "cli=true",
 				"--readme-markdown-template-file", "readme_test.txt",
+				"--tf-execution-mode", "agent",
+				"--tf-agent-pool-id", "pool-abc123",
 			},
 			Expect: &TemplateOpts{
 				Name:                       "cli-test",
@@ -65,6 +67,8 @@ func TestCmdTemplateUpdate(t *testing.T) {
 				ReadmeMarkdownTemplateFile: "readme_test.txt",
 				Labels:                     []string{"cli"},
 				Tags:                       map[string]string{"cli": "true"},
+				TerraformExecutionMode:     "agent",
+				TerraformAgentPoolID:       "pool-abc123",
 			},
 		},
 		{

@@ -1,0 +1,3 @@
+```release-note:breaking-change
+waypoint: Remove type field from variable options config file.
+```

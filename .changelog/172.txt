@@ -1,0 +1,3 @@
+```release-note:feature
+waypoint: Support setting variables when creating apps.
+```

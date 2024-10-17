@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp/internal/commands/waypoint/internal"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -113,6 +114,27 @@ $ hcp waypoint add-ons definitions create -n=my-add-on-definition \
 					Value:    flagvalue.Simple("", &opts.TerraformCloudProjectID),
 					Required: true,
 				},
+				{
+					Name:         "variable-options-file",
+					DisplayValue: "VARIABLE_OPTIONS_FILE",
+					Description:  "The file containing the HCL definition of Variable Options.",
+					Value:        flagvalue.Simple("", &opts.VariableOptionsFile),
+				},
+				{
+					Name:         "tf-execution-mode",
+					DisplayValue: "TF_EXECUTION_MODE",
+					Description: "The execution mode of the HCP Terraform " +
+						"workspaces for add-ons using this add-on definition.",
+					Value: flagvalue.Simple("remote", &opts.TerraformExecutionMode),
+				},
+				{
+					Name:         "tf-agent-pool-id",
+					DisplayValue: "TF_AGENT_POOL_ID",
+					Description: "The ID of the Terraform agent pool to use for " +
+						"running Terraform operations. This is only applicable " +
+						"when the execution mode is set to 'agent'.",
+					Value: flagvalue.Simple("", &opts.TerraformAgentPoolID),
+				},
 			},
 		},
 	}
@@ -136,6 +158,18 @@ func addOnDefinitionCreate(opts *AddOnDefinitionOpts) error {
 		}
 	}
 
+	// read variable options file and parse hcl
+	var variables []*models.HashicorpCloudWaypointTFModuleVariable
+	if opts.VariableOptionsFile != "" {
+		variables, err = internal.ParseVariableOptionsFile(opts.VariableOptionsFile)
+		if err != nil {
+			return errors.Wrapf(err, "%s failed to read Variable Options hcl file %q",
+				opts.IO.ColorScheme().FailureIcon(),
+				opts.VariableOptionsFile,
+			)
+		}
+	}
+
 	_, err = opts.WS.WaypointServiceCreateAddOnDefinition(
 		&waypoint_service.WaypointServiceCreateAddOnDefinitionParams{
 			NamespaceID: ns.ID,
@@ -149,7 +183,8 @@ func addOnDefinitionCreate(opts *AddOnDefinitionOpts) error {
 					Name:      opts.TerraformCloudProjectName,
 					ProjectID: opts.TerraformCloudProjectID,
 				},
-				ModuleSource: opts.TerraformNoCodeModuleSource,
+				ModuleSource:    opts.TerraformNoCodeModuleSource,
+				VariableOptions: variables,
 			},
 			Context: opts.Ctx,
 		}, nil)

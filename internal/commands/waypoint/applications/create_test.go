@@ -46,10 +46,19 @@ func TestNewCmdCreateApplication(t *testing.T) {
 		{
 			Name:    "Happy",
 			Profile: profile.TestProfile,
-			Args:    []string{"-n", "app-name", "-t", "templates-name"},
+			Args: []string{
+				"-n", "app-name",
+				"-t", "templates-name",
+				"--var", "var1=val1",
+				"--var-file", "vars.hcl",
+			},
 			Expect: &ApplicationOpts{
 				Name:         "app-name",
 				TemplateName: "templates-name",
+				Variables: map[string]string{
+					"var1": "val1",
+				},
+				VariablesFile: "vars.hcl",
 			},
 		},
 	}
