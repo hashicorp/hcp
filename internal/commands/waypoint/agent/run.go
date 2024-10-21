@@ -154,8 +154,9 @@ func runOp(
 	ns string,
 ) {
 	var (
-		status     string
-		statusCode int
+		status      string
+		statusCode  int
+		sequenceNum string
 	)
 
 	log = log.With("group", ao.Group, "operation", ao.ID, "action-run-id", ao.ActionRunID)
@@ -175,8 +176,12 @@ func runOp(
 		if err != nil {
 			log.Error("unable to register action as starting", "error", err)
 		} else {
+			if resp != nil && resp.Payload != nil {
+				sequenceNum = resp.Payload.Sequence
+
+			}
 			defer func() {
-				log.Info("reporting action run ended", "status", status, "status-code", statusCode)
+				log.Info("reporting action run ended", "status", status, "status-code", statusCode, "action-run-sequence", sequenceNum)
 
 				_, err = opts.WS.WaypointServiceEndingAction(&waypoint_service.WaypointServiceEndingActionParams{
 					NamespaceID: ns,
