@@ -54,6 +54,8 @@ func TestCmdTemplateCreate(t *testing.T) {
 				"-d", "A template created with the CLI.",
 				"-t", "cli=true",
 				"--readme-markdown-template-file", "readme_test.txt",
+				"--tf-execution-mode", "agent",
+				"--tf-agent-pool-id", "pool-abc123",
 			},
 			Expect: &TemplateOpts{
 				Name:                        "cli-test",
@@ -65,6 +67,8 @@ func TestCmdTemplateCreate(t *testing.T) {
 				ReadmeMarkdownTemplateFile:  "readme_test.txt",
 				Labels:                      []string{"cli"},
 				Tags:                        map[string]string{"cli": "true"},
+				TerraformExecutionMode:      "agent",
+				TerraformAgentPoolID:        "pool-abc123",
 			},
 		},
 		{
@@ -141,125 +145,4 @@ func TestCmdTemplateCreate(t *testing.T) {
 			}
 		})
 	}
-}
-
-// Test_VariableOptionsFileParse tests the parsing of variable options from a
-// file.
-func Test_VariableOptionsFileParse(t *testing.T) {
-	t.Parallel()
-
-	t.Run("can parse variables", func(t *testing.T) {
-		t.Parallel()
-
-		r := require.New(t)
-
-		hcl := `
-          variable_option "string_variable" {
-            type = "string"
-            options = [
-              "a string value",
-            ]
-            user_editable = false
-          }
-`
-
-		variableInputs, err := parseVariableOptions("blah.hcl", []byte(hcl))
-		r.NoError(err)
-		r.Equal(1, len(variableInputs))
-		r.Equal("string_variable", variableInputs[0].Name)
-		r.Equal("string", variableInputs[0].VariableType)
-		r.Equal(false, variableInputs[0].UserEditable)
-	})
-
-	t.Run("handles multiple options", func(t *testing.T) {
-		t.Parallel()
-
-		r := require.New(t)
-
-		hcl := `
-          variable_option "string_variable" {
-            type = "string"
-            options = [
-              "a string value",
-        		"another string value",
-            ]
-            user_editable =true
-          }
-`
-
-		variableInputs, err := parseVariableOptions("blah.hcl", []byte(hcl))
-		r.NoError(err)
-		r.Equal(1, len(variableInputs))
-		r.Equal("string_variable", variableInputs[0].Name)
-		r.Equal(2, len(variableInputs[0].Options))
-		r.Equal(true, variableInputs[0].UserEditable)
-	})
-
-	t.Run("handles multiple variables", func(t *testing.T) {
-		t.Parallel()
-
-		r := require.New(t)
-
-		hcl := `
-variable_option "string_variable" {
-  type = "string"
-  options = [
-    "a string value",
-		"another",
-  ]
-  user_editable = false
-}
-
-variable_option "misc_variable" {
-  type = "int"
-  options = [
-    8,
-		2,
-  ]
-  user_editable = false
-}
-`
-
-		variableInputs, err := parseVariableOptions("blah.hcl", []byte(hcl))
-		r.NoError(err)
-		r.Equal(2, len(variableInputs))
-		r.Equal("string_variable", variableInputs[0].Name)
-		r.Equal(2, len(variableInputs[0].Options))
-		r.Equal(false, variableInputs[0].UserEditable)
-
-		r.Equal("misc_variable", variableInputs[1].Name)
-		r.Equal(2, len(variableInputs[1].Options))
-		r.Equal("int", variableInputs[1].VariableType)
-		r.Equal(false, variableInputs[1].UserEditable)
-	})
-
-	t.Run("errors on missing attributes", func(t *testing.T) {
-		t.Parallel()
-
-		r := require.New(t)
-
-		hcl := `
-variable_option "" {
-  options = [
-    8,
-		2,
-  ]
-}
-`
-
-		_, err := parseVariableOptions("blah.hcl", []byte(hcl))
-		r.Error(err)
-	})
-
-	t.Run("returns nil empty", func(t *testing.T) {
-		t.Parallel()
-
-		r := require.New(t)
-
-		hcl := ``
-
-		variableInputs, err := parseVariableOptions("blah.hcl", []byte(hcl))
-		r.NoError(err)
-		r.Equal(0, len(variableInputs))
-	})
 }

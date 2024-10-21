@@ -21,6 +21,10 @@ type AddOnDefinitionOpts struct {
 	TerraformNoCodeModuleSource string
 	TerraformCloudProjectName   string
 	TerraformCloudProjectID     string
+	TerraformExecutionMode      string
+	TerraformAgentPoolID        string
+
+	VariableOptionsFile string
 
 	// testFunc is used for testing, so that the command can be tested without
 	// using the real API.

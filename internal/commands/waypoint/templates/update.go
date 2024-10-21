@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp/internal/commands/waypoint/internal"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -121,6 +122,21 @@ $ hcp waypoint templates update -n=my-template \
 					Description:  "The file containing the HCL definition of Variable Options.",
 					Value:        flagvalue.Simple("", &opts.VariableOptionsFile),
 				},
+				{
+					Name:         "tf-execution-mode",
+					DisplayValue: "TF_EXECUTION_MODE",
+					Description: "The execution mode of the HCP Terraform " +
+						"workspaces for applications using this template.",
+					Value: flagvalue.Simple("remote", &opts.TerraformExecutionMode),
+				},
+				{
+					Name:         "tf-agent-pool-id",
+					DisplayValue: "TF_AGENT_POOL_ID",
+					Description: "The ID of the Terraform agent pool to use for " +
+						"running Terraform operations. This is only applicable " +
+						"when the execution mode is set to 'agent'.",
+					Value: flagvalue.Simple("", &opts.TerraformAgentPoolID),
+				},
 			},
 		},
 	}
@@ -177,6 +193,8 @@ func templateUpdate(opts *TemplateOpts) error {
 			Name:      opts.TerraformCloudProjectName,
 			ProjectID: opts.TerraformCloudProjectID,
 		},
+		TfExecutionMode: opts.TerraformExecutionMode,
+		TfAgentPoolID:   opts.TerraformAgentPoolID,
 	}
 
 	// grab the existing collection things
@@ -220,9 +238,8 @@ func templateUpdate(opts *TemplateOpts) error {
 
 	// read variable options file and parse hcl
 	var variables []*models.HashicorpCloudWaypointTFModuleVariable
-
 	if opts.VariableOptionsFile != "" {
-		vars, err := parseVariableOptionsFile(opts.VariableOptionsFile)
+		vars, err := internal.ParseVariableOptionsFile(opts.VariableOptionsFile)
 		if err != nil {
 			return errors.Wrapf(err, "%s failed to read Variable Options hcl file %q",
 				opts.IO.ColorScheme().FailureIcon(),

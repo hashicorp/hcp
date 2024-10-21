@@ -1,0 +1,3 @@
+```release-note:feature
+waypoint: Add flags to make execution mode configurable for Waypoint templates and add-on definitions.
+```

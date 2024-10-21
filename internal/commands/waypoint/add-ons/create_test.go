@@ -48,11 +48,19 @@ func TestNewCmdCreate(t *testing.T) {
 				"-n=cli-test",
 				"--app=testApp",
 				"--add-on-definition-name=testAddOnDefinition",
+				"--var-file", "vars.hcl",
+				"--var", "key=value",
+				"--var", "key2=value2",
 			},
 			Expect: &AddOnOpts{
 				Name:                "cli-test",
 				ApplicationName:     "testApp",
 				AddOnDefinitionName: "testAddOnDefinition",
+				Variables: map[string]string{
+					"key":  "value",
+					"key2": "value2",
+				},
+				VariablesFile: "vars.hcl",
 			},
 		},
 	}
@@ -86,6 +94,8 @@ func TestNewCmdCreate(t *testing.T) {
 				r.Equal(c.Expect.Name, addOnOpts.Name)
 				r.Equal(c.Expect.ApplicationName, addOnOpts.ApplicationName)
 				r.Equal(c.Expect.AddOnDefinitionName, addOnOpts.AddOnDefinitionName)
+				r.Equal(c.Expect.Variables, addOnOpts.Variables)
+				r.Equal(c.Expect.VariablesFile, addOnOpts.VariablesFile)
 			}
 		})
 	}
