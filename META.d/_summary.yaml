@@ -1,12 +1,8 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
-
----
-schema: 1.1
-partition: hcp
 category: library
+partition: hcp
+schema: 1.1
 summary:
-  owner: team-cloud-platform-systems
-  visibility: external
   description: |
     The hcp CLI lets you administer HashiCorp Cloud Platform (HCP) resources and services. You can interact with hcp directly or integrate it in scripts to automate your workflows. The HCP CLI is available across most platforms and lets you efficiently execute common platform tasks and manage HCP resources at scale.
+  owner: team-cloud-core-platform
+  visibility: external
