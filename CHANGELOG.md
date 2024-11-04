@@ -1,3 +1,21 @@
+## 0.7.0 (November 04, 2024)
+
+BREAKING CHANGES:
+
+* waypoint: Remove type field from variable options config file. [[GH-174](https://github.com/hashicorp/hcp/issues/174)]
+
+FEATURES:
+
+* waypoint: Add ability for variable options on an add-on definition to be configured with an HCL file. [[GH-170](https://github.com/hashicorp/hcp/issues/170)]
+* waypoint: Add flags to make execution mode configurable for Waypoint templates and add-on definitions. [[GH-163](https://github.com/hashicorp/hcp/issues/163)]
+* waypoint: Support setting variables when creating apps. [[GH-172](https://github.com/hashicorp/hcp/issues/172)]
+* waypoint: Support setting variables when installing add-ons. [[GH-173](https://github.com/hashicorp/hcp/issues/173)]
+
+IMPROVEMENTS:
+
+* Waypoint: Action sequence numbers are now reported on agent run completion [[GH-165](https://github.com/hashicorp/hcp/issues/165)]
+* vault-secrets: Update vault-secrets rotating secrets from `secret_name` to `name` usage [[GH-184](https://github.com/hashicorp/hcp/issues/184)]
+
 ## 0.6.0 (October 10, 2024)
 
 FEATURES:
