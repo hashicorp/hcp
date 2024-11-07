@@ -95,6 +95,80 @@ func (_c *MockClientService_ResourceServiceGetIamPolicy_Call) RunAndReturn(run f
 	return _c
 }
 
+// ResourceServiceGetResource provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) ResourceServiceGetResource(params *resource_service.ResourceServiceGetResourceParams, authInfo runtime.ClientAuthInfoWriter, opts ...resource_service.ClientOption) (*resource_service.ResourceServiceGetResourceOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ResourceServiceGetResource")
+	}
+
+	var r0 *resource_service.ResourceServiceGetResourceOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*resource_service.ResourceServiceGetResourceParams, runtime.ClientAuthInfoWriter, ...resource_service.ClientOption) (*resource_service.ResourceServiceGetResourceOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*resource_service.ResourceServiceGetResourceParams, runtime.ClientAuthInfoWriter, ...resource_service.ClientOption) *resource_service.ResourceServiceGetResourceOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*resource_service.ResourceServiceGetResourceOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*resource_service.ResourceServiceGetResourceParams, runtime.ClientAuthInfoWriter, ...resource_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_ResourceServiceGetResource_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ResourceServiceGetResource'
+type MockClientService_ResourceServiceGetResource_Call struct {
+	*mock.Call
+}
+
+// ResourceServiceGetResource is a helper method to define mock.On call
+//   - params *resource_service.ResourceServiceGetResourceParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...resource_service.ClientOption
+func (_e *MockClientService_Expecter) ResourceServiceGetResource(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_ResourceServiceGetResource_Call {
+	return &MockClientService_ResourceServiceGetResource_Call{Call: _e.mock.On("ResourceServiceGetResource",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_ResourceServiceGetResource_Call) Run(run func(params *resource_service.ResourceServiceGetResourceParams, authInfo runtime.ClientAuthInfoWriter, opts ...resource_service.ClientOption)) *MockClientService_ResourceServiceGetResource_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]resource_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(resource_service.ClientOption)
+			}
+		}
+		run(args[0].(*resource_service.ResourceServiceGetResourceParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_ResourceServiceGetResource_Call) Return(_a0 *resource_service.ResourceServiceGetResourceOK, _a1 error) *MockClientService_ResourceServiceGetResource_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_ResourceServiceGetResource_Call) RunAndReturn(run func(*resource_service.ResourceServiceGetResourceParams, runtime.ClientAuthInfoWriter, ...resource_service.ClientOption) (*resource_service.ResourceServiceGetResourceOK, error)) *MockClientService_ResourceServiceGetResource_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ResourceServiceList provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) ResourceServiceList(params *resource_service.ResourceServiceListParams, authInfo runtime.ClientAuthInfoWriter, opts ...resource_service.ClientOption) (*resource_service.ResourceServiceListOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -165,6 +239,154 @@ func (_c *MockClientService_ResourceServiceList_Call) Return(_a0 *resource_servi
 }
 
 func (_c *MockClientService_ResourceServiceList_Call) RunAndReturn(run func(*resource_service.ResourceServiceListParams, runtime.ClientAuthInfoWriter, ...resource_service.ClientOption) (*resource_service.ResourceServiceListOK, error)) *MockClientService_ResourceServiceList_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ResourceServiceListAccessibleResources provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) ResourceServiceListAccessibleResources(params *resource_service.ResourceServiceListAccessibleResourcesParams, authInfo runtime.ClientAuthInfoWriter, opts ...resource_service.ClientOption) (*resource_service.ResourceServiceListAccessibleResourcesOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ResourceServiceListAccessibleResources")
+	}
+
+	var r0 *resource_service.ResourceServiceListAccessibleResourcesOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*resource_service.ResourceServiceListAccessibleResourcesParams, runtime.ClientAuthInfoWriter, ...resource_service.ClientOption) (*resource_service.ResourceServiceListAccessibleResourcesOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*resource_service.ResourceServiceListAccessibleResourcesParams, runtime.ClientAuthInfoWriter, ...resource_service.ClientOption) *resource_service.ResourceServiceListAccessibleResourcesOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*resource_service.ResourceServiceListAccessibleResourcesOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*resource_service.ResourceServiceListAccessibleResourcesParams, runtime.ClientAuthInfoWriter, ...resource_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_ResourceServiceListAccessibleResources_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ResourceServiceListAccessibleResources'
+type MockClientService_ResourceServiceListAccessibleResources_Call struct {
+	*mock.Call
+}
+
+// ResourceServiceListAccessibleResources is a helper method to define mock.On call
+//   - params *resource_service.ResourceServiceListAccessibleResourcesParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...resource_service.ClientOption
+func (_e *MockClientService_Expecter) ResourceServiceListAccessibleResources(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_ResourceServiceListAccessibleResources_Call {
+	return &MockClientService_ResourceServiceListAccessibleResources_Call{Call: _e.mock.On("ResourceServiceListAccessibleResources",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_ResourceServiceListAccessibleResources_Call) Run(run func(params *resource_service.ResourceServiceListAccessibleResourcesParams, authInfo runtime.ClientAuthInfoWriter, opts ...resource_service.ClientOption)) *MockClientService_ResourceServiceListAccessibleResources_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]resource_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(resource_service.ClientOption)
+			}
+		}
+		run(args[0].(*resource_service.ResourceServiceListAccessibleResourcesParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_ResourceServiceListAccessibleResources_Call) Return(_a0 *resource_service.ResourceServiceListAccessibleResourcesOK, _a1 error) *MockClientService_ResourceServiceListAccessibleResources_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_ResourceServiceListAccessibleResources_Call) RunAndReturn(run func(*resource_service.ResourceServiceListAccessibleResourcesParams, runtime.ClientAuthInfoWriter, ...resource_service.ClientOption) (*resource_service.ResourceServiceListAccessibleResourcesOK, error)) *MockClientService_ResourceServiceListAccessibleResources_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ResourceServiceListRoles provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) ResourceServiceListRoles(params *resource_service.ResourceServiceListRolesParams, authInfo runtime.ClientAuthInfoWriter, opts ...resource_service.ClientOption) (*resource_service.ResourceServiceListRolesOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ResourceServiceListRoles")
+	}
+
+	var r0 *resource_service.ResourceServiceListRolesOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*resource_service.ResourceServiceListRolesParams, runtime.ClientAuthInfoWriter, ...resource_service.ClientOption) (*resource_service.ResourceServiceListRolesOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*resource_service.ResourceServiceListRolesParams, runtime.ClientAuthInfoWriter, ...resource_service.ClientOption) *resource_service.ResourceServiceListRolesOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*resource_service.ResourceServiceListRolesOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*resource_service.ResourceServiceListRolesParams, runtime.ClientAuthInfoWriter, ...resource_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_ResourceServiceListRoles_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ResourceServiceListRoles'
+type MockClientService_ResourceServiceListRoles_Call struct {
+	*mock.Call
+}
+
+// ResourceServiceListRoles is a helper method to define mock.On call
+//   - params *resource_service.ResourceServiceListRolesParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...resource_service.ClientOption
+func (_e *MockClientService_Expecter) ResourceServiceListRoles(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_ResourceServiceListRoles_Call {
+	return &MockClientService_ResourceServiceListRoles_Call{Call: _e.mock.On("ResourceServiceListRoles",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_ResourceServiceListRoles_Call) Run(run func(params *resource_service.ResourceServiceListRolesParams, authInfo runtime.ClientAuthInfoWriter, opts ...resource_service.ClientOption)) *MockClientService_ResourceServiceListRoles_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]resource_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(resource_service.ClientOption)
+			}
+		}
+		run(args[0].(*resource_service.ResourceServiceListRolesParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_ResourceServiceListRoles_Call) Return(_a0 *resource_service.ResourceServiceListRolesOK, _a1 error) *MockClientService_ResourceServiceListRoles_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_ResourceServiceListRoles_Call) RunAndReturn(run func(*resource_service.ResourceServiceListRolesParams, runtime.ClientAuthInfoWriter, ...resource_service.ClientOption) (*resource_service.ResourceServiceListRolesOK, error)) *MockClientService_ResourceServiceListRoles_Call {
 	_c.Call.Return(run)
 	return _c
 }
