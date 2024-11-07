@@ -1058,6 +1058,154 @@ func (_c *MockClientService_CreateMongoDBAtlasRotatingSecret_Call) RunAndReturn(
 	return _c
 }
 
+// CreatePostgresIntegration provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) CreatePostgresIntegration(params *secret_service.CreatePostgresIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.CreatePostgresIntegrationOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreatePostgresIntegration")
+	}
+
+	var r0 *secret_service.CreatePostgresIntegrationOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.CreatePostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.CreatePostgresIntegrationOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.CreatePostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.CreatePostgresIntegrationOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.CreatePostgresIntegrationOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.CreatePostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_CreatePostgresIntegration_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreatePostgresIntegration'
+type MockClientService_CreatePostgresIntegration_Call struct {
+	*mock.Call
+}
+
+// CreatePostgresIntegration is a helper method to define mock.On call
+//   - params *secret_service.CreatePostgresIntegrationParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) CreatePostgresIntegration(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_CreatePostgresIntegration_Call {
+	return &MockClientService_CreatePostgresIntegration_Call{Call: _e.mock.On("CreatePostgresIntegration",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_CreatePostgresIntegration_Call) Run(run func(params *secret_service.CreatePostgresIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_CreatePostgresIntegration_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.CreatePostgresIntegrationParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_CreatePostgresIntegration_Call) Return(_a0 *secret_service.CreatePostgresIntegrationOK, _a1 error) *MockClientService_CreatePostgresIntegration_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_CreatePostgresIntegration_Call) RunAndReturn(run func(*secret_service.CreatePostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.CreatePostgresIntegrationOK, error)) *MockClientService_CreatePostgresIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreatePostgresRotatingSecret provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) CreatePostgresRotatingSecret(params *secret_service.CreatePostgresRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.CreatePostgresRotatingSecretOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreatePostgresRotatingSecret")
+	}
+
+	var r0 *secret_service.CreatePostgresRotatingSecretOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.CreatePostgresRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.CreatePostgresRotatingSecretOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.CreatePostgresRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.CreatePostgresRotatingSecretOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.CreatePostgresRotatingSecretOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.CreatePostgresRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_CreatePostgresRotatingSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreatePostgresRotatingSecret'
+type MockClientService_CreatePostgresRotatingSecret_Call struct {
+	*mock.Call
+}
+
+// CreatePostgresRotatingSecret is a helper method to define mock.On call
+//   - params *secret_service.CreatePostgresRotatingSecretParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) CreatePostgresRotatingSecret(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_CreatePostgresRotatingSecret_Call {
+	return &MockClientService_CreatePostgresRotatingSecret_Call{Call: _e.mock.On("CreatePostgresRotatingSecret",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_CreatePostgresRotatingSecret_Call) Run(run func(params *secret_service.CreatePostgresRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_CreatePostgresRotatingSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.CreatePostgresRotatingSecretParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_CreatePostgresRotatingSecret_Call) Return(_a0 *secret_service.CreatePostgresRotatingSecretOK, _a1 error) *MockClientService_CreatePostgresRotatingSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_CreatePostgresRotatingSecret_Call) RunAndReturn(run func(*secret_service.CreatePostgresRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.CreatePostgresRotatingSecretOK, error)) *MockClientService_CreatePostgresRotatingSecret_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateSync provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) CreateSync(params *secret_service.CreateSyncParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.CreateSyncOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -2090,6 +2238,80 @@ func (_c *MockClientService_DeleteMongoDBAtlasIntegration_Call) Return(_a0 *secr
 }
 
 func (_c *MockClientService_DeleteMongoDBAtlasIntegration_Call) RunAndReturn(run func(*secret_service.DeleteMongoDBAtlasIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.DeleteMongoDBAtlasIntegrationOK, error)) *MockClientService_DeleteMongoDBAtlasIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeletePostgresIntegration provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) DeletePostgresIntegration(params *secret_service.DeletePostgresIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.DeletePostgresIntegrationOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeletePostgresIntegration")
+	}
+
+	var r0 *secret_service.DeletePostgresIntegrationOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.DeletePostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.DeletePostgresIntegrationOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.DeletePostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.DeletePostgresIntegrationOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.DeletePostgresIntegrationOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.DeletePostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_DeletePostgresIntegration_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeletePostgresIntegration'
+type MockClientService_DeletePostgresIntegration_Call struct {
+	*mock.Call
+}
+
+// DeletePostgresIntegration is a helper method to define mock.On call
+//   - params *secret_service.DeletePostgresIntegrationParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) DeletePostgresIntegration(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_DeletePostgresIntegration_Call {
+	return &MockClientService_DeletePostgresIntegration_Call{Call: _e.mock.On("DeletePostgresIntegration",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_DeletePostgresIntegration_Call) Run(run func(params *secret_service.DeletePostgresIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_DeletePostgresIntegration_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.DeletePostgresIntegrationParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_DeletePostgresIntegration_Call) Return(_a0 *secret_service.DeletePostgresIntegrationOK, _a1 error) *MockClientService_DeletePostgresIntegration_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_DeletePostgresIntegration_Call) RunAndReturn(run func(*secret_service.DeletePostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.DeletePostgresIntegrationOK, error)) *MockClientService_DeletePostgresIntegration_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -3496,6 +3718,154 @@ func (_c *MockClientService_GetMongoDBAtlasRotatingSecretConfig_Call) Return(_a0
 }
 
 func (_c *MockClientService_GetMongoDBAtlasRotatingSecretConfig_Call) RunAndReturn(run func(*secret_service.GetMongoDBAtlasRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetMongoDBAtlasRotatingSecretConfigOK, error)) *MockClientService_GetMongoDBAtlasRotatingSecretConfig_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetPostgresIntegration provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) GetPostgresIntegration(params *secret_service.GetPostgresIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.GetPostgresIntegrationOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPostgresIntegration")
+	}
+
+	var r0 *secret_service.GetPostgresIntegrationOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.GetPostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetPostgresIntegrationOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.GetPostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.GetPostgresIntegrationOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.GetPostgresIntegrationOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.GetPostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_GetPostgresIntegration_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPostgresIntegration'
+type MockClientService_GetPostgresIntegration_Call struct {
+	*mock.Call
+}
+
+// GetPostgresIntegration is a helper method to define mock.On call
+//   - params *secret_service.GetPostgresIntegrationParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) GetPostgresIntegration(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_GetPostgresIntegration_Call {
+	return &MockClientService_GetPostgresIntegration_Call{Call: _e.mock.On("GetPostgresIntegration",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_GetPostgresIntegration_Call) Run(run func(params *secret_service.GetPostgresIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_GetPostgresIntegration_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.GetPostgresIntegrationParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_GetPostgresIntegration_Call) Return(_a0 *secret_service.GetPostgresIntegrationOK, _a1 error) *MockClientService_GetPostgresIntegration_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_GetPostgresIntegration_Call) RunAndReturn(run func(*secret_service.GetPostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetPostgresIntegrationOK, error)) *MockClientService_GetPostgresIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetPostgresRotatingSecretConfig provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) GetPostgresRotatingSecretConfig(params *secret_service.GetPostgresRotatingSecretConfigParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.GetPostgresRotatingSecretConfigOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPostgresRotatingSecretConfig")
+	}
+
+	var r0 *secret_service.GetPostgresRotatingSecretConfigOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.GetPostgresRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetPostgresRotatingSecretConfigOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.GetPostgresRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.GetPostgresRotatingSecretConfigOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.GetPostgresRotatingSecretConfigOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.GetPostgresRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_GetPostgresRotatingSecretConfig_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPostgresRotatingSecretConfig'
+type MockClientService_GetPostgresRotatingSecretConfig_Call struct {
+	*mock.Call
+}
+
+// GetPostgresRotatingSecretConfig is a helper method to define mock.On call
+//   - params *secret_service.GetPostgresRotatingSecretConfigParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) GetPostgresRotatingSecretConfig(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_GetPostgresRotatingSecretConfig_Call {
+	return &MockClientService_GetPostgresRotatingSecretConfig_Call{Call: _e.mock.On("GetPostgresRotatingSecretConfig",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_GetPostgresRotatingSecretConfig_Call) Run(run func(params *secret_service.GetPostgresRotatingSecretConfigParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_GetPostgresRotatingSecretConfig_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.GetPostgresRotatingSecretConfigParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_GetPostgresRotatingSecretConfig_Call) Return(_a0 *secret_service.GetPostgresRotatingSecretConfigOK, _a1 error) *MockClientService_GetPostgresRotatingSecretConfig_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_GetPostgresRotatingSecretConfig_Call) RunAndReturn(run func(*secret_service.GetPostgresRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetPostgresRotatingSecretConfigOK, error)) *MockClientService_GetPostgresRotatingSecretConfig_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4976,6 +5346,80 @@ func (_c *MockClientService_ListOpenAppSecretVersions_Call) Return(_a0 *secret_s
 }
 
 func (_c *MockClientService_ListOpenAppSecretVersions_Call) RunAndReturn(run func(*secret_service.ListOpenAppSecretVersionsParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.ListOpenAppSecretVersionsOK, error)) *MockClientService_ListOpenAppSecretVersions_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ListPostgresIntegrations provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) ListPostgresIntegrations(params *secret_service.ListPostgresIntegrationsParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.ListPostgresIntegrationsOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListPostgresIntegrations")
+	}
+
+	var r0 *secret_service.ListPostgresIntegrationsOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.ListPostgresIntegrationsParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.ListPostgresIntegrationsOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.ListPostgresIntegrationsParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.ListPostgresIntegrationsOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.ListPostgresIntegrationsOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.ListPostgresIntegrationsParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_ListPostgresIntegrations_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListPostgresIntegrations'
+type MockClientService_ListPostgresIntegrations_Call struct {
+	*mock.Call
+}
+
+// ListPostgresIntegrations is a helper method to define mock.On call
+//   - params *secret_service.ListPostgresIntegrationsParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) ListPostgresIntegrations(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_ListPostgresIntegrations_Call {
+	return &MockClientService_ListPostgresIntegrations_Call{Call: _e.mock.On("ListPostgresIntegrations",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_ListPostgresIntegrations_Call) Run(run func(params *secret_service.ListPostgresIntegrationsParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_ListPostgresIntegrations_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.ListPostgresIntegrationsParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_ListPostgresIntegrations_Call) Return(_a0 *secret_service.ListPostgresIntegrationsOK, _a1 error) *MockClientService_ListPostgresIntegrations_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_ListPostgresIntegrations_Call) RunAndReturn(run func(*secret_service.ListPostgresIntegrationsParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.ListPostgresIntegrationsOK, error)) *MockClientService_ListPostgresIntegrations_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -6563,6 +7007,154 @@ func (_c *MockClientService_UpdateMongoDBAtlasRotatingSecret_Call) Return(_a0 *s
 }
 
 func (_c *MockClientService_UpdateMongoDBAtlasRotatingSecret_Call) RunAndReturn(run func(*secret_service.UpdateMongoDBAtlasRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateMongoDBAtlasRotatingSecretOK, error)) *MockClientService_UpdateMongoDBAtlasRotatingSecret_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdatePostgresIntegration provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) UpdatePostgresIntegration(params *secret_service.UpdatePostgresIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdatePostgresIntegrationOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdatePostgresIntegration")
+	}
+
+	var r0 *secret_service.UpdatePostgresIntegrationOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdatePostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdatePostgresIntegrationOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdatePostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.UpdatePostgresIntegrationOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.UpdatePostgresIntegrationOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.UpdatePostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_UpdatePostgresIntegration_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdatePostgresIntegration'
+type MockClientService_UpdatePostgresIntegration_Call struct {
+	*mock.Call
+}
+
+// UpdatePostgresIntegration is a helper method to define mock.On call
+//   - params *secret_service.UpdatePostgresIntegrationParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) UpdatePostgresIntegration(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_UpdatePostgresIntegration_Call {
+	return &MockClientService_UpdatePostgresIntegration_Call{Call: _e.mock.On("UpdatePostgresIntegration",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_UpdatePostgresIntegration_Call) Run(run func(params *secret_service.UpdatePostgresIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_UpdatePostgresIntegration_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.UpdatePostgresIntegrationParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_UpdatePostgresIntegration_Call) Return(_a0 *secret_service.UpdatePostgresIntegrationOK, _a1 error) *MockClientService_UpdatePostgresIntegration_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_UpdatePostgresIntegration_Call) RunAndReturn(run func(*secret_service.UpdatePostgresIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdatePostgresIntegrationOK, error)) *MockClientService_UpdatePostgresIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdatePostgresRotatingSecret provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) UpdatePostgresRotatingSecret(params *secret_service.UpdatePostgresRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdatePostgresRotatingSecretOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdatePostgresRotatingSecret")
+	}
+
+	var r0 *secret_service.UpdatePostgresRotatingSecretOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdatePostgresRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdatePostgresRotatingSecretOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdatePostgresRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.UpdatePostgresRotatingSecretOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.UpdatePostgresRotatingSecretOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.UpdatePostgresRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_UpdatePostgresRotatingSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdatePostgresRotatingSecret'
+type MockClientService_UpdatePostgresRotatingSecret_Call struct {
+	*mock.Call
+}
+
+// UpdatePostgresRotatingSecret is a helper method to define mock.On call
+//   - params *secret_service.UpdatePostgresRotatingSecretParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) UpdatePostgresRotatingSecret(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_UpdatePostgresRotatingSecret_Call {
+	return &MockClientService_UpdatePostgresRotatingSecret_Call{Call: _e.mock.On("UpdatePostgresRotatingSecret",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_UpdatePostgresRotatingSecret_Call) Run(run func(params *secret_service.UpdatePostgresRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_UpdatePostgresRotatingSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.UpdatePostgresRotatingSecretParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_UpdatePostgresRotatingSecret_Call) Return(_a0 *secret_service.UpdatePostgresRotatingSecretOK, _a1 error) *MockClientService_UpdatePostgresRotatingSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_UpdatePostgresRotatingSecret_Call) RunAndReturn(run func(*secret_service.UpdatePostgresRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdatePostgresRotatingSecretOK, error)) *MockClientService_UpdatePostgresRotatingSecret_Call {
 	_c.Call.Return(run)
 	return _c
 }

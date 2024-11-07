@@ -152,7 +152,6 @@ func updateRun(opts *UpdateOpts) error {
 		req.Body = &mongoDBBody
 
 		_, err = opts.PreviewClient.UpdateMongoDBAtlasIntegration(req, nil)
-
 		if err != nil {
 			return fmt.Errorf("failed to update MongoDB Atlas integration: %w", err)
 		}
@@ -176,7 +175,6 @@ func updateRun(opts *UpdateOpts) error {
 		req.Body = &awsBody
 
 		_, err = opts.PreviewClient.UpdateAwsIntegration(req, nil)
-
 		if err != nil {
 			return fmt.Errorf("failed to update AWS integration: %w", err)
 		}
@@ -200,9 +198,31 @@ func updateRun(opts *UpdateOpts) error {
 		req.Body = &gcpBody
 
 		_, err = opts.PreviewClient.UpdateGcpIntegration(req, nil)
-
 		if err != nil {
 			return fmt.Errorf("failed to update GCP integration: %w", err)
+		}
+
+	case Postgres:
+		req := preview_secret_service.NewUpdatePostgresIntegrationParamsWithContext(opts.Ctx)
+		req.OrganizationID = opts.Profile.OrganizationID
+		req.ProjectID = opts.Profile.ProjectID
+		req.Name = opts.IntegrationName
+
+		var body preview_models.SecretServiceUpdatePostgresIntegrationBody
+		detailBytes, err := json.Marshal(internalConfig.Details)
+		if err != nil {
+			return fmt.Errorf("error marshaling details config: %w", err)
+		}
+
+		err = body.UnmarshalBinary(detailBytes)
+		if err != nil {
+			return fmt.Errorf("error marshaling details config: %w", err)
+		}
+		req.Body = &body
+
+		_, err = opts.PreviewClient.UpdatePostgresIntegration(req, nil)
+		if err != nil {
+			return fmt.Errorf("failed to update MongoDB Atlas integration: %w", err)
 		}
 	}
 

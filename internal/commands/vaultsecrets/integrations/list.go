@@ -120,7 +120,7 @@ func listRun(opts *ListOpts) error {
 		for {
 			resp, err := opts.PreviewClient.ListTwilioIntegrations(params, nil)
 			if err != nil {
-				return fmt.Errorf("failed to list twilio integrations: %w", err)
+				return fmt.Errorf("failed to list Twilio integrations: %w", err)
 			}
 
 			integrations = append(integrations, resp.Payload.Integrations...)
@@ -146,7 +146,7 @@ func listRun(opts *ListOpts) error {
 		for {
 			resp, err := opts.PreviewClient.ListMongoDBAtlasIntegrations(params, nil)
 			if err != nil {
-				return fmt.Errorf("failed to list mongo integrations: %w", err)
+				return fmt.Errorf("failed to list MongoDB Atlas integrations: %w", err)
 			}
 
 			integrations = append(integrations, resp.Payload.Integrations...)
@@ -157,6 +157,7 @@ func listRun(opts *ListOpts) error {
 			next := resp.Payload.Pagination.NextPageToken
 			params.PaginationNextPageToken = &next
 		}
+
 		return opts.Output.Display(newMongoDBDisplayer(false, integrations...))
 
 	case AWS:
@@ -182,6 +183,7 @@ func listRun(opts *ListOpts) error {
 			next := resp.Payload.Pagination.NextPageToken
 			params.PaginationNextPageToken = &next
 		}
+
 		return opts.Output.Display(newAwsDisplayer(false, false, integrations...))
 
 	case GCP:
@@ -207,7 +209,34 @@ func listRun(opts *ListOpts) error {
 			next := resp.Payload.Pagination.NextPageToken
 			params.PaginationNextPageToken = &next
 		}
+
 		return opts.Output.Display(newGcpDisplayer(false, false, integrations...))
+
+	case Postgres:
+		var integrations []*preview_models.Secrets20231128PostgresIntegration
+
+		params := &preview_secret_service.ListPostgresIntegrationsParams{
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+		}
+
+		for {
+			resp, err := opts.PreviewClient.ListPostgresIntegrations(params, nil)
+			if err != nil {
+				return fmt.Errorf("failed to list Postgres integrations: %w", err)
+			}
+
+			integrations = append(integrations, resp.Payload.Integrations...)
+			if resp.Payload.Pagination == nil || resp.Payload.Pagination.NextPageToken == "" {
+				break
+			}
+
+			next := resp.Payload.Pagination.NextPageToken
+			params.PaginationNextPageToken = &next
+		}
+
+		return opts.Output.Display(newPostgresDisplayer(false, integrations...))
 
 	default:
 		return fmt.Errorf("not a valid integration type")

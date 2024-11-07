@@ -111,10 +111,11 @@ type IntegrationConfig struct {
 }
 
 var (
-	TwilioKeys = []string{"account_sid", "api_key_secret", "api_key_sid"}
-	MongoKeys  = []string{"private_key", "public_key"}
-	AWSKeys    = []string{"access_keys", "federated_workload_identity"}
-	GCPKeys    = []string{"service_account_key", "federated_workload_identity"}
+	TwilioKeys   = []string{"account_sid", "api_key_secret", "api_key_sid"}
+	MongoKeys    = []string{"private_key", "public_key"}
+	AWSKeys      = []string{"access_keys", "federated_workload_identity"}
+	GCPKeys      = []string{"service_account_key", "federated_workload_identity"}
+	PostgresKeys = []string{"connection_string"}
 )
 
 var providerToRequiredFields = map[string][]string{
@@ -122,6 +123,7 @@ var providerToRequiredFields = map[string][]string{
 	string(MongoDBAtlas): MongoKeys,
 	string(AWS):          AWSKeys,
 	string(GCP):          GCPKeys,
+	string(Postgres):     PostgresKeys,
 }
 
 var awsAuthMethodsToReqKeys = map[string][]string{
@@ -201,7 +203,6 @@ func createRun(opts *CreateOpts) error {
 		req.Body.Name = opts.IntegrationName
 
 		_, err = opts.PreviewClient.CreateMongoDBAtlasIntegration(req, nil)
-
 		if err != nil {
 			return fmt.Errorf("failed to create MongoDB Atlas integration: %w", err)
 		}
@@ -225,7 +226,6 @@ func createRun(opts *CreateOpts) error {
 		req.Body.Name = opts.IntegrationName
 
 		_, err = opts.PreviewClient.CreateAwsIntegration(req, nil)
-
 		if err != nil {
 			return fmt.Errorf("failed to create AWS integration: %w", err)
 		}
@@ -249,9 +249,32 @@ func createRun(opts *CreateOpts) error {
 		req.Body.Name = opts.IntegrationName
 
 		_, err = opts.PreviewClient.CreateGcpIntegration(req, nil)
-
 		if err != nil {
 			return fmt.Errorf("failed to create GCP integration: %w", err)
+		}
+
+	case Postgres:
+		req := preview_secret_service.NewCreatePostgresIntegrationParamsWithContext(opts.Ctx)
+		req.OrganizationID = opts.Profile.OrganizationID
+		req.ProjectID = opts.Profile.ProjectID
+
+		detailBytes, err := json.Marshal(internalConfig.Details)
+		if err != nil {
+			return fmt.Errorf("error marshaling details config: %w", err)
+		}
+
+		var body preview_models.SecretServiceCreatePostgresIntegrationBody
+		err = body.UnmarshalBinary(detailBytes)
+		if err != nil {
+			return fmt.Errorf("error marshaling details config: %w", err)
+		}
+
+		req.Body = &body
+		req.Body.Name = opts.IntegrationName
+
+		_, err = opts.PreviewClient.CreatePostgresIntegration(req, nil)
+		if err != nil {
+			return fmt.Errorf("failed to create MongoDB Atlas integration: %w", err)
 		}
 
 	default:

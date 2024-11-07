@@ -85,7 +85,6 @@ func (m *mongodbDisplayer) DefaultFormat() format.Format {
 }
 
 func (m *mongodbDisplayer) Payload() any {
-
 	if m.previewMongoDBIntegrations != nil {
 		return m.previewMongoDBIntegrationsPayload()
 	}
@@ -143,7 +142,6 @@ func (a *awsDisplayer) DefaultFormat() format.Format {
 }
 
 func (a *awsDisplayer) Payload() any {
-
 	if a.previewAwsIntegrations != nil {
 		return a.previewAwsIntegrationsPayload()
 	}
@@ -183,7 +181,6 @@ func (a *awsDisplayer) FieldTemplates() []format.Field {
 				ValueFormat: "{{ .FederatedWorkloadIdentity.RoleArn }}",
 			},
 		}...)
-
 	} else {
 		return append(fields, []format.Field{
 			{
@@ -214,7 +211,6 @@ func (g *gcpDisplayer) DefaultFormat() format.Format {
 }
 
 func (g *gcpDisplayer) Payload() any {
-
 	if g.previewGcpIntegrations != nil {
 		return g.previewGcpIntegrationsPayload()
 	}
@@ -317,5 +313,60 @@ func (g *genericDisplayer) FieldTemplates() []format.Field {
 			Name:        "Created",
 			ValueFormat: "{{ .CreatedAt }}",
 		},
+	}
+}
+
+type postgresDisplayer struct {
+	previewPostgresIntegrations []*preview_models.Secrets20231128PostgresIntegration
+
+	single bool
+}
+
+func newPostgresDisplayer(single bool, integrations ...*preview_models.Secrets20231128PostgresIntegration) *postgresDisplayer {
+	return &postgresDisplayer{
+		previewPostgresIntegrations: integrations,
+		single:                      single,
+	}
+}
+
+func (m *postgresDisplayer) DefaultFormat() format.Format {
+	return format.Table
+}
+
+func (m *postgresDisplayer) Payload() any {
+	if m.previewPostgresIntegrations != nil {
+		return m.previewPostgresIntegrationsPayload()
+	}
+
+	return nil
+}
+
+func (m *postgresDisplayer) previewPostgresIntegrationsPayload() any {
+	if m.single {
+		if len(m.previewPostgresIntegrations) != 1 {
+			return nil
+		}
+		return m.previewPostgresIntegrations[0]
+	}
+	return m.previewPostgresIntegrations
+}
+
+func (m *postgresDisplayer) FieldTemplates() []format.Field {
+	fields := []format.Field{
+		{
+			Name:        "Integration Name",
+			ValueFormat: "{{ .Name }}",
+		},
+	}
+
+	if m.single {
+		return append(fields, []format.Field{
+			{
+				Name:        "Connection String",
+				ValueFormat: "{{ .StaticCredentialDetails.ConnectionString }}",
+			},
+		}...)
+	} else {
+		return fields
 	}
 }
