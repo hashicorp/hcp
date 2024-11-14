@@ -1,16 +1,24 @@
-### Changes proposed in this PR:
+### :hammer_and_wrench:  Description
 
-### How I've tested this PR:
+<!-- What changed?
+<!-- Why was it changed? -->
+<!-- How does it affect end-user behavior? -->
 
-### How I expect reviewers to test this PR:
+### :link:  Additional Link
 
+<!-- Any additional link to understand the context of the change. -->
 
-<!-- If you are adding a new command or editing an existing one, please provide
-     an example of the command being invoked.
-### Output of affected commands:
--->
+### :building_construction:  Local Testing
 
-### Checklist:
+<!-- List steps to test your change on a local environment. -->
+
+### :+1:  Checklist
+
+- [ ] The PR has a descriptive title.
+- [ ] Input validation updated
+- [ ] Unit tests updated
+- [ ] Documentation updated
+- [ ] Major architecture changes have a corresponding RFC
 - [ ] Tests added if applicable
 - [ ] CHANGELOG entry added or label 'pr/no-changelog' added to PR
   > Run `CHANGELOG_PR=<PR number> make changelog/new-entry` for guidance
