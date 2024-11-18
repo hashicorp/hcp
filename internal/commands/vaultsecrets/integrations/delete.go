@@ -99,9 +99,6 @@ func deleteRun(opts *DeleteOpts) error {
 			return fmt.Errorf("failed to delete integration: %w", err)
 		}
 
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully deleted integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.IntegrationName)
-		return nil
-
 	case MongoDBAtlas:
 		_, err := opts.PreviewClient.DeleteMongoDBAtlasIntegration(&preview_secret_service.DeleteMongoDBAtlasIntegrationParams{
 			Context:        opts.Ctx,
@@ -112,9 +109,6 @@ func deleteRun(opts *DeleteOpts) error {
 		if err != nil {
 			return fmt.Errorf("failed to delete integration: %w", err)
 		}
-
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully deleted integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.IntegrationName)
-		return nil
 
 	case AWS:
 		_, err := opts.PreviewClient.DeleteAwsIntegration(&preview_secret_service.DeleteAwsIntegrationParams{
@@ -127,9 +121,6 @@ func deleteRun(opts *DeleteOpts) error {
 			return fmt.Errorf("failed to delete integration: %w", err)
 		}
 
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully deleted integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.IntegrationName)
-		return nil
-
 	case GCP:
 		_, err := opts.PreviewClient.DeleteGcpIntegration(&preview_secret_service.DeleteGcpIntegrationParams{
 			Context:        opts.Ctx,
@@ -141,10 +132,22 @@ func deleteRun(opts *DeleteOpts) error {
 			return fmt.Errorf("failed to delete integration: %w", err)
 		}
 
-		fmt.Fprintf(opts.IO.Err(), "%s Successfully deleted integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.IntegrationName)
-		return nil
+	case Postgres:
+		_, err := opts.PreviewClient.DeletePostgresIntegration(&preview_secret_service.DeletePostgresIntegrationParams{
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+			Name:           opts.IntegrationName,
+		}, nil)
+		if err != nil {
+			return fmt.Errorf("failed to delete integration: %w", err)
+		}
 
 	default:
 		return fmt.Errorf("not a valid integration type")
 	}
+
+	fmt.Fprintf(opts.IO.Err(), "%s Successfully deleted integration with name %q\n", opts.IO.ColorScheme().SuccessIcon(), opts.IntegrationName)
+
+	return nil
 }

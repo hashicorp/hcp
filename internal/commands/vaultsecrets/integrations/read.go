@@ -151,6 +151,19 @@ func readRun(opts *ReadOpts) error {
 
 		return opts.Output.Display(newGcpDisplayer(true, resp.Payload.Integration.FederatedWorkloadIdentity != nil, resp.Payload.Integration))
 
+	case Postgres:
+		resp, err := opts.PreviewClient.GetPostgresIntegration(&preview_secret_service.GetPostgresIntegrationParams{
+			Context:        opts.Ctx,
+			ProjectID:      opts.Profile.ProjectID,
+			OrganizationID: opts.Profile.OrganizationID,
+			Name:           opts.IntegrationName,
+		}, nil)
+		if err != nil {
+			return fmt.Errorf("failed to read integration: %w", err)
+		}
+
+		return opts.Output.Display(newPostgresDisplayer(true, resp.Payload.Integration))
+
 	default:
 		return fmt.Errorf("not a valid integration type")
 	}

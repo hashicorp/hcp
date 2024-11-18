@@ -15,6 +15,7 @@ const (
 	MongoDBAtlas IntegrationType = "mongodb-atlas"
 	AWS          IntegrationType = "aws"
 	GCP          IntegrationType = "gcp"
+	Postgres     IntegrationType = "postgres"
 )
 
 func NewCmdIntegrations(ctx *cmd.Context) *cmd.Command {
