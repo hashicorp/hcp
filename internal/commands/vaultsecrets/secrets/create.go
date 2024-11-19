@@ -190,7 +190,7 @@ var (
 		"integration_name":     "",
 		"rotation_policy_name": "",
 		"postgres_params": map[string]any{
-			"usernames": "",
+			"usernames": []string{},
 		},
 	}
 
@@ -376,6 +376,7 @@ func createRun(opts *CreateOpts) error {
 		case integrations.Postgres:
 			req := preview_secret_service.NewCreatePostgresRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
+			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 
 			var postgresBody preview_models.SecretServiceCreatePostgresRotatingSecretBody
