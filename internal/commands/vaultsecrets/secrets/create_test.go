@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
 	"os"
 	"path/filepath"
 	"testing"
@@ -134,6 +135,7 @@ func TestCreateRun(t *testing.T) {
 		ErrMsg           string
 		MockCalled       bool
 		AugmentOpts      func(*CreateOpts)
+		Provider         integrations.IntegrationType
 		Input            []byte
 	}{
 		{
@@ -186,6 +188,7 @@ func TestCreateRun(t *testing.T) {
 				o.Type = secretTypeRotating
 			},
 			MockCalled: true,
+			Provider:   integrations.MongoDBAtlas,
 			Input: []byte(`type = "mongodb-atlas"
 details = {
   integration_name = "mongo-db-integration"
@@ -202,6 +205,23 @@ details = {
 	  "database_name" = "dn2"
 	  "collection_name" = "cn2"
 	}]
+  }
+}`),
+		},
+		{
+			Name:    "Success: Create a Postgres rotating secret",
+			RespErr: false,
+			AugmentOpts: func(o *CreateOpts) {
+				o.Type = secretTypeRotating
+			},
+			MockCalled: true,
+			Provider:   integrations.Postgres,
+			Input: []byte(`type = "postgres"
+details = {
+  integration_name = "postgres-integration"
+  rotation_policy_name = "built-in:60-days-2-active"
+  postgres_params = {
+  	usernames = ["postgres_user_1"]
   }
 }`),
 		},
@@ -310,45 +330,77 @@ details = {
 				}
 			} else if opts.Type == secretTypeRotating {
 				if c.MockCalled {
-					if c.RespErr {
-						pvs.EXPECT().CreateMongoDBAtlasRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
-					} else {
-						pvs.EXPECT().CreateMongoDBAtlasRotatingSecret(&preview_secret_service.CreateMongoDBAtlasRotatingSecretParams{
-							OrganizationID: testProfile(t).OrganizationID,
-							ProjectID:      testProfile(t).ProjectID,
-							AppName:        testProfile(t).VaultSecrets.AppName,
-							Body: &preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody{
-								Name:               opts.SecretName,
-								IntegrationName:    "mongo-db-integration",
-								RotationPolicyName: "built-in:60-days-2-active",
-								SecretDetails: &preview_models.Secrets20231128MongoDBAtlasSecretDetails{
-									MongodbGroupID: "mbdgi",
-									MongodbRoles: []*preview_models.Secrets20231128MongoDBRole{
-										{
-											RoleName:       "rn1",
-											DatabaseName:   "dn1",
-											CollectionName: "cn1",
-										},
-										{
-											RoleName:       "rn2",
-											DatabaseName:   "dn2",
-											CollectionName: "cn2",
+					switch c.Provider {
+					case integrations.MongoDBAtlas:
+						if c.RespErr {
+							pvs.EXPECT().CreateMongoDBAtlasRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+						} else {
+							pvs.EXPECT().CreateMongoDBAtlasRotatingSecret(&preview_secret_service.CreateMongoDBAtlasRotatingSecretParams{
+								OrganizationID: testProfile(t).OrganizationID,
+								ProjectID:      testProfile(t).ProjectID,
+								AppName:        testProfile(t).VaultSecrets.AppName,
+								Body: &preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody{
+									Name:               opts.SecretName,
+									IntegrationName:    "mongo-db-integration",
+									RotationPolicyName: "built-in:60-days-2-active",
+									SecretDetails: &preview_models.Secrets20231128MongoDBAtlasSecretDetails{
+										MongodbGroupID: "mbdgi",
+										MongodbRoles: []*preview_models.Secrets20231128MongoDBRole{
+											{
+												RoleName:       "rn1",
+												DatabaseName:   "dn1",
+												CollectionName: "cn1",
+											},
+											{
+												RoleName:       "rn2",
+												DatabaseName:   "dn2",
+												CollectionName: "cn2",
+											},
 										},
 									},
 								},
-							},
-							Context: opts.Ctx,
-						}, mock.Anything).Return(&preview_secret_service.CreateMongoDBAtlasRotatingSecretOK{
-							Payload: &preview_models.Secrets20231128CreateMongoDBAtlasRotatingSecretResponse{
-								Config: &preview_models.Secrets20231128RotatingSecretConfig{
-									AppName:            opts.AppName,
-									CreatedAt:          dt,
-									IntegrationName:    "mongo-db-integration",
-									RotationPolicyName: "built-in:60-days-2-active",
-									Name:               opts.SecretName,
+								Context: opts.Ctx,
+							}, mock.Anything).Return(&preview_secret_service.CreateMongoDBAtlasRotatingSecretOK{
+								Payload: &preview_models.Secrets20231128CreateMongoDBAtlasRotatingSecretResponse{
+									Config: &preview_models.Secrets20231128RotatingSecretConfig{
+										AppName:            opts.AppName,
+										CreatedAt:          dt,
+										IntegrationName:    "mongo-db-integration",
+										RotationPolicyName: "built-in:60-days-2-active",
+										Name:               opts.SecretName,
+									},
 								},
-							},
-						}, nil).Once()
+							}, nil).Once()
+						}
+					case integrations.Postgres:
+						if c.RespErr {
+							pvs.EXPECT().CreatePostgresRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+						} else {
+							println(testProfile(t).ProjectID)
+							pvs.EXPECT().CreatePostgresRotatingSecret(&preview_secret_service.CreatePostgresRotatingSecretParams{
+								OrganizationID: testProfile(t).OrganizationID,
+								ProjectID:      testProfile(t).ProjectID,
+								AppName:        testProfile(t).VaultSecrets.AppName,
+								Body: &preview_models.SecretServiceCreatePostgresRotatingSecretBody{
+									Name:               opts.SecretName,
+									IntegrationName:    "postgres-integration",
+									RotationPolicyName: "built-in:60-days-2-active",
+									PostgresParams:     &preview_models.Secrets20231128PostgresParams{Usernames: []string{"postgres_user_1"}},
+								},
+								Context: opts.Ctx,
+							}, mock.Anything).Return(&preview_secret_service.CreatePostgresRotatingSecretOK{
+								Payload: &preview_models.Secrets20231128CreatePostgresRotatingSecretResponse{
+									Config: &preview_models.Secrets20231128PostgresRotatingSecretConfig{
+										AppName:            opts.AppName,
+										CreatedAt:          dt,
+										IntegrationName:    "postgres-integration",
+										RotationPolicyName: "built-in:60-days-2-active",
+										Name:               opts.SecretName,
+										PostgresParams:     &preview_models.Secrets20231128PostgresParams{Usernames: []string{"postgres_user_1"}},
+									},
+								},
+							}, nil).Once()
+						}
 					}
 				}
 			} else if opts.Type == secretTypeDynamic {
