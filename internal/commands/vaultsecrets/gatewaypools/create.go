@@ -118,16 +118,16 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 func createFields(showOauth bool) []format.Field {
 	fields := []format.Field{
 		{
-			Name:        "GatewayPool Name",
+			Name:        "Gateway Pool Name",
 			ValueFormat: "{{ .GatewayPool.Name }}",
+		},
+		{
+			Name:        "Gateway Pool Resource ID",
+			ValueFormat: "{{ .GatewayPool.ResourceId }}",
 		},
 		{
 			Name:        "Description",
 			ValueFormat: "{{ .GatewayPool.Description }}",
-		},
-		{
-			Name:        "Resource Name",
-			ValueFormat: "{{ .GatewayPool.ResourceName }}",
 		},
 	}
 
@@ -143,6 +143,7 @@ func createFields(showOauth bool) []format.Field {
 			},
 		}...)
 	}
+
 	return fields
 }
 
@@ -164,7 +165,6 @@ func createRun(opts *CreateOpts) error {
 			Description: opts.Description,
 		},
 	}, nil)
-
 	if err != nil {
 		return fmt.Errorf("failed to create gateway pool: %w", err)
 	}
