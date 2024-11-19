@@ -73,16 +73,24 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 func readFields() []format.Field {
 	return []format.Field{
 		{
-			Name:        "GatewayPool Name",
+			Name:        "Gateway Pool Name",
 			ValueFormat: "{{ .GatewayPool.Name }}",
 		},
 		{
-			Name:        "Description",
-			ValueFormat: "{{ .GatewayPool.Description }}",
+			Name:        "Gateway Pool Resource Name",
+			ValueFormat: "{{ .GatewayPool.ResourceName }}",
+		},
+		{
+			Name:        "Gateway Pool Resource ID",
+			ValueFormat: "{{ .GatewayPool.ResourceID }}",
 		},
 		{
 			Name:        "Integrations",
 			ValueFormat: "{{ .Integrations }}",
+		},
+		{
+			Name:        "Description",
+			ValueFormat: "{{ .GatewayPool.Description }}",
 		},
 	}
 }
@@ -94,7 +102,6 @@ func readRun(opts *ReadOpts) error {
 		OrganizationID:  opts.Profile.OrganizationID,
 		GatewayPoolName: opts.GatewayPoolName,
 	}, nil)
-
 	if err != nil {
 		return fmt.Errorf("failed to read gateway pool: %w", err)
 	}

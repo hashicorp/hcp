@@ -60,8 +60,16 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 func listFields() []format.Field {
 	return []format.Field{
 		{
-			Name:        "GatewayPool Name",
+			Name:        "Gateway Pool Name",
 			ValueFormat: "{{ .Name }}",
+		},
+		{
+			Name:        "Gateway Pool Resource Name",
+			ValueFormat: "{{ .ResourceName }}",
+		},
+		{
+			Name:        "Gateway Pool Resource ID",
+			ValueFormat: "{{ .ResourceID }}",
 		},
 		{
 			Name:        "Description",
