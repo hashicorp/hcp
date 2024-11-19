@@ -7,10 +7,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
 
 	"github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
