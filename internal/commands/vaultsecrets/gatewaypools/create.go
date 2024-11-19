@@ -175,11 +175,9 @@ func createRun(opts *CreateOpts) error {
 	}
 	if opts.OutDirPath != "" {
 		creds := &gatewayCreds{
-			ProjectID:    resp.Payload.GatewayPool.ProjectID,
-			ResourceName: resp.Payload.GatewayPool.ResourceName,
-			ResourceID:   resp.Payload.GatewayPool.ResourceID,
-			Scheme:       auth.CredentialFileSchemeServicePrincipal,
-			Oauth:        oauth,
+			ProjectID: resp.Payload.GatewayPool.ProjectID,
+			Scheme:    auth.CredentialFileSchemeServicePrincipal,
+			Oauth:     oauth,
 		}
 		if err := writeGatewayCredentialFile(filepath.Join(opts.OutDirPath, CredsFilePath), creds); err != nil {
 			return fmt.Errorf("failed to write the gateway credential file: %w", err)
@@ -207,9 +205,8 @@ func createRun(opts *CreateOpts) error {
 }
 
 type gatewayCreds struct {
-	ProjectID    string `json:"project_id,omitempty"`
-	ResourceName string `json:"resource_name,omitempty"`
-	ResourceID   string `json:"resource_id,omitempty"`
+	ProjectID string `json:"project_id,omitempty"`
+
 	// Scheme is the authentication scheme which is service_principal_creds
 	Scheme string `json:"scheme,omitempty"`
 
