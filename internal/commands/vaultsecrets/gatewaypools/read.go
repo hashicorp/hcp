@@ -77,6 +77,10 @@ func readFields() []format.Field {
 			ValueFormat: "{{ .GatewayPool.Name }}",
 		},
 		{
+			Name:        "Gateway Pool Resource Name",
+			ValueFormat: "{{ .GatewayPool.ResourceName }}",
+		},
+		{
 			Name:        "Gateway Pool Resource ID",
 			ValueFormat: "{{ .GatewayPool.ResourceID }}",
 		},

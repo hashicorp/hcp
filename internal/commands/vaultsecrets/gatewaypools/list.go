@@ -64,6 +64,10 @@ func listFields() []format.Field {
 			ValueFormat: "{{ .Name }}",
 		},
 		{
+			Name:        "Gateway Pool Resource Name",
+			ValueFormat: "{{ .ResourceName }}",
+		},
+		{
 			Name:        "Gateway Pool Resource ID",
 			ValueFormat: "{{ .ResourceID }}",
 		},
