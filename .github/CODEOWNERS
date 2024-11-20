@@ -1,6 +1,6 @@
 # Individual command groups will be owned by product teams but the overall CLI
 # will be owned as follows.
-* @dadgar @hashicorp/cloud-core-platform-surfaces @hashicorp/cloud-core-platform-systems
+@hashicorp/cloud-core-platform-surfaces @hashicorp/cloud-core-platform-systems
 
 # Files that all teams can contribute to
 .changelog
