@@ -184,7 +184,7 @@ details = {
   integration_name = "postgres-integration"
   rotation_policy_name = "built-in:60-days-2-active"
   postgres_params = {
-  	usernames = ["postgres_user_1"]
+  	usernames = ["postgres_user_1", "postgres_user_2"]
   }
 }`),
 		},
@@ -343,7 +343,7 @@ details = {
 									Config: &preview_models.Secrets20231128PostgresRotatingSecretConfig{
 										AppName:            opts.AppName,
 										CreatedAt:          dt,
-										IntegrationName:    "mongo-db-integration",
+										IntegrationName:    "postgres-integration",
 										RotationPolicyName: "built-in:60-days-2-active",
 										Name:               opts.SecretName,
 									},
