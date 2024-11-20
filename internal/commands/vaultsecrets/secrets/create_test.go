@@ -18,12 +18,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
-	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -272,17 +269,15 @@ details = {
 				}
 			}
 			vs := mock_secret_service.NewMockClientService(t)
-			pvs := mock_preview_secret_service.NewMockClientService(t)
 
 			opts := &CreateOpts{
-				Ctx:           context.Background(),
-				IO:            io,
-				Profile:       testProfile(t),
-				Output:        format.New(io),
-				Client:        vs,
-				PreviewClient: pvs,
-				AppName:       testProfile(t).VaultSecrets.AppName,
-				SecretName:    "test_secret",
+				Ctx:        context.Background(),
+				IO:         io,
+				Profile:    testProfile(t),
+				Output:     format.New(io),
+				Client:     vs,
+				AppName:    testProfile(t).VaultSecrets.AppName,
+				SecretName: "test_secret",
 			}
 
 			if c.AugmentOpts != nil {
@@ -305,25 +300,24 @@ details = {
 						vs.EXPECT().CreateAppKVSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 					} else {
 						vs.EXPECT().CreateAppKVSecret(&secret_service.CreateAppKVSecretParams{
-							LocationOrganizationID: testProfile(t).OrganizationID,
-							LocationProjectID:      testProfile(t).ProjectID,
-							AppName:                testProfile(t).VaultSecrets.AppName,
-							Body: secret_service.CreateAppKVSecretBody{
+							OrganizationID: testProfile(t).OrganizationID,
+							ProjectID:      testProfile(t).ProjectID,
+							AppName:        testProfile(t).VaultSecrets.AppName,
+							Body: &models.SecretServiceCreateAppKVSecretBody{
 								Name:  opts.SecretName,
 								Value: testSecretValue,
 							},
 							Context: opts.Ctx,
 						}, mock.Anything).Return(&secret_service.CreateAppKVSecretOK{
-							Payload: &models.Secrets20230613CreateAppKVSecretResponse{
-								Secret: &models.Secrets20230613Secret{
+							Payload: &models.Secrets20231128CreateAppKVSecretResponse{
+								Secret: &models.Secrets20231128Secret{
 									Name:      opts.SecretName,
 									CreatedAt: dt,
-									Version: &models.Secrets20230613SecretVersion{
-										Version:   "2",
+									StaticVersion: &models.Secrets20231128SecretStaticVersion{
+										Version:   2,
 										CreatedAt: dt,
-										Type:      "kv",
 									},
-									LatestVersion: "2",
+									LatestVersion: 2,
 								},
 							},
 						}, nil).Once()
@@ -334,19 +328,19 @@ details = {
 					switch c.Provider {
 					case integrations.MongoDBAtlas:
 						if c.RespErr {
-							pvs.EXPECT().CreateMongoDBAtlasRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+							vs.EXPECT().CreateMongoDBAtlasRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 						} else {
-							pvs.EXPECT().CreateMongoDBAtlasRotatingSecret(&preview_secret_service.CreateMongoDBAtlasRotatingSecretParams{
+							vs.EXPECT().CreateMongoDBAtlasRotatingSecret(&secret_service.CreateMongoDBAtlasRotatingSecretParams{
 								OrganizationID: testProfile(t).OrganizationID,
 								ProjectID:      testProfile(t).ProjectID,
 								AppName:        testProfile(t).VaultSecrets.AppName,
-								Body: &preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody{
+								Body: &models.SecretServiceCreateMongoDBAtlasRotatingSecretBody{
 									Name:               opts.SecretName,
 									IntegrationName:    "mongo-db-integration",
 									RotationPolicyName: "built-in:60-days-2-active",
-									SecretDetails: &preview_models.Secrets20231128MongoDBAtlasSecretDetails{
+									SecretDetails: &models.Secrets20231128MongoDBAtlasSecretDetails{
 										MongodbGroupID: "mbdgi",
-										MongodbRoles: []*preview_models.Secrets20231128MongoDBRole{
+										MongodbRoles: []*models.Secrets20231128MongoDBRole{
 											{
 												RoleName:       "rn1",
 												DatabaseName:   "dn1",
@@ -361,9 +355,9 @@ details = {
 									},
 								},
 								Context: opts.Ctx,
-							}, mock.Anything).Return(&preview_secret_service.CreateMongoDBAtlasRotatingSecretOK{
-								Payload: &preview_models.Secrets20231128CreateMongoDBAtlasRotatingSecretResponse{
-									Config: &preview_models.Secrets20231128RotatingSecretConfig{
+							}, mock.Anything).Return(&secret_service.CreateMongoDBAtlasRotatingSecretOK{
+								Payload: &models.Secrets20231128CreateMongoDBAtlasRotatingSecretResponse{
+									Config: &models.Secrets20231128RotatingSecretConfig{
 										AppName:            opts.AppName,
 										CreatedAt:          dt,
 										IntegrationName:    "mongo-db-integration",
@@ -375,29 +369,29 @@ details = {
 						}
 					case integrations.Postgres:
 						if c.RespErr {
-							pvs.EXPECT().CreatePostgresRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+							vs.EXPECT().CreatePostgresRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 						} else {
 							println(testProfile(t).ProjectID)
-							pvs.EXPECT().CreatePostgresRotatingSecret(&preview_secret_service.CreatePostgresRotatingSecretParams{
+							vs.EXPECT().CreatePostgresRotatingSecret(&secret_service.CreatePostgresRotatingSecretParams{
 								OrganizationID: testProfile(t).OrganizationID,
 								ProjectID:      testProfile(t).ProjectID,
 								AppName:        testProfile(t).VaultSecrets.AppName,
-								Body: &preview_models.SecretServiceCreatePostgresRotatingSecretBody{
+								Body: &models.SecretServiceCreatePostgresRotatingSecretBody{
 									Name:               opts.SecretName,
 									IntegrationName:    "postgres-integration",
 									RotationPolicyName: "built-in:60-days-2-active",
-									PostgresParams:     &preview_models.Secrets20231128PostgresParams{Usernames: []string{"postgres_user_1", "postgres_user_2"}},
+									PostgresParams:     &models.Secrets20231128PostgresParams{Usernames: []string{"postgres_user_1", "postgres_user_2"}},
 								},
 								Context: opts.Ctx,
-							}, mock.Anything).Return(&preview_secret_service.CreatePostgresRotatingSecretOK{
-								Payload: &preview_models.Secrets20231128CreatePostgresRotatingSecretResponse{
-									Config: &preview_models.Secrets20231128PostgresRotatingSecretConfig{
+							}, mock.Anything).Return(&secret_service.CreatePostgresRotatingSecretOK{
+								Payload: &models.Secrets20231128CreatePostgresRotatingSecretResponse{
+									Config: &models.Secrets20231128PostgresRotatingSecretConfig{
 										AppName:            opts.AppName,
 										CreatedAt:          dt,
 										IntegrationName:    "postgres-integration",
 										RotationPolicyName: "built-in:60-days-2-active",
 										Name:               opts.SecretName,
-										PostgresParams:     &preview_models.Secrets20231128PostgresParams{Usernames: []string{"postgres_user_1", "postgres_user_2"}},
+										PostgresParams:     &models.Secrets20231128PostgresParams{Usernames: []string{"postgres_user_1", "postgres_user_2"}},
 									},
 								},
 							}, nil).Once()
@@ -407,25 +401,25 @@ details = {
 			} else if opts.Type == secretTypeDynamic {
 				if c.MockCalled {
 					if c.RespErr {
-						pvs.EXPECT().CreateAwsDynamicSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+						vs.EXPECT().CreateAwsDynamicSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 					} else {
-						pvs.EXPECT().CreateAwsDynamicSecret(&preview_secret_service.CreateAwsDynamicSecretParams{
+						vs.EXPECT().CreateAwsDynamicSecret(&secret_service.CreateAwsDynamicSecretParams{
 							OrganizationID: testProfile(t).OrganizationID,
 							ProjectID:      testProfile(t).ProjectID,
 							AppName:        testProfile(t).VaultSecrets.AppName,
-							Body: &preview_models.SecretServiceCreateAwsDynamicSecretBody{
+							Body: &models.SecretServiceCreateAwsDynamicSecretBody{
 								IntegrationName: "Aws-Int-12",
 								Name:            opts.SecretName,
 								DefaultTTL:      "3600s",
-								AssumeRole: &preview_models.Secrets20231128AssumeRoleRequest{
+								AssumeRole: &models.Secrets20231128AssumeRoleRequest{
 									RoleArn: "ra",
 								},
 							},
 							Context: opts.Ctx,
-						}, mock.Anything).Return(&preview_secret_service.CreateAwsDynamicSecretOK{
-							Payload: &preview_models.Secrets20231128CreateAwsDynamicSecretResponse{
-								Secret: &preview_models.Secrets20231128AwsDynamicSecret{
-									AssumeRole: &preview_models.Secrets20231128AssumeRoleResponse{
+						}, mock.Anything).Return(&secret_service.CreateAwsDynamicSecretOK{
+							Payload: &models.Secrets20231128CreateAwsDynamicSecretResponse{
+								Secret: &models.Secrets20231128AwsDynamicSecret{
+									AssumeRole: &models.Secrets20231128AssumeRoleResponse{
 										RoleArn: "ra",
 									},
 									DefaultTTL:      "3600s",

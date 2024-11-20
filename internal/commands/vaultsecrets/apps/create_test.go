@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
-	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -151,16 +151,16 @@ func TestCreateRun(t *testing.T) {
 				vs.EXPECT().CreateApp(mock.Anything, mock.Anything).Return(nil, errors.New("missing app name")).Once()
 			} else {
 				vs.EXPECT().CreateApp(&secret_service.CreateAppParams{
-					Context:                opts.Ctx,
-					LocationOrganizationID: "123",
-					LocationProjectID:      "abc",
-					Body: secret_service.CreateAppBody{
+					Context:        opts.Ctx,
+					OrganizationID: "123",
+					ProjectID:      "abc",
+					Body: &models.SecretServiceCreateAppBody{
 						Name:        opts.AppName,
 						Description: opts.Description,
 					},
 				}, nil).Return(&secret_service.CreateAppOK{
-					Payload: &models.Secrets20230613CreateAppResponse{
-						App: &models.Secrets20230613App{
+					Payload: &models.Secrets20231128CreateAppResponse{
+						App: &models.Secrets20231128App{
 							Name:        opts.AppName,
 							Description: opts.Description,
 						},

@@ -7,9 +7,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -24,19 +23,17 @@ type ListOpts struct {
 	Output  *format.Outputter
 	IO      iostreams.IOStreams
 
-	Type          IntegrationType
-	Client        secret_service.ClientService
-	PreviewClient preview_secret_service.ClientService
+	Type   IntegrationType
+	Client secret_service.ClientService
 }
 
 func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 	opts := &ListOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		IO:            ctx.IO,
-		Output:        ctx.Output,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
-		Client:        secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		IO:      ctx.IO,
+		Output:  ctx.Output,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -82,15 +79,15 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 
 func listRun(opts *ListOpts) error {
 	if opts.Type == "" {
-		var integrations []*preview_models.Secrets20231128Integration
-		params := &preview_secret_service.ListIntegrationsParams{
+		var integrations []*models.Secrets20231128Integration
+		params := &secret_service.ListIntegrationsParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
 			Capabilities:   []string{"ROTATION", "DYNAMIC"},
 		}
 		for {
-			resp, err := opts.PreviewClient.ListIntegrations(params, nil)
+			resp, err := opts.Client.ListIntegrations(params, nil)
 			if err != nil {
 				return fmt.Errorf("failed to list integrations: %w", err)
 			}
@@ -109,16 +106,16 @@ func listRun(opts *ListOpts) error {
 
 	switch opts.Type {
 	case Twilio:
-		var integrations []*preview_models.Secrets20231128TwilioIntegration
+		var integrations []*models.Secrets20231128TwilioIntegration
 
-		params := &preview_secret_service.ListTwilioIntegrationsParams{
+		params := &secret_service.ListTwilioIntegrationsParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
 		}
 
 		for {
-			resp, err := opts.PreviewClient.ListTwilioIntegrations(params, nil)
+			resp, err := opts.Client.ListTwilioIntegrations(params, nil)
 			if err != nil {
 				return fmt.Errorf("failed to list Twilio integrations: %w", err)
 			}
@@ -135,16 +132,16 @@ func listRun(opts *ListOpts) error {
 		return opts.Output.Display(newTwilioDisplayer(false, integrations...))
 
 	case MongoDBAtlas:
-		var integrations []*preview_models.Secrets20231128MongoDBAtlasIntegration
+		var integrations []*models.Secrets20231128MongoDBAtlasIntegration
 
-		params := &preview_secret_service.ListMongoDBAtlasIntegrationsParams{
+		params := &secret_service.ListMongoDBAtlasIntegrationsParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
 		}
 
 		for {
-			resp, err := opts.PreviewClient.ListMongoDBAtlasIntegrations(params, nil)
+			resp, err := opts.Client.ListMongoDBAtlasIntegrations(params, nil)
 			if err != nil {
 				return fmt.Errorf("failed to list MongoDB Atlas integrations: %w", err)
 			}
@@ -161,16 +158,16 @@ func listRun(opts *ListOpts) error {
 		return opts.Output.Display(newMongoDBDisplayer(false, integrations...))
 
 	case AWS:
-		var integrations []*preview_models.Secrets20231128AwsIntegration
+		var integrations []*models.Secrets20231128AwsIntegration
 
-		params := &preview_secret_service.ListAwsIntegrationsParams{
+		params := &secret_service.ListAwsIntegrationsParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
 		}
 
 		for {
-			resp, err := opts.PreviewClient.ListAwsIntegrations(params, nil)
+			resp, err := opts.Client.ListAwsIntegrations(params, nil)
 			if err != nil {
 				return fmt.Errorf("failed to list AWS integrations: %w", err)
 			}
@@ -187,16 +184,16 @@ func listRun(opts *ListOpts) error {
 		return opts.Output.Display(newAwsDisplayer(false, false, integrations...))
 
 	case GCP:
-		var integrations []*preview_models.Secrets20231128GcpIntegration
+		var integrations []*models.Secrets20231128GcpIntegration
 
-		params := &preview_secret_service.ListGcpIntegrationsParams{
+		params := &secret_service.ListGcpIntegrationsParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
 		}
 
 		for {
-			resp, err := opts.PreviewClient.ListGcpIntegrations(params, nil)
+			resp, err := opts.Client.ListGcpIntegrations(params, nil)
 			if err != nil {
 				return fmt.Errorf("failed to list GCP integrations: %w", err)
 			}
@@ -213,16 +210,16 @@ func listRun(opts *ListOpts) error {
 		return opts.Output.Display(newGcpDisplayer(false, false, integrations...))
 
 	case Postgres:
-		var integrations []*preview_models.Secrets20231128PostgresIntegration
+		var integrations []*models.Secrets20231128PostgresIntegration
 
-		params := &preview_secret_service.ListPostgresIntegrationsParams{
+		params := &secret_service.ListPostgresIntegrationsParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
 		}
 
 		for {
-			resp, err := opts.PreviewClient.ListPostgresIntegrations(params, nil)
+			resp, err := opts.Client.ListPostgresIntegrations(params, nil)
 			if err != nil {
 				return fmt.Errorf("failed to list Postgres integrations: %w", err)
 			}

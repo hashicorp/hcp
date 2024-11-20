@@ -7,8 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/helper"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -24,20 +23,18 @@ type RotateOpts struct {
 	Output  *format.Outputter
 	IO      iostreams.IOStreams
 
-	AppName       string
-	SecretName    string
-	Client        secret_service.ClientService
-	PreviewClient preview_secret_service.ClientService
+	AppName    string
+	SecretName string
+	Client     secret_service.ClientService
 }
 
 func NewCmdRotate(ctx *cmd.Context, runF func(*RotateOpts) error) *cmd.Command {
 	opts := &RotateOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		IO:            ctx.IO,
-		Output:        ctx.Output,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
-		Client:        secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		IO:      ctx.IO,
+		Output:  ctx.Output,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -78,13 +75,13 @@ func NewCmdRotate(ctx *cmd.Context, runF func(*RotateOpts) error) *cmd.Command {
 			return rotateRun(opts)
 		},
 	}
-	cmd.Args.Autocomplete = helper.PredictSecretName(ctx, cmd, opts.PreviewClient)
+	cmd.Args.Autocomplete = helper.PredictSecretName(ctx, cmd, opts.Client)
 
 	return cmd
 }
 
 func rotateRun(opts *RotateOpts) error {
-	params := &preview_secret_service.RotateSecretParams{
+	params := &secret_service.RotateSecretParams{
 		Context:        opts.Ctx,
 		OrganizationID: opts.Profile.OrganizationID,
 		ProjectID:      opts.Profile.ProjectID,
@@ -92,7 +89,7 @@ func rotateRun(opts *RotateOpts) error {
 		Name:           opts.SecretName,
 	}
 
-	_, err := opts.PreviewClient.RotateSecret(params, nil)
+	_, err := opts.Client.RotateSecret(params, nil)
 	if err != nil {
 		return fmt.Errorf("failed to rotate the secret %q: %w", opts.SecretName, err)
 	}

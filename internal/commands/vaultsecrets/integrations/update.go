@@ -9,13 +9,12 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/hcl/v2/hclsimple"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
@@ -29,7 +28,6 @@ type UpdateOpts struct {
 
 	IntegrationName string
 	ConfigFilePath  string
-	PreviewClient   preview_secret_service.ClientService
 	Client          secret_service.ClientService
 }
 
@@ -40,8 +38,7 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 		IO:      ctx.IO,
 		Output:  ctx.Output,
 
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
-		Client:        secret_service.New(ctx.HCP, nil),
+		Client: secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -111,12 +108,12 @@ func updateRun(opts *UpdateOpts) error {
 
 	switch config.Type {
 	case Twilio:
-		req := preview_secret_service.NewUpdateTwilioIntegrationParamsWithContext(opts.Ctx)
+		req := secret_service.NewUpdateTwilioIntegrationParamsWithContext(opts.Ctx)
 		req.OrganizationID = opts.Profile.OrganizationID
 		req.ProjectID = opts.Profile.ProjectID
 		req.Name = opts.IntegrationName
 
-		var twilioBody preview_models.SecretServiceUpdateTwilioIntegrationBody
+		var twilioBody models.SecretServiceUpdateTwilioIntegrationBody
 		detailBytes, err := json.Marshal(internalConfig.Details)
 		if err != nil {
 			return fmt.Errorf("error marshaling details config: %w", err)
@@ -128,18 +125,18 @@ func updateRun(opts *UpdateOpts) error {
 		}
 		req.Body = &twilioBody
 
-		_, err = opts.PreviewClient.UpdateTwilioIntegration(req, nil)
+		_, err = opts.Client.UpdateTwilioIntegration(req, nil)
 		if err != nil {
 			return fmt.Errorf("failed to update Twilio integration: %w", err)
 		}
 
 	case MongoDBAtlas:
-		req := preview_secret_service.NewUpdateMongoDBAtlasIntegrationParamsWithContext(opts.Ctx)
+		req := secret_service.NewUpdateMongoDBAtlasIntegrationParamsWithContext(opts.Ctx)
 		req.OrganizationID = opts.Profile.OrganizationID
 		req.ProjectID = opts.Profile.ProjectID
 		req.Name = opts.IntegrationName
 
-		var mongoDBBody preview_models.SecretServiceUpdateMongoDBAtlasIntegrationBody
+		var mongoDBBody models.SecretServiceUpdateMongoDBAtlasIntegrationBody
 		detailBytes, err := json.Marshal(internalConfig.Details)
 		if err != nil {
 			return fmt.Errorf("error marshaling details config: %w", err)
@@ -151,18 +148,18 @@ func updateRun(opts *UpdateOpts) error {
 		}
 		req.Body = &mongoDBBody
 
-		_, err = opts.PreviewClient.UpdateMongoDBAtlasIntegration(req, nil)
+		_, err = opts.Client.UpdateMongoDBAtlasIntegration(req, nil)
 		if err != nil {
 			return fmt.Errorf("failed to update MongoDB Atlas integration: %w", err)
 		}
 
 	case AWS:
-		req := preview_secret_service.NewUpdateAwsIntegrationParamsWithContext(opts.Ctx)
+		req := secret_service.NewUpdateAwsIntegrationParamsWithContext(opts.Ctx)
 		req.OrganizationID = opts.Profile.OrganizationID
 		req.ProjectID = opts.Profile.ProjectID
 		req.Name = opts.IntegrationName
 
-		var awsBody preview_models.SecretServiceUpdateAwsIntegrationBody
+		var awsBody models.SecretServiceUpdateAwsIntegrationBody
 		detailBytes, err := json.Marshal(internalConfig.Details)
 		if err != nil {
 			return fmt.Errorf("error marshaling details config: %w", err)
@@ -174,18 +171,18 @@ func updateRun(opts *UpdateOpts) error {
 		}
 		req.Body = &awsBody
 
-		_, err = opts.PreviewClient.UpdateAwsIntegration(req, nil)
+		_, err = opts.Client.UpdateAwsIntegration(req, nil)
 		if err != nil {
 			return fmt.Errorf("failed to update AWS integration: %w", err)
 		}
 
 	case GCP:
-		req := preview_secret_service.NewUpdateGcpIntegrationParamsWithContext(opts.Ctx)
+		req := secret_service.NewUpdateGcpIntegrationParamsWithContext(opts.Ctx)
 		req.OrganizationID = opts.Profile.OrganizationID
 		req.ProjectID = opts.Profile.ProjectID
 		req.Name = opts.IntegrationName
 
-		var gcpBody preview_models.SecretServiceUpdateGcpIntegrationBody
+		var gcpBody models.SecretServiceUpdateGcpIntegrationBody
 		detailBytes, err := json.Marshal(internalConfig.Details)
 		if err != nil {
 			return fmt.Errorf("error marshaling details config: %w", err)
@@ -197,18 +194,18 @@ func updateRun(opts *UpdateOpts) error {
 		}
 		req.Body = &gcpBody
 
-		_, err = opts.PreviewClient.UpdateGcpIntegration(req, nil)
+		_, err = opts.Client.UpdateGcpIntegration(req, nil)
 		if err != nil {
 			return fmt.Errorf("failed to update GCP integration: %w", err)
 		}
 
 	case Postgres:
-		req := preview_secret_service.NewUpdatePostgresIntegrationParamsWithContext(opts.Ctx)
+		req := secret_service.NewUpdatePostgresIntegrationParamsWithContext(opts.Ctx)
 		req.OrganizationID = opts.Profile.OrganizationID
 		req.ProjectID = opts.Profile.ProjectID
 		req.Name = opts.IntegrationName
 
-		var body preview_models.SecretServiceUpdatePostgresIntegrationBody
+		var body models.SecretServiceUpdatePostgresIntegrationBody
 		detailBytes, err := json.Marshal(internalConfig.Details)
 		if err != nil {
 			return fmt.Errorf("error marshaling details config: %w", err)
@@ -220,7 +217,7 @@ func updateRun(opts *UpdateOpts) error {
 		}
 		req.Body = &body
 
-		_, err = opts.PreviewClient.UpdatePostgresIntegration(req, nil)
+		_, err = opts.Client.UpdatePostgresIntegration(req, nil)
 		if err != nil {
 			return fmt.Errorf("failed to update MongoDB Atlas integration: %w", err)
 		}

@@ -12,9 +12,9 @@ import (
 	"github.com/go-openapi/runtime/client"
 	"github.com/stretchr/testify/require"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
-	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -111,13 +111,13 @@ func TestReadRun(t *testing.T) {
 			r := require.New(t)
 
 			io := iostreams.Test()
-			vs := mock_preview_secret_service.NewMockClientService(t)
+			vs := mock_secret_service.NewMockClientService(t)
 
 			opts := &ReadOpts{
 				Ctx:             context.Background(),
 				Profile:         profile.TestProfile(t).SetOrgID("123").SetProjectID("abc"),
 				IO:              io,
-				PreviewClient:   vs,
+				Client:          vs,
 				Output:          format.New(io),
 				IntegrationName: c.IntegrationName,
 				Type:            c.Type,
@@ -126,16 +126,16 @@ func TestReadRun(t *testing.T) {
 			if c.ErrMsg != "" {
 				vs.EXPECT().GetTwilioIntegration(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 			} else {
-				vs.EXPECT().GetTwilioIntegration(&preview_secret_service.GetTwilioIntegrationParams{
+				vs.EXPECT().GetTwilioIntegration(&secret_service.GetTwilioIntegrationParams{
 					OrganizationID: "123",
 					ProjectID:      "abc",
 					Name:           opts.IntegrationName,
 					Context:        opts.Ctx,
-				}, nil).Return(&preview_secret_service.GetTwilioIntegrationOK{
-					Payload: &preview_models.Secrets20231128GetTwilioIntegrationResponse{
-						Integration: &preview_models.Secrets20231128TwilioIntegration{
+				}, nil).Return(&secret_service.GetTwilioIntegrationOK{
+					Payload: &models.Secrets20231128GetTwilioIntegrationResponse{
+						Integration: &models.Secrets20231128TwilioIntegration{
 							Name: opts.IntegrationName,
-							StaticCredentialDetails: &preview_models.Secrets20231128TwilioStaticCredentialsResponse{
+							StaticCredentialDetails: &models.Secrets20231128TwilioStaticCredentialsResponse{
 								AccountSid: "account_sid",
 								APIKeySid:  "api_key_sid",
 							},

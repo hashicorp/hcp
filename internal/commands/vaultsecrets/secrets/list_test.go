@@ -14,9 +14,9 @@ import (
 	"github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
-	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -124,42 +124,42 @@ func TestListRun(t *testing.T) {
 
 			io := iostreams.Test()
 			io.ErrorTTY = true
-			vs := mock_preview_secret_service.NewMockClientService(t)
+			vs := mock_secret_service.NewMockClientService(t)
 			opts := &ListOpts{
-				Ctx:           context.Background(),
-				IO:            io,
-				Profile:       testProfile(t),
-				Output:        format.New(io),
-				PreviewClient: vs,
-				AppName:       testProfile(t).VaultSecrets.AppName,
+				Ctx:     context.Background(),
+				IO:      io,
+				Profile: testProfile(t),
+				Output:  format.New(io),
+				Client:  vs,
+				AppName: testProfile(t).VaultSecrets.AppName,
 			}
 
 			if c.RespErr {
 				vs.EXPECT().ListAppSecrets(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 			} else {
 				paginationNextPageToken := "next_page_token"
-				vs.EXPECT().ListAppSecrets(&preview_secret_service.ListAppSecretsParams{
+				vs.EXPECT().ListAppSecrets(&secret_service.ListAppSecretsParams{
 					OrganizationID: testProfile(t).OrganizationID,
 					ProjectID:      testProfile(t).ProjectID,
 					AppName:        testProfile(t).VaultSecrets.AppName,
 					Context:        opts.Ctx,
-				}, mock.Anything).Return(&preview_secret_service.ListAppSecretsOK{
-					Payload: &preview_models.Secrets20231128ListAppSecretsResponse{
+				}, mock.Anything).Return(&secret_service.ListAppSecretsOK{
+					Payload: &models.Secrets20231128ListAppSecretsResponse{
 						Secrets: getMockSecrets(0, 10),
-						Pagination: &preview_models.CommonPaginationResponse{
+						Pagination: &models.CommonPaginationResponse{
 							NextPageToken: paginationNextPageToken,
 						},
 					},
 				}, nil).Once()
 
-				vs.EXPECT().ListAppSecrets(&preview_secret_service.ListAppSecretsParams{
+				vs.EXPECT().ListAppSecrets(&secret_service.ListAppSecretsParams{
 					OrganizationID:          testProfile(t).OrganizationID,
 					ProjectID:               testProfile(t).ProjectID,
 					AppName:                 testProfile(t).VaultSecrets.AppName,
 					Context:                 opts.Ctx,
 					PaginationNextPageToken: &paginationNextPageToken,
-				}, mock.Anything).Return(&preview_secret_service.ListAppSecretsOK{
-					Payload: &preview_models.Secrets20231128ListAppSecretsResponse{
+				}, mock.Anything).Return(&secret_service.ListAppSecretsOK{
+					Payload: &models.Secrets20231128ListAppSecretsResponse{
 						Secrets: getMockSecrets(10, 5),
 					},
 				}, nil).Once()
@@ -178,10 +178,10 @@ func TestListRun(t *testing.T) {
 	}
 }
 
-func getMockSecrets(start, limit int) []*preview_models.Secrets20231128Secret {
-	var secrets []*preview_models.Secrets20231128Secret
+func getMockSecrets(start, limit int) []*models.Secrets20231128Secret {
+	var secrets []*models.Secrets20231128Secret
 	for i := start; i < (start + limit); i++ {
-		secrets = append(secrets, &preview_models.Secrets20231128Secret{
+		secrets = append(secrets, &models.Secrets20231128Secret{
 			Name:          fmt.Sprint("test_secret_", i),
 			LatestVersion: int64(rand.Intn(5)),
 			CreatedAt:     strfmt.DateTime(time.Now()),

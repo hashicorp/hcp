@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
-	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -155,16 +155,16 @@ func TestUpdateRun(t *testing.T) {
 				vs.EXPECT().UpdateApp(mock.Anything, mock.Anything).Return(nil, errors.New(c.Error)).Once()
 			} else {
 				vs.EXPECT().UpdateApp(&secret_service.UpdateAppParams{
-					Context:                opts.Ctx,
-					LocationOrganizationID: "123",
-					LocationProjectID:      "abc",
-					Name:                   opts.AppName,
-					Body: secret_service.UpdateAppBody{
+					Context:        opts.Ctx,
+					OrganizationID: "123",
+					ProjectID:      "abc",
+					Name:           opts.AppName,
+					Body: &models.SecretServiceUpdateAppBody{
 						Description: opts.Description,
 					},
 				}, nil).Return(&secret_service.UpdateAppOK{
-					Payload: &models.Secrets20230613UpdateAppResponse{
-						App: &models.Secrets20230613App{
+					Payload: &models.Secrets20231128UpdateAppResponse{
+						App: &models.Secrets20231128App{
 							Name:        opts.AppName,
 							Description: opts.Description,
 						},

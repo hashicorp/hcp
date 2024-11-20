@@ -7,7 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -22,16 +22,16 @@ type DeleteOpts struct {
 	IO      iostreams.IOStreams
 
 	GatewayPoolName string
-	PreviewClient   preview_secret_service.ClientService
+	Client          secret_service.ClientService
 }
 
 func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 	opts := &DeleteOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		Output:        ctx.Output,
-		IO:            ctx.IO,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		Output:  ctx.Output,
+		IO:      ctx.IO,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -65,13 +65,13 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 			return deleteRun(opts)
 		},
 	}
-	cmd.Args.Autocomplete = PredictGatewayPoolName(ctx, cmd, preview_secret_service.New(ctx.HCP, nil))
+	cmd.Args.Autocomplete = PredictGatewayPoolName(ctx, cmd, secret_service.New(ctx.HCP, nil))
 
 	return cmd
 }
 
 func deleteRun(opts *DeleteOpts) error {
-	_, err := opts.PreviewClient.DeleteGatewayPool(&preview_secret_service.DeleteGatewayPoolParams{
+	_, err := opts.Client.DeleteGatewayPool(&secret_service.DeleteGatewayPoolParams{
 		Context:         opts.Ctx,
 		OrganizationID:  opts.Profile.OrganizationID,
 		ProjectID:       opts.Profile.ProjectID,

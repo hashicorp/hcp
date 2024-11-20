@@ -7,7 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -21,16 +21,16 @@ type ListOpts struct {
 	Output  *format.Outputter
 	IO      iostreams.IOStreams
 
-	PreviewClient preview_secret_service.ClientService
+	Client secret_service.ClientService
 }
 
 func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 	opts := &ListOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		IO:            ctx.IO,
-		Output:        ctx.Output,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		IO:      ctx.IO,
+		Output:  ctx.Output,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -79,13 +79,13 @@ func listFields() []format.Field {
 }
 
 func listRun(opts *ListOpts) error {
-	params := &preview_secret_service.ListGatewayPoolsParams{
+	params := &secret_service.ListGatewayPoolsParams{
 		Context:        opts.Ctx,
 		ProjectID:      opts.Profile.ProjectID,
 		OrganizationID: opts.Profile.OrganizationID,
 	}
 
-	resp, err := opts.PreviewClient.ListGatewayPools(params, nil)
+	resp, err := opts.Client.ListGatewayPools(params, nil)
 	if err != nil {
 		return fmt.Errorf("failed to list gateway pools: %w", err)
 	}

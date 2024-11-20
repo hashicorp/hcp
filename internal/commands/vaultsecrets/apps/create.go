@@ -7,8 +7,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -23,20 +24,18 @@ type CreateOpts struct {
 	Output  *format.Outputter
 	IO      iostreams.IOStreams
 
-	AppName       string
-	Description   string
-	Client        secret_service.ClientService
-	PreviewClient preview_secret_service.ClientService
+	AppName     string
+	Description string
+	Client      secret_service.ClientService
 }
 
 func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 	opts := &CreateOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		Output:        ctx.Output,
-		IO:            ctx.IO,
-		Client:        secret_service.New(ctx.HCP, nil),
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		Output:  ctx.Output,
+		IO:      ctx.IO,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -88,10 +87,10 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 
 func createRun(opts *CreateOpts) error {
 	resp, err := opts.Client.CreateApp(&secret_service.CreateAppParams{
-		Context:                opts.Ctx,
-		LocationProjectID:      opts.Profile.ProjectID,
-		LocationOrganizationID: opts.Profile.OrganizationID,
-		Body: secret_service.CreateAppBody{
+		Context:        opts.Ctx,
+		ProjectID:      opts.Profile.ProjectID,
+		OrganizationID: opts.Profile.OrganizationID,
+		Body: &models.SecretServiceCreateAppBody{
 			Name:        opts.AppName,
 			Description: opts.Description,
 		},

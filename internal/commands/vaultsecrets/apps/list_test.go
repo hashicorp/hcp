@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
-	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -95,40 +95,40 @@ func TestListRun(t *testing.T) {
 
 			io := iostreams.Test()
 			io.ErrorTTY = true
-			vs := mock_preview_secret_service.NewMockClientService(t)
+			vs := mock_secret_service.NewMockClientService(t)
 
 			opts := &ListOpts{
-				Ctx:           context.Background(),
-				IO:            io,
-				Profile:       profile.TestProfile(t).SetOrgID("123").SetProjectID("abc"),
-				Output:        format.New(io),
-				PreviewClient: vs,
+				Ctx:     context.Background(),
+				IO:      io,
+				Profile: profile.TestProfile(t).SetOrgID("123").SetProjectID("abc"),
+				Output:  format.New(io),
+				Client:  vs,
 			}
 
 			if c.ErrMsg != "" {
 				vs.EXPECT().ListApps(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 			} else {
 				paginationNextPageToken := "token"
-				vs.EXPECT().ListApps(&preview_secret_service.ListAppsParams{
+				vs.EXPECT().ListApps(&secret_service.ListAppsParams{
 					OrganizationID: "123",
 					ProjectID:      "abc",
 					Context:        opts.Ctx,
-				}, mock.Anything).Return(&preview_secret_service.ListAppsOK{
-					Payload: &preview_models.Secrets20231128ListAppsResponse{
+				}, mock.Anything).Return(&secret_service.ListAppsOK{
+					Payload: &models.Secrets20231128ListAppsResponse{
 						Apps: getMockApps(0, 10),
-						Pagination: &preview_models.CommonPaginationResponse{
+						Pagination: &models.CommonPaginationResponse{
 							NextPageToken: paginationNextPageToken,
 						},
 					},
 				}, nil).Once()
 
-				vs.EXPECT().ListApps(&preview_secret_service.ListAppsParams{
+				vs.EXPECT().ListApps(&secret_service.ListAppsParams{
 					OrganizationID:          "123",
 					ProjectID:               "abc",
 					Context:                 opts.Ctx,
 					PaginationNextPageToken: &paginationNextPageToken,
-				}, mock.Anything).Return(&preview_secret_service.ListAppsOK{
-					Payload: &preview_models.Secrets20231128ListAppsResponse{
+				}, mock.Anything).Return(&secret_service.ListAppsOK{
+					Payload: &models.Secrets20231128ListAppsResponse{
 						Apps: getMockApps(10, 5),
 					},
 				}, nil).Once()
@@ -147,10 +147,10 @@ func TestListRun(t *testing.T) {
 	}
 }
 
-func getMockApps(start, limit int) []*preview_models.Secrets20231128App {
-	var secrets []*preview_models.Secrets20231128App
+func getMockApps(start, limit int) []*models.Secrets20231128App {
+	var secrets []*models.Secrets20231128App
 	for i := start; i < (start + limit); i++ {
-		secrets = append(secrets, &preview_models.Secrets20231128App{
+		secrets = append(secrets, &models.Secrets20231128App{
 			Name:        fmt.Sprint("test_app_", i),
 			Description: fmt.Sprint("test_description_", i),
 		})

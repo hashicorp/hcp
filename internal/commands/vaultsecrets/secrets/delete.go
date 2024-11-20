@@ -7,8 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/helper"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -20,12 +19,11 @@ import (
 
 func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 	opts := &DeleteOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		IO:            ctx.IO,
-		Output:        ctx.Output,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
-		Client:        secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		IO:      ctx.IO,
+		Output:  ctx.Output,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -65,7 +63,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 			return deleteRun(opts)
 		},
 	}
-	cmd.Args.Autocomplete = helper.PredictSecretName(ctx, cmd, opts.PreviewClient)
+	cmd.Args.Autocomplete = helper.PredictSecretName(ctx, cmd, opts.Client)
 
 	return cmd
 }
@@ -76,16 +74,15 @@ type DeleteOpts struct {
 	IO      iostreams.IOStreams
 	Output  *format.Outputter
 
-	AppName       string
-	SecretName    string
-	PreviewClient preview_secret_service.ClientService
-	Client        secret_service.ClientService
+	AppName    string
+	SecretName string
+	Client     secret_service.ClientService
 }
 
 func deleteRun(opts *DeleteOpts) error {
 	req := secret_service.NewDeleteAppSecretParamsWithContext(opts.Ctx)
-	req.LocationOrganizationID = opts.Profile.OrganizationID
-	req.LocationProjectID = opts.Profile.ProjectID
+	req.OrganizationID = opts.Profile.OrganizationID
+	req.ProjectID = opts.Profile.ProjectID
 	req.AppName = opts.AppName
 	req.SecretName = opts.SecretName
 

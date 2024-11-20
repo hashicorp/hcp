@@ -7,8 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/helper"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -20,12 +19,11 @@ import (
 
 func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 	opts := &ReadOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		IO:            ctx.IO,
-		Output:        ctx.Output,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
-		Client:        secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		IO:      ctx.IO,
+		Output:  ctx.Output,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -66,7 +64,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 			return readRun(opts)
 		},
 	}
-	cmd.Args.Autocomplete = helper.PredictSecretName(ctx, cmd, opts.PreviewClient)
+	cmd.Args.Autocomplete = helper.PredictSecretName(ctx, cmd, opts.Client)
 
 	return cmd
 }
@@ -77,24 +75,23 @@ type ReadOpts struct {
 	IO      iostreams.IOStreams
 	Output  *format.Outputter
 
-	AppName       string
-	SecretName    string
-	PreviewClient preview_secret_service.ClientService
-	Client        secret_service.ClientService
+	AppName    string
+	SecretName string
+	Client     secret_service.ClientService
 }
 
 func readRun(opts *ReadOpts) error {
-	req := preview_secret_service.NewGetAppSecretParamsWithContext(opts.Ctx)
+	req := secret_service.NewGetAppSecretParamsWithContext(opts.Ctx)
 	req.OrganizationID = opts.Profile.OrganizationID
 	req.ProjectID = opts.Profile.ProjectID
 	req.AppName = opts.AppName
 	req.SecretName = opts.SecretName
 
-	resp, err := opts.PreviewClient.GetAppSecret(req, nil)
+	resp, err := opts.Client.GetAppSecret(req, nil)
 	if err != nil {
 		return fmt.Errorf("failed to read the secret %q: %w", opts.SecretName, err)
 	}
 
-	displayer := newDisplayer().PreviewSecrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty)
+	displayer := newDisplayer().Secrets(resp.Payload.Secret).SetDefaultFormat(format.Pretty)
 	return opts.Output.Display(displayer)
 }

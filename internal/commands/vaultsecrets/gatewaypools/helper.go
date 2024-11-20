@@ -7,14 +7,14 @@ import (
 	"context"
 	"fmt"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/posener/complete"
 )
 
 // PredictGatewayPoolName returns a predict function for gateway pools names.
-func PredictGatewayPoolName(ctx *cmd.Context, c *cmd.Command, client preview_secret_service.ClientService) complete.PredictFunc {
+func PredictGatewayPoolName(ctx *cmd.Context, c *cmd.Command, client secret_service.ClientService) complete.PredictFunc {
 	return func(args complete.Args) []string {
 		// Parse the args
 		remainingArgs, err := ctx.ParseFlags(c, args.All)
@@ -40,8 +40,8 @@ func PredictGatewayPoolName(ctx *cmd.Context, c *cmd.Command, client preview_sec
 	}
 }
 
-func listGatewayPools(ctx context.Context, orgID, projectID string, client preview_secret_service.ClientService) ([]*preview_models.Secrets20231128GatewayPool, error) {
-	req := preview_secret_service.NewListGatewayPoolsParamsWithContext(ctx)
+func listGatewayPools(ctx context.Context, orgID, projectID string, client secret_service.ClientService) ([]*models.Secrets20231128GatewayPool, error) {
+	req := secret_service.NewListGatewayPoolsParamsWithContext(ctx)
 	req.OrganizationID = orgID
 	req.ProjectID = projectID
 

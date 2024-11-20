@@ -12,8 +12,8 @@ import (
 	"github.com/go-openapi/runtime/client"
 	"github.com/stretchr/testify/require"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
-	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -117,13 +117,13 @@ func TestDeleteRun(t *testing.T) {
 			r := require.New(t)
 
 			io := iostreams.Test()
-			vs := mock_preview_secret_service.NewMockClientService(t)
+			vs := mock_secret_service.NewMockClientService(t)
 
 			opts := &DeleteOpts{
 				Ctx:             context.Background(),
 				Profile:         profile.TestProfile(t).SetOrgID("123").SetProjectID("abc"),
 				IO:              io,
-				PreviewClient:   vs,
+				Client:          vs,
 				Output:          format.New(io),
 				IntegrationName: c.IntegrationName,
 				Type:            c.Type,
@@ -132,12 +132,12 @@ func TestDeleteRun(t *testing.T) {
 			if c.ErrMsg != "" {
 				vs.EXPECT().DeleteTwilioIntegration(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 			} else {
-				vs.EXPECT().DeleteTwilioIntegration(&preview_secret_service.DeleteTwilioIntegrationParams{
+				vs.EXPECT().DeleteTwilioIntegration(&secret_service.DeleteTwilioIntegrationParams{
 					OrganizationID: "123",
 					ProjectID:      "abc",
 					Name:           opts.IntegrationName,
 					Context:        opts.Ctx,
-				}, nil).Return(&preview_secret_service.DeleteTwilioIntegrationOK{}, nil).Once()
+				}, nil).Return(&secret_service.DeleteTwilioIntegrationOK{}, nil).Once()
 			}
 
 			// Run the command

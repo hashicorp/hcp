@@ -4,7 +4,7 @@
 package secrets
 
 import (
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/apps/helper"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/versions"
@@ -39,7 +39,7 @@ func NewCmdSecrets(ctx *cmd.Context) *cmd.Command {
 	// Autocomplete the persistent flag.
 	for _, f := range cmd.Flags.Persistent {
 		if f.Name == "app" {
-			f.Autocomplete = helper.PredictAppName(ctx, cmd, preview_secret_service.New(ctx.HCP, nil))
+			f.Autocomplete = helper.PredictAppName(ctx, cmd, secret_service.New(ctx.HCP, nil))
 		}
 	}
 
