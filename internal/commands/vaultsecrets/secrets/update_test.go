@@ -14,10 +14,10 @@ import (
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
 
 	"github.com/go-openapi/strfmt"
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/go-openapi/runtime/client"
@@ -316,7 +316,7 @@ details = {
 										CreatedAt:          dt,
 										IntegrationName:    "mongo-db-integration",
 										RotationPolicyName: "built-in:60-days-2-active",
-										SecretName:         opts.SecretName,
+										Name:               opts.SecretName,
 									},
 								},
 							}, nil).Once()

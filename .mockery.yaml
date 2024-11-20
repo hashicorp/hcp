@@ -25,7 +25,7 @@ packages:
   github.com/hashicorp/hcp/internal/pkg/api/releasesapi/client:
     config:
       dir: "internal/pkg/api/releasesapi/mocks"
-  github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client:
+  github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client:
     config:
       dir: "internal/pkg/api/mocks/{{.PackagePath}}"
       outpkg: "mock_{{.PackageName}}"
