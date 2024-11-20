@@ -334,7 +334,7 @@ details = {
 									RotateOnUpdate:     true,
 									RotationPolicyName: "built-in:60-days-2-active",
 									PostgresParams: &preview_models.Secrets20231128PostgresParams{
-										Usernames: []string{"postgres_user_1"},
+										Usernames: []string{"postgres_user_1", "postgres_user_2"},
 									},
 								},
 								Context: opts.Ctx,
@@ -346,6 +346,9 @@ details = {
 										IntegrationName:    "postgres-integration",
 										RotationPolicyName: "built-in:60-days-2-active",
 										Name:               opts.SecretName,
+										PostgresParams: &preview_models.Secrets20231128PostgresParams{
+											Usernames: []string{"postgres_user_1", "postgres_user_2"},
+										},
 									},
 								},
 							}, nil).Once()

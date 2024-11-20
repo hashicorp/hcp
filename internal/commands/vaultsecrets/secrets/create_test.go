@@ -222,7 +222,7 @@ details = {
   integration_name = "postgres-integration"
   rotation_policy_name = "built-in:60-days-2-active"
   postgres_params = {
-  	usernames = ["postgres_user_1"]
+  	usernames = ["postgres_user_1", "postgres_user_2"]
   }
 }`),
 		},
@@ -386,7 +386,7 @@ details = {
 									Name:               opts.SecretName,
 									IntegrationName:    "postgres-integration",
 									RotationPolicyName: "built-in:60-days-2-active",
-									PostgresParams:     &preview_models.Secrets20231128PostgresParams{Usernames: []string{"postgres_user_1"}},
+									PostgresParams:     &preview_models.Secrets20231128PostgresParams{Usernames: []string{"postgres_user_1", "postgres_user_2"}},
 								},
 								Context: opts.Ctx,
 							}, mock.Anything).Return(&preview_secret_service.CreatePostgresRotatingSecretOK{
@@ -397,7 +397,7 @@ details = {
 										IntegrationName:    "postgres-integration",
 										RotationPolicyName: "built-in:60-days-2-active",
 										Name:               opts.SecretName,
-										PostgresParams:     &preview_models.Secrets20231128PostgresParams{Usernames: []string{"postgres_user_1"}},
+										PostgresParams:     &preview_models.Secrets20231128PostgresParams{Usernames: []string{"postgres_user_1", "postgres_user_2"}},
 									},
 								},
 							}, nil).Once()
