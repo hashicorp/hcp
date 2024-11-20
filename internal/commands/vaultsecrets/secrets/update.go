@@ -235,6 +235,31 @@ func updateRun(opts *UpdateOpts) error {
 			if err != nil {
 				return fmt.Errorf("failed to update secret with name %q: %w", opts.SecretName, err)
 			}
+
+		case integrations.Postgres:
+			req := preview_secret_service.NewUpdatePostgresRotatingSecretParamsWithContext(opts.Ctx)
+			req.OrganizationID = opts.Profile.OrganizationID
+			req.ProjectID = opts.Profile.ProjectID
+			req.AppName = opts.AppName
+			req.Name = opts.SecretName
+
+			var postgresBody preview_models.SecretServiceUpdatePostgresRotatingSecretBody
+			detailBytes, err := json.Marshal(internalConfig.Details)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
+			}
+
+			err = postgresBody.UnmarshalBinary(detailBytes)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling details config: %w", err)
+			}
+
+			req.Body = &postgresBody
+
+			_, err = opts.PreviewClient.UpdatePostgresRotatingSecret(req, nil)
+			if err != nil {
+				return fmt.Errorf("failed to update secret with name %q: %w", opts.SecretName, err)
+			}
 		}
 
 	case secretTypeDynamic:

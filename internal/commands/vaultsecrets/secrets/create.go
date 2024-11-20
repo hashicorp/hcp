@@ -186,6 +186,14 @@ var (
 		},
 	}
 
+	postgresRotatingSecretTemplate = map[string]any{
+		"integration_name":     "",
+		"rotation_policy_name": "",
+		"postgres_params": map[string]any{
+			"usernames": []string{},
+		},
+	}
+
 	awsDynamicSecretTemplate = map[string]any{
 		"integration_name": "",
 		"default_ttl":      "",
@@ -365,6 +373,31 @@ func createRun(opts *CreateOpts) error {
 				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 			}
 
+		case integrations.Postgres:
+			req := preview_secret_service.NewCreatePostgresRotatingSecretParamsWithContext(opts.Ctx)
+			req.OrganizationID = opts.Profile.OrganizationID
+			req.ProjectID = opts.Profile.ProjectID
+			req.AppName = opts.AppName
+
+			var postgresBody preview_models.SecretServiceCreatePostgresRotatingSecretBody
+			detailBytes, err := json.Marshal(internalConfig.Details)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
+			}
+
+			err = postgresBody.UnmarshalBinary(detailBytes)
+			if err != nil {
+				return fmt.Errorf("error marshaling details config: %w", err)
+			}
+
+			postgresBody.Name = opts.SecretName
+			req.Body = &postgresBody
+
+			_, err = opts.PreviewClient.CreatePostgresRotatingSecret(req, nil)
+			if err != nil {
+				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
+			}
+
 		default:
 			return fmt.Errorf("unsupported rotating secret provider type")
 		}
@@ -538,6 +571,7 @@ var availableRotatingSecretProviders = map[string]map[string]any{
 	string(integrations.MongoDBAtlas): mongoDBAtlasRotatingSecretTemplate,
 	string(integrations.AWS):          awsRotatingSecretTemplate,
 	string(integrations.GCP):          gcpRotatingSecretTemplate,
+	string(integrations.Postgres):     postgresRotatingSecretTemplate,
 }
 
 var availableDynamicSecretProviders = map[string]map[string]any{
