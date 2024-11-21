@@ -31,10 +31,3 @@ packages:
       outpkg: "mock_{{.PackageName}}"
       all: true
       recursive: true
-  github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client:
-    config:
-      dir: "internal/pkg/api/mocks/{{.PackagePath}}"
-      outpkg: "mock_{{.PackageName}}"
-      all: true
-      recursive: true
-
