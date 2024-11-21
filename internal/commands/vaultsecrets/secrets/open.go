@@ -11,8 +11,7 @@ import (
 	"os"
 	"strings"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/helper"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -25,12 +24,11 @@ import (
 
 func NewCmdOpen(ctx *cmd.Context, runF func(*OpenOpts) error) *cmd.Command {
 	opts := &OpenOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		IO:            ctx.IO,
-		Output:        ctx.Output,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
-		Client:        secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		IO:      ctx.IO,
+		Output:  ctx.Output,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -76,7 +74,7 @@ func NewCmdOpen(ctx *cmd.Context, runF func(*OpenOpts) error) *cmd.Command {
 			return openRun(opts)
 		},
 	}
-	cmd.Args.Autocomplete = helper.PredictSecretName(ctx, cmd, opts.PreviewClient)
+	cmd.Args.Autocomplete = helper.PredictSecretName(ctx, cmd, opts.Client)
 
 	return cmd
 }
@@ -90,7 +88,6 @@ type OpenOpts struct {
 	AppName        string
 	SecretName     string
 	OutputFilePath string
-	PreviewClient  preview_secret_service.ClientService
 	Client         secret_service.ClientService
 }
 
@@ -108,13 +105,13 @@ func openRun(opts *OpenOpts) (err error) {
 		}
 	}()
 
-	req := preview_secret_service.NewOpenAppSecretParamsWithContext(opts.Ctx)
+	req := secret_service.NewOpenAppSecretParamsWithContext(opts.Ctx)
 	req.OrganizationID = opts.Profile.OrganizationID
 	req.ProjectID = opts.Profile.ProjectID
 	req.AppName = opts.AppName
 	req.SecretName = opts.SecretName
 
-	resp, err := opts.PreviewClient.OpenAppSecret(req, nil)
+	resp, err := opts.Client.OpenAppSecret(req, nil)
 	if err != nil {
 		return fmt.Errorf("failed to read the secret %q: %w", opts.SecretName, err)
 	}

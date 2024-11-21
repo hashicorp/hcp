@@ -15,10 +15,10 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 
-	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -100,7 +100,7 @@ func TestRunRun(t *testing.T) {
 
 	cases := []struct {
 		Name            string
-		Secrets         []*preview_models.Secrets20231128OpenSecret
+		Secrets         []*models.Secrets20231128OpenSecret
 		RespErr         bool
 		ErrMsg          string
 		IOErrorContains string
@@ -115,20 +115,20 @@ func TestRunRun(t *testing.T) {
 		{
 			Name:    "Success",
 			RespErr: false,
-			Secrets: []*preview_models.Secrets20231128OpenSecret{
+			Secrets: []*models.Secrets20231128OpenSecret{
 				{
 					Name:          "static",
-					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
+					StaticVersion: &models.Secrets20231128OpenSecretStaticVersion{},
 				},
 				{
 					Name: "rotating",
-					RotatingVersion: &preview_models.Secrets20231128OpenSecretRotatingVersion{
+					RotatingVersion: &models.Secrets20231128OpenSecretRotatingVersion{
 						Values: map[string]string{"sub_key": "value"},
 					},
 				},
 				{
 					Name: "dynamic",
-					DynamicInstance: &preview_models.Secrets20231128OpenSecretDynamicInstance{
+					DynamicInstance: &models.Secrets20231128OpenSecretDynamicInstance{
 						Values: map[string]string{"sub_key": "value"},
 					},
 				},
@@ -139,20 +139,20 @@ func TestRunRun(t *testing.T) {
 			RespErr:         false,
 			ErrMsg:          "multiple secrets map to the same environment variable",
 			IOErrorContains: "ERROR: \"static_collision\" [static], \"static\" [rotating] map to the same environment variable \"STATIC_COLLISION\"",
-			Secrets: []*preview_models.Secrets20231128OpenSecret{
+			Secrets: []*models.Secrets20231128OpenSecret{
 				{
 					Name:          "static_collision",
 					Type:          "static",
 					LatestVersion: 1,
 					CreatedAt:     strfmt.DateTime(time.Now()),
-					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
+					StaticVersion: &models.Secrets20231128OpenSecretStaticVersion{},
 				},
 				{
 					Name:          "static",
 					Type:          "rotating",
 					LatestVersion: 1,
 					CreatedAt:     strfmt.DateTime(time.Now()),
-					RotatingVersion: &preview_models.Secrets20231128OpenSecretRotatingVersion{
+					RotatingVersion: &models.Secrets20231128OpenSecretRotatingVersion{
 						Values: map[string]string{"collision": ""},
 					},
 				},
@@ -162,22 +162,22 @@ func TestRunRun(t *testing.T) {
 			Name:          "Paginated",
 			PaginatedResp: true,
 			RespErr:       false,
-			Secrets: []*preview_models.Secrets20231128OpenSecret{
+			Secrets: []*models.Secrets20231128OpenSecret{
 				{
 					Name:          "static_1",
-					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
+					StaticVersion: &models.Secrets20231128OpenSecretStaticVersion{},
 				},
 				{
 					Name:          "static_2",
-					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
+					StaticVersion: &models.Secrets20231128OpenSecretStaticVersion{},
 				},
 				{
 					Name:          "static_3",
-					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
+					StaticVersion: &models.Secrets20231128OpenSecretStaticVersion{},
 				},
 				{
 					Name:          "static_4",
-					StaticVersion: &preview_models.Secrets20231128OpenSecretStaticVersion{},
+					StaticVersion: &models.Secrets20231128OpenSecretStaticVersion{},
 				},
 			},
 		},
@@ -191,15 +191,15 @@ func TestRunRun(t *testing.T) {
 
 			io := iostreams.Test()
 			io.ErrorTTY = true
-			vs := mock_preview_secret_service.NewMockClientService(t)
+			vs := mock_secret_service.NewMockClientService(t)
 			opts := &RunOpts{
-				Ctx:           context.Background(),
-				IO:            io,
-				Profile:       testProfile(t),
-				Output:        format.New(io),
-				PreviewClient: vs,
-				AppName:       testProfile(t).VaultSecrets.AppName,
-				Command:       []string{"echo \"Testing\""},
+				Ctx:     context.Background(),
+				IO:      io,
+				Profile: testProfile(t),
+				Output:  format.New(io),
+				Client:  vs,
+				AppName: testProfile(t).VaultSecrets.AppName,
+				Command: []string{"echo \"Testing\""},
 			}
 
 			if c.RespErr {
@@ -209,15 +209,15 @@ func TestRunRun(t *testing.T) {
 
 				// expect first request to be missing the page token
 				// provide half the secrets and a NextPageToken
-				vs.EXPECT().OpenAppSecrets(&preview_secret_service.OpenAppSecretsParams{
+				vs.EXPECT().OpenAppSecrets(&secret_service.OpenAppSecretsParams{
 					OrganizationID: testProfile(t).OrganizationID,
 					ProjectID:      testProfile(t).ProjectID,
 					AppName:        testProfile(t).VaultSecrets.AppName,
 					Context:        opts.Ctx,
-				}, mock.Anything).Return(&preview_secret_service.OpenAppSecretsOK{
-					Payload: &preview_models.Secrets20231128OpenAppSecretsResponse{
+				}, mock.Anything).Return(&secret_service.OpenAppSecretsOK{
+					Payload: &models.Secrets20231128OpenAppSecretsResponse{
 						Secrets: c.Secrets[:len(c.Secrets)/2],
-						Pagination: &preview_models.CommonPaginationResponse{
+						Pagination: &models.CommonPaginationResponse{
 							NextPageToken: paginationNextPageToken,
 						},
 					},
@@ -225,25 +225,25 @@ func TestRunRun(t *testing.T) {
 
 				// expect second request to have a page token
 				// provide later half of the secrets
-				vs.EXPECT().OpenAppSecrets(&preview_secret_service.OpenAppSecretsParams{
+				vs.EXPECT().OpenAppSecrets(&secret_service.OpenAppSecretsParams{
 					OrganizationID:          testProfile(t).OrganizationID,
 					ProjectID:               testProfile(t).ProjectID,
 					AppName:                 testProfile(t).VaultSecrets.AppName,
 					Context:                 opts.Ctx,
 					PaginationNextPageToken: &paginationNextPageToken,
-				}, mock.Anything).Return(&preview_secret_service.OpenAppSecretsOK{
-					Payload: &preview_models.Secrets20231128OpenAppSecretsResponse{
+				}, mock.Anything).Return(&secret_service.OpenAppSecretsOK{
+					Payload: &models.Secrets20231128OpenAppSecretsResponse{
 						Secrets: c.Secrets[len(c.Secrets)/2:],
 					},
 				}, nil).Once()
 			} else {
-				vs.EXPECT().OpenAppSecrets(&preview_secret_service.OpenAppSecretsParams{
+				vs.EXPECT().OpenAppSecrets(&secret_service.OpenAppSecretsParams{
 					OrganizationID: testProfile(t).OrganizationID,
 					ProjectID:      testProfile(t).ProjectID,
 					AppName:        testProfile(t).VaultSecrets.AppName,
 					Context:        opts.Ctx,
-				}, nil).Return(&preview_secret_service.OpenAppSecretsOK{
-					Payload: &preview_models.Secrets20231128OpenAppSecretsResponse{
+				}, nil).Return(&secret_service.OpenAppSecretsOK{
+					Payload: &models.Secrets20231128OpenAppSecretsResponse{
 						Secrets: c.Secrets,
 					},
 				}, nil).Once()

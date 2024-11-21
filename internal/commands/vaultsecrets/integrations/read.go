@@ -7,8 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -26,17 +25,15 @@ type ReadOpts struct {
 	IntegrationName string
 	Type            IntegrationType
 	Client          secret_service.ClientService
-	PreviewClient   preview_secret_service.ClientService
 }
 
 func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 	opts := &ReadOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		Output:        ctx.Output,
-		IO:            ctx.IO,
-		Client:        secret_service.New(ctx.HCP, nil),
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		Output:  ctx.Output,
+		IO:      ctx.IO,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -87,7 +84,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 func readRun(opts *ReadOpts) error {
 	switch opts.Type {
 	case "":
-		resp, err := opts.PreviewClient.GetIntegration(&preview_secret_service.GetIntegrationParams{
+		resp, err := opts.Client.GetIntegration(&secret_service.GetIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
@@ -100,7 +97,7 @@ func readRun(opts *ReadOpts) error {
 		return opts.Output.Display(newGenericDisplayer(true, resp.Payload.Integration))
 
 	case Twilio:
-		resp, err := opts.PreviewClient.GetTwilioIntegration(&preview_secret_service.GetTwilioIntegrationParams{
+		resp, err := opts.Client.GetTwilioIntegration(&secret_service.GetTwilioIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
@@ -113,7 +110,7 @@ func readRun(opts *ReadOpts) error {
 		return opts.Output.Display(newTwilioDisplayer(true, resp.Payload.Integration))
 
 	case MongoDBAtlas:
-		resp, err := opts.PreviewClient.GetMongoDBAtlasIntegration(&preview_secret_service.GetMongoDBAtlasIntegrationParams{
+		resp, err := opts.Client.GetMongoDBAtlasIntegration(&secret_service.GetMongoDBAtlasIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
@@ -126,7 +123,7 @@ func readRun(opts *ReadOpts) error {
 		return opts.Output.Display(newMongoDBDisplayer(true, resp.Payload.Integration))
 
 	case AWS:
-		resp, err := opts.PreviewClient.GetAwsIntegration(&preview_secret_service.GetAwsIntegrationParams{
+		resp, err := opts.Client.GetAwsIntegration(&secret_service.GetAwsIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
@@ -139,7 +136,7 @@ func readRun(opts *ReadOpts) error {
 		return opts.Output.Display(newAwsDisplayer(true, resp.Payload.Integration.FederatedWorkloadIdentity != nil, resp.Payload.Integration))
 
 	case GCP:
-		resp, err := opts.PreviewClient.GetGcpIntegration(&preview_secret_service.GetGcpIntegrationParams{
+		resp, err := opts.Client.GetGcpIntegration(&secret_service.GetGcpIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
@@ -152,7 +149,7 @@ func readRun(opts *ReadOpts) error {
 		return opts.Output.Display(newGcpDisplayer(true, resp.Payload.Integration.FederatedWorkloadIdentity != nil, resp.Payload.Integration))
 
 	case Postgres:
-		resp, err := opts.PreviewClient.GetPostgresIntegration(&preview_secret_service.GetPostgresIntegrationParams{
+		resp, err := opts.Client.GetPostgresIntegration(&secret_service.GetPostgresIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,

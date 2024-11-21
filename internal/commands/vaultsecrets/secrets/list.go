@@ -7,9 +7,8 @@ import (
 	"context"
 	"fmt"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -21,12 +20,11 @@ import (
 
 func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 	opts := &ListOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		IO:            ctx.IO,
-		Output:        ctx.Output,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
-		Client:        secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		IO:      ctx.IO,
+		Output:  ctx.Output,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -70,20 +68,19 @@ type ListOpts struct {
 	IO      iostreams.IOStreams
 	Output  *format.Outputter
 
-	AppName       string
-	PreviewClient preview_secret_service.ClientService
-	Client        secret_service.ClientService
+	AppName string
+	Client  secret_service.ClientService
 }
 
 func listRun(opts *ListOpts) error {
-	req := preview_secret_service.NewListAppSecretsParamsWithContext(opts.Ctx)
+	req := secret_service.NewListAppSecretsParamsWithContext(opts.Ctx)
 	req.OrganizationID = opts.Profile.OrganizationID
 	req.ProjectID = opts.Profile.ProjectID
 	req.AppName = opts.AppName
 
 	var secrets []*models.Secrets20231128Secret
 	for {
-		resp, err := opts.PreviewClient.ListAppSecrets(req, nil)
+		resp, err := opts.Client.ListAppSecrets(req, nil)
 		if err != nil {
 			return fmt.Errorf("failed to list secrets: %w", err)
 		}
@@ -96,5 +93,5 @@ func listRun(opts *ListOpts) error {
 		next := resp.Payload.Pagination.NextPageToken
 		req.PaginationNextPageToken = &next
 	}
-	return opts.Output.Display(newDisplayer().PreviewSecrets(secrets...))
+	return opts.Output.Display(newDisplayer().Secrets(secrets...))
 }

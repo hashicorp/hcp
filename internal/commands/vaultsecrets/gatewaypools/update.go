@@ -7,8 +7,8 @@ import (
 	"context"
 	"fmt"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -25,16 +25,16 @@ type UpdateOpts struct {
 
 	GatewayPoolName string
 	Description     string
-	PreviewClient   preview_secret_service.ClientService
+	Client          secret_service.ClientService
 }
 
 func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 	opts := &UpdateOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		Output:        ctx.Output,
-		IO:            ctx.IO,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		Output:  ctx.Output,
+		IO:      ctx.IO,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -87,7 +87,7 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 }
 
 func updateRun(opts *UpdateOpts) error {
-	_, err := opts.PreviewClient.UpdateGatewayPool(&preview_secret_service.UpdateGatewayPoolParams{
+	_, err := opts.Client.UpdateGatewayPool(&secret_service.UpdateGatewayPoolParams{
 		Context:         opts.Ctx,
 		OrganizationID:  opts.Profile.OrganizationID,
 		ProjectID:       opts.Profile.ProjectID,

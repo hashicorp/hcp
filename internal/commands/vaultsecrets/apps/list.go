@@ -7,9 +7,8 @@ import (
 	"context"
 	"fmt"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -23,18 +22,16 @@ type ListOpts struct {
 	Output  *format.Outputter
 	IO      iostreams.IOStreams
 
-	Client        secret_service.ClientService
-	PreviewClient preview_secret_service.ClientService
+	Client secret_service.ClientService
 }
 
 func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 	opts := &ListOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		IO:            ctx.IO,
-		Output:        ctx.Output,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
-		Client:        secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		IO:      ctx.IO,
+		Output:  ctx.Output,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -62,7 +59,7 @@ func NewCmdList(ctx *cmd.Context, runF func(*ListOpts) error) *cmd.Command {
 }
 
 func listRun(opts *ListOpts) error {
-	params := &preview_secret_service.ListAppsParams{
+	params := &secret_service.ListAppsParams{
 		Context:        opts.Ctx,
 		ProjectID:      opts.Profile.ProjectID,
 		OrganizationID: opts.Profile.OrganizationID,
@@ -70,7 +67,7 @@ func listRun(opts *ListOpts) error {
 
 	var apps []*models.Secrets20231128App
 	for {
-		resp, err := opts.PreviewClient.ListApps(params, nil)
+		resp, err := opts.Client.ListApps(params, nil)
 
 		if err != nil {
 			return fmt.Errorf("failed to list apps: %w", err)
@@ -84,5 +81,5 @@ func listRun(opts *ListOpts) error {
 		next := resp.Payload.Pagination.NextPageToken
 		params.PaginationNextPageToken = &next
 	}
-	return opts.Output.Display(newDisplayerPreview(false, apps...))
+	return opts.Output.Display(newDisplayer(false, apps...))
 }

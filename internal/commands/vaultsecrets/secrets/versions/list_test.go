@@ -14,9 +14,9 @@ import (
 	"github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -141,45 +141,45 @@ func TestListRun(t *testing.T) {
 
 			io := iostreams.Test()
 			io.ErrorTTY = true
-			vs := mock_preview_secret_service.NewMockClientService(t)
+			vs := mock_secret_service.NewMockClientService(t)
 			opts := &ListOpts{
-				Ctx:           context.Background(),
-				IO:            io,
-				Profile:       testProfile(t),
-				Output:        format.New(io),
-				PreviewClient: vs,
-				AppName:       testProfile(t).VaultSecrets.AppName,
-				SecretName:    testSecretName,
+				Ctx:        context.Background(),
+				IO:         io,
+				Profile:    testProfile(t),
+				Output:     format.New(io),
+				Client:     vs,
+				AppName:    testProfile(t).VaultSecrets.AppName,
+				SecretName: testSecretName,
 			}
 
 			if c.RespErr {
 				vs.EXPECT().ListAppSecretVersions(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 			} else {
 				paginationNextPageToken := "next_page_token"
-				vs.EXPECT().ListAppSecretVersions(&preview_secret_service.ListAppSecretVersionsParams{
+				vs.EXPECT().ListAppSecretVersions(&secret_service.ListAppSecretVersionsParams{
 					OrganizationID: testProfile(t).OrganizationID,
 					ProjectID:      testProfile(t).ProjectID,
 					AppName:        testProfile(t).VaultSecrets.AppName,
 					SecretName:     testSecretName,
 					Context:        opts.Ctx,
-				}, mock.Anything).Return(&preview_secret_service.ListAppSecretVersionsOK{
-					Payload: &preview_models.Secrets20231128ListAppSecretVersionsResponse{
+				}, mock.Anything).Return(&secret_service.ListAppSecretVersionsOK{
+					Payload: &models.Secrets20231128ListAppSecretVersionsResponse{
 						StaticVersions: getMockSecretList(0, 10),
-						Pagination: &preview_models.CommonPaginationResponse{
+						Pagination: &models.CommonPaginationResponse{
 							NextPageToken: paginationNextPageToken,
 						},
 					},
 				}, nil).Once()
 
-				vs.EXPECT().ListAppSecretVersions(&preview_secret_service.ListAppSecretVersionsParams{
+				vs.EXPECT().ListAppSecretVersions(&secret_service.ListAppSecretVersionsParams{
 					OrganizationID:          testProfile(t).OrganizationID,
 					ProjectID:               testProfile(t).ProjectID,
 					AppName:                 testProfile(t).VaultSecrets.AppName,
 					SecretName:              testSecretName,
 					Context:                 opts.Ctx,
 					PaginationNextPageToken: &paginationNextPageToken,
-				}, mock.Anything).Return(&preview_secret_service.ListAppSecretVersionsOK{
-					Payload: &preview_models.Secrets20231128ListAppSecretVersionsResponse{
+				}, mock.Anything).Return(&secret_service.ListAppSecretVersionsOK{
+					Payload: &models.Secrets20231128ListAppSecretVersionsResponse{
 						StaticVersions: getMockSecretList(10, 5),
 					},
 				}, nil).Once()
@@ -198,20 +198,20 @@ func TestListRun(t *testing.T) {
 	}
 }
 
-func getMockSecretList(start, limit int) *preview_models.Secrets20231128SecretStaticVersionList {
-	var secrets []*preview_models.Secrets20231128SecretStaticVersion
+func getMockSecretList(start, limit int) *models.Secrets20231128SecretStaticVersionList {
+	var secrets []*models.Secrets20231128SecretStaticVersion
 	for i := start; i < (start + limit); i++ {
-		secrets = append(secrets, &preview_models.Secrets20231128SecretStaticVersion{
+		secrets = append(secrets, &models.Secrets20231128SecretStaticVersion{
 			Version:   int64(rand.Intn(5)),
 			CreatedAt: strfmt.DateTime(time.Now()),
-			CreatedBy: &preview_models.Secrets20231128Principal{
+			CreatedBy: &models.Secrets20231128Principal{
 				Email: fmt.Sprintf("test-user-%d@example.com", i),
 				Name:  fmt.Sprintf("test-user-%d", i),
 				Type:  "kv",
 			},
 		})
 	}
-	return &preview_models.Secrets20231128SecretStaticVersionList{
+	return &models.Secrets20231128SecretStaticVersionList{
 		Versions: secrets,
 	}
 }

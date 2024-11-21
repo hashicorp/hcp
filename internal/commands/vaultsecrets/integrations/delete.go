@@ -7,8 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -26,17 +25,15 @@ type DeleteOpts struct {
 	IntegrationName string
 	Type            IntegrationType
 	Client          secret_service.ClientService
-	PreviewClient   preview_secret_service.ClientService
 }
 
 func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 	opts := &DeleteOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		Output:        ctx.Output,
-		IO:            ctx.IO,
-		Client:        secret_service.New(ctx.HCP, nil),
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		Output:  ctx.Output,
+		IO:      ctx.IO,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -89,7 +86,7 @@ func NewCmdDelete(ctx *cmd.Context, runF func(*DeleteOpts) error) *cmd.Command {
 func deleteRun(opts *DeleteOpts) error {
 	switch opts.Type {
 	case Twilio:
-		_, err := opts.PreviewClient.DeleteTwilioIntegration(&preview_secret_service.DeleteTwilioIntegrationParams{
+		_, err := opts.Client.DeleteTwilioIntegration(&secret_service.DeleteTwilioIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
@@ -100,7 +97,7 @@ func deleteRun(opts *DeleteOpts) error {
 		}
 
 	case MongoDBAtlas:
-		_, err := opts.PreviewClient.DeleteMongoDBAtlasIntegration(&preview_secret_service.DeleteMongoDBAtlasIntegrationParams{
+		_, err := opts.Client.DeleteMongoDBAtlasIntegration(&secret_service.DeleteMongoDBAtlasIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
@@ -111,7 +108,7 @@ func deleteRun(opts *DeleteOpts) error {
 		}
 
 	case AWS:
-		_, err := opts.PreviewClient.DeleteAwsIntegration(&preview_secret_service.DeleteAwsIntegrationParams{
+		_, err := opts.Client.DeleteAwsIntegration(&secret_service.DeleteAwsIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
@@ -122,7 +119,7 @@ func deleteRun(opts *DeleteOpts) error {
 		}
 
 	case GCP:
-		_, err := opts.PreviewClient.DeleteGcpIntegration(&preview_secret_service.DeleteGcpIntegrationParams{
+		_, err := opts.Client.DeleteGcpIntegration(&secret_service.DeleteGcpIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
@@ -133,7 +130,7 @@ func deleteRun(opts *DeleteOpts) error {
 		}
 
 	case Postgres:
-		_, err := opts.PreviewClient.DeletePostgresIntegration(&preview_secret_service.DeletePostgresIntegrationParams{
+		_, err := opts.Client.DeletePostgresIntegration(&secret_service.DeletePostgresIntegrationParams{
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,

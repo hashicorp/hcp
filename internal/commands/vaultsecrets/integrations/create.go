@@ -14,9 +14,8 @@ import (
 	"golang.org/x/exp/maps"
 
 	"github.com/hashicorp/hcl/v2/hclsimple"
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -33,7 +32,6 @@ type CreateOpts struct {
 
 	IntegrationName string
 	ConfigFilePath  string
-	PreviewClient   preview_secret_service.ClientService
 	Client          secret_service.ClientService
 }
 
@@ -46,8 +44,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 		IO:      ctx.IO,
 		Output:  ctx.Output,
 
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
-		Client:        secret_service.New(ctx.HCP, nil),
+		Client: secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -162,11 +159,11 @@ func createRun(opts *CreateOpts) error {
 
 	switch config.Type {
 	case Twilio:
-		req := preview_secret_service.NewCreateTwilioIntegrationParamsWithContext(opts.Ctx)
+		req := secret_service.NewCreateTwilioIntegrationParamsWithContext(opts.Ctx)
 		req.OrganizationID = opts.Profile.OrganizationID
 		req.ProjectID = opts.Profile.ProjectID
 
-		var twilioBody preview_models.SecretServiceCreateTwilioIntegrationBody
+		var twilioBody models.SecretServiceCreateTwilioIntegrationBody
 		detailBytes, err := json.Marshal(internalConfig.Details)
 		if err != nil {
 			return fmt.Errorf("error marshaling details config: %w", err)
@@ -179,17 +176,17 @@ func createRun(opts *CreateOpts) error {
 		req.Body = &twilioBody
 		req.Body.Name = opts.IntegrationName
 
-		_, err = opts.PreviewClient.CreateTwilioIntegration(req, nil)
+		_, err = opts.Client.CreateTwilioIntegration(req, nil)
 		if err != nil {
 			return fmt.Errorf("failed to create Twilio integration: %w", err)
 		}
 
 	case MongoDBAtlas:
-		req := preview_secret_service.NewCreateMongoDBAtlasIntegrationParamsWithContext(opts.Ctx)
+		req := secret_service.NewCreateMongoDBAtlasIntegrationParamsWithContext(opts.Ctx)
 		req.OrganizationID = opts.Profile.OrganizationID
 		req.ProjectID = opts.Profile.ProjectID
 
-		var mongoDBBody preview_models.SecretServiceCreateMongoDBAtlasIntegrationBody
+		var mongoDBBody models.SecretServiceCreateMongoDBAtlasIntegrationBody
 		detailBytes, err := json.Marshal(internalConfig.Details)
 		if err != nil {
 			return fmt.Errorf("error marshaling details config: %w", err)
@@ -202,17 +199,17 @@ func createRun(opts *CreateOpts) error {
 		req.Body = &mongoDBBody
 		req.Body.Name = opts.IntegrationName
 
-		_, err = opts.PreviewClient.CreateMongoDBAtlasIntegration(req, nil)
+		_, err = opts.Client.CreateMongoDBAtlasIntegration(req, nil)
 		if err != nil {
 			return fmt.Errorf("failed to create MongoDB Atlas integration: %w", err)
 		}
 
 	case AWS:
-		req := preview_secret_service.NewCreateAwsIntegrationParamsWithContext(opts.Ctx)
+		req := secret_service.NewCreateAwsIntegrationParamsWithContext(opts.Ctx)
 		req.OrganizationID = opts.Profile.OrganizationID
 		req.ProjectID = opts.Profile.ProjectID
 
-		var awsBody preview_models.SecretServiceCreateAwsIntegrationBody
+		var awsBody models.SecretServiceCreateAwsIntegrationBody
 		detailBytes, err := json.Marshal(internalConfig.Details)
 		if err != nil {
 			return fmt.Errorf("error marshaling details config: %w", err)
@@ -225,17 +222,17 @@ func createRun(opts *CreateOpts) error {
 		req.Body = &awsBody
 		req.Body.Name = opts.IntegrationName
 
-		_, err = opts.PreviewClient.CreateAwsIntegration(req, nil)
+		_, err = opts.Client.CreateAwsIntegration(req, nil)
 		if err != nil {
 			return fmt.Errorf("failed to create AWS integration: %w", err)
 		}
 
 	case GCP:
-		req := preview_secret_service.NewCreateGcpIntegrationParamsWithContext(opts.Ctx)
+		req := secret_service.NewCreateGcpIntegrationParamsWithContext(opts.Ctx)
 		req.OrganizationID = opts.Profile.OrganizationID
 		req.ProjectID = opts.Profile.ProjectID
 
-		var gcpBody preview_models.SecretServiceCreateGcpIntegrationBody
+		var gcpBody models.SecretServiceCreateGcpIntegrationBody
 		detailBytes, err := json.Marshal(internalConfig.Details)
 		if err != nil {
 			return fmt.Errorf("error marshaling details config: %w", err)
@@ -248,13 +245,13 @@ func createRun(opts *CreateOpts) error {
 		req.Body = &gcpBody
 		req.Body.Name = opts.IntegrationName
 
-		_, err = opts.PreviewClient.CreateGcpIntegration(req, nil)
+		_, err = opts.Client.CreateGcpIntegration(req, nil)
 		if err != nil {
 			return fmt.Errorf("failed to create GCP integration: %w", err)
 		}
 
 	case Postgres:
-		req := preview_secret_service.NewCreatePostgresIntegrationParamsWithContext(opts.Ctx)
+		req := secret_service.NewCreatePostgresIntegrationParamsWithContext(opts.Ctx)
 		req.OrganizationID = opts.Profile.OrganizationID
 		req.ProjectID = opts.Profile.ProjectID
 
@@ -263,7 +260,7 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("error marshaling details config: %w", err)
 		}
 
-		var body preview_models.SecretServiceCreatePostgresIntegrationBody
+		var body models.SecretServiceCreatePostgresIntegrationBody
 		err = body.UnmarshalBinary(detailBytes)
 		if err != nil {
 			return fmt.Errorf("error marshaling details config: %w", err)
@@ -272,7 +269,7 @@ func createRun(opts *CreateOpts) error {
 		req.Body = &body
 		req.Body.Name = opts.IntegrationName
 
-		_, err = opts.PreviewClient.CreatePostgresIntegration(req, nil)
+		_, err = opts.Client.CreatePostgresIntegration(req, nil)
 		if err != nil {
 			return fmt.Errorf("failed to create MongoDB Atlas integration: %w", err)
 		}

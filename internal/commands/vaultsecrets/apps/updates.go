@@ -7,8 +7,9 @@ import (
 	"context"
 	"fmt"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -23,20 +24,18 @@ type UpdateOpts struct {
 	Output  *format.Outputter
 	IO      iostreams.IOStreams
 
-	AppName       string
-	Description   string
-	Client        secret_service.ClientService
-	PreviewClient preview_secret_service.ClientService
+	AppName     string
+	Description string
+	Client      secret_service.ClientService
 }
 
 func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 	opts := &UpdateOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		Output:        ctx.Output,
-		IO:            ctx.IO,
-		Client:        secret_service.New(ctx.HCP, nil),
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		Output:  ctx.Output,
+		IO:      ctx.IO,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -87,11 +86,11 @@ func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 
 func updateRun(opts *UpdateOpts) error {
 	_, err := opts.Client.UpdateApp(&secret_service.UpdateAppParams{
-		Context:                opts.Ctx,
-		LocationProjectID:      opts.Profile.ProjectID,
-		Name:                   opts.AppName,
-		LocationOrganizationID: opts.Profile.OrganizationID,
-		Body: secret_service.UpdateAppBody{
+		Context:        opts.Ctx,
+		ProjectID:      opts.Profile.ProjectID,
+		Name:           opts.AppName,
+		OrganizationID: opts.Profile.OrganizationID,
+		Body: &models.SecretServiceUpdateAppBody{
 			Description: opts.Description,
 		},
 	}, nil)

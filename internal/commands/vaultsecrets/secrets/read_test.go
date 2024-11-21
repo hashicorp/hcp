@@ -12,9 +12,9 @@ import (
 	"github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -144,30 +144,30 @@ func TestReadRun(t *testing.T) {
 
 			io := iostreams.Test()
 			io.ErrorTTY = true
-			vs := mock_preview_secret_service.NewMockClientService(t)
+			vs := mock_secret_service.NewMockClientService(t)
 			opts := &ReadOpts{
-				Ctx:           context.Background(),
-				IO:            io,
-				Profile:       testProfile(t),
-				Output:        format.New(io),
-				PreviewClient: vs,
-				AppName:       testProfile(t).VaultSecrets.AppName,
-				SecretName:    testSecretName,
+				Ctx:        context.Background(),
+				IO:         io,
+				Profile:    testProfile(t),
+				Output:     format.New(io),
+				Client:     vs,
+				AppName:    testProfile(t).VaultSecrets.AppName,
+				SecretName: testSecretName,
 			}
 
 			if c.MockCalled {
 				if c.RespErr {
 					vs.EXPECT().GetAppSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 				} else {
-					vs.EXPECT().GetAppSecret(&preview_secret_service.GetAppSecretParams{
+					vs.EXPECT().GetAppSecret(&secret_service.GetAppSecretParams{
 						OrganizationID: testProfile(t).OrganizationID,
 						ProjectID:      testProfile(t).ProjectID,
 						AppName:        testProfile(t).VaultSecrets.AppName,
 						SecretName:     opts.SecretName,
 						Context:        opts.Ctx,
-					}, mock.Anything).Return(&preview_secret_service.GetAppSecretOK{
-						Payload: &preview_models.Secrets20231128GetAppSecretResponse{
-							Secret: &preview_models.Secrets20231128Secret{
+					}, mock.Anything).Return(&secret_service.GetAppSecretOK{
+						Payload: &models.Secrets20231128GetAppSecretResponse{
+							Secret: &models.Secrets20231128Secret{
 								Name:          opts.SecretName,
 								LatestVersion: 2,
 								CreatedAt:     strfmt.DateTime(time.Now()),

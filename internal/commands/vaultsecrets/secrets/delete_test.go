@@ -11,8 +11,8 @@ import (
 
 	"github.com/go-openapi/runtime/client"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -145,11 +145,11 @@ func TestDeleteRun(t *testing.T) {
 				vs.EXPECT().DeleteAppSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 			} else {
 				vs.EXPECT().DeleteAppSecret(&secret_service.DeleteAppSecretParams{
-					LocationOrganizationID: testProfile(t).OrganizationID,
-					LocationProjectID:      testProfile(t).ProjectID,
-					AppName:                testProfile(t).VaultSecrets.AppName,
-					SecretName:             opts.SecretName,
-					Context:                opts.Ctx,
+					OrganizationID: testProfile(t).OrganizationID,
+					ProjectID:      testProfile(t).ProjectID,
+					AppName:        testProfile(t).VaultSecrets.AppName,
+					SecretName:     opts.SecretName,
+					Context:        opts.Ctx,
 				}, mock.Anything).Return(&secret_service.DeleteAppSecretOK{}, nil).Once()
 			}
 

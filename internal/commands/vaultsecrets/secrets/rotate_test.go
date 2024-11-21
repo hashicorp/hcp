@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -142,28 +142,28 @@ func TestRotateRun(t *testing.T) {
 
 			io := iostreams.Test()
 			io.ErrorTTY = true
-			vs := mock_preview_secret_service.NewMockClientService(t)
+			vs := mock_secret_service.NewMockClientService(t)
 			opts := &RotateOpts{
-				Ctx:           context.Background(),
-				IO:            io,
-				Profile:       testProfile(t),
-				Output:        format.New(io),
-				PreviewClient: vs,
-				AppName:       testProfile(t).VaultSecrets.AppName,
-				SecretName:    testSecretName,
+				Ctx:        context.Background(),
+				IO:         io,
+				Profile:    testProfile(t),
+				Output:     format.New(io),
+				Client:     vs,
+				AppName:    testProfile(t).VaultSecrets.AppName,
+				SecretName: testSecretName,
 			}
 
 			if c.MockCalled {
 				if c.RespErr {
 					vs.EXPECT().RotateSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 				} else {
-					vs.EXPECT().RotateSecret(&preview_secret_service.RotateSecretParams{
+					vs.EXPECT().RotateSecret(&secret_service.RotateSecretParams{
 						OrganizationID: testProfile(t).OrganizationID,
 						ProjectID:      testProfile(t).ProjectID,
 						AppName:        testProfile(t).VaultSecrets.AppName,
 						Name:           opts.SecretName,
 						Context:        opts.Ctx,
-					}, mock.Anything).Return(&preview_secret_service.RotateSecretOK{}, nil).Once()
+					}, mock.Anything).Return(&secret_service.RotateSecretOK{}, nil).Once()
 				}
 			}
 

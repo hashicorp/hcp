@@ -13,8 +13,8 @@ import (
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/hashicorp/hcp-sdk-go/auth"
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 	"github.com/hashicorp/hcp-sdk-go/config/files"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -39,16 +39,16 @@ type CreateOpts struct {
 	Description      string
 	OutDirPath       string
 	ShowClientSecret bool
-	PreviewClient    preview_secret_service.ClientService
+	Client           secret_service.ClientService
 }
 
 func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 	opts := &CreateOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		Output:        ctx.Output,
-		IO:            ctx.IO,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		Output:  ctx.Output,
+		IO:      ctx.IO,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -160,7 +160,7 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("failed to create the output directory: %w", err)
 		}
 	}
-	resp, err := opts.PreviewClient.CreateGatewayPool(&preview_secret_service.CreateGatewayPoolParams{
+	resp, err := opts.Client.CreateGatewayPool(&secret_service.CreateGatewayPoolParams{
 		Context:        opts.Ctx,
 		OrganizationID: opts.Profile.OrganizationID,
 		ProjectID:      opts.Profile.ProjectID,

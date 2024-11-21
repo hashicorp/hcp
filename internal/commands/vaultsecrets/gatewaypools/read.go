@@ -7,7 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -22,16 +22,16 @@ type ReadOpts struct {
 	IO      iostreams.IOStreams
 
 	GatewayPoolName string
-	PreviewClient   preview_secret_service.ClientService
+	Client          secret_service.ClientService
 }
 
 func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 	opts := &ReadOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		Output:        ctx.Output,
-		IO:            ctx.IO,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		Output:  ctx.Output,
+		IO:      ctx.IO,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -65,7 +65,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(*ReadOpts) error) *cmd.Command {
 			return readRun(opts)
 		},
 	}
-	cmd.Args.Autocomplete = PredictGatewayPoolName(ctx, cmd, preview_secret_service.New(ctx.HCP, nil))
+	cmd.Args.Autocomplete = PredictGatewayPoolName(ctx, cmd, secret_service.New(ctx.HCP, nil))
 
 	return cmd
 }
@@ -96,7 +96,7 @@ func readFields() []format.Field {
 }
 
 func readRun(opts *ReadOpts) error {
-	resp, err := opts.PreviewClient.GetGatewayPool(&preview_secret_service.GetGatewayPoolParams{
+	resp, err := opts.Client.GetGatewayPool(&secret_service.GetGatewayPoolParams{
 		Context:         opts.Ctx,
 		ProjectID:       opts.Profile.ProjectID,
 		OrganizationID:  opts.Profile.OrganizationID,
@@ -110,7 +110,7 @@ func readRun(opts *ReadOpts) error {
 		return fmt.Errorf("gateway pool not found")
 	}
 
-	integList, err := opts.PreviewClient.ListGatewayPoolIntegrations(&preview_secret_service.ListGatewayPoolIntegrationsParams{
+	integList, err := opts.Client.ListGatewayPoolIntegrations(&secret_service.ListGatewayPoolIntegrationsParams{
 		Context:         opts.Ctx,
 		ProjectID:       opts.Profile.ProjectID,
 		OrganizationID:  opts.Profile.OrganizationID,

@@ -7,15 +7,15 @@ import (
 	"context"
 	"fmt"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/posener/complete"
 )
 
 // PredictSecretName returns a predict function for secret names.
-func PredictSecretName(ctx *cmd.Context, c *cmd.Command, client preview_secret_service.ClientService) complete.PredictFunc {
+func PredictSecretName(ctx *cmd.Context, c *cmd.Command, client secret_service.ClientService) complete.PredictFunc {
 	return func(args complete.Args) []string {
 		// Parse the args
 		remainingArgs, err := ctx.ParseFlags(c, args.All)
@@ -46,13 +46,13 @@ func PredictSecretName(ctx *cmd.Context, c *cmd.Command, client preview_secret_s
 	}
 }
 
-func getSecrets(ctx context.Context, orgID, projectID, appName string, client preview_secret_service.ClientService) ([]*preview_models.Secrets20231128Secret, error) {
-	req := preview_secret_service.NewListAppSecretsParamsWithContext(ctx)
+func getSecrets(ctx context.Context, orgID, projectID, appName string, client secret_service.ClientService) ([]*models.Secrets20231128Secret, error) {
+	req := secret_service.NewListAppSecretsParamsWithContext(ctx)
 	req.OrganizationID = orgID
 	req.ProjectID = projectID
 	req.AppName = appName
 
-	var secrets []*preview_models.Secrets20231128Secret
+	var secrets []*models.Secrets20231128Secret
 	for {
 
 		resp, err := client.ListAppSecrets(req, nil)

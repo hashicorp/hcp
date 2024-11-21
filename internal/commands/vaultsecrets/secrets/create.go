@@ -19,9 +19,8 @@ import (
 	"golang.org/x/exp/maps"
 
 	"github.com/hashicorp/hcl/v2/hclsimple"
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -34,12 +33,11 @@ import (
 
 func NewCmdCreate(ctx *cmd.Context, runF func(*CreateOpts) error) *cmd.Command {
 	opts := &CreateOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		IO:            ctx.IO,
-		Output:        ctx.Output,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
-		Client:        secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		IO:      ctx.IO,
+		Output:  ctx.Output,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -130,7 +128,6 @@ type CreateOpts struct {
 	SecretValuePlaintext string
 	SecretFilePath       string
 	Type                 string
-	PreviewClient        preview_secret_service.ClientService
 	Client               secret_service.ClientService
 }
 
@@ -221,11 +218,11 @@ func createRun(opts *CreateOpts) error {
 		}
 
 		req := secret_service.NewCreateAppKVSecretParamsWithContext(opts.Ctx)
-		req.LocationOrganizationID = opts.Profile.OrganizationID
-		req.LocationProjectID = opts.Profile.ProjectID
+		req.OrganizationID = opts.Profile.OrganizationID
+		req.ProjectID = opts.Profile.ProjectID
 		req.AppName = opts.AppName
 
-		req.Body = secret_service.CreateAppKVSecretBody{
+		req.Body = &models.SecretServiceCreateAppKVSecretBody{
 			Name:  opts.SecretName,
 			Value: opts.SecretValuePlaintext,
 		}
@@ -265,12 +262,12 @@ func createRun(opts *CreateOpts) error {
 
 		switch config.Type {
 		case integrations.Twilio:
-			req := preview_secret_service.NewCreateTwilioRotatingSecretParamsWithContext(opts.Ctx)
+			req := secret_service.NewCreateTwilioRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 
-			var twilioBody preview_models.SecretServiceCreateTwilioRotatingSecretBody
+			var twilioBody models.SecretServiceCreateTwilioRotatingSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
@@ -284,7 +281,7 @@ func createRun(opts *CreateOpts) error {
 			twilioBody.Name = opts.SecretName
 			req.Body = &twilioBody
 
-			resp, err := opts.PreviewClient.CreateTwilioRotatingSecret(req, nil)
+			resp, err := opts.Client.CreateTwilioRotatingSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 			}
@@ -295,12 +292,12 @@ func createRun(opts *CreateOpts) error {
 
 		case integrations.MongoDBAtlas:
 
-			req := preview_secret_service.NewCreateMongoDBAtlasRotatingSecretParamsWithContext(opts.Ctx)
+			req := secret_service.NewCreateMongoDBAtlasRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 
-			var mongoDBBody preview_models.SecretServiceCreateMongoDBAtlasRotatingSecretBody
+			var mongoDBBody models.SecretServiceCreateMongoDBAtlasRotatingSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
@@ -314,7 +311,7 @@ func createRun(opts *CreateOpts) error {
 			mongoDBBody.Name = opts.SecretName
 			req.Body = &mongoDBBody
 
-			resp, err := opts.PreviewClient.CreateMongoDBAtlasRotatingSecret(req, nil)
+			resp, err := opts.Client.CreateMongoDBAtlasRotatingSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 			}
@@ -324,12 +321,12 @@ func createRun(opts *CreateOpts) error {
 			}
 
 		case integrations.AWS:
-			req := preview_secret_service.NewCreateAwsIAMUserAccessKeyRotatingSecretParamsWithContext(opts.Ctx)
+			req := secret_service.NewCreateAwsIAMUserAccessKeyRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 
-			var awsBody preview_models.SecretServiceCreateAwsIAMUserAccessKeyRotatingSecretBody
+			var awsBody models.SecretServiceCreateAwsIAMUserAccessKeyRotatingSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
@@ -343,18 +340,18 @@ func createRun(opts *CreateOpts) error {
 			awsBody.Name = opts.SecretName
 			req.Body = &awsBody
 
-			_, err = opts.PreviewClient.CreateAwsIAMUserAccessKeyRotatingSecret(req, nil)
+			_, err = opts.Client.CreateAwsIAMUserAccessKeyRotatingSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 			}
 
 		case integrations.GCP:
-			req := preview_secret_service.NewCreateGcpServiceAccountKeyRotatingSecretParamsWithContext(opts.Ctx)
+			req := secret_service.NewCreateGcpServiceAccountKeyRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 
-			var gcpBody preview_models.SecretServiceCreateGcpServiceAccountKeyRotatingSecretBody
+			var gcpBody models.SecretServiceCreateGcpServiceAccountKeyRotatingSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
@@ -368,18 +365,18 @@ func createRun(opts *CreateOpts) error {
 			gcpBody.Name = opts.SecretName
 			req.Body = &gcpBody
 
-			_, err = opts.PreviewClient.CreateGcpServiceAccountKeyRotatingSecret(req, nil)
+			_, err = opts.Client.CreateGcpServiceAccountKeyRotatingSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 			}
 
 		case integrations.Postgres:
-			req := preview_secret_service.NewCreatePostgresRotatingSecretParamsWithContext(opts.Ctx)
+			req := secret_service.NewCreatePostgresRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 
-			var postgresBody preview_models.SecretServiceCreatePostgresRotatingSecretBody
+			var postgresBody models.SecretServiceCreatePostgresRotatingSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
@@ -393,7 +390,7 @@ func createRun(opts *CreateOpts) error {
 			postgresBody.Name = opts.SecretName
 			req.Body = &postgresBody
 
-			_, err = opts.PreviewClient.CreatePostgresRotatingSecret(req, nil)
+			_, err = opts.Client.CreatePostgresRotatingSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 			}
@@ -429,12 +426,12 @@ func createRun(opts *CreateOpts) error {
 
 		switch config.Type {
 		case integrations.AWS:
-			req := preview_secret_service.NewCreateAwsDynamicSecretParamsWithContext(opts.Ctx)
+			req := secret_service.NewCreateAwsDynamicSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 
-			var awsBody preview_models.SecretServiceCreateAwsDynamicSecretBody
+			var awsBody models.SecretServiceCreateAwsDynamicSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
@@ -448,18 +445,18 @@ func createRun(opts *CreateOpts) error {
 			awsBody.Name = opts.SecretName
 			req.Body = &awsBody
 
-			_, err = opts.PreviewClient.CreateAwsDynamicSecret(req, nil)
+			_, err = opts.Client.CreateAwsDynamicSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 			}
 
 		case integrations.GCP:
-			req := preview_secret_service.NewCreateGcpDynamicSecretParamsWithContext(opts.Ctx)
+			req := secret_service.NewCreateGcpDynamicSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 
-			var gcpBody preview_models.SecretServiceCreateGcpDynamicSecretBody
+			var gcpBody models.SecretServiceCreateGcpDynamicSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
@@ -473,7 +470,7 @@ func createRun(opts *CreateOpts) error {
 			gcpBody.Name = opts.SecretName
 			req.Body = &gcpBody
 
-			_, err = opts.PreviewClient.CreateGcpDynamicSecret(req, nil)
+			_, err = opts.Client.CreateGcpDynamicSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to create secret with name %q: %w", opts.SecretName, err)
 			}

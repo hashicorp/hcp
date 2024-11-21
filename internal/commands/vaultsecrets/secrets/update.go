@@ -12,9 +12,8 @@ import (
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/hashicorp/hcl/v2/hclsimple"
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -36,18 +35,16 @@ type UpdateOpts struct {
 	SecretValuePlaintext string
 	SecretFilePath       string
 	Type                 string
-	PreviewClient        preview_secret_service.ClientService
 	Client               secret_service.ClientService
 }
 
 func NewCmdUpdate(ctx *cmd.Context, runF func(*UpdateOpts) error) *cmd.Command {
 	opts := &UpdateOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		IO:            ctx.IO,
-		Output:        ctx.Output,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
-		Client:        secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		IO:      ctx.IO,
+		Output:  ctx.Output,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -131,13 +128,13 @@ func updateRun(opts *UpdateOpts) error {
 
 		switch secretConfig.Type {
 		case integrations.Twilio:
-			req := preview_secret_service.NewUpdateTwilioRotatingSecretParamsWithContext(opts.Ctx)
+			req := secret_service.NewUpdateTwilioRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 			req.Name = opts.SecretName
 
-			var twilioBody preview_models.SecretServiceUpdateTwilioRotatingSecretBody
+			var twilioBody models.SecretServiceUpdateTwilioRotatingSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
@@ -149,7 +146,7 @@ func updateRun(opts *UpdateOpts) error {
 			}
 			req.Body = &twilioBody
 
-			resp, err := opts.PreviewClient.UpdateTwilioRotatingSecret(req, nil)
+			resp, err := opts.Client.UpdateTwilioRotatingSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to update secret with name %q: %w", opts.SecretName, err)
 			}
@@ -159,13 +156,13 @@ func updateRun(opts *UpdateOpts) error {
 			}
 
 		case integrations.MongoDBAtlas:
-			req := preview_secret_service.NewUpdateMongoDBAtlasRotatingSecretParamsWithContext(opts.Ctx)
+			req := secret_service.NewUpdateMongoDBAtlasRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 			req.Name = opts.SecretName
 
-			var mongoDBBody preview_models.SecretServiceUpdateMongoDBAtlasRotatingSecretBody
+			var mongoDBBody models.SecretServiceUpdateMongoDBAtlasRotatingSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
@@ -177,7 +174,7 @@ func updateRun(opts *UpdateOpts) error {
 			}
 			req.Body = &mongoDBBody
 
-			resp, err := opts.PreviewClient.UpdateMongoDBAtlasRotatingSecret(req, nil)
+			resp, err := opts.Client.UpdateMongoDBAtlasRotatingSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to update secret with name %q: %w", opts.SecretName, err)
 			}
@@ -187,13 +184,13 @@ func updateRun(opts *UpdateOpts) error {
 			}
 
 		case integrations.AWS:
-			req := preview_secret_service.NewUpdateAwsIAMUserAccessKeyRotatingSecretParamsWithContext(opts.Ctx)
+			req := secret_service.NewUpdateAwsIAMUserAccessKeyRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 			req.Name = opts.SecretName
 
-			var awsBody preview_models.SecretServiceUpdateAwsIAMUserAccessKeyRotatingSecretBody
+			var awsBody models.SecretServiceUpdateAwsIAMUserAccessKeyRotatingSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
@@ -206,19 +203,19 @@ func updateRun(opts *UpdateOpts) error {
 
 			req.Body = &awsBody
 
-			_, err = opts.PreviewClient.UpdateAwsIAMUserAccessKeyRotatingSecret(req, nil)
+			_, err = opts.Client.UpdateAwsIAMUserAccessKeyRotatingSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to update secret with name %q: %w", opts.SecretName, err)
 			}
 
 		case integrations.GCP:
-			req := preview_secret_service.NewUpdateGcpServiceAccountKeyRotatingSecretParamsWithContext(opts.Ctx)
+			req := secret_service.NewUpdateGcpServiceAccountKeyRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 			req.Name = opts.SecretName
 
-			var gcpBody preview_models.SecretServiceUpdateGcpServiceAccountKeyRotatingSecretBody
+			var gcpBody models.SecretServiceUpdateGcpServiceAccountKeyRotatingSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
@@ -231,19 +228,19 @@ func updateRun(opts *UpdateOpts) error {
 
 			req.Body = &gcpBody
 
-			_, err = opts.PreviewClient.UpdateGcpServiceAccountKeyRotatingSecret(req, nil)
+			_, err = opts.Client.UpdateGcpServiceAccountKeyRotatingSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to update secret with name %q: %w", opts.SecretName, err)
 			}
 
 		case integrations.Postgres:
-			req := preview_secret_service.NewUpdatePostgresRotatingSecretParamsWithContext(opts.Ctx)
+			req := secret_service.NewUpdatePostgresRotatingSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 			req.Name = opts.SecretName
 
-			var postgresBody preview_models.SecretServiceUpdatePostgresRotatingSecretBody
+			var postgresBody models.SecretServiceUpdatePostgresRotatingSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
@@ -256,7 +253,7 @@ func updateRun(opts *UpdateOpts) error {
 
 			req.Body = &postgresBody
 
-			_, err = opts.PreviewClient.UpdatePostgresRotatingSecret(req, nil)
+			_, err = opts.Client.UpdatePostgresRotatingSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to update secret with name %q: %w", opts.SecretName, err)
 			}
@@ -276,13 +273,13 @@ func updateRun(opts *UpdateOpts) error {
 
 		switch secretConfig.Type {
 		case integrations.AWS:
-			req := preview_secret_service.NewUpdateAwsDynamicSecretParamsWithContext(opts.Ctx)
+			req := secret_service.NewUpdateAwsDynamicSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 			req.Name = opts.SecretName
 
-			var awsBody preview_models.SecretServiceUpdateAwsDynamicSecretBody
+			var awsBody models.SecretServiceUpdateAwsDynamicSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
@@ -295,19 +292,19 @@ func updateRun(opts *UpdateOpts) error {
 
 			req.Body = &awsBody
 
-			_, err = opts.PreviewClient.UpdateAwsDynamicSecret(req, nil)
+			_, err = opts.Client.UpdateAwsDynamicSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to update secret with name %q: %w", opts.SecretName, err)
 			}
 
 		case integrations.GCP:
-			req := preview_secret_service.NewUpdateGcpDynamicSecretParamsWithContext(opts.Ctx)
+			req := secret_service.NewUpdateGcpDynamicSecretParamsWithContext(opts.Ctx)
 			req.OrganizationID = opts.Profile.OrganizationID
 			req.ProjectID = opts.Profile.ProjectID
 			req.AppName = opts.AppName
 			req.Name = opts.SecretName
 
-			var gcpBody preview_models.SecretServiceUpdateGcpDynamicSecretBody
+			var gcpBody models.SecretServiceUpdateGcpDynamicSecretBody
 			detailBytes, err := json.Marshal(internalConfig.Details)
 			if err != nil {
 				return fmt.Errorf("error marshaling details config: %w", err)
@@ -320,7 +317,7 @@ func updateRun(opts *UpdateOpts) error {
 
 			req.Body = &gcpBody
 
-			_, err = opts.PreviewClient.UpdateGcpDynamicSecret(req, nil)
+			_, err = opts.Client.UpdateGcpDynamicSecret(req, nil)
 			if err != nil {
 				return fmt.Errorf("failed to update secret with name %q: %w", opts.SecretName, err)
 			}

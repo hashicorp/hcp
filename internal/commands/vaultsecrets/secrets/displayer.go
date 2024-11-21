@@ -6,17 +6,15 @@ package secrets
 import (
 	"fmt"
 
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 )
 
 const multiValueSecretFmt = "{{ range $key, $value := %s }}{{printf \"%%s: %%s\\n\" $key $value}}{{ end }}"
 
 type displayer struct {
-	secrets              []*models.Secrets20230613Secret
-	previewSecrets       []*preview_models.Secrets20231128Secret
-	openAppSecrets       []*preview_models.Secrets20231128OpenSecret
+	secrets              []*models.Secrets20231128Secret
+	openAppSecrets       []*models.Secrets20231128OpenSecret
 	secretType           string
 	secretTypeFormatters map[string]secretTypeFormatter
 	fields               []format.Field
@@ -103,7 +101,7 @@ func newDisplayer() *displayer {
 	}
 }
 
-func (d *displayer) Secrets(secrets ...*models.Secrets20230613Secret) *displayer {
+func (d *displayer) Secrets(secrets ...*models.Secrets20231128Secret) *displayer {
 	d.secrets = secrets
 	if len(secrets) == 1 {
 		d.secretType = secretTypeKV
@@ -111,15 +109,7 @@ func (d *displayer) Secrets(secrets ...*models.Secrets20230613Secret) *displayer
 	return d
 }
 
-func (d *displayer) PreviewSecrets(secrets ...*preview_models.Secrets20231128Secret) *displayer {
-	d.previewSecrets = secrets
-	if len(secrets) == 1 {
-		d.secretType = secrets[0].Type
-	}
-	return d
-}
-
-func (d *displayer) OpenAppSecrets(secrets ...*preview_models.Secrets20231128OpenSecret) *displayer {
+func (d *displayer) OpenAppSecrets(secrets ...*models.Secrets20231128OpenSecret) *displayer {
 	d.openAppSecrets = secrets
 	if len(secrets) == 1 {
 		d.secretType = secrets[0].Type
@@ -147,10 +137,6 @@ func (d *displayer) DefaultFormat() format.Format {
 }
 
 func (d *displayer) Payload() any {
-	if d.previewSecrets != nil {
-		return d.previewSecretsPayload()
-	}
-
 	if d.openAppSecrets != nil {
 		return d.openAppSecretsPayload()
 	}
@@ -175,13 +161,6 @@ func (d *displayer) secretsFieldTemplate() []format.Field {
 		},
 	}
 
-	if len(d.previewSecrets) > 0 {
-		fields = append(fields, format.Field{
-			Name:        "Type",
-			ValueFormat: "{{ .Type }}",
-		})
-	}
-
 	fields = append(fields, []format.Field{
 		{
 			Name:        "Created At",
@@ -190,6 +169,10 @@ func (d *displayer) secretsFieldTemplate() []format.Field {
 		{
 			Name:        "Latest Version",
 			ValueFormat: "{{ if eq (printf \"%v\" .LatestVersion) \"0\" }}-{{ else }}{{ .LatestVersion }}{{ end }}",
+		},
+		{
+			Name:        "Type",
+			ValueFormat: "{{ .Type }}",
 		},
 	}...)
 
@@ -219,13 +202,6 @@ func (d *displayer) secretsPayload() any {
 	return d.secrets
 }
 
-func (d *displayer) previewSecretsPayload() any {
-	if len(d.previewSecrets) == 1 {
-		return d.previewSecrets[0]
-	}
-	return d.previewSecrets
-}
-
 func (d *displayer) openAppSecretsPayload() any {
 	if len(d.openAppSecrets) == 1 {
 		return d.openAppSecrets[0]
@@ -234,7 +210,7 @@ func (d *displayer) openAppSecretsPayload() any {
 }
 
 type rotatingSecretsDisplayer struct {
-	previewRotatingSecrets []*preview_models.Secrets20231128RotatingSecretConfig
+	previewRotatingSecrets []*models.Secrets20231128RotatingSecretConfig
 	single                 bool
 
 	format format.Format
@@ -247,7 +223,7 @@ func newRotatingSecretsDisplayer(single bool) *rotatingSecretsDisplayer {
 	}
 }
 
-func (r *rotatingSecretsDisplayer) PreviewRotatingSecrets(secrets ...*preview_models.Secrets20231128RotatingSecretConfig) *rotatingSecretsDisplayer {
+func (r *rotatingSecretsDisplayer) PreviewRotatingSecrets(secrets ...*models.Secrets20231128RotatingSecretConfig) *rotatingSecretsDisplayer {
 	r.previewRotatingSecrets = secrets
 	return r
 }

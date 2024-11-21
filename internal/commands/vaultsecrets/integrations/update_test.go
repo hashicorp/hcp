@@ -13,9 +13,9 @@ import (
 	"github.com/go-openapi/runtime/client"
 	"github.com/stretchr/testify/require"
 
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -138,45 +138,45 @@ details = {
 			r.NoError(err)
 
 			io := iostreams.Test()
-			vs := mock_preview_secret_service.NewMockClientService(t)
+			vs := mock_secret_service.NewMockClientService(t)
 
 			opts := &UpdateOpts{
 				Ctx:             context.Background(),
 				Profile:         profile.TestProfile(t).SetOrgID("123").SetProjectID("abc"),
 				IO:              io,
-				PreviewClient:   vs,
+				Client:          vs,
 				Output:          format.New(io),
 				IntegrationName: c.IntegrationName,
 				ConfigFilePath:  f.Name(),
 			}
 
 			if c.Error == "" {
-				vs.EXPECT().UpdateAwsIntegration(&preview_secret_service.UpdateAwsIntegrationParams{
+				vs.EXPECT().UpdateAwsIntegration(&secret_service.UpdateAwsIntegrationParams{
 					Context:        opts.Ctx,
 					OrganizationID: "123",
 					ProjectID:      "abc",
 					Name:           opts.IntegrationName,
-					Body: &preview_models.SecretServiceUpdateAwsIntegrationBody{
-						FederatedWorkloadIdentity: &preview_models.Secrets20231128AwsFederatedWorkloadIdentityRequest{
+					Body: &models.SecretServiceUpdateAwsIntegrationBody{
+						FederatedWorkloadIdentity: &models.Secrets20231128AwsFederatedWorkloadIdentityRequest{
 							Audience: "abc",
 							RoleArn:  "def",
 						},
-						Capabilities: []*preview_models.Secrets20231128Capability{
-							preview_models.Secrets20231128CapabilityROTATION.Pointer(),
-							preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
+						Capabilities: []*models.Secrets20231128Capability{
+							models.Secrets20231128CapabilityROTATION.Pointer(),
+							models.Secrets20231128CapabilityDYNAMIC.Pointer(),
 						},
 					},
-				}, nil).Return(&preview_secret_service.UpdateAwsIntegrationOK{
-					Payload: &preview_models.Secrets20231128UpdateAwsIntegrationResponse{
-						Integration: &preview_models.Secrets20231128AwsIntegration{
+				}, nil).Return(&secret_service.UpdateAwsIntegrationOK{
+					Payload: &models.Secrets20231128UpdateAwsIntegrationResponse{
+						Integration: &models.Secrets20231128AwsIntegration{
 							Name: opts.IntegrationName,
-							FederatedWorkloadIdentity: &preview_models.Secrets20231128AwsFederatedWorkloadIdentityResponse{
+							FederatedWorkloadIdentity: &models.Secrets20231128AwsFederatedWorkloadIdentityResponse{
 								Audience: "abc",
 								RoleArn:  "def",
 							},
-							Capabilities: []*preview_models.Secrets20231128Capability{
-								preview_models.Secrets20231128CapabilityROTATION.Pointer(),
-								preview_models.Secrets20231128CapabilityDYNAMIC.Pointer(),
+							Capabilities: []*models.Secrets20231128Capability{
+								models.Secrets20231128CapabilityROTATION.Pointer(),
+								models.Secrets20231128CapabilityDYNAMIC.Pointer(),
 							},
 						},
 					},

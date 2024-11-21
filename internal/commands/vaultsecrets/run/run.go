@@ -12,9 +12,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/go-hclog"
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/apps/helper"
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/secrets/appname"
@@ -32,20 +31,18 @@ type RunOpts struct {
 	Output  *format.Outputter
 	Logger  hclog.Logger
 
-	AppName       string
-	Command       []string
-	PreviewClient preview_secret_service.ClientService
-	Client        secret_service.ClientService
+	AppName string
+	Command []string
+	Client  secret_service.ClientService
 }
 
 func NewCmdRun(ctx *cmd.Context, runF func(*RunOpts) error) *cmd.Command {
 	opts := &RunOpts{
-		Ctx:           ctx.ShutdownCtx,
-		Profile:       ctx.Profile,
-		IO:            ctx.IO,
-		Output:        ctx.Output,
-		PreviewClient: preview_secret_service.New(ctx.HCP, nil),
-		Client:        secret_service.New(ctx.HCP, nil),
+		Ctx:     ctx.ShutdownCtx,
+		Profile: ctx.Profile,
+		IO:      ctx.IO,
+		Output:  ctx.Output,
+		Client:  secret_service.New(ctx.HCP, nil),
 	}
 
 	cmd := &cmd.Command{
@@ -105,7 +102,7 @@ func NewCmdRun(ctx *cmd.Context, runF func(*RunOpts) error) *cmd.Command {
 	}
 	for _, f := range cmd.Flags.Local {
 		if f.Name == "app" {
-			f.Autocomplete = helper.PredictAppName(ctx, cmd, opts.PreviewClient)
+			f.Autocomplete = helper.PredictAppName(ctx, cmd, opts.Client)
 		}
 	}
 
@@ -221,14 +218,14 @@ func setupChildProcess(ctx context.Context, command []string, envVars []string) 
 }
 
 func fetchPaginatedSecrets(opts *RunOpts) ([]*models.Secrets20231128OpenSecret, error) {
-	params := preview_secret_service.NewOpenAppSecretsParamsWithContext(opts.Ctx)
+	params := secret_service.NewOpenAppSecretsParamsWithContext(opts.Ctx)
 	params.OrganizationID = opts.Profile.OrganizationID
 	params.ProjectID = opts.Profile.ProjectID
 	params.AppName = opts.AppName
 
 	var secrets []*models.Secrets20231128OpenSecret
 	for {
-		resp, err := opts.PreviewClient.OpenAppSecrets(params, nil)
+		resp, err := opts.Client.OpenAppSecrets(params, nil)
 		if err != nil {
 			return nil, fmt.Errorf("failed to open app secrets: %w", err)
 		}

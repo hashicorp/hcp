@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/models"
-	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -136,13 +136,13 @@ func TestReadRun(t *testing.T) {
 				vs.EXPECT().GetApp(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 			} else {
 				vs.EXPECT().GetApp(&secret_service.GetAppParams{
-					LocationOrganizationID: "123",
-					LocationProjectID:      "abc",
-					Name:                   opts.AppName,
-					Context:                opts.Ctx,
+					OrganizationID: "123",
+					ProjectID:      "abc",
+					Name:           opts.AppName,
+					Context:        opts.Ctx,
 				}, nil).Return(&secret_service.GetAppOK{
-					Payload: &models.Secrets20230613GetAppResponse{
-						App: &models.Secrets20230613App{
+					Payload: &models.Secrets20231128GetAppResponse{
+						App: &models.Secrets20231128App{
 							Name: opts.AppName,
 						},
 					},

@@ -14,10 +14,9 @@ import (
 	"github.com/hashicorp/hcp/internal/commands/vaultsecrets/integrations"
 
 	"github.com/go-openapi/strfmt"
-	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	preview_models "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/models"
-	mock_preview_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/preview/2023-11-28/client/secret_service"
-	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-06-13/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
+	mock_secret_service "github.com/hashicorp/hcp/internal/pkg/api/mocks/github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/go-openapi/runtime/client"
@@ -252,17 +251,15 @@ details = {
 			io := iostreams.Test()
 
 			vs := mock_secret_service.NewMockClientService(t)
-			pvs := mock_preview_secret_service.NewMockClientService(t)
 
 			opts := &UpdateOpts{
-				Ctx:           context.Background(),
-				IO:            io,
-				Profile:       testProfile(t),
-				Output:        format.New(io),
-				Client:        vs,
-				PreviewClient: pvs,
-				AppName:       testProfile(t).VaultSecrets.AppName,
-				SecretName:    "test_secret",
+				Ctx:        context.Background(),
+				IO:         io,
+				Profile:    testProfile(t),
+				Output:     format.New(io),
+				Client:     vs,
+				AppName:    testProfile(t).VaultSecrets.AppName,
+				SecretName: "test_secret",
 			}
 
 			if c.AugmentOpts != nil {
@@ -282,19 +279,19 @@ details = {
 					switch c.Provider {
 					case integrations.MongoDBAtlas:
 						if c.RespErr {
-							pvs.EXPECT().UpdateMongoDBAtlasRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+							vs.EXPECT().UpdateMongoDBAtlasRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 						} else {
-							pvs.EXPECT().UpdateMongoDBAtlasRotatingSecret(&preview_secret_service.UpdateMongoDBAtlasRotatingSecretParams{
+							vs.EXPECT().UpdateMongoDBAtlasRotatingSecret(&secret_service.UpdateMongoDBAtlasRotatingSecretParams{
 								OrganizationID: testProfile(t).OrganizationID,
 								ProjectID:      testProfile(t).ProjectID,
 								AppName:        testProfile(t).VaultSecrets.AppName,
 								Name:           "test_secret",
-								Body: &preview_models.SecretServiceUpdateMongoDBAtlasRotatingSecretBody{
+								Body: &models.SecretServiceUpdateMongoDBAtlasRotatingSecretBody{
 									RotateOnUpdate:     true,
 									RotationPolicyName: "built-in:60-days-2-active",
-									SecretDetails: &preview_models.Secrets20231128MongoDBAtlasSecretDetails{
+									SecretDetails: &models.Secrets20231128MongoDBAtlasSecretDetails{
 										MongodbGroupID: "mbdgi",
-										MongodbRoles: []*preview_models.Secrets20231128MongoDBRole{
+										MongodbRoles: []*models.Secrets20231128MongoDBRole{
 											{
 												RoleName:       "rn1",
 												DatabaseName:   "dn1",
@@ -309,44 +306,44 @@ details = {
 									},
 								},
 								Context: opts.Ctx,
-							}, mock.Anything).Return(&preview_secret_service.UpdateMongoDBAtlasRotatingSecretOK{
-								Payload: &preview_models.Secrets20231128UpdateMongoDBAtlasRotatingSecretResponse{
-									Config: &preview_models.Secrets20231128RotatingSecretConfig{
+							}, mock.Anything).Return(&secret_service.UpdateMongoDBAtlasRotatingSecretOK{
+								Payload: &models.Secrets20231128UpdateMongoDBAtlasRotatingSecretResponse{
+									Config: &models.Secrets20231128RotatingSecretConfig{
 										AppName:            opts.AppName,
 										CreatedAt:          dt,
 										IntegrationName:    "mongo-db-integration",
 										RotationPolicyName: "built-in:60-days-2-active",
-										SecretName:         opts.SecretName,
+										Name:               opts.SecretName,
 									},
 								},
 							}, nil).Once()
 						}
 					case integrations.Postgres:
 						if c.RespErr {
-							pvs.EXPECT().UpdatePostgresRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+							vs.EXPECT().UpdatePostgresRotatingSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 						} else {
-							pvs.EXPECT().UpdatePostgresRotatingSecret(&preview_secret_service.UpdatePostgresRotatingSecretParams{
+							vs.EXPECT().UpdatePostgresRotatingSecret(&secret_service.UpdatePostgresRotatingSecretParams{
 								OrganizationID: testProfile(t).OrganizationID,
 								ProjectID:      testProfile(t).ProjectID,
 								AppName:        testProfile(t).VaultSecrets.AppName,
 								Name:           "test_secret",
-								Body: &preview_models.SecretServiceUpdatePostgresRotatingSecretBody{
+								Body: &models.SecretServiceUpdatePostgresRotatingSecretBody{
 									RotateOnUpdate:     true,
 									RotationPolicyName: "built-in:60-days-2-active",
-									PostgresParams: &preview_models.Secrets20231128PostgresParams{
+									PostgresParams: &models.Secrets20231128PostgresParams{
 										Usernames: []string{"postgres_user_1", "postgres_user_2"},
 									},
 								},
 								Context: opts.Ctx,
-							}, mock.Anything).Return(&preview_secret_service.UpdatePostgresRotatingSecretOK{
-								Payload: &preview_models.Secrets20231128UpdatePostgresRotatingSecretResponse{
-									Config: &preview_models.Secrets20231128PostgresRotatingSecretConfig{
+							}, mock.Anything).Return(&secret_service.UpdatePostgresRotatingSecretOK{
+								Payload: &models.Secrets20231128UpdatePostgresRotatingSecretResponse{
+									Config: &models.Secrets20231128PostgresRotatingSecretConfig{
 										AppName:            opts.AppName,
 										CreatedAt:          dt,
 										IntegrationName:    "postgres-integration",
 										RotationPolicyName: "built-in:60-days-2-active",
 										Name:               opts.SecretName,
-										PostgresParams: &preview_models.Secrets20231128PostgresParams{
+										PostgresParams: &models.Secrets20231128PostgresParams{
 											Usernames: []string{"postgres_user_1", "postgres_user_2"},
 										},
 									},
@@ -359,24 +356,24 @@ details = {
 			} else if opts.Type == secretTypeDynamic {
 				if c.MockCalled {
 					if c.RespErr {
-						pvs.EXPECT().UpdateAwsDynamicSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
+						vs.EXPECT().UpdateAwsDynamicSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
 					} else {
-						pvs.EXPECT().UpdateAwsDynamicSecret(&preview_secret_service.UpdateAwsDynamicSecretParams{
+						vs.EXPECT().UpdateAwsDynamicSecret(&secret_service.UpdateAwsDynamicSecretParams{
 							OrganizationID: testProfile(t).OrganizationID,
 							ProjectID:      testProfile(t).ProjectID,
 							AppName:        testProfile(t).VaultSecrets.AppName,
 							Name:           opts.SecretName,
-							Body: &preview_models.SecretServiceUpdateAwsDynamicSecretBody{
+							Body: &models.SecretServiceUpdateAwsDynamicSecretBody{
 								DefaultTTL: "3600s",
-								AssumeRole: &preview_models.Secrets20231128AssumeRoleRequest{
+								AssumeRole: &models.Secrets20231128AssumeRoleRequest{
 									RoleArn: "ra2",
 								},
 							},
 							Context: opts.Ctx,
-						}, mock.Anything).Return(&preview_secret_service.UpdateAwsDynamicSecretOK{
-							Payload: &preview_models.Secrets20231128UpdateAwsDynamicSecretResponse{
-								Secret: &preview_models.Secrets20231128AwsDynamicSecret{
-									AssumeRole: &preview_models.Secrets20231128AssumeRoleResponse{
+						}, mock.Anything).Return(&secret_service.UpdateAwsDynamicSecretOK{
+							Payload: &models.Secrets20231128UpdateAwsDynamicSecretResponse{
+								Secret: &models.Secrets20231128AwsDynamicSecret{
+									AssumeRole: &models.Secrets20231128AssumeRoleResponse{
 										RoleArn: "ra2",
 									},
 									DefaultTTL:      "3600s",
