@@ -146,6 +146,15 @@ $ hcp waypoint templates create -n=my-template \
 						"when the execution mode is set to 'agent'.",
 					Value: flagvalue.Simple("", &opts.TerraformAgentPoolID),
 				},
+				{
+					Name:         "tf-no-code-module-id",
+					DisplayValue: "TF_NO_CODE_MODULE_ID",
+					Description: "The ID of the Terraform no-code module to use for " +
+						"running Terraform operations. This is in the format " +
+						"of 'nocode-<ID>'.",
+					Value:    flagvalue.Simple("", &opts.TerraformNoCodeModuleID),
+					Required: true,
+				},
 			},
 		},
 	}
@@ -209,6 +218,7 @@ func templateCreate(opts *TemplateOpts) error {
 					VariableOptions: variables,
 					TfExecutionMode: opts.TerraformExecutionMode,
 					TfAgentPoolID:   opts.TerraformAgentPoolID,
+					ModuleID:        opts.TerraformNoCodeModuleID,
 				},
 			},
 			Context: opts.Ctx,

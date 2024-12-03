@@ -100,6 +100,7 @@ func addOnDefinitionRead(opts *AddOnDefinitionOpts) error {
 		format.NewField("Execution Mode", "{{ .TfExecutionMode }}"),
 		format.NewField("Agent Pool ID", "{{ .TfAgentPoolID }}"),
 		format.NewField("Variable Options", optionNamesStr),
+		format.NewField("Terraform No-code Module ID", "{{ .ModuleID }}"),
 	}
 
 	return opts.Output.Display(format.NewDisplayer(addOnDef, format.Pretty, fields))

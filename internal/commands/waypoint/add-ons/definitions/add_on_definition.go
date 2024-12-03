@@ -23,6 +23,7 @@ type AddOnDefinitionOpts struct {
 	TerraformCloudProjectID     string
 	TerraformExecutionMode      string
 	TerraformAgentPoolID        string
+	TerraformNoCodeModuleID     string
 
 	VariableOptionsFile string
 
