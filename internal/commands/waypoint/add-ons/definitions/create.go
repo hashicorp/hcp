@@ -33,6 +33,7 @@ $ hcp waypoint add-ons definitions create -n=my-add-on-definition \
   -d="My Add-on Definition description." \
   --readme-markdown-template-file="README.tpl" \
   --tfc-no-code-module-source="app.terraform.io/hashicorp/dir/template" \
+  --tf-no-code-module-id="nocode-123456" \
   --tfc-project-name="my-tfc-project" \
   --tfc-project-id="prj-123456" \
   -l=label1 \
