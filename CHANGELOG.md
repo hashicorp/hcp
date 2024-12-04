@@ -1,3 +1,15 @@
+## 0.8.0 (December 04, 2024)
+
+FEATURES:
+
+* hvs: support postgres rotating secret CRUDL [[GH-192](https://github.com/hashicorp/hcp/issues/192)]
+* vault-secrets: Adds support for creating / updating / reading / deleting Postgres integrations. [[GH-189](https://github.com/hashicorp/hcp/issues/189)]
+
+IMPROVEMENTS:
+
+* HVS: Use stable/2023-11-28 api [[GH-197](https://github.com/hashicorp/hcp/issues/197)]
+* vault-secrets: adding Gateway Pool Resource ID to the output of gateway commands. [[GH-195](https://github.com/hashicorp/hcp/issues/195)]
+
 ## 0.7.0 (November 04, 2024)
 
 BREAKING CHANGES:
