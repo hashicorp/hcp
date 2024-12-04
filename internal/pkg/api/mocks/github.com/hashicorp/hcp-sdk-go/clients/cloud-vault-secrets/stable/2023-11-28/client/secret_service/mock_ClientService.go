@@ -392,6 +392,80 @@ func (_c *MockClientService_CreateAwsIntegration_Call) RunAndReturn(run func(*se
 	return _c
 }
 
+// CreateAzureApplicationPasswordRotatingSecret provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) CreateAzureApplicationPasswordRotatingSecret(params *secret_service.CreateAzureApplicationPasswordRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.CreateAzureApplicationPasswordRotatingSecretOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateAzureApplicationPasswordRotatingSecret")
+	}
+
+	var r0 *secret_service.CreateAzureApplicationPasswordRotatingSecretOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.CreateAzureApplicationPasswordRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.CreateAzureApplicationPasswordRotatingSecretOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.CreateAzureApplicationPasswordRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.CreateAzureApplicationPasswordRotatingSecretOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.CreateAzureApplicationPasswordRotatingSecretOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.CreateAzureApplicationPasswordRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_CreateAzureApplicationPasswordRotatingSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateAzureApplicationPasswordRotatingSecret'
+type MockClientService_CreateAzureApplicationPasswordRotatingSecret_Call struct {
+	*mock.Call
+}
+
+// CreateAzureApplicationPasswordRotatingSecret is a helper method to define mock.On call
+//   - params *secret_service.CreateAzureApplicationPasswordRotatingSecretParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) CreateAzureApplicationPasswordRotatingSecret(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_CreateAzureApplicationPasswordRotatingSecret_Call {
+	return &MockClientService_CreateAzureApplicationPasswordRotatingSecret_Call{Call: _e.mock.On("CreateAzureApplicationPasswordRotatingSecret",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_CreateAzureApplicationPasswordRotatingSecret_Call) Run(run func(params *secret_service.CreateAzureApplicationPasswordRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_CreateAzureApplicationPasswordRotatingSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.CreateAzureApplicationPasswordRotatingSecretParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_CreateAzureApplicationPasswordRotatingSecret_Call) Return(_a0 *secret_service.CreateAzureApplicationPasswordRotatingSecretOK, _a1 error) *MockClientService_CreateAzureApplicationPasswordRotatingSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_CreateAzureApplicationPasswordRotatingSecret_Call) RunAndReturn(run func(*secret_service.CreateAzureApplicationPasswordRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.CreateAzureApplicationPasswordRotatingSecretOK, error)) *MockClientService_CreateAzureApplicationPasswordRotatingSecret_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateAzureIntegration provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) CreateAzureIntegration(params *secret_service.CreateAzureIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.CreateAzureIntegrationOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -3126,6 +3200,80 @@ func (_c *MockClientService_GetAwsIntegration_Call) Return(_a0 *secret_service.G
 }
 
 func (_c *MockClientService_GetAwsIntegration_Call) RunAndReturn(run func(*secret_service.GetAwsIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetAwsIntegrationOK, error)) *MockClientService_GetAwsIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetAzureApplicationPasswordRotatingSecretConfig provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) GetAzureApplicationPasswordRotatingSecretConfig(params *secret_service.GetAzureApplicationPasswordRotatingSecretConfigParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.GetAzureApplicationPasswordRotatingSecretConfigOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAzureApplicationPasswordRotatingSecretConfig")
+	}
+
+	var r0 *secret_service.GetAzureApplicationPasswordRotatingSecretConfigOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.GetAzureApplicationPasswordRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetAzureApplicationPasswordRotatingSecretConfigOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.GetAzureApplicationPasswordRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.GetAzureApplicationPasswordRotatingSecretConfigOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.GetAzureApplicationPasswordRotatingSecretConfigOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.GetAzureApplicationPasswordRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_GetAzureApplicationPasswordRotatingSecretConfig_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAzureApplicationPasswordRotatingSecretConfig'
+type MockClientService_GetAzureApplicationPasswordRotatingSecretConfig_Call struct {
+	*mock.Call
+}
+
+// GetAzureApplicationPasswordRotatingSecretConfig is a helper method to define mock.On call
+//   - params *secret_service.GetAzureApplicationPasswordRotatingSecretConfigParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) GetAzureApplicationPasswordRotatingSecretConfig(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_GetAzureApplicationPasswordRotatingSecretConfig_Call {
+	return &MockClientService_GetAzureApplicationPasswordRotatingSecretConfig_Call{Call: _e.mock.On("GetAzureApplicationPasswordRotatingSecretConfig",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_GetAzureApplicationPasswordRotatingSecretConfig_Call) Run(run func(params *secret_service.GetAzureApplicationPasswordRotatingSecretConfigParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_GetAzureApplicationPasswordRotatingSecretConfig_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.GetAzureApplicationPasswordRotatingSecretConfigParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_GetAzureApplicationPasswordRotatingSecretConfig_Call) Return(_a0 *secret_service.GetAzureApplicationPasswordRotatingSecretConfigOK, _a1 error) *MockClientService_GetAzureApplicationPasswordRotatingSecretConfig_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_GetAzureApplicationPasswordRotatingSecretConfig_Call) RunAndReturn(run func(*secret_service.GetAzureApplicationPasswordRotatingSecretConfigParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetAzureApplicationPasswordRotatingSecretConfigOK, error)) *MockClientService_GetAzureApplicationPasswordRotatingSecretConfig_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -6711,6 +6859,80 @@ func (_c *MockClientService_UpdateAwsIntegration_Call) Return(_a0 *secret_servic
 }
 
 func (_c *MockClientService_UpdateAwsIntegration_Call) RunAndReturn(run func(*secret_service.UpdateAwsIntegrationParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateAwsIntegrationOK, error)) *MockClientService_UpdateAwsIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateAzureApplicationPasswordRotatingSecret provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) UpdateAzureApplicationPasswordRotatingSecret(params *secret_service.UpdateAzureApplicationPasswordRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdateAzureApplicationPasswordRotatingSecretOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateAzureApplicationPasswordRotatingSecret")
+	}
+
+	var r0 *secret_service.UpdateAzureApplicationPasswordRotatingSecretOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateAzureApplicationPasswordRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateAzureApplicationPasswordRotatingSecretOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateAzureApplicationPasswordRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.UpdateAzureApplicationPasswordRotatingSecretOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.UpdateAzureApplicationPasswordRotatingSecretOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.UpdateAzureApplicationPasswordRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_UpdateAzureApplicationPasswordRotatingSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateAzureApplicationPasswordRotatingSecret'
+type MockClientService_UpdateAzureApplicationPasswordRotatingSecret_Call struct {
+	*mock.Call
+}
+
+// UpdateAzureApplicationPasswordRotatingSecret is a helper method to define mock.On call
+//   - params *secret_service.UpdateAzureApplicationPasswordRotatingSecretParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) UpdateAzureApplicationPasswordRotatingSecret(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_UpdateAzureApplicationPasswordRotatingSecret_Call {
+	return &MockClientService_UpdateAzureApplicationPasswordRotatingSecret_Call{Call: _e.mock.On("UpdateAzureApplicationPasswordRotatingSecret",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_UpdateAzureApplicationPasswordRotatingSecret_Call) Run(run func(params *secret_service.UpdateAzureApplicationPasswordRotatingSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_UpdateAzureApplicationPasswordRotatingSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.UpdateAzureApplicationPasswordRotatingSecretParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_UpdateAzureApplicationPasswordRotatingSecret_Call) Return(_a0 *secret_service.UpdateAzureApplicationPasswordRotatingSecretOK, _a1 error) *MockClientService_UpdateAzureApplicationPasswordRotatingSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_UpdateAzureApplicationPasswordRotatingSecret_Call) RunAndReturn(run func(*secret_service.UpdateAzureApplicationPasswordRotatingSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateAzureApplicationPasswordRotatingSecretOK, error)) *MockClientService_UpdateAzureApplicationPasswordRotatingSecret_Call {
 	_c.Call.Return(run)
 	return _c
 }
