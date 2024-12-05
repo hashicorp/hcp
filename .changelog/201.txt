@@ -1,0 +1,3 @@
+```release-note:bug
+vault-secrets: corrected json output for gateways, GatewayPool -> gateway_pool
+```
