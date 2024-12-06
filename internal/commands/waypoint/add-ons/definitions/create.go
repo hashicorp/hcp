@@ -33,6 +33,7 @@ $ hcp waypoint add-ons definitions create -n=my-add-on-definition \
   -d="My Add-on Definition description." \
   --readme-markdown-template-file="README.tpl" \
   --tfc-no-code-module-source="app.terraform.io/hashicorp/dir/template" \
+  --tf-no-code-module-id="nocode-123456" \
   --tfc-project-name="my-tfc-project" \
   --tfc-project-id="prj-123456" \
   -l=label1 \
@@ -135,6 +136,15 @@ $ hcp waypoint add-ons definitions create -n=my-add-on-definition \
 						"when the execution mode is set to 'agent'.",
 					Value: flagvalue.Simple("", &opts.TerraformAgentPoolID),
 				},
+				{
+					Name:         "tf-no-code-module-id",
+					DisplayValue: "TF_NO_CODE_MODULE_ID",
+					Description: "The ID of the Terraform no-code module to use for " +
+						"running Terraform operations. This is in the format " +
+						"of 'nocode-<ID>'.",
+					Value:    flagvalue.Simple("", &opts.TerraformNoCodeModuleID),
+					Required: true,
+				},
 			},
 		},
 	}
@@ -174,17 +184,20 @@ func addOnDefinitionCreate(opts *AddOnDefinitionOpts) error {
 		&waypoint_service.WaypointServiceCreateAddOnDefinitionParams{
 			NamespaceID: ns.ID,
 			Body: &models.HashicorpCloudWaypointWaypointServiceCreateAddOnDefinitionBody{
-				Name:                   opts.Name,
-				Summary:                opts.Summary,
-				Description:            opts.Description,
-				ReadmeMarkdownTemplate: readmeTpl,
-				Labels:                 opts.Labels,
-				TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointTerraformCloudWorkspaceDetails{
-					Name:      opts.TerraformCloudProjectName,
-					ProjectID: opts.TerraformCloudProjectID,
+				AddOnDefinition: &models.HashicorpCloudWaypointAddOnDefinition{
+					Name:                   opts.Name,
+					Summary:                opts.Summary,
+					Description:            opts.Description,
+					ReadmeMarkdownTemplate: readmeTpl,
+					Labels:                 opts.Labels,
+					TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointTerraformCloudWorkspaceDetails{
+						Name:      opts.TerraformCloudProjectName,
+						ProjectID: opts.TerraformCloudProjectID,
+					},
+					ModuleSource:    opts.TerraformNoCodeModuleSource,
+					VariableOptions: variables,
+					ModuleID:        opts.TerraformNoCodeModuleID,
 				},
-				ModuleSource:    opts.TerraformNoCodeModuleSource,
-				VariableOptions: variables,
 			},
 			Context: opts.Ctx,
 		}, nil)
