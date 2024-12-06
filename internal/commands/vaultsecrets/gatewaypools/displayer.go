@@ -10,13 +10,13 @@ import (
 )
 
 type gatewayPoolWithIntegrations struct {
-	GatewayPool  *preview_models.Secrets20231128GatewayPool
-	Integrations []string
+	GatewayPool  *preview_models.Secrets20231128GatewayPool `json:"gateway_pool"`
+	Integrations []string                                   `json:"integrations,omitempty"`
 }
 
 type gatewayPoolWithOauth struct {
-	GatewayPool *preview_models.Secrets20231128GatewayPool
-	Oauth       *auth.OauthConfig
+	GatewayPool *preview_models.Secrets20231128GatewayPool `json:"gateway_pool"`
+	Oauth       *auth.OauthConfig                          `json:"oauth,omitempty"`
 }
 
 type displayer struct {
