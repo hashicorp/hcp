@@ -11,7 +11,7 @@ import (
 
 type gatewayPoolWithIntegrations struct {
 	GatewayPool  *preview_models.Secrets20231128GatewayPool `json:"gateway_pool"`
-	Integrations []string                                   `json:"integrations"`
+	Integrations []string                                   `json:"integrations,omitempty"`
 }
 
 type gatewayPoolWithOauth struct {
