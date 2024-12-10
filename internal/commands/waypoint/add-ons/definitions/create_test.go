@@ -56,6 +56,7 @@ func TestCmdAddOnDefinitionCreate(t *testing.T) {
 				"--tf-execution-mode", "agent",
 				"--tf-agent-pool-id", "pool-abc123",
 				"--variable-options-file", "vars.hcl",
+				"--tf-no-code-module-id", "nocode-abc123",
 			},
 			Expect: &AddOnDefinitionOpts{
 				Name:                        "cli-test",
@@ -69,6 +70,7 @@ func TestCmdAddOnDefinitionCreate(t *testing.T) {
 				TerraformExecutionMode:      "agent",
 				TerraformAgentPoolID:        "pool-abc123",
 				VariableOptionsFile:         "vars.hcl",
+				TerraformNoCodeModuleID:     "nocode-abc123",
 			},
 		},
 	}
