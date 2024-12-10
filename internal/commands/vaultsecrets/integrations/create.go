@@ -271,7 +271,7 @@ func createRun(opts *CreateOpts) error {
 
 		_, err = opts.Client.CreatePostgresIntegration(req, nil)
 		if err != nil {
-			return fmt.Errorf("failed to create MongoDB Atlas integration: %w", err)
+			return fmt.Errorf("failed to create Postgres integration: %w", err)
 		}
 
 	default:
