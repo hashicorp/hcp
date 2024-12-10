@@ -1,0 +1,3 @@
+```release-note:bug
+vault-secrets: corrected error output for postgres integration creation, MongoDB Atlas -> Postgres.
+```
