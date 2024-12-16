@@ -56,6 +56,7 @@ func TestCmdTemplateCreate(t *testing.T) {
 				"--readme-markdown-template-file", "readme_test.txt",
 				"--tf-execution-mode", "agent",
 				"--tf-agent-pool-id", "pool-abc123",
+				"--tf-no-code-module-id", "nocode-abc123",
 			},
 			Expect: &TemplateOpts{
 				Name:                        "cli-test",
@@ -69,6 +70,7 @@ func TestCmdTemplateCreate(t *testing.T) {
 				Tags:                        map[string]string{"cli": "true"},
 				TerraformExecutionMode:      "agent",
 				TerraformAgentPoolID:        "pool-abc123",
+				TerraformNoCodeModuleID:     "nocode-abc123",
 			},
 		},
 		{
@@ -87,6 +89,7 @@ func TestCmdTemplateCreate(t *testing.T) {
 				"-l", "cli",
 				"-t", "cli=true",
 				"--variable-options-file", "variable_options.hcl",
+				"--tf-no-code-module-id", "nocode-abc123",
 			},
 			Expect: &TemplateOpts{
 				Name:                        "cli-test",
@@ -99,6 +102,7 @@ func TestCmdTemplateCreate(t *testing.T) {
 				VariableOptionsFile:         "variable_options.hcl",
 				Labels:                      []string{"cli"},
 				Tags:                        map[string]string{"cli": "true"},
+				TerraformNoCodeModuleID:     "nocode-abc123",
 			},
 		},
 	}
@@ -142,6 +146,7 @@ func TestCmdTemplateCreate(t *testing.T) {
 				r.Equal(c.Expect.VariableOptionsFile, tplOpts.VariableOptionsFile)
 				r.Equal(c.Expect.Labels, tplOpts.Labels)
 				r.Equal(c.Expect.Tags, tplOpts.Tags)
+				r.Equal(c.Expect.TerraformNoCodeModuleID, tplOpts.TerraformNoCodeModuleID)
 			}
 		})
 	}

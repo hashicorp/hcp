@@ -162,17 +162,19 @@ func addOnDefinitionUpdate(opts *AddOnDefinitionOpts) error {
 			Context:                     opts.Ctx,
 			ExistingAddOnDefinitionName: opts.Name,
 			Body: &models.HashicorpCloudWaypointWaypointServiceUpdateAddOnDefinitionBody{
-				Summary:                opts.Summary,
-				Description:            opts.Description,
-				ReadmeMarkdownTemplate: readmeTpl,
-				Labels:                 opts.Labels,
-				TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointTerraformCloudWorkspaceDetails{
-					ProjectID: opts.TerraformCloudProjectID,
-					Name:      opts.TerraformCloudProjectName,
+				AddOnDefinition: &models.HashicorpCloudWaypointAddOnDefinition{
+					Summary:                opts.Summary,
+					Description:            opts.Description,
+					ReadmeMarkdownTemplate: readmeTpl,
+					Labels:                 opts.Labels,
+					TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointTerraformCloudWorkspaceDetails{
+						ProjectID: opts.TerraformCloudProjectID,
+						Name:      opts.TerraformCloudProjectName,
+					},
+					TfExecutionMode: opts.TerraformExecutionMode,
+					TfAgentPoolID:   opts.TerraformAgentPoolID,
+					VariableOptions: variables,
 				},
-				TfExecutionMode: opts.TerraformExecutionMode,
-				TfAgentPoolID:   opts.TerraformAgentPoolID,
-				VariableOptions: variables,
 			},
 		}, nil,
 	)

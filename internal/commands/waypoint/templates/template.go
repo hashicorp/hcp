@@ -32,6 +32,7 @@ type TemplateOpts struct {
 	TerraformCloudProjectID     string
 	TerraformExecutionMode      string
 	TerraformAgentPoolID        string
+	TerraformNoCodeModuleID     string
 
 	VariableOptionsFile string
 

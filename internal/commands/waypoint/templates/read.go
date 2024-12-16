@@ -101,10 +101,11 @@ func templateRead(opts *TemplateOpts) error {
 		format.NewField("Labels", "{{ .Labels }}"),
 		format.NewField("Readme Template", "{{ .ReadmeTemplate }}"),
 		format.NewField("Tags", "{{ .Tags}}"),
-		format.NewField("Terraform Nocode Source", "{{ .ModuleSource}}"),
+		format.NewField("Terraform No-Code Module Source", "{{ .ModuleSource}}"),
 		format.NewField("Execution Mode", "{{ .TfExecutionMode}}"),
 		format.NewField("Agent Pool ID", "{{ .TfAgentPoolID}}"),
 		format.NewField("Variable Options", optionNamesStr),
+		format.NewField("Terraform No-code Module ID", "{{ .ModuleID }}"),
 	}
 
 	// Display the created project
