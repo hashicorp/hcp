@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/models"
 	"io"
 	"net/http"
 	"strings"
@@ -169,16 +170,30 @@ func (i *InitOpts) configureOrgAndProject() error {
 }
 
 func (i *InitOpts) configureVaultSecrets() error {
-	// Retrieve apps associated with org and project ID
-	listAppReq := preview_secret_service.NewListAppsParamsWithContext(i.Ctx)
-	listAppReq.OrganizationID = i.Profile.OrganizationID
-	listAppReq.ProjectID = i.Profile.ProjectID
-	listAppResp, err := i.SecretService.ListApps(listAppReq, nil)
-	if err != nil {
-		return err
+	params := &preview_secret_service.ListAppsParams{
+		Context:        i.Ctx,
+		ProjectID:      i.Profile.ProjectID,
+		OrganizationID: i.Profile.OrganizationID,
 	}
 
-	appCount := len(listAppResp.Payload.Apps)
+	var apps []*models.Secrets20231128App
+	for {
+		resp, err := i.SecretService.ListApps(params, nil)
+
+		if err != nil {
+			return fmt.Errorf("failed to list apps: %w", err)
+		}
+
+		apps = append(apps, resp.Payload.Apps...)
+		if resp.Payload.Pagination == nil || resp.Payload.Pagination.NextPageToken == "" {
+			break
+		}
+
+		next := resp.Payload.Pagination.NextPageToken
+		params.PaginationNextPageToken = &next
+	}
+
+	appCount := len(apps)
 	if appCount <= 0 {
 		appsCreateDoc := heredoc.New(i.IO, heredoc.WithPreserveNewlines()).Must(`
 No Vault Secrets application found. Create one and set on the active profile by issuing:
@@ -190,11 +205,11 @@ No Vault Secrets application found. Create one and set on the active profile by 
 		return nil
 	}
 
-	appName := listAppResp.Payload.Apps[0].Name
+	appName := apps[0].Name
 	if appCount > 1 {
 		prompt := promptui.Select{
 			Label: "Multiple apps found. Please select the one you would like to configure.",
-			Items: listAppResp.Payload.Apps,
+			Items: apps,
 			Templates: &promptui.SelectTemplates{
 				Active:   `> {{ .Name }}`,
 				Inactive: `{{ .Name }}`,
@@ -210,7 +225,7 @@ No Vault Secrets application found. Create one and set on the active profile by 
 			Stdout:       iostreams.NopWriteCloser(i.IO.Err()),
 			Searcher: func(term string, index int) bool {
 				term = strings.ToLower(term)
-				name := strings.ToLower(listAppResp.Payload.Apps[index].Name)
+				name := strings.ToLower(apps[index].Name)
 				return strings.Contains(name, term)
 			},
 		}
@@ -219,7 +234,7 @@ No Vault Secrets application found. Create one and set on the active profile by 
 		if err != nil {
 			return fmt.Errorf("prompt failed: %w", err)
 		}
-		appName = listAppResp.Payload.Apps[i].Name
+		appName = apps[i].Name
 	}
 
 	cs := i.IO.ColorScheme()
