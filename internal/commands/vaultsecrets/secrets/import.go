@@ -35,7 +35,7 @@ func NewCmdImport(ctx *cmd.Context, runF func(*ImportOpts) error) *cmd.Command {
 
 	cmd := &cmd.Command{
 		Name:      "import",
-		ShortHelp: "Import new static secret.",
+		ShortHelp: "Import new static secrets.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp vault-secrets secrets import" }} command imports static secrets and creates them under a Vault Secrets application.
 		The configuration for importing your static secrets will be read from the provided HCL config file.
