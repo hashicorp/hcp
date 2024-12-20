@@ -2,13 +2,14 @@ package secrets
 
 import (
 	"context"
+	"testing"
+
 	"github.com/go-openapi/runtime/client"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestNewCmdImport(t *testing.T) {
