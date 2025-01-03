@@ -1,0 +1,3 @@
+```release-note:bug
+profile: Add support for listing all apps when configuring profile vault-secrets apps
+```
