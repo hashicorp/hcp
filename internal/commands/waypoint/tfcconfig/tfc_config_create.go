@@ -7,8 +7,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -17,8 +17,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func NewCmdCreate(ctx *cmd.Context, runF func(opts *TFCConfigCreateOpts) error) *cmd.Command {
-	opts := &TFCConfigCreateOpts{
+func NewCmdCreate(ctx *cmd.Context, runF func(opts *CreateOpts) error) *cmd.Command {
+	opts := &CreateOpts{
 		Ctx:            ctx.ShutdownCtx,
 		Output:         ctx.Output,
 		Profile:        ctx.Profile,
@@ -26,7 +26,7 @@ func NewCmdCreate(ctx *cmd.Context, runF func(opts *TFCConfigCreateOpts) error) 
 		WaypointClient: waypoint_service.New(ctx.HCP, nil),
 	}
 
-	cmd := &cmd.Command{
+	c := &cmd.Command{
 		Name:      "create",
 		ShortHelp: "Set TFC Configuration.",
 		LongHelp: heredoc.New(ctx.IO).Mustf(`
@@ -79,10 +79,10 @@ func NewCmdCreate(ctx *cmd.Context, runF func(opts *TFCConfigCreateOpts) error) 
 			return cmd.RequireOrgAndProject(ctx)
 		},
 	}
-	return cmd
+	return c
 }
 
-type TFCConfigCreateOpts struct {
+type CreateOpts struct {
 	Ctx     context.Context
 	Profile *profile.Profile
 	Output  *format.Outputter
@@ -93,33 +93,25 @@ type TFCConfigCreateOpts struct {
 	WaypointClient waypoint_service.ClientService
 }
 
-func createRun(opts *TFCConfigCreateOpts) error {
-	nsID, err := GetNamespace(opts.Ctx, opts.WaypointClient, opts.Profile.OrganizationID, opts.Profile.ProjectID)
-	if err != nil {
-		return fmt.Errorf("error getting namespace: %w", err)
-	}
-
-	ns := &models.HashicorpCloudWaypointRefNamespace{ID: nsID}
+func createRun(opts *CreateOpts) error {
 	resp, err := opts.WaypointClient.WaypointServiceCreateTFCConfig(
 		&waypoint_service.WaypointServiceCreateTFCConfigParams{
-			Body: &models.HashicorpCloudWaypointWaypointServiceCreateTFCConfigBody{
-				Namespace: ns,
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Body: &models.HashicorpCloudWaypointV20241122WaypointServiceCreateTFCConfigBody{
 				TfcConfig: &models.HashicorpCloudWaypointTFCConfig{
 					OrganizationName: opts.TfcOrg,
 					Token:            opts.Token,
 				},
 			},
-			NamespaceID: nsID,
-			Context:     opts.Ctx,
+			Context: opts.Ctx,
 		}, nil,
 	)
 	if err != nil {
 		return errors.Wrapf(err, "%s error creating TFC config", opts.IO.ColorScheme().FailureIcon())
-
 	}
 
 	fmt.Fprintf(opts.IO.Err(), "%s TFC Config %q created!\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.TfcConfig.OrganizationName)
 
 	return nil
-
 }
