@@ -4,7 +4,7 @@
 package applications
 
 import (
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -12,7 +12,7 @@ import (
 )
 
 func NewCmdApplicationsList(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
-	cmd := &cmd.Command{
+	c := &cmd.Command{
 		Name:      "list",
 		ShortHelp: "List all HCP Waypoint applications.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
@@ -27,19 +27,15 @@ func NewCmdApplicationsList(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Comman
 		},
 	}
 
-	return cmd
+	return c
 }
 
 func applicationsList(opts *ApplicationOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-
-	resp, err := opts.WS.WaypointServiceListApplications(
+	resp, err := opts.WS2024Client.WaypointServiceListApplications(
 		&waypoint_service.WaypointServiceListApplicationsParams{
-			NamespaceID: ns.ID,
-			Context:     opts.Ctx,
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Context:                         opts.Ctx,
 		}, nil,
 	)
 	if err != nil {
