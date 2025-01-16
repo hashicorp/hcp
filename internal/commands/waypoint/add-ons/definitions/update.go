@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 	"github.com/hashicorp/hcp/internal/commands/waypoint/internal"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -127,12 +127,10 @@ $ hcp waypoint add-ons definitions update -n=my-add-on-definition \
 }
 
 func addOnDefinitionUpdate(opts *AddOnDefinitionOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-
-	var readmeTpl []byte
+	var (
+		readmeTpl []byte
+		err       error
+	)
 	if opts.ReadmeMarkdownTemplateFile != "" {
 		readmeTpl, err = os.ReadFile(opts.ReadmeMarkdownTemplateFile)
 		if err != nil {
@@ -156,12 +154,13 @@ func addOnDefinitionUpdate(opts *AddOnDefinitionOpts) error {
 		variables = vars
 	}
 
-	_, err = opts.WS.WaypointServiceUpdateAddOnDefinition2(
+	_, err = opts.WS2024Client.WaypointServiceUpdateAddOnDefinition2(
 		&waypoint_service.WaypointServiceUpdateAddOnDefinition2Params{
-			NamespaceID:                 ns.ID,
-			Context:                     opts.Ctx,
-			ExistingAddOnDefinitionName: opts.Name,
-			Body: &models.HashicorpCloudWaypointWaypointServiceUpdateAddOnDefinitionBody{
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Context:                         opts.Ctx,
+			ExistingAddOnDefinitionName:     opts.Name,
+			Body: &models.HashicorpCloudWaypointV20241122WaypointServiceUpdateAddOnDefinitionBody{
 				AddOnDefinition: &models.HashicorpCloudWaypointAddOnDefinition{
 					Summary:                opts.Summary,
 					Description:            opts.Description,
