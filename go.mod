@@ -12,7 +12,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/go-version v1.7.0
 	github.com/hashicorp/hcl/v2 v2.23.0
-	github.com/hashicorp/hcp-sdk-go v0.131.0
+	github.com/hashicorp/hcp-sdk-go v0.131.1-0.20250115174642-56cccc8d9986
 	github.com/lithammer/dedent v1.1.0
 	github.com/manifoldco/promptui v0.9.0
 	github.com/mitchellh/cli v1.1.5
