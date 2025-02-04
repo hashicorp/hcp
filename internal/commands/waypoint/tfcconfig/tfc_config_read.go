@@ -7,8 +7,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -17,8 +17,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func NewCmdRead(ctx *cmd.Context, runF func(opts *TFCConfigReadOpts) error) *cmd.Command {
-	opts := &TFCConfigReadOpts{
+func NewCmdRead(ctx *cmd.Context, runF func(opts *ReadOpts) error) *cmd.Command {
+	opts := &ReadOpts{
 		Ctx:            ctx.ShutdownCtx,
 		Profile:        ctx.Profile,
 		Output:         ctx.Output,
@@ -26,7 +26,7 @@ func NewCmdRead(ctx *cmd.Context, runF func(opts *TFCConfigReadOpts) error) *cmd
 		WaypointClient: waypoint_service.New(ctx.HCP, nil),
 	}
 
-	cmd := &cmd.Command{
+	c := &cmd.Command{
 		Name:      "read",
 		ShortHelp: "Read TFC Config properties.",
 		LongHelp: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
@@ -51,18 +51,15 @@ func NewCmdRead(ctx *cmd.Context, runF func(opts *TFCConfigReadOpts) error) *cmd
 			return cmd.RequireOrgAndProject(ctx)
 		},
 	}
-	return cmd
+	return c
 }
 
-func readRun(opts *TFCConfigReadOpts) error {
-	nsID, err := GetNamespace(opts.Ctx, opts.WaypointClient, opts.Profile.OrganizationID, opts.Profile.ProjectID)
-	if err != nil {
-		return err
-	}
+func readRun(opts *ReadOpts) error {
 	resp, err := opts.WaypointClient.WaypointServiceGetTFCConfig(
 		&waypoint_service.WaypointServiceGetTFCConfigParams{
-			NamespaceID: nsID,
-			Context:     opts.Ctx,
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Context:                         opts.Ctx,
 		}, nil,
 	)
 	if err != nil {
@@ -105,7 +102,7 @@ func (d configDisplayer) FieldTemplates() []format.Field {
 	}
 }
 
-type TFCConfigReadOpts struct {
+type ReadOpts struct {
 	Ctx            context.Context
 	Profile        *profile.Profile
 	Output         *format.Outputter
