@@ -7,11 +7,11 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
-	"github.com/pkg/errors"
 )
 
 func NewCmdGroupList(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
@@ -39,22 +39,12 @@ func NewCmdGroupList(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
 }
 
 func agentGroupList(log hclog.Logger, opts *GroupOpts) error {
-	resp, err := opts.WS.WaypointServiceGetNamespace(&waypoint_service.WaypointServiceGetNamespaceParams{
-		LocationOrganizationID: opts.Profile.OrganizationID,
-		LocationProjectID:      opts.Profile.ProjectID,
-		Context:                opts.Ctx,
-	}, nil)
-	if err != nil {
-		return errors.Wrapf(err, "Unable to access HCP project")
-	}
-
-	ns := resp.Payload.Namespace
-
 	ctx := opts.Ctx
 
-	list, err := opts.WS.WaypointServiceListAgentGroups(&waypoint_service.WaypointServiceListAgentGroupsParams{
-		NamespaceID: ns.ID,
-		Context:     ctx,
+	list, err := opts.WS2024Client.WaypointServiceListAgentGroups(&waypoint_service.WaypointServiceListAgentGroupsParams{
+		NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+		NamespaceLocationProjectID:      opts.Profile.ProjectID,
+		Context:                         ctx,
 	}, nil)
 
 	if err != nil {

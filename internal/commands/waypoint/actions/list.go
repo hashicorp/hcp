@@ -6,7 +6,8 @@ package actions
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -26,7 +27,7 @@ func NewCmdList(ctx *cmd.Context) *cmd.Command {
 		Name:      "list",
 		ShortHelp: "List all known actions.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp waypoint actions list" }} command 
+		The {{ template "mdCodeOrBold" "hcp waypoint actions list" }} command
 		lists all known actions from HCP Waypoint.
 		`),
 		RunF: func(c *cmd.Command, args []string) error {
@@ -46,9 +47,12 @@ func listActions(c *cmd.Command, args []string, opts *ListOpts) error {
 		return err
 	}
 
-	resp, err := opts.WS.WaypointServiceListActionConfigs(&waypoint_service.WaypointServiceListActionConfigsParams{
-		NamespaceID: ns.ID,
-		Context:     opts.Ctx,
+	resp, err := opts.WS2024Client.WaypointServiceListActionConfigs(&waypoint_service.WaypointServiceListActionConfigsParams{
+		// TODO: NamespaceID is still required; remove when SDK is updated
+		NamespaceID:                     &ns.ID,
+		NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+		NamespaceLocationProjectID:      opts.Profile.ProjectID,
+		Context:                         opts.Ctx,
 	}, nil)
 	if err != nil {
 		return fmt.Errorf("error listing actions: %w", err)

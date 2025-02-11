@@ -7,11 +7,11 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
-	"github.com/pkg/errors"
 )
 
 func NewCmdGroupDelete(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
@@ -51,23 +51,13 @@ func NewCmdGroupDelete(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
 }
 
 func agentGroupDelete(log hclog.Logger, opts *GroupOpts) error {
-	resp, err := opts.WS.WaypointServiceGetNamespace(&waypoint_service.WaypointServiceGetNamespaceParams{
-		LocationOrganizationID: opts.Profile.OrganizationID,
-		LocationProjectID:      opts.Profile.ProjectID,
-		Context:                opts.Ctx,
-	}, nil)
-	if err != nil {
-		return errors.Wrapf(err, "Unable to access HCP project")
-	}
-
-	ns := resp.Payload.Namespace
-
 	ctx := opts.Ctx
 
-	_, err = opts.WS.WaypointServiceDeleteAgentGroup(&waypoint_service.WaypointServiceDeleteAgentGroupParams{
-		Name:        opts.Name,
-		NamespaceID: ns.ID,
-		Context:     ctx,
+	_, err := opts.WS2024Client.WaypointServiceDeleteAgentGroup(&waypoint_service.WaypointServiceDeleteAgentGroupParams{
+		Name:                            opts.Name,
+		NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+		NamespaceLocationProjectID:      opts.Profile.ProjectID,
+		Context:                         ctx,
 	}, nil)
 
 	if err != nil {

@@ -9,14 +9,15 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
+	"github.com/pkg/errors"
+
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/waypoint/agent"
-	"github.com/pkg/errors"
 )
 
 type RunOpts struct {
@@ -84,9 +85,10 @@ func agentRun(log hclog.Logger, opts *RunOpts) error {
 	ctx := opts.Ctx
 
 	// check the groups!
-	resp2, err := opts.WS.WaypointServiceValidateAgentGroups(&waypoint_service.WaypointServiceValidateAgentGroupsParams{
-		NamespaceID: ns.ID,
-		Body: &models.HashicorpCloudWaypointWaypointServiceValidateAgentGroupsBody{
+	resp2, err := opts.WS2024Client.WaypointServiceValidateAgentGroups(&waypoint_service.WaypointServiceValidateAgentGroupsParams{
+		NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+		NamespaceLocationProjectID:      opts.Profile.ProjectID,
+		Body: &models.HashicorpCloudWaypointV20241122WaypointServiceValidateAgentGroupsBody{
 			Groups: opts.Groups,
 		},
 		Context: opts.Ctx,
@@ -120,12 +122,13 @@ func agentRun(log hclog.Logger, opts *RunOpts) error {
 	}
 
 	for {
-		opCfg, err := opts.WS.WaypointServiceRetrieveAgentOperation(&waypoint_service.WaypointServiceRetrieveAgentOperationParams{
-			Body: &models.HashicorpCloudWaypointWaypointServiceRetrieveAgentOperationBody{
+		opCfg, err := opts.WS2024Client.WaypointServiceRetrieveAgentOperation(&waypoint_service.WaypointServiceRetrieveAgentOperationParams{
+			Body: &models.HashicorpCloudWaypointV20241122WaypointServiceRetrieveAgentOperationBody{
 				Groups: opts.Groups,
 			},
-			NamespaceID: ns.ID,
-			Context:     ctx,
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Context:                         ctx,
 		}, nil)
 
 		if err != nil {
@@ -164,13 +167,14 @@ func runOp(
 	if ao.ActionRunID != "" {
 		log.Info("reporting action run starting")
 
-		resp, err := opts.WS.WaypointServiceStartingAction(&waypoint_service.WaypointServiceStartingActionParams{
-			NamespaceID: ns,
-			Body: &models.HashicorpCloudWaypointWaypointServiceStartingActionBody{
+		resp, err := opts.WS2024Client.WaypointServiceStartingAction(&waypoint_service.WaypointServiceStartingActionParams{
+			Body: &models.HashicorpCloudWaypointV20241122WaypointServiceStartingActionBody{
 				ActionRunID: ao.ActionRunID,
 				GroupName:   ao.Group,
 			},
-			Context: ctx,
+			Context:                         ctx,
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
 		}, nil)
 
 		if err != nil {
@@ -183,14 +187,15 @@ func runOp(
 			defer func() {
 				log.Info("reporting action run ended", "status", status, "status-code", statusCode, "action-run-sequence", sequenceNum)
 
-				_, err = opts.WS.WaypointServiceEndingAction(&waypoint_service.WaypointServiceEndingActionParams{
-					NamespaceID: ns,
-					Body: &models.HashicorpCloudWaypointWaypointServiceEndingActionBody{
+				_, err = opts.WS2024Client.WaypointServiceEndingAction(&waypoint_service.WaypointServiceEndingActionParams{
+					Body: &models.HashicorpCloudWaypointV20241122WaypointServiceEndingActionBody{
 						ActionRunID: resp.Payload.ActionRunID,
 						FinalStatus: status,
 						StatusCode:  int32(statusCode),
 					},
-					Context: ctx,
+					Context:                         ctx,
+					NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+					NamespaceLocationProjectID:      opts.Profile.ProjectID,
 				}, nil)
 
 				if err != nil {

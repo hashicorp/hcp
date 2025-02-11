@@ -7,8 +7,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -121,14 +121,11 @@ func createAction(c *cmd.Command, args []string, opts *CreateOpts) error {
 	}
 
 	// Ok, run the command!!
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-	_, err = opts.WS.WaypointServiceCreateActionConfig(&waypoint_service.WaypointServiceCreateActionConfigParams{
-		NamespaceID: ns.ID,
-		Context:     opts.Ctx,
-		Body: &models.HashicorpCloudWaypointWaypointServiceCreateActionConfigBody{
+	_, err := opts.WS2024Client.WaypointServiceCreateActionConfig(&waypoint_service.WaypointServiceCreateActionConfigParams{
+		NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+		NamespaceLocationProjectID:      opts.Profile.ProjectID,
+		Context:                         opts.Ctx,
+		Body: &models.HashicorpCloudWaypointV20241122WaypointServiceCreateActionConfigBody{
 			ActionConfig: &models.HashicorpCloudWaypointActionConfig{
 				Name:        opts.Name,
 				Description: opts.Description,
