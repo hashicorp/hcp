@@ -7,13 +7,13 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
+
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
-	"github.com/pkg/errors"
 )
 
 func NewCmdGroupCreate(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
@@ -63,20 +63,16 @@ func NewCmdGroupCreate(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
 }
 
 func agentGroupCreate(log hclog.Logger, opts *GroupOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return errors.Wrapf(err, "Unable to access HCP project")
-	}
-
 	ctx := opts.Ctx
 
 	grp := &models.HashicorpCloudWaypointAgentGroup{
 		Description: opts.Description,
 		Name:        opts.Name,
 	}
-	_, err = opts.WS.WaypointServiceCreateAgentGroup(&waypoint_service.WaypointServiceCreateAgentGroupParams{
-		NamespaceID: ns.ID,
-		Body: &models.HashicorpCloudWaypointWaypointServiceCreateAgentGroupBody{
+	_, err := opts.WS2024Client.WaypointServiceCreateAgentGroup(&waypoint_service.WaypointServiceCreateAgentGroupParams{
+		NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+		NamespaceLocationProjectID:      opts.Profile.ProjectID,
+		Body: &models.HashicorpCloudWaypointV20241122WaypointServiceCreateAgentGroupBody{
 			Group: grp,
 		},
 		Context: ctx,
