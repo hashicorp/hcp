@@ -8,6 +8,8 @@ import (
 
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	service20241122 "github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
@@ -17,16 +19,18 @@ import (
 
 func New(ctx *cmd.Context) WaypointOpts {
 	return WaypointOpts{
-		Ctx:     ctx.ShutdownCtx,
-		Profile: ctx.Profile,
-		IO:      ctx.IO,
-		Output:  ctx.Output,
-		WS:      waypoint_service.New(ctx.HCP, nil),
+		Ctx:          ctx.ShutdownCtx,
+		Profile:      ctx.Profile,
+		IO:           ctx.IO,
+		Output:       ctx.Output,
+		WS:           waypoint_service.New(ctx.HCP, nil),
+		WS2024Client: service20241122.New(ctx.HCP, nil),
 	}
 }
 
 type WaypointOpts struct {
-	WS waypoint_service.ClientService
+	WS           waypoint_service.ClientService
+	WS2024Client service20241122.ClientService
 
 	Ctx     context.Context
 	Profile *profile.Profile

@@ -6,8 +6,8 @@ package addons
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 	"github.com/hashicorp/hcp/internal/commands/waypoint/internal"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -16,7 +16,7 @@ import (
 )
 
 func NewCmdCreate(ctx *cmd.Context, opts *AddOnOpts) *cmd.Command {
-	cmd := &cmd.Command{
+	c := &cmd.Command{
 		Name:      "create",
 		ShortHelp: "Create a new HCP Waypoint add-on.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
@@ -90,15 +90,10 @@ $ hcp waypoint add-ons create -n=my-addon -a=my-application -d=my-addon-definiti
 		},
 	}
 
-	return cmd
+	return c
 }
 
 func addOnCreate(opts *AddOnOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-
 	// Variable Processing
 
 	// a map is used with the key being the variable name, so that
@@ -136,11 +131,12 @@ func addOnCreate(opts *AddOnOpts) error {
 
 	// End Variable Processing
 
-	_, err = opts.WS.WaypointServiceCreateAddOn(
+	_, err := opts.WS2024Client.WaypointServiceCreateAddOn(
 		&waypoint_service.WaypointServiceCreateAddOnParams{
-			NamespaceID: ns.ID,
-			Context:     opts.Ctx,
-			Body: &models.HashicorpCloudWaypointWaypointServiceCreateAddOnBody{
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Context:                         opts.Ctx,
+			Body: &models.HashicorpCloudWaypointV20241122WaypointServiceCreateAddOnBody{
 				Application: &models.HashicorpCloudWaypointRefApplication{
 					Name: opts.ApplicationName,
 				},

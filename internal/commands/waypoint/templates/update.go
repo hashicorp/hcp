@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 	"github.com/hashicorp/hcp/internal/commands/waypoint/internal"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -144,11 +144,6 @@ $ hcp waypoint templates update -n=my-template \
 }
 
 func templateUpdate(opts *TemplateOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-
 	// NOTE (clint): We have to get the existing template to get the collections
 	// (labels, tags, actions, variables) so that we can either omit or post
 	// updates to them based on the inputs here. This is because of how the
@@ -160,11 +155,12 @@ func templateUpdate(opts *TemplateOpts) error {
 	// Unfortunately even if the model had omitempty, this would then cause the
 	// fieldmask to not get set, which is needed for the PATCH semantics, thus
 	// no change would occur.
-	resp, err := opts.WS.WaypointServiceGetApplicationTemplate2(
+	resp, err := opts.WS2024Client.WaypointServiceGetApplicationTemplate2(
 		&waypoint_service.WaypointServiceGetApplicationTemplate2Params{
-			NamespaceID:             ns.ID,
-			Context:                 opts.Ctx,
-			ApplicationTemplateName: opts.Name,
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Context:                         opts.Ctx,
+			ApplicationTemplateName:         opts.Name,
 		}, nil,
 	)
 	if err != nil {
@@ -253,9 +249,10 @@ func templateUpdate(opts *TemplateOpts) error {
 	// if a variable file is present but represents an empty list of variables,
 	// we need to set the fieldmask for variables to clear them out
 
-	_, err = opts.WS.WaypointServiceUpdateApplicationTemplate6(
+	_, err = opts.WS2024Client.WaypointServiceUpdateApplicationTemplate6(
 		&waypoint_service.WaypointServiceUpdateApplicationTemplate6Params{
-			NamespaceID:                     ns.ID,
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
 			Context:                         opts.Ctx,
 			ExistingApplicationTemplateName: opts.Name,
 			ApplicationTemplate:             updatedTpl,

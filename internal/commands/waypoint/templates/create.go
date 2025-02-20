@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 	"github.com/hashicorp/hcp/internal/commands/waypoint/internal"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -17,7 +17,7 @@ import (
 )
 
 func NewCmdCreate(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
-	cmd := &cmd.Command{
+	c := &cmd.Command{
 		Name:      "create",
 		ShortHelp: "Create a new HCP Waypoint template.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
@@ -160,16 +160,14 @@ $ hcp waypoint templates create -n=my-template \
 		},
 	}
 
-	return cmd
+	return c
 }
 
 func templateCreate(opts *TemplateOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-
-	var tags []*models.HashicorpCloudWaypointTag
+	var (
+		tags []*models.HashicorpCloudWaypointTag
+		err  error
+	)
 	for k, v := range opts.Tags {
 		tags = append(tags, &models.HashicorpCloudWaypointTag{
 			Key:   k,
@@ -200,10 +198,11 @@ func templateCreate(opts *TemplateOpts) error {
 		}
 	}
 
-	_, err = opts.WS.WaypointServiceCreateApplicationTemplate(
+	_, err = opts.WS2024Client.WaypointServiceCreateApplicationTemplate(
 		&waypoint_service.WaypointServiceCreateApplicationTemplateParams{
-			NamespaceID: ns.ID,
-			Body: &models.HashicorpCloudWaypointWaypointServiceCreateApplicationTemplateBody{
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Body: &models.HashicorpCloudWaypointV20241122WaypointServiceCreateApplicationTemplateBody{
 				ApplicationTemplate: &models.HashicorpCloudWaypointApplicationTemplate{
 					Name:                   opts.Name,
 					Summary:                opts.Summary,

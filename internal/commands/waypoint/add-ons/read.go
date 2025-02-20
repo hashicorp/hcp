@@ -4,7 +4,7 @@
 package addons
 
 import (
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -13,7 +13,7 @@ import (
 )
 
 func NewCmdRead(ctx *cmd.Context, opts *AddOnOpts) *cmd.Command {
-	cmd := &cmd.Command{
+	c := &cmd.Command{
 		Name:      "read",
 		ShortHelp: "Read an HCP Waypoint add-on.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
@@ -49,20 +49,16 @@ $ hcp waypoint add-ons read -n=my-addon
 			},
 		},
 	}
-	return cmd
+	return c
 }
 
 func addOnRead(opts *AddOnOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-
-	getResp, err := opts.WS.WaypointServiceGetAddOn2(
+	getResp, err := opts.WS2024Client.WaypointServiceGetAddOn2(
 		&waypoint_service.WaypointServiceGetAddOn2Params{
-			NamespaceID: ns.ID,
-			Context:     opts.Ctx,
-			AddOnName:   opts.Name,
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Context:                         opts.Ctx,
+			AddOnName:                       opts.Name,
 		}, nil,
 	)
 	if err != nil {

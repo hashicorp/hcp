@@ -6,7 +6,7 @@ package definitions
 import (
 	"strings"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -56,16 +56,12 @@ $ hcp waypoint add-ons definitions read -n=my-addon-definition
 }
 
 func addOnDefinitionRead(opts *AddOnDefinitionOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-
-	getResp, err := opts.WS.WaypointServiceGetAddOnDefinition2(
+	getResp, err := opts.WS2024Client.WaypointServiceGetAddOnDefinition2(
 		&waypoint_service.WaypointServiceGetAddOnDefinition2Params{
-			NamespaceID:         ns.ID,
-			Context:             opts.Ctx,
-			AddOnDefinitionName: opts.Name,
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Context:                         opts.Ctx,
+			AddOnDefinitionName:             opts.Name,
 		}, nil,
 	)
 	if err != nil {

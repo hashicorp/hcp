@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -16,7 +16,7 @@ import (
 )
 
 func NewCmdApplicationsUpdate(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
-	cmd := &cmd.Command{
+	c := &cmd.Command{
 		Name:      "update",
 		ShortHelp: "Update an existing HCP Waypoint application.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
@@ -69,16 +69,14 @@ $ hcp waypoint applications update -n=my-application --action-config-name my-act
 		},
 	}
 
-	return cmd
+	return c
 }
 
 func applicationUpdate(opts *ApplicationOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-
-	var acrs []*models.HashicorpCloudWaypointActionCfgRef
+	var (
+		acrs []*models.HashicorpCloudWaypointActionCfgRef
+		err  error
+	)
 	for _, acn := range opts.ActionConfigNames {
 		acrs = append(acrs, &models.HashicorpCloudWaypointActionCfgRef{
 			Name: acn,
@@ -96,12 +94,13 @@ func applicationUpdate(opts *ApplicationOpts) error {
 		}
 	}
 
-	_, err = opts.WS.WaypointServiceUpdateApplication2(
+	_, err = opts.WS2024Client.WaypointServiceUpdateApplication2(
 		&waypoint_service.WaypointServiceUpdateApplication2Params{
-			NamespaceID:     ns.ID,
-			Context:         opts.Ctx,
-			ApplicationName: opts.Name,
-			Body: &models.HashicorpCloudWaypointWaypointServiceUpdateApplicationBody{
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Context:                         opts.Ctx,
+			ApplicationName:                 opts.Name,
+			Body: &models.HashicorpCloudWaypointV20241122WaypointServiceUpdateApplicationBody{
 				ActionCfgRefs:  acrs,
 				ReadmeMarkdown: readme,
 			},
