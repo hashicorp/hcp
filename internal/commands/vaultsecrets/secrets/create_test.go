@@ -147,7 +147,7 @@ func TestCreateRun(t *testing.T) {
 			RespErr:          true,
 			AugmentOpts: func(o *CreateOpts) {
 				o.SecretFilePath = "-"
-				o.Type = secretTypeKV
+				o.Type = "static"
 			},
 			ErrMsg: "secret value cannot be empty",
 		},
@@ -156,7 +156,7 @@ func TestCreateRun(t *testing.T) {
 			ReadViaStdin: true,
 			AugmentOpts: func(o *CreateOpts) {
 				o.SecretFilePath = "-"
-				o.Type = secretTypeKV
+				o.Type = "static"
 			},
 			MockCalled: true,
 		},
@@ -166,7 +166,7 @@ func TestCreateRun(t *testing.T) {
 			ErrMsg:  "[POST /secrets/2023-11-28/organizations/{organization_id}/projects/{project_id}/apps/{app_name}/secret/kv][429] CreateAppKVSecret default  &{Code:8 Details:[] Message:maximum number of secret versions reached}",
 			AugmentOpts: func(o *CreateOpts) {
 				o.SecretValuePlaintext = testSecretValue
-				o.Type = secretTypeKV
+				o.Type = "static"
 			},
 			MockCalled: true,
 		},
@@ -175,7 +175,7 @@ func TestCreateRun(t *testing.T) {
 			RespErr: false,
 			AugmentOpts: func(o *CreateOpts) {
 				o.SecretValuePlaintext = testSecretValue
-				o.Type = secretTypeKV
+				o.Type = "static"
 			},
 			MockCalled: true,
 		},
@@ -294,7 +294,7 @@ details = {
 			}
 
 			dt := strfmt.NewDateTime()
-			if opts.Type == secretTypeKV {
+			if opts.Type == "static" {
 				if c.MockCalled {
 					if c.RespErr {
 						vs.EXPECT().CreateAppKVSecret(mock.Anything, mock.Anything).Return(nil, errors.New(c.ErrMsg)).Once()
