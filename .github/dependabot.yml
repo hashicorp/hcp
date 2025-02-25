@@ -1,0 +1,20 @@
+---
+version: 2
+
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "America/New_York"
+    groups:
+      gomod-breaking:
+        update-types:
+          - major
+      gomod-backward-compatible:
+        update-types:
+          - minor
+          - patch
+    open-pull-requests-limit: 1
