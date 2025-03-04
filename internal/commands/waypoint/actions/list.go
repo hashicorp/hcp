@@ -42,14 +42,7 @@ func NewCmdList(ctx *cmd.Context) *cmd.Command {
 }
 
 func listActions(c *cmd.Command, args []string, opts *ListOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-
 	resp, err := opts.WS2024Client.WaypointServiceListActionConfigs(&waypoint_service.WaypointServiceListActionConfigsParams{
-		// TODO: NamespaceID is still required; remove when SDK is updated
-		NamespaceID:                     &ns.ID,
 		NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
 		NamespaceLocationProjectID:      opts.Profile.ProjectID,
 		Context:                         opts.Ctx,
