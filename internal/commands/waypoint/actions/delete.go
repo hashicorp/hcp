@@ -6,7 +6,8 @@ package actions
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -29,7 +30,7 @@ func NewCmdDelete(ctx *cmd.Context) *cmd.Command {
 		ShortHelp: "Delete an existing action.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
 		The {{ template "mdCodeOrBold" "hcp waypoint actions delete" }}
-		command deletes an existing action. This will remove the action 
+		command deletes an existing action. This will remove the action
 		completely from HCP Waypoint.
 		`),
 		RunF: func(c *cmd.Command, args []string) error {
@@ -55,17 +56,13 @@ func NewCmdDelete(ctx *cmd.Context) *cmd.Command {
 }
 
 func deleteAction(c *cmd.Command, args []string, opts *DeleteOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-
 	// Make action name a string pointer
 	actionName := &opts.Name
-	_, err = opts.WS.WaypointServiceDeleteActionConfig(&waypoint_service.WaypointServiceDeleteActionConfigParams{
-		NamespaceID: ns.ID,
-		Context:     opts.Ctx,
-		ActionName:  actionName,
+	_, err := opts.WS2024Client.WaypointServiceDeleteActionConfig(&waypoint_service.WaypointServiceDeleteActionConfigParams{
+		NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+		NamespaceLocationProjectID:      opts.Profile.ProjectID,
+		Context:                         opts.Ctx,
+		ActionName:                      actionName,
 	}, nil)
 	if err != nil {
 		return fmt.Errorf("failed to delete action %q: %w", opts.Name, err)

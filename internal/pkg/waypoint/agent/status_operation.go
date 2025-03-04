@@ -9,16 +9,17 @@ import (
 
 	"github.com/go-openapi/strfmt"
 	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 )
 
 type StatusOperation struct {
 	wp waypoint_service.ClientService
 
-	namespace string
-	cfgID     string
-	runID     string
+	orgID  string
+	projID string
+	cfgID  string
+	runID  string
 
 	Message string
 	Values  map[string]string
@@ -27,11 +28,12 @@ type StatusOperation struct {
 
 func (s *StatusOperation) Run(ctx context.Context, log hclog.Logger) (OperationStatus, error) {
 	ret, err := s.wp.WaypointServiceSendStatusLog(&waypoint_service.WaypointServiceSendStatusLogParams{
-		ActionConfigID: s.cfgID,
-		ActionRunSeq:   s.runID,
-		NamespaceID:    s.namespace,
+		ActionConfigID:                  s.cfgID,
+		ActionRunSeq:                    s.runID,
+		NamespaceLocationOrganizationID: s.orgID,
+		NamespaceLocationProjectID:      s.projID,
 
-		Body: &models.HashicorpCloudWaypointWaypointServiceSendStatusLogBody{
+		Body: &models.HashicorpCloudWaypointV20241122WaypointServiceSendStatusLogBody{
 			StatusLog: &models.HashicorpCloudWaypointStatusLog{
 				EmittedAt: strfmt.DateTime(time.Now()),
 				Log:       s.Message,
