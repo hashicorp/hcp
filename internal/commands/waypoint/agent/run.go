@@ -77,11 +77,6 @@ func agentRun(log hclog.Logger, opts *RunOpts) error {
 
 	opts.Groups = cfg.Groups()
 
-	ns, err := opts.Namespace()
-	if err != nil {
-		return errors.Wrapf(err, "Unable to access HCP project")
-	}
-
 	ctx := opts.Ctx
 
 	// check the groups!
@@ -112,7 +107,6 @@ func agentRun(log hclog.Logger, opts *RunOpts) error {
 	log.Info("Waypoint agent initialized",
 		"hcp-org", opts.Profile.OrganizationID,
 		"hcp-project", opts.Profile.ProjectID,
-		"waypoint-namespace", ns.ID,
 		"groups", opts.Groups,
 	)
 
@@ -134,7 +128,7 @@ func agentRun(log hclog.Logger, opts *RunOpts) error {
 		if err != nil {
 			log.Error("error reading agent operation", "error", err)
 		} else if ao := opCfg.Payload.Operation; ao != nil {
-			runOp(log, ctx, opts, ao, exec, ns.ID)
+			runOp(log, ctx, opts, ao, exec)
 		}
 
 		retry.Reset(agentRunDuration)
@@ -154,7 +148,6 @@ func runOp(
 	opts *RunOpts,
 	ao *models.HashicorpCloudWaypointAgentOperation,
 	exec *agent.Executor,
-	ns string,
 ) {
 	var (
 		status      string
