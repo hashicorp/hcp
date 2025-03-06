@@ -7,7 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -16,15 +16,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-func NewCmdDelete(ctx *cmd.Context, runF func(opts *TFCConfigDeleteOpts) error) *cmd.Command {
-	opts := &TFCConfigDeleteOpts{
+func NewCmdDelete(ctx *cmd.Context, runF func(opts *DeleteOpts) error) *cmd.Command {
+	opts := &DeleteOpts{
 		Ctx:            ctx.ShutdownCtx,
 		Profile:        ctx.Profile,
 		Output:         ctx.Output,
 		IO:             ctx.IO,
 		WaypointClient: waypoint_service.New(ctx.HCP, nil),
 	}
-	cmd := &cmd.Command{
+	c := &cmd.Command{
 		Name:      "delete",
 		ShortHelp: "Delete TFC Configuration.",
 		LongHelp: heredoc.New(ctx.IO, heredoc.WithPreserveNewlines()).Must(`
@@ -50,20 +50,16 @@ func NewCmdDelete(ctx *cmd.Context, runF func(opts *TFCConfigDeleteOpts) error) 
 			return cmd.RequireOrgAndProject(ctx)
 		},
 	}
-	return cmd
 
+	return c
 }
 
-func deleteRun(opts *TFCConfigDeleteOpts) error {
-	nsID, err := GetNamespace(opts.Ctx, opts.WaypointClient, opts.Profile.OrganizationID, opts.Profile.ProjectID)
-	if err != nil {
-		return err
-	}
-
+func deleteRun(opts *DeleteOpts) error {
 	resp, err := opts.WaypointClient.WaypointServiceDeleteTFCConfig(
 		&waypoint_service.WaypointServiceDeleteTFCConfigParams{
-			NamespaceID: nsID,
-			Context:     opts.Ctx,
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Context:                         opts.Ctx,
 		}, nil,
 	)
 	if err != nil {
@@ -77,7 +73,7 @@ func deleteRun(opts *TFCConfigDeleteOpts) error {
 	return nil
 }
 
-type TFCConfigDeleteOpts struct {
+type DeleteOpts struct {
 	Ctx            context.Context
 	Profile        *profile.Profile
 	Output         *format.Outputter

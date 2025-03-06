@@ -6,7 +6,8 @@ package actions
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -55,17 +56,13 @@ func NewCmdRead(ctx *cmd.Context) *cmd.Command {
 }
 
 func readAction(c *cmd.Command, args []string, opts *ReadOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-
 	// Make action name a string pointer
 	actionName := &opts.Name
-	resp, err := opts.WS.WaypointServiceGetActionConfig(&waypoint_service.WaypointServiceGetActionConfigParams{
-		NamespaceID: ns.ID,
-		Context:     opts.Ctx,
-		ActionName:  actionName,
+	resp, err := opts.WS2024Client.WaypointServiceGetActionConfig(&waypoint_service.WaypointServiceGetActionConfigParams{
+		NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+		NamespaceLocationProjectID:      opts.Profile.ProjectID,
+		Context:                         opts.Ctx,
+		ActionName:                      actionName,
 	}, nil)
 	if err != nil {
 		return fmt.Errorf("error getting action for %q: %w",
