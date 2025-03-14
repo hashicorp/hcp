@@ -26,7 +26,7 @@ func (_m *MockHCPConfig) EXPECT() *MockHCPConfig_Expecter {
 	return &MockHCPConfig_Expecter{mock: &_m.Mock}
 }
 
-// APIAddress provides a mock function with given fields:
+// APIAddress provides a mock function with no fields
 func (_m *MockHCPConfig) APIAddress() string {
 	ret := _m.Called()
 
@@ -71,7 +71,7 @@ func (_c *MockHCPConfig_APIAddress_Call) RunAndReturn(run func() string) *MockHC
 	return _c
 }
 
-// APITLSConfig provides a mock function with given fields:
+// APITLSConfig provides a mock function with no fields
 func (_m *MockHCPConfig) APITLSConfig() *tls.Config {
 	ret := _m.Called()
 
@@ -118,7 +118,7 @@ func (_c *MockHCPConfig_APITLSConfig_Call) RunAndReturn(run func() *tls.Config) 
 	return _c
 }
 
-// Logout provides a mock function with given fields:
+// Logout provides a mock function with no fields
 func (_m *MockHCPConfig) Logout() error {
 	ret := _m.Called()
 
@@ -163,7 +163,7 @@ func (_c *MockHCPConfig_Logout_Call) RunAndReturn(run func() error) *MockHCPConf
 	return _c
 }
 
-// PortalURL provides a mock function with given fields:
+// PortalURL provides a mock function with no fields
 func (_m *MockHCPConfig) PortalURL() *url.URL {
 	ret := _m.Called()
 
@@ -210,7 +210,7 @@ func (_c *MockHCPConfig_PortalURL_Call) RunAndReturn(run func() *url.URL) *MockH
 	return _c
 }
 
-// Profile provides a mock function with given fields:
+// Profile provides a mock function with no fields
 func (_m *MockHCPConfig) Profile() *profile.UserProfile {
 	ret := _m.Called()
 
@@ -257,7 +257,7 @@ func (_c *MockHCPConfig_Profile_Call) RunAndReturn(run func() *profile.UserProfi
 	return _c
 }
 
-// SCADAAddress provides a mock function with given fields:
+// SCADAAddress provides a mock function with no fields
 func (_m *MockHCPConfig) SCADAAddress() string {
 	ret := _m.Called()
 
@@ -302,7 +302,7 @@ func (_c *MockHCPConfig_SCADAAddress_Call) RunAndReturn(run func() string) *Mock
 	return _c
 }
 
-// SCADATLSConfig provides a mock function with given fields:
+// SCADATLSConfig provides a mock function with no fields
 func (_m *MockHCPConfig) SCADATLSConfig() *tls.Config {
 	ret := _m.Called()
 
@@ -349,7 +349,7 @@ func (_c *MockHCPConfig_SCADATLSConfig_Call) RunAndReturn(run func() *tls.Config
 	return _c
 }
 
-// Token provides a mock function with given fields:
+// Token provides a mock function with no fields
 func (_m *MockHCPConfig) Token() (*oauth2.Token, error) {
 	ret := _m.Called()
 

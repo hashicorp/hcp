@@ -790,7 +790,7 @@ func (_c *MockClientService_SetTransport_Call) Return() *MockClientService_SetTr
 }
 
 func (_c *MockClientService_SetTransport_Call) RunAndReturn(run func(runtime.ClientTransport)) *MockClientService_SetTransport_Call {
-	_c.Call.Return(run)
+	_c.Run(run)
 	return _c
 }
 

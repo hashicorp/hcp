@@ -31,3 +31,9 @@ packages:
       outpkg: "mock_{{.PackageName}}"
       all: true
       recursive: true
+  github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client:
+    config:
+      dir: "internal/pkg/api/mocks/{{.PackagePath}}"
+      outpkg: "mock_{{.PackageName}}"
+      all: true
+      recursive: true
