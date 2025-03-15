@@ -1,0 +1,3 @@
+```release-note:bug
+waypoint: Fix panic listing Waypoint agent groups when none exist.
+```

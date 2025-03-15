@@ -170,6 +170,80 @@ func (_c *MockClientService_CreateApp_Call) RunAndReturn(run func(*secret_servic
 	return _c
 }
 
+// CreateAppDynamicSecret provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) CreateAppDynamicSecret(params *secret_service.CreateAppDynamicSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.CreateAppDynamicSecretOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateAppDynamicSecret")
+	}
+
+	var r0 *secret_service.CreateAppDynamicSecretOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.CreateAppDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.CreateAppDynamicSecretOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.CreateAppDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.CreateAppDynamicSecretOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.CreateAppDynamicSecretOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.CreateAppDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_CreateAppDynamicSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateAppDynamicSecret'
+type MockClientService_CreateAppDynamicSecret_Call struct {
+	*mock.Call
+}
+
+// CreateAppDynamicSecret is a helper method to define mock.On call
+//   - params *secret_service.CreateAppDynamicSecretParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) CreateAppDynamicSecret(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_CreateAppDynamicSecret_Call {
+	return &MockClientService_CreateAppDynamicSecret_Call{Call: _e.mock.On("CreateAppDynamicSecret",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_CreateAppDynamicSecret_Call) Run(run func(params *secret_service.CreateAppDynamicSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_CreateAppDynamicSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.CreateAppDynamicSecretParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_CreateAppDynamicSecret_Call) Return(_a0 *secret_service.CreateAppDynamicSecretOK, _a1 error) *MockClientService_CreateAppDynamicSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_CreateAppDynamicSecret_Call) RunAndReturn(run func(*secret_service.CreateAppDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.CreateAppDynamicSecretOK, error)) *MockClientService_CreateAppDynamicSecret_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateAppKVSecret provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) CreateAppKVSecret(params *secret_service.CreateAppKVSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.CreateAppKVSecretOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -3200,6 +3274,80 @@ func (_c *MockClientService_GetApp_Call) Return(_a0 *secret_service.GetAppOK, _a
 }
 
 func (_c *MockClientService_GetApp_Call) RunAndReturn(run func(*secret_service.GetAppParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetAppOK, error)) *MockClientService_GetApp_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetAppDynamicSecret provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) GetAppDynamicSecret(params *secret_service.GetAppDynamicSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.GetAppDynamicSecretOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAppDynamicSecret")
+	}
+
+	var r0 *secret_service.GetAppDynamicSecretOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.GetAppDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetAppDynamicSecretOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.GetAppDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.GetAppDynamicSecretOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.GetAppDynamicSecretOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.GetAppDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_GetAppDynamicSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAppDynamicSecret'
+type MockClientService_GetAppDynamicSecret_Call struct {
+	*mock.Call
+}
+
+// GetAppDynamicSecret is a helper method to define mock.On call
+//   - params *secret_service.GetAppDynamicSecretParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) GetAppDynamicSecret(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_GetAppDynamicSecret_Call {
+	return &MockClientService_GetAppDynamicSecret_Call{Call: _e.mock.On("GetAppDynamicSecret",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_GetAppDynamicSecret_Call) Run(run func(params *secret_service.GetAppDynamicSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_GetAppDynamicSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.GetAppDynamicSecretParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_GetAppDynamicSecret_Call) Return(_a0 *secret_service.GetAppDynamicSecretOK, _a1 error) *MockClientService_GetAppDynamicSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_GetAppDynamicSecret_Call) RunAndReturn(run func(*secret_service.GetAppDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.GetAppDynamicSecretOK, error)) *MockClientService_GetAppDynamicSecret_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -7673,7 +7821,7 @@ func (_c *MockClientService_SetTransport_Call) Return() *MockClientService_SetTr
 }
 
 func (_c *MockClientService_SetTransport_Call) RunAndReturn(run func(runtime.ClientTransport)) *MockClientService_SetTransport_Call {
-	_c.Call.Return(run)
+	_c.Run(run)
 	return _c
 }
 
@@ -7895,6 +8043,80 @@ func (_c *MockClientService_UpdateApp_Call) Return(_a0 *secret_service.UpdateApp
 }
 
 func (_c *MockClientService_UpdateApp_Call) RunAndReturn(run func(*secret_service.UpdateAppParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateAppOK, error)) *MockClientService_UpdateApp_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateAppDynamicSecret provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) UpdateAppDynamicSecret(params *secret_service.UpdateAppDynamicSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption) (*secret_service.UpdateAppDynamicSecretOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateAppDynamicSecret")
+	}
+
+	var r0 *secret_service.UpdateAppDynamicSecretOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateAppDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateAppDynamicSecretOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*secret_service.UpdateAppDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) *secret_service.UpdateAppDynamicSecretOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*secret_service.UpdateAppDynamicSecretOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*secret_service.UpdateAppDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_UpdateAppDynamicSecret_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateAppDynamicSecret'
+type MockClientService_UpdateAppDynamicSecret_Call struct {
+	*mock.Call
+}
+
+// UpdateAppDynamicSecret is a helper method to define mock.On call
+//   - params *secret_service.UpdateAppDynamicSecretParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...secret_service.ClientOption
+func (_e *MockClientService_Expecter) UpdateAppDynamicSecret(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_UpdateAppDynamicSecret_Call {
+	return &MockClientService_UpdateAppDynamicSecret_Call{Call: _e.mock.On("UpdateAppDynamicSecret",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_UpdateAppDynamicSecret_Call) Run(run func(params *secret_service.UpdateAppDynamicSecretParams, authInfo runtime.ClientAuthInfoWriter, opts ...secret_service.ClientOption)) *MockClientService_UpdateAppDynamicSecret_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]secret_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(secret_service.ClientOption)
+			}
+		}
+		run(args[0].(*secret_service.UpdateAppDynamicSecretParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_UpdateAppDynamicSecret_Call) Return(_a0 *secret_service.UpdateAppDynamicSecretOK, _a1 error) *MockClientService_UpdateAppDynamicSecret_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_UpdateAppDynamicSecret_Call) RunAndReturn(run func(*secret_service.UpdateAppDynamicSecretParams, runtime.ClientAuthInfoWriter, ...secret_service.ClientOption) (*secret_service.UpdateAppDynamicSecretOK, error)) *MockClientService_UpdateAppDynamicSecret_Call {
 	_c.Call.Return(run)
 	return _c
 }

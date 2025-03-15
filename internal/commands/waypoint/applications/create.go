@@ -6,8 +6,8 @@ package applications
 import (
 	"fmt"
 
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 	"github.com/hashicorp/hcp/internal/commands/waypoint/internal"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
@@ -16,7 +16,7 @@ import (
 )
 
 func NewCmdApplicationsCreate(ctx *cmd.Context, opts *ApplicationOpts) *cmd.Command {
-	cmd := &cmd.Command{
+	c := &cmd.Command{
 		Name:      "create",
 		ShortHelp: "Create a new HCP Waypoint application.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
@@ -91,15 +91,10 @@ $ hcp waypoint application create -n=my-application -t=my-template
 		},
 	}
 
-	return cmd
+	return c
 }
 
 func applicationCreate(opts *ApplicationOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-
 	actionConfigs := make([]*models.HashicorpCloudWaypointActionCfgRef, len(opts.ActionConfigNames))
 	for i, name := range opts.ActionConfigNames {
 		actionConfigs[i] = &models.HashicorpCloudWaypointActionCfgRef{
@@ -144,11 +139,12 @@ func applicationCreate(opts *ApplicationOpts) error {
 
 	// End Variable Processing
 
-	_, err = opts.WS.WaypointServiceCreateApplicationFromTemplate(
+	_, err := opts.WS2024Client.WaypointServiceCreateApplicationFromTemplate(
 		&waypoint_service.WaypointServiceCreateApplicationFromTemplateParams{
-			NamespaceID: ns.ID,
-			Context:     opts.Ctx,
-			Body: &models.HashicorpCloudWaypointWaypointServiceCreateApplicationFromTemplateBody{
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Context:                         opts.Ctx,
+			Body: &models.HashicorpCloudWaypointV20241122WaypointServiceCreateApplicationFromTemplateBody{
 				Name: opts.Name,
 				ApplicationTemplate: &models.HashicorpCloudWaypointRefApplicationTemplate{
 					Name: opts.TemplateName,

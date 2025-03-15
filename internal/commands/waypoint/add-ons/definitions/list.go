@@ -4,8 +4,8 @@
 package definitions
 
 import (
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -43,17 +43,13 @@ $ hcp waypoint add-ons definitions list
 }
 
 func addOnDefinitionsList(opts *AddOnDefinitionOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-
 	var addOnDefinitions []*models.HashicorpCloudWaypointAddOnDefinition
 
-	listResp, err := opts.WS.WaypointServiceListAddOnDefinitions(
+	listResp, err := opts.WS2024Client.WaypointServiceListAddOnDefinitions(
 		&waypoint_service.WaypointServiceListAddOnDefinitionsParams{
-			NamespaceID: ns.ID,
-			Context:     opts.Ctx,
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Context:                         opts.Ctx,
 		}, nil,
 	)
 	if err != nil {
@@ -65,11 +61,12 @@ func addOnDefinitionsList(opts *AddOnDefinitionOpts) error {
 	addOnDefinitions = append(addOnDefinitions, listResp.GetPayload().AddOnDefinitions...)
 
 	for listResp.GetPayload().Pagination.NextPageToken != "" {
-		listResp, err = opts.WS.WaypointServiceListAddOnDefinitions(
+		listResp, err = opts.WS2024Client.WaypointServiceListAddOnDefinitions(
 			&waypoint_service.WaypointServiceListAddOnDefinitionsParams{
-				NamespaceID:             ns.ID,
-				Context:                 opts.Ctx,
-				PaginationNextPageToken: &listResp.GetPayload().Pagination.NextPageToken,
+				NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+				NamespaceLocationProjectID:      opts.Profile.ProjectID,
+				Context:                         opts.Ctx,
+				PaginationNextPageToken:         &listResp.GetPayload().Pagination.NextPageToken,
 			}, nil)
 		if err != nil {
 			return errors.Wrapf(err, "%s failed to list paginated add-on definitions",

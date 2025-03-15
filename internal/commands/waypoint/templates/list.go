@@ -4,8 +4,8 @@
 package templates
 
 import (
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/client/waypoint_service"
-	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2023-08-18/models"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -13,7 +13,7 @@ import (
 )
 
 func NewCmdList(ctx *cmd.Context, opts *TemplateOpts) *cmd.Command {
-	cmd := &cmd.Command{
+	c := &cmd.Command{
 		Name:      "list",
 		ShortHelp: "List all HCP Waypoint templates.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
@@ -36,21 +36,17 @@ $ hcp waypoint templates list
 		},
 	}
 
-	return cmd
+	return c
 }
 
 func listTemplates(opts *TemplateOpts) error {
-	ns, err := opts.Namespace()
-	if err != nil {
-		return err
-	}
-
 	var templates []*models.HashicorpCloudWaypointApplicationTemplate
 
-	resp, err := opts.WS.WaypointServiceListApplicationTemplates(
+	resp, err := opts.WS2024Client.WaypointServiceListApplicationTemplates(
 		&waypoint_service.WaypointServiceListApplicationTemplatesParams{
-			NamespaceID: ns.ID,
-			Context:     opts.Ctx,
+			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+			NamespaceLocationProjectID:      opts.Profile.ProjectID,
+			Context:                         opts.Ctx,
 		}, nil)
 	if err != nil {
 		return errors.Wrapf(err, "%s failed to list templates",
@@ -61,11 +57,12 @@ func listTemplates(opts *TemplateOpts) error {
 	templates = append(templates, resp.GetPayload().ApplicationTemplates...)
 
 	for resp.GetPayload().Pagination.NextPageToken != "" {
-		resp, err = opts.WS.WaypointServiceListApplicationTemplates(
+		resp, err = opts.WS2024Client.WaypointServiceListApplicationTemplates(
 			&waypoint_service.WaypointServiceListApplicationTemplatesParams{
-				NamespaceID:             ns.ID,
-				Context:                 opts.Ctx,
-				PaginationNextPageToken: &resp.GetPayload().Pagination.NextPageToken,
+				NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
+				NamespaceLocationProjectID:      opts.Profile.ProjectID,
+				Context:                         opts.Ctx,
+				PaginationNextPageToken:         &resp.GetPayload().Pagination.NextPageToken,
 			}, nil)
 		if err != nil {
 			return errors.Wrapf(err, "%s failed to list paginated templates",
