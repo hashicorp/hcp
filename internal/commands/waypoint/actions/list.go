@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 
 	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -42,6 +43,8 @@ func NewCmdList(ctx *cmd.Context) *cmd.Command {
 }
 
 func listActions(c *cmd.Command, args []string, opts *ListOpts) error {
+	var actionsList actionsListDisplayer
+
 	resp, err := opts.WS2024Client.WaypointServiceListActionConfigs(&waypoint_service.WaypointServiceListActionConfigsParams{
 		NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
 		NamespaceLocationProjectID:      opts.Profile.ProjectID,
@@ -52,5 +55,37 @@ func listActions(c *cmd.Command, args []string, opts *ListOpts) error {
 	}
 
 	respPayload := resp.GetPayload()
-	return opts.Output.Show(respPayload.ActionConfigs, format.Pretty)
+
+	actionsList = append(actionsList, respPayload.ActionConfigs...)
+
+	return opts.Output.Show(actionsList, format.Pretty)
+}
+
+type actionsListDisplayer []*models.HashicorpCloudWaypointActionConfig
+
+func (d actionsListDisplayer) DefaultFormat() format.Format {
+	return format.Table
+}
+
+func (d actionsListDisplayer) Payload() any {
+	return d
+}
+
+func (d actionsListDisplayer) FieldTemplates() []format.Field {
+	//TODO(henry): fix this format (maybe don't include URL)
+	// Also write tests for this
+	return []format.Field{
+		{
+			Name:        "Name",
+			ValueFormat: "{{ .Name }}",
+		},
+		{
+			Name:        "ActionURL",
+			ValueFormat: "{{ .ActionURL }}",
+		},
+		{
+			Name:        "Description",
+			ValueFormat: "{{ .Description }}",
+		},
+	}
 }
