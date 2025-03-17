@@ -1,0 +1,3 @@
+```release-note:bug
+security: address vulnerability GO-2025-3487 and GO-2025-3488.
+```
