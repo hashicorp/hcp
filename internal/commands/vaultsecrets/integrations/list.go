@@ -84,7 +84,6 @@ func listRun(opts *ListOpts) error {
 			Context:        opts.Ctx,
 			ProjectID:      opts.Profile.ProjectID,
 			OrganizationID: opts.Profile.OrganizationID,
-			Capabilities:   []string{"ROTATION", "DYNAMIC"},
 		}
 		for {
 			resp, err := opts.Client.ListIntegrations(params, nil)
