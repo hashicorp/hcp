@@ -1,0 +1,3 @@
+```release-note:bug
+vault-secrets: fixed list integrations request to pull in all integrations when no parameters specified
+```
