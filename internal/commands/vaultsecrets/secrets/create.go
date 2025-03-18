@@ -212,7 +212,7 @@ var (
 
 func createRun(opts *CreateOpts) error {
 	switch opts.Type {
-	case "static", "":
+	case secretTypeKV, "static", "":
 		if err := readPlainTextSecret(opts); err != nil {
 			return err
 		}
