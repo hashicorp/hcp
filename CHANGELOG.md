@@ -1,3 +1,17 @@
+## 0.9.0 (March 18, 2024)
+
+BREAKING CHANGES:
+
+* waypoint: Require no-code module ID for creating templates and add-on defintiions. [[GH-198](https://github.com/hashicorp/hcp/issues/198)]
+
+BUG FIXES:
+
+* security: address vulnerability GO-2025-3487 and GO-2025-3488. [[GH-219](https://github.com/hashicorp/hcp/issues/219)]
+* vault-secrets: corrected error output for postgres integration creation, MongoDB Atlas -> Postgres. [[GH-203](https://github.com/hashicorp/hcp/issues/203)]
+* vault-secrets: corrected json output for gateways, GatewayPool -> gateway_pool [[GH-201](https://github.com/hashicorp/hcp/issues/201)]
+* vault-secrets: fixed list integrations request to pull in all integrations when no parameters specified [[GH-222](https://github.com/hashicorp/hcp/issues/222)]
+* waypoint: Fix panic listing Waypoint agent groups when none exist. [[GH-220](https://github.com/hashicorp/hcp/issues/220)]
+
 ## 0.8.0 (December 04, 2024)
 
 FEATURES:
