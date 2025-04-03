@@ -33,7 +33,6 @@ func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
 		WaypointOpts: opts.New(ctx),
 		Request: &models.HashicorpCloudWaypointActionConfigRequest{
 			Custom: &models.HashicorpCloudWaypointActionConfigFlavorCustom{},
-			Github: &models.HashicorpCloudWaypointActionConfigFlavorGitHub{},
 		},
 	}
 
@@ -97,10 +96,10 @@ func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
 func createAction(c *cmd.Command, args []string, opts *CreateOpts) error {
 	// Validate Request Type is not set to all options
 	if opts.Request != nil {
-		if opts.Request.Custom != nil && opts.Request.Github != nil {
+		if opts.Request.Custom != nil && opts.Request.Custom.URL != "" && opts.Request.Github != nil {
 			return errors.New("only one request type can be set")
 		}
-		if opts.Request.Custom != nil {
+		if opts.Request.Github != nil {
 			return errors.New("gitHub request types are not yet supported")
 		}
 	}

@@ -1,0 +1,3 @@
+```release-note:bug
+waypoint: Fix a bug preventing Waypoint actions from being created or updated.
+```
