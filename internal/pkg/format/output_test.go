@@ -5,6 +5,7 @@ package format_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/hcp/internal/pkg/format"
@@ -39,4 +40,31 @@ func TestOutputter_SetFormat(t *testing.T) {
 	var parsed *KV
 	r.NoError(json.Unmarshal(io.Output.Bytes(), &parsed))
 	r.Equal(d.KVs[0], parsed)
+}
+
+type InnerStruct struct {
+	Name string
+}
+
+type OuterStruct struct {
+	Name  string
+	Inner *InnerStruct
+}
+
+func TestNilInnerStruct(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	kv := &OuterStruct{
+		Name: "OuterStruct",
+		// we leave inner nil on purpose
+	}
+
+	io := iostreams.Test()
+	out := format.New(io)
+	err := out.Show(kv, format.Pretty)
+
+	fmt.Println("err", err)
+	// r.NoError(err)
+	r.Equal("Name:       OuterStruct\nInner:      <nil>\n", io.Output.String())
 }
