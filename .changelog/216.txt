@@ -1,0 +1,3 @@
+```release-note:bug
+fix(vaultsecrets.secrets.create): parse correct secret-type for kv
+```
