@@ -8,9 +8,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
-	"github.com/stretchr/testify/require"
 )
 
 func TestOutputter_SetFormat(t *testing.T) {
@@ -42,13 +43,18 @@ func TestOutputter_SetFormat(t *testing.T) {
 	r.Equal(d.KVs[0], parsed)
 }
 
-type InnerStruct struct {
+type InnerL2Struct struct {
 	Name string
+}
+
+type InnerL1Struct struct {
+	Name  string
+	Inner *InnerL2Struct
 }
 
 type OuterStruct struct {
 	Name  string
-	Inner *InnerStruct
+	Inner *InnerL1Struct
 }
 
 func TestNilInnerStruct(t *testing.T) {
@@ -64,7 +70,51 @@ func TestNilInnerStruct(t *testing.T) {
 	out := format.New(io)
 	err := out.Show(kv, format.Pretty)
 
-	fmt.Println("err", err)
-	// r.NoError(err)
-	r.Equal("Name:       OuterStruct\nInner:      <nil>\n", io.Output.String())
+	r.NoError(err)
+	fmt.Println(io.Output.String())
+	r.Equal("Name:             OuterStruct\n", io.Output.String())
+}
+
+func TestNilInnerL2Struct(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	kv := &OuterStruct{
+		Name: "OuterStruct",
+		Inner: &InnerL1Struct{
+			Name: "InnerL1Struct",
+			// we leave inner nil on purpose
+		},
+	}
+
+	io := iostreams.Test()
+	out := format.New(io)
+	err := out.Show(kv, format.Pretty)
+
+	r.NoError(err)
+	fmt.Println(io.Output.String())
+	r.Equal("Name:             OuterStruct\nInner Name:       InnerL1Struct\n", io.Output.String())
+}
+
+func TestNonNilInnerStruct(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+
+	kv := &OuterStruct{
+		Name: "OuterStruct",
+		Inner: &InnerL1Struct{
+			Name: "InnerL1Struct",
+			Inner: &InnerL2Struct{
+				Name: "InnerStruct",
+			},
+		},
+	}
+
+	io := iostreams.Test()
+	out := format.New(io)
+	err := out.Show(kv, format.Pretty)
+
+	r.NoError(err)
+	fmt.Println(io.Output.String())
+	r.Equal("Name:             OuterStruct\nInner Name:       InnerL1Struct\nInner Inner Name: InnerStruct\n", io.Output.String())
 }

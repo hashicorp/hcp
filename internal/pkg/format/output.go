@@ -148,7 +148,10 @@ func inferFields[T any](payload T, columns []string) []Field {
 				if f.Type.Kind() == reflect.Ptr {
 					t = f.Type.Elem()
 				}
+				dotted, _ := fieldNames(parts)
+				ret = append(ret, NewField("", fmt.Sprintf("{{ if .%s }}", dotted)))
 				getFields(t, parts)
+				ret = append(ret, NewField("", "{{ end }}"))
 			} else {
 				dotted, formatted := fieldNames(parts)
 				df := NewField(formatted, fmt.Sprintf("{{ .%s }}", dotted))
@@ -372,8 +375,12 @@ func prettyPrintTemplate(d Displayer) string {
 	// Go through each field and output a new line
 	fields := d.FieldTemplates()
 	for i, f := range fields {
-		fmt.Fprintf(w, "%s:\t%s", f.Name, f.ValueFormat)
-		if i != len(fields)-1 {
+		if f.Name != "" {
+			fmt.Fprintf(w, "%s:\t%s", f.Name, f.ValueFormat)
+		} else {
+			fmt.Fprintf(w, "%s", f.ValueFormat)
+		}
+		if i != len(fields)-1 && fields[i+1].Name != "" {
 			fmt.Fprintln(w)
 		}
 	}
