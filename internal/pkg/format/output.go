@@ -103,7 +103,7 @@ func inferFields[T any](payload T, columns []string) []Field {
 	toField := map[string]int{}
 
 	for i, col := range columns {
-		toField[col] = i
+		toField[fmt.Sprintf(".%s", col)] = i
 	}
 
 	st := rv.Type()
@@ -119,7 +119,7 @@ func inferFields[T any](payload T, columns []string) []Field {
 	// and the spaced version is the parts joined by a space (e.g. "Cluster Info
 	// Name") and each part spaced on camel case words.
 	fieldNames := func(parts []string) (dotted, spaced string) {
-		dotted = strings.Join(parts, ".")
+		dotted = "." + strings.Join(parts, ".")
 		for i, part := range parts {
 			if i != 0 {
 				spaced += " "
@@ -128,6 +128,28 @@ func inferFields[T any](payload T, columns []string) []Field {
 			spaced += formatName(part)
 		}
 		return
+	}
+
+	dottedToTmpl := func(dotted string) string {
+		parts := strings.Split(dotted, ".")
+		if len(parts) == 2 { // Input has no dots or is just a dot
+			return fmt.Sprintf("{{ %s }}", dotted)
+		}
+		var result []string
+		current := parts[0] // This will be empty string if input starts with dot
+		for i := 1; i < len(parts); i++ {
+			current += "." + parts[i]
+			result = append(result, current)
+		}
+		var sb strings.Builder
+		for _, r := range result {
+			sb.WriteString(fmt.Sprintf("{{ if %s }}", r))
+		}
+		sb.WriteString(fmt.Sprintf("{{ %s }}", result[len(result)-1]))
+		for i, iLen := 0, len(result); i < iLen; i++ {
+			sb.WriteString("{{ end }}")
+		}
+		return sb.String()
 	}
 
 	var getFields func(st reflect.Type, namePrefix []string)
@@ -151,7 +173,7 @@ func inferFields[T any](payload T, columns []string) []Field {
 				getFields(t, parts)
 			} else {
 				dotted, formatted := fieldNames(parts)
-				df := NewField(formatted, fmt.Sprintf("{{ .%s }}", dotted))
+				df := NewField(formatted, fmt.Sprintf("%s", dottedToTmpl(dotted)))
 				if all {
 					ret = append(ret, df)
 				} else if idx, ok := toField[dotted]; ok {
@@ -165,7 +187,7 @@ func inferFields[T any](payload T, columns []string) []Field {
 		// any String() method on the struct.
 		if exportedFields == 0 {
 			dotted, formatted := fieldNames(namePrefix)
-			ret = append(ret, NewField(formatted, fmt.Sprintf("{{ .%s}}", dotted)))
+			ret = append(ret, NewField(formatted, fmt.Sprintf("{{ %s}}", dottedToTmpl(dotted))))
 		}
 	}
 
