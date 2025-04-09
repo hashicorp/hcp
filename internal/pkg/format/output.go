@@ -173,7 +173,7 @@ func inferFields[T any](payload T, columns []string) []Field {
 				getFields(t, parts)
 			} else {
 				dotted, formatted := fieldNames(parts)
-				df := NewField(formatted, fmt.Sprintf("%s", dottedToTmpl(dotted)))
+				df := NewField(formatted, dottedToTmpl(dotted))
 				if all {
 					ret = append(ret, df)
 				} else if idx, ok := toField[dotted]; ok {
@@ -187,7 +187,7 @@ func inferFields[T any](payload T, columns []string) []Field {
 		// any String() method on the struct.
 		if exportedFields == 0 {
 			dotted, formatted := fieldNames(namePrefix)
-			ret = append(ret, NewField(formatted, fmt.Sprintf("{{ %s}}", dottedToTmpl(dotted))))
+			ret = append(ret, NewField(formatted, dottedToTmpl(dotted)))
 		}
 	}
 
