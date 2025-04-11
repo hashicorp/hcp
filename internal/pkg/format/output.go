@@ -167,7 +167,7 @@ func inferFields[T any](payload T, columns []string) []Field {
 
 		// Handle the case where the struct has no exported fields such as
 		// time.Time. In this case, we display the struct directly, defering to
-		//any String() method on the struct.
+		// any String() method on the struct.
 		if exportedFields == 0 {
 			dotted, formatted := fieldNames(namePrefix)
 			ret = append(ret, NewField(formatted, fmt.Sprintf("{{ .%s}}", dotted)))
