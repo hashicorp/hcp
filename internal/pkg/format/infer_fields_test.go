@@ -97,7 +97,7 @@ func TestInferFields(t *testing.T) {
 	}
 
 	r.Equal([]Field{
-		{Name: "Metadata Test", ValueFormat: "{{ .Metadata.Test }}"},
+		{Name: "Metadata Test", ValueFormat: "{{ if .Metadata }}{{ if .Metadata.Test }}{{ .Metadata.Test }}{{ end }}{{ end }}"},
 	}, inferFields(s7, nil))
 
 	s8 := struct {
@@ -110,7 +110,7 @@ func TestInferFields(t *testing.T) {
 	}
 
 	r.Equal([]Field{
-		{Name: "Metadata Test", ValueFormat: "{{ .Metadata.Test }}"},
+		{Name: "Metadata Test", ValueFormat: "{{ if .Metadata }}{{ if .Metadata.Test }}{{ .Metadata.Test }}{{ end }}{{ end }}"},
 	}, inferFields(s8, nil))
 
 }
