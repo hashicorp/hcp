@@ -152,12 +152,21 @@ func inferFields[T any](payload T, columns []string) []Field {
 		return sb.String()
 	}
 
-	var getFields func(st reflect.Type, namePrefix []string)
-	getFields = func(st reflect.Type, namePrefix []string) {
+	var getFields func(st reflect.Type, val reflect.Value, namePrefix []string)
+	getFields = func(st reflect.Type, val reflect.Value, namePrefix []string) {
 		exportedFields := 0
 		for i := 0; i < st.NumField(); i++ {
 			f := st.Field(i)
-			if !f.IsExported() {
+			if val.Kind() == reflect.Ptr {
+				val = val.Elem()
+			}
+			fieldVal := val.Field(i)
+			// Ignore unexported fields, or zero value fields.
+			if fieldVal.Kind() == reflect.Ptr && fieldVal.IsNil() {
+				continue // skip nil pointers
+			} else if fieldVal.IsZero() {
+				continue // skip zero values (empty strings, 0, nil slices, etc.)
+			} else if !f.IsExported() {
 				continue
 			}
 			exportedFields++
@@ -170,7 +179,7 @@ func inferFields[T any](payload T, columns []string) []Field {
 				if f.Type.Kind() == reflect.Ptr {
 					t = f.Type.Elem()
 				}
-				getFields(t, parts)
+				getFields(t, fieldVal, parts)
 			} else {
 				dotted, formatted := fieldNames(parts)
 				df := NewField(formatted, dottedToTmpl(dotted))
@@ -192,7 +201,7 @@ func inferFields[T any](payload T, columns []string) []Field {
 	}
 
 	// Gather the fields
-	getFields(st, nil)
+	getFields(st, rv, nil)
 	return ret
 }
 
