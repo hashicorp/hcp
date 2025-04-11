@@ -103,7 +103,7 @@ func inferFields[T any](payload T, columns []string) []Field {
 	toField := map[string]int{}
 
 	for i, col := range columns {
-		toField[fmt.Sprintf(".%s", col)] = i
+		toField[col] = i
 	}
 
 	st := rv.Type()
@@ -119,7 +119,7 @@ func inferFields[T any](payload T, columns []string) []Field {
 	// and the spaced version is the parts joined by a space (e.g. "Cluster Info
 	// Name") and each part spaced on camel case words.
 	fieldNames := func(parts []string) (dotted, spaced string) {
-		dotted = "." + strings.Join(parts, ".")
+		dotted = strings.Join(parts, ".")
 		for i, part := range parts {
 			if i != 0 {
 				spaced += " "
@@ -130,34 +130,16 @@ func inferFields[T any](payload T, columns []string) []Field {
 		return
 	}
 
-	dottedToTmpl := func(dotted string) string {
-		parts := strings.Split(dotted, ".")
-		if len(parts) == 2 { // Input has no dots or is just a dot
-			return fmt.Sprintf("{{ %s }}", dotted)
-		}
-		var result []string
-		current := parts[0] // This will be empty string if input starts with dot
-		for i := 1; i < len(parts); i++ {
-			current += "." + parts[i]
-			result = append(result, current)
-		}
-		var sb strings.Builder
-		for _, r := range result {
-			sb.WriteString(fmt.Sprintf("{{ if %s }}", r))
-		}
-		sb.WriteString(fmt.Sprintf("{{ %s }}", result[len(result)-1]))
-		for i, iLen := 0, len(result); i < iLen; i++ {
-			sb.WriteString("{{ end }}")
-		}
-		return sb.String()
-	}
-
-	var getFields func(st reflect.Type, namePrefix []string)
-	getFields = func(st reflect.Type, namePrefix []string) {
+	var getFields func(st reflect.Type, val reflect.Value, namePrefix []string)
+	getFields = func(st reflect.Type, val reflect.Value, namePrefix []string) {
 		exportedFields := 0
 		for i := 0; i < st.NumField(); i++ {
 			f := st.Field(i)
+			fieldVal := val.Field(i)
 			if !f.IsExported() {
+				continue
+			}
+			if (fieldVal.Type().Kind() == reflect.Pointer && fieldVal.IsNil()) || fieldVal.IsZero() {
 				continue
 			}
 			exportedFields++
@@ -169,11 +151,12 @@ func inferFields[T any](payload T, columns []string) []Field {
 				t := f.Type
 				if f.Type.Kind() == reflect.Ptr {
 					t = f.Type.Elem()
+					fieldVal = fieldVal.Elem()
 				}
-				getFields(t, parts)
+				getFields(t, fieldVal, parts)
 			} else {
 				dotted, formatted := fieldNames(parts)
-				df := NewField(formatted, dottedToTmpl(dotted))
+				df := NewField(formatted, fmt.Sprintf("{{ .%s }}", dotted))
 				if all {
 					ret = append(ret, df)
 				} else if idx, ok := toField[dotted]; ok {
@@ -187,12 +170,12 @@ func inferFields[T any](payload T, columns []string) []Field {
 		// any String() method on the struct.
 		if exportedFields == 0 {
 			dotted, formatted := fieldNames(namePrefix)
-			ret = append(ret, NewField(formatted, dottedToTmpl(dotted)))
+			ret = append(ret, NewField(formatted, fmt.Sprintf("{{ .%s}}", dotted)))
 		}
 	}
 
 	// Gather the fields
-	getFields(st, nil)
+	getFields(st, rv, nil)
 	return ret
 }
 

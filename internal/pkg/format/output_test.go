@@ -72,7 +72,7 @@ func TestNilInnerStruct(t *testing.T) {
 
 	r.NoError(err)
 	fmt.Println(io.Output.String())
-	r.Equal("Name:             OuterStruct\nInner Name:       \nInner Inner Name: \n", io.Output.String())
+	r.Equal("Name: OuterStruct\n", io.Output.String())
 }
 
 func TestNilInnerL2Struct(t *testing.T) {
@@ -93,7 +93,7 @@ func TestNilInnerL2Struct(t *testing.T) {
 
 	r.NoError(err)
 	fmt.Println(io.Output.String())
-	r.Equal("Name:             OuterStruct\nInner Name:       InnerL1Struct\nInner Inner Name: \n", io.Output.String())
+	r.Equal("Name:       OuterStruct\nInner Name: InnerL1Struct\n", io.Output.String())
 }
 
 func TestNonNilInnerStruct(t *testing.T) {
