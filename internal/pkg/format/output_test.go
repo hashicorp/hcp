@@ -8,10 +8,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
+	"github.com/stretchr/testify/require"
 )
 
 func TestOutputter_SetFormat(t *testing.T) {

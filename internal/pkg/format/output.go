@@ -130,10 +130,10 @@ func inferFields[T any](payload T, columns []string) []Field {
 		return
 	}
 
-	dottedToTmpl := func(dotted string) string {
+	dottedToTmpl := func(formattedName, dotted string) string {
 		parts := strings.Split(dotted, ".")
 		if len(parts) == 2 { // Input has no dots or is just a dot
-			return fmt.Sprintf("{{ %s }}", dotted)
+			return fmt.Sprintf("{{ %q }}: {{ %s }}\n", formattedName, dotted)
 		}
 		var result []string
 		current := parts[0] // This will be empty string if input starts with dot
@@ -145,28 +145,20 @@ func inferFields[T any](payload T, columns []string) []Field {
 		for _, r := range result {
 			sb.WriteString(fmt.Sprintf("{{ if %s }}", r))
 		}
-		sb.WriteString(fmt.Sprintf("{{ %s }}", result[len(result)-1]))
+		sb.WriteString(fmt.Sprintf("{{ %q }}: {{ %s }}\n", formattedName, result[len(result)-1]))
 		for i, iLen := 0, len(result); i < iLen; i++ {
-			sb.WriteString("{{ end }}")
+			sb.WriteString("{{ end -}}")
 		}
 		return sb.String()
 	}
 
-	var getFields func(st reflect.Type, val reflect.Value, namePrefix []string)
-	getFields = func(st reflect.Type, val reflect.Value, namePrefix []string) {
+	var getFields func(st reflect.Type, namePrefix []string)
+	getFields = func(st reflect.Type, namePrefix []string) {
 		exportedFields := 0
 		for i := 0; i < st.NumField(); i++ {
 			f := st.Field(i)
-			if val.Kind() == reflect.Ptr {
-				val = val.Elem()
-			}
-			fieldVal := val.Field(i)
 			// Ignore unexported fields, or zero value fields.
-			if fieldVal.Kind() == reflect.Ptr && fieldVal.IsNil() {
-				continue // skip nil pointers
-			} else if fieldVal.IsZero() {
-				continue // skip zero values (empty strings, 0, nil slices, etc.)
-			} else if !f.IsExported() {
+			if !f.IsExported() {
 				continue
 			}
 			exportedFields++
@@ -179,10 +171,10 @@ func inferFields[T any](payload T, columns []string) []Field {
 				if f.Type.Kind() == reflect.Ptr {
 					t = f.Type.Elem()
 				}
-				getFields(t, fieldVal, parts)
+				getFields(t, parts)
 			} else {
 				dotted, formatted := fieldNames(parts)
-				df := NewField(formatted, dottedToTmpl(dotted))
+				df := NewField(formatted, dottedToTmpl(formatted, dotted))
 				if all {
 					ret = append(ret, df)
 				} else if idx, ok := toField[dotted]; ok {
@@ -196,12 +188,12 @@ func inferFields[T any](payload T, columns []string) []Field {
 		// any String() method on the struct.
 		if exportedFields == 0 {
 			dotted, formatted := fieldNames(namePrefix)
-			ret = append(ret, NewField(formatted, dottedToTmpl(dotted)))
+			ret = append(ret, NewField(formatted, dottedToTmpl(formatted, dotted)))
 		}
 	}
 
 	// Gather the fields
-	getFields(st, rv, nil)
+	getFields(st, nil)
 	return ret
 }
 
@@ -376,7 +368,7 @@ func (o *Outputter) outputPretty(d Displayer) error {
 				return err
 			}
 
-			fmt.Fprintln(o.io.Out())
+			fmt.Fprint(o.io.Out())
 			if i != rv.Len()-1 {
 				fmt.Fprintln(o.io.Out(), "---")
 			}
@@ -402,12 +394,11 @@ func prettyPrintTemplate(d Displayer) string {
 
 	// Go through each field and output a new line
 	fields := d.FieldTemplates()
-	for i, f := range fields {
-		fmt.Fprintf(w, "%s:\t%s", f.Name, f.ValueFormat)
-		if i != len(fields)-1 {
-			fmt.Fprintln(w)
-		}
+	for _, f := range fields {
+		fmt.Fprint(w, f.ValueFormat)
+		//fmt.Fprintf(w, "%s:\t%s", f.Name, val)
 	}
+	fmt.Fprintln(w)
 
 	// Ignore the error
 	_ = w.Flush()
