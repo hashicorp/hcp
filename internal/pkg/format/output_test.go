@@ -121,6 +121,8 @@ func TestNonNilInnerStruct(t *testing.T) {
 }
 
 func TestWithSlice(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
 	j := `{
   "action_configs": [
     {
@@ -178,13 +180,7 @@ func TestWithSlice(t *testing.T) {
 }`
 	thing := example.HashicorpCloudWaypointListActionConfigResponse{}
 	err := json.Unmarshal([]byte(j), &thing)
-	t.Parallel()
-	r := require.New(t)
-
-	// dsp := DisplayFields(thing.ActionConfigs, Pretty)
-	// tmpl := prettyPrintTemplate(dsp)
-	// fmt.Println(tmpl)
-
+	r.NoError(err)
 	io := iostreams.Test()
 	out := format.New(io)
 	err = out.Show(thing.ActionConfigs, format.Pretty)
