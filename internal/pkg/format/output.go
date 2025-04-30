@@ -171,7 +171,39 @@ func inferFields[T any](payload T, columns []string) []Field {
 
 	// Gather the fields
 	getFields(st, nil)
+	for i := range ret {
+		ret[i].ValueFormat = convertToScopedWithBlocks(ret[i].ValueFormat)
+	}
 	return ret
+}
+
+// convertToScopedWithBlocks converts a full dot-path into nested `with` blocks using local field scope.
+// {{ .Request.Agent.Op.ActionRunID }} => {{ with .Request }}{{ with .Agent }}{{ with .Op }}{{ .ActionRunID }}{{ end }}{{ end }}{{ end }}
+func convertToScopedWithBlocks(input string) string {
+	input = strings.TrimSpace(input)
+	// Remove surrounding {{ and }} if present
+	if strings.HasPrefix(input, "{{") && strings.HasSuffix(input, "}}") {
+		input = strings.TrimSpace(strings.TrimSuffix(strings.TrimPrefix(input, "{{"), "}}"))
+	}
+	// Only process if input starts with "."
+	if !strings.HasPrefix(input, ".") {
+		return input
+	}
+	// Split by "." and ignore the leading empty string from input[1:]
+	parts := strings.Split(input[1:], ".")
+	if len(parts) < 2 {
+		return "{{ " + input + " }}"
+	}
+	var builder strings.Builder
+	// Open with blocks
+	for _, part := range parts[:len(parts)-1] {
+		builder.WriteString(fmt.Sprintf("{{ with .%s }}", part))
+	}
+	// Final value
+	builder.WriteString(fmt.Sprintf("{{ .%s }}", parts[len(parts)-1]))
+	// Close all with blocks
+	builder.WriteString(strings.Repeat("{{ end }}", len(parts)-1))
+	return strings.TrimSpace(builder.String())
 }
 
 type internalDisplayer[T any] struct {
