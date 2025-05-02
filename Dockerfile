@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: BUSL-1.1
 
 ## Common Base Layer
-FROM alpine:3.20 as base
+FROM alpine:3.21 as base
 
 RUN apk --no-cache upgrade && apk --no-cache add \
 	bash \
