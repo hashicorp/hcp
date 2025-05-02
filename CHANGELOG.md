@@ -1,4 +1,12 @@
-## 0.9.0 (March 18, 2024)
+## 0.9.1 (May 2, 2025)
+
+BUG FIXES:
+
+* Fix a bug preventing the usage of pretty printing [[GH-225](https://github.com/hashicorp/hcp/issues/225)]
+* security: fix CVE-2025-31498. [[GH-232](https://github.com/hashicorp/hcp/issues/232)]
+* waypoint: Fix a bug preventing Waypoint actions from being created or updated. [[GH-224](https://github.com/hashicorp/hcp/issues/224)]
+
+## 0.9.0 (March 18, 2025)
 
 BREAKING CHANGES:
 
