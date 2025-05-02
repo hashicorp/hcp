@@ -12,6 +12,7 @@ container {
 			vulnerabilities = [
 				"CVE-2024-53427",
 				"CVE-2025-46394",
+				"CVE-2024-58251",
 			]
 		}
   	}
