@@ -9,7 +9,10 @@ container {
 		suppress {
 			// there is currently no release available for jq
 			// https://security.alpinelinux.org/vuln/CVE-2024-53427
-			vulnerabilities = ["CVE-2024-53427"]
+			vulnerabilities = [
+				"CVE-2024-53427",
+				"CVE-2025-46394",
+			]
 		}
   	}
 }
