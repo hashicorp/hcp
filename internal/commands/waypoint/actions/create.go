@@ -10,14 +10,15 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 
-	"github.com/hashicorp/hcp/internal/commands/waypoint/opts"
+	wpopts "github.com/hashicorp/hcp/internal/commands/waypoint/opts"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
+	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
 
 type CreateOpts struct {
-	opts.WaypointOpts
+	wpopts.WaypointOpts
 
 	Name        string
 	Description string
@@ -26,14 +27,18 @@ type CreateOpts struct {
 	// Workarounds due to not being able to set these values directly in cmd.Flag
 	RequestCustomMethod string
 	RequestHeaders      map[string]string
+
+	// Agent flavor fields
+	AgentGroup     string
+	AgentOperation string
 }
 
-func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
-	opts := &CreateOpts{
-		WaypointOpts: opts.New(ctx),
-		Request: &models.HashicorpCloudWaypointActionConfigRequest{
+func NewCmdCreate(ctx *cmd.Context, opts *CreateOpts) *cmd.Command {
+	opts.WaypointOpts = wpopts.New(ctx)
+	if opts.Request == nil {
+		opts.Request = &models.HashicorpCloudWaypointActionConfigRequest{
 			Custom: &models.HashicorpCloudWaypointActionConfigFlavorCustom{},
-		},
+		}
 	}
 
 	cmd := &cmd.Command{
@@ -52,40 +57,61 @@ func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
 		Flags: cmd.Flags{
 			Local: []*cmd.Flag{
 				{
-					Name:        "name",
-					Shorthand:   "n",
-					Description: "The name of the action.",
-					Value:       flagvalue.Simple("", &opts.Name),
+					Name:         "name",
+					Shorthand:    "n",
+					DisplayValue: "NAME",
+					Description:  "The name of the action.",
+					Value:        flagvalue.Simple("", &opts.Name),
+					Required:     true,
 				},
 				{
-					Name:        "description",
-					Shorthand:   "d",
-					Description: "The description of the action.",
-					Value:       flagvalue.Simple("", &opts.Description),
+					Name:         "description",
+					Shorthand:    "d",
+					DisplayValue: "DESCRIPTION",
+					Description:  "The description of the action.",
+					Value:        flagvalue.Simple("", &opts.Description),
 				},
 				// Custom Requests
 				{
-					Name:        "url",
-					Description: "The URL of the action.",
-					Value:       flagvalue.Simple("", &opts.Request.Custom.URL),
+					Name:         "url",
+					DisplayValue: "URL",
+					Description:  "The URL of the action.",
+					Value:        flagvalue.Simple("", &opts.Request.Custom.URL),
 				},
 				{
-					Name:        "body",
-					Description: "The request body to submit when running the action.",
-					Value:       flagvalue.Simple("", &opts.Request.Custom.Body),
+					Name:         "body",
+					DisplayValue: "BODY",
+					Description:  "The request body to submit when running the action.",
+					Value:        flagvalue.Simple("", &opts.Request.Custom.Body),
 				},
 				{
-					Name:        "method",
-					Description: "The HTTP method to use when making the request.",
-					Value:       flagvalue.Simple("GET", &opts.RequestCustomMethod),
+					Name:         "method",
+					DisplayValue: "METHOD",
+					Description:  "The HTTP method to use when making the request.",
+					Value:        flagvalue.Simple("GET", &opts.RequestCustomMethod),
 				},
 				{
-					Name:        "header",
-					Description: "The headers to include in the request. This flag can be specified multiple times.",
-					Value:       flagvalue.SimpleMap(map[string]string{}, &opts.RequestHeaders),
-					Repeatable:  true,
+					Name:         "header",
+					DisplayValue: "KEY=VALUE",
+					Description:  "The headers to include in the request. This flag can be specified multiple times.",
+					Value:        flagvalue.SimpleMap(map[string]string{}, &opts.RequestHeaders),
+					Repeatable:   true,
 				},
 				// GitHub Requests
+
+				// Agent Requests
+				{
+					Name:         "agent-group",
+					DisplayValue: "GROUP",
+					Description:  "The agent group to use for the action.",
+					Value:        flagvalue.Simple("", &opts.AgentGroup),
+				},
+				{
+					Name:         "agent-operation",
+					DisplayValue: "OPERATION",
+					Description:  "The operation ID to run in the agent group.",
+					Value:        flagvalue.Simple("", &opts.AgentOperation),
+				},
 			},
 		},
 	}
@@ -104,8 +130,34 @@ func createAction(c *cmd.Command, args []string, opts *CreateOpts) error {
 		}
 	}
 
-	// Mutate flag values to Custom options
-	if opts.Request.Custom != nil {
+	// Determine action flavor
+	hasAgent := opts.AgentGroup != "" || opts.AgentOperation != ""
+	hasCustom := opts.Request.Custom != nil && opts.Request.Custom.URL != ""
+
+	// Validate agent flags
+	if hasAgent {
+		if hasCustom {
+			return errors.New("cannot specify both custom action and agent action flags")
+		}
+
+		if opts.AgentGroup == "" {
+			return errors.New("agent-group must be specified when using agent action")
+		}
+
+		if opts.AgentOperation == "" {
+			return errors.New("agent-operation must be specified when using agent action")
+		}
+
+		// Create agent flavor request
+		opts.Request.Agent = &models.HashicorpCloudWaypointActionConfigFlavorAgent{
+			Op: &models.HashicorpCloudWaypointAgentOperation{
+				Group: opts.AgentGroup,
+				ID:    opts.AgentOperation,
+			},
+		}
+		// Clear custom request since we're using agent
+		opts.Request.Custom = nil
+	} else if hasCustom {
 		// Parse the headers
 		for k, v := range opts.RequestHeaders {
 			opts.Request.Custom.Headers = append(opts.Request.Custom.Headers, &models.HashicorpCloudWaypointActionConfigFlavorCustomHeader{
@@ -117,6 +169,8 @@ func createAction(c *cmd.Command, args []string, opts *CreateOpts) error {
 		// Cast the string to a const for the sdk API
 		customMethod := models.HashicorpCloudWaypointActionConfigFlavorCustomMethod(opts.RequestCustomMethod)
 		opts.Request.Custom.Method = &customMethod
+	} else {
+		return errors.New("must specify either custom action flags (--url) or agent action flags (--agent-group, --agent-operation)")
 	}
 
 	// Ok, run the command!!
@@ -137,7 +191,28 @@ func createAction(c *cmd.Command, args []string, opts *CreateOpts) error {
 		return fmt.Errorf("failed to create action %q: %w", opts.Name, err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Action %q created.", opts.Name)
+	// Choose fields based on action flavor
+	var fields []format.Field
+	if opts.Request.Agent != nil {
+		fields = []format.Field{
+			format.NewField("Name", "{{ .Name }}"),
+			format.NewField("Description", "{{ .Description }}"),
+			format.NewField("Agent Group", "{{ .Request.Agent.Op.Group }}"),
+			format.NewField("Agent Operation", "{{ .Request.Agent.Op.ID }}"),
+		}
+	} else if opts.Request.Custom != nil {
+		fields = []format.Field{
+			format.NewField("Name", "{{ .Name }}"),
+			format.NewField("Description", "{{ .Description }}"),
+			format.NewField("URL", "{{ .Request.Custom.URL }}"),
+			format.NewField("Method", "{{ .Request.Custom.Method }}"),
+		}
+	}
 
-	return nil
+	d := format.NewDisplayer(&models.HashicorpCloudWaypointActionConfig{
+		Name:        opts.Name,
+		Description: opts.Description,
+		Request:     opts.Request,
+	}, format.Pretty, fields)
+	return opts.Output.Display(d)
 }
