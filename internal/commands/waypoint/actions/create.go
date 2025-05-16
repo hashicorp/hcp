@@ -174,7 +174,7 @@ func createAction(c *cmd.Command, args []string, opts *CreateOpts) error {
 	}
 
 	// Ok, run the command!!
-	_, err := opts.WS2024Client.WaypointServiceCreateActionConfig(&waypoint_service.WaypointServiceCreateActionConfigParams{
+	resp, err := opts.WS2024Client.WaypointServiceCreateActionConfig(&waypoint_service.WaypointServiceCreateActionConfigParams{
 		NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
 		NamespaceLocationProjectID:      opts.Profile.ProjectID,
 		Context:                         opts.Ctx,
@@ -191,16 +191,21 @@ func createAction(c *cmd.Command, args []string, opts *CreateOpts) error {
 		return fmt.Errorf("failed to create action %q: %w", opts.Name, err)
 	}
 
+	actionCfg := resp.GetPayload().ActionConfig
+	if actionCfg == nil {
+		return fmt.Errorf("no action config returned from API")
+	}
+
 	// Choose fields based on action flavor
 	var fields []format.Field
-	if opts.Request.Agent != nil {
+	if actionCfg.Request != nil && actionCfg.Request.Agent != nil {
 		fields = []format.Field{
 			format.NewField("Name", "{{ .Name }}"),
 			format.NewField("Description", "{{ .Description }}"),
 			format.NewField("Agent Group", "{{ .Request.Agent.Op.Group }}"),
 			format.NewField("Agent Operation", "{{ .Request.Agent.Op.ID }}"),
 		}
-	} else if opts.Request.Custom != nil {
+	} else if actionCfg.Request != nil && actionCfg.Request.Custom != nil {
 		fields = []format.Field{
 			format.NewField("Name", "{{ .Name }}"),
 			format.NewField("Description", "{{ .Description }}"),
@@ -210,9 +215,9 @@ func createAction(c *cmd.Command, args []string, opts *CreateOpts) error {
 	}
 
 	d := format.NewDisplayer(&models.HashicorpCloudWaypointActionConfig{
-		Name:        opts.Name,
-		Description: opts.Description,
-		Request:     opts.Request,
+		Name:        actionCfg.Name,
+		Description: actionCfg.Description,
+		Request:     actionCfg.Request,
 	}, format.Pretty, fields)
 	return opts.Output.Display(d)
 }
