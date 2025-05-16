@@ -146,6 +146,13 @@ func TestCmdCreate(t *testing.T) {
 			if c.Error == "" {
 				call := ws.EXPECT().WaypointServiceCreateActionConfig(mock.Anything, mock.Anything)
 				ok := waypoint_service.NewWaypointServiceCreateActionConfigOK()
+				ok.Payload = &models.HashicorpCloudWaypointCreateActionConfigResponse{
+					ActionConfig: &models.HashicorpCloudWaypointActionConfig{
+						Name:        gotOpts.Name,
+						Description: gotOpts.Description,
+						Request:     gotOpts.Request,
+					},
+				}
 				call.Return(ok, nil)
 			}
 			if c.Setup != nil {
@@ -202,6 +209,17 @@ func TestCreateAction(t *testing.T) {
 				opts.RequestCustomMethod = "POST"
 				call := ws.EXPECT().WaypointServiceCreateActionConfig(mock.Anything, mock.Anything)
 				ok := waypoint_service.NewWaypointServiceCreateActionConfigOK()
+				ok.Payload = &models.HashicorpCloudWaypointCreateActionConfigResponse{
+					ActionConfig: &models.HashicorpCloudWaypointActionConfig{
+						Name:        opts.Name,
+						Description: opts.Description,
+						Request: &models.HashicorpCloudWaypointActionConfigRequest{
+							Custom: &models.HashicorpCloudWaypointActionConfigFlavorCustom{
+								URL: opts.Request.Custom.URL,
+							},
+						},
+					},
+				}
 				call.Return(ok, nil)
 			},
 			ExpectErr: "",
@@ -216,6 +234,20 @@ func TestCreateAction(t *testing.T) {
 				opts.AgentOperation = "op1"
 				call := ws.EXPECT().WaypointServiceCreateActionConfig(mock.Anything, mock.Anything)
 				ok := waypoint_service.NewWaypointServiceCreateActionConfigOK()
+				ok.Payload = &models.HashicorpCloudWaypointCreateActionConfigResponse{
+					ActionConfig: &models.HashicorpCloudWaypointActionConfig{
+						Name:        opts.Name,
+						Description: opts.Description,
+						Request: &models.HashicorpCloudWaypointActionConfigRequest{
+							Agent: &models.HashicorpCloudWaypointActionConfigFlavorAgent{
+								Op: &models.HashicorpCloudWaypointAgentOperation{
+									Group: opts.AgentGroup,
+									ID:    opts.AgentOperation,
+								},
+							},
+						},
+					},
+				}
 				call.Return(ok, nil)
 			},
 			ExpectErr: "",
