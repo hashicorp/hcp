@@ -191,6 +191,9 @@ func createAction(c *cmd.Command, args []string, opts *CreateOpts) error {
 		return fmt.Errorf("failed to create action %q: %w", opts.Name, err)
 	}
 
+	if resp == nil || resp.GetPayload() == nil {
+		return fmt.Errorf("no response returned from API")
+	}
 	actionCfg := resp.GetPayload().ActionConfig
 	if actionCfg == nil {
 		return fmt.Errorf("no action config returned from API")
