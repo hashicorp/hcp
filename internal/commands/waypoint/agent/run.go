@@ -215,7 +215,7 @@ func runOp(
 		return
 	}
 
-	opStat, err := exec.Execute(ctx, ao)
+	opStat, err := exec.Execute(ctx, opts.WS2024Client, opts.Profile, ao)
 	if err != nil {
 		status = "error execution operation: " + err.Error()
 		statusCode = 2

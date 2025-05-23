@@ -11,6 +11,9 @@ import (
 	"slices"
 
 	"github.com/hashicorp/go-hclog"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
+	"github.com/hashicorp/hcp/internal/pkg/profile"
 )
 
 type ShellOperation struct {
@@ -23,7 +26,13 @@ type DockerOptions struct {
 	Image string `hcl:"image"`
 }
 
-func (s *ShellOperation) Run(ctx context.Context, log hclog.Logger) (OperationStatus, error) {
+func (s *ShellOperation) Run(
+	ctx context.Context,
+	log hclog.Logger,
+	api waypoint_service.ClientService,
+	profile *profile.Profile,
+	opInfo *models.HashicorpCloudWaypointV20241122AgentOperation,
+) (OperationStatus, error) {
 	if s.DockerOptions != nil {
 		return s.runUnderDocker(ctx, log)
 	}
