@@ -64,6 +64,9 @@ func agentGroupDelete(log hclog.Logger, opts *GroupOpts) error {
 		return fmt.Errorf("error deleting group: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Group deleted\n")
+	fmt.Fprintf(opts.IO.Err(), "%s Group %q deleted\n",
+		opts.IO.ColorScheme().SuccessIcon(),
+		opts.Name,
+	)
 	return nil
 }

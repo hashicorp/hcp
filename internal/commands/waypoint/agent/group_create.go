@@ -12,7 +12,6 @@ import (
 
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
-	"github.com/hashicorp/hcp/internal/pkg/format"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
 
@@ -36,7 +35,7 @@ func NewCmdGroupCreate(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
 				{
 					Name:         "description",
 					Shorthand:    "d",
-					DisplayValue: "TEXT",
+					DisplayValue: "DESCRIPTION",
 					Description:  "Description for the group.",
 					Value:        flagvalue.Simple("", &opts.Description),
 				},
@@ -82,5 +81,9 @@ func agentGroupCreate(log hclog.Logger, opts *GroupOpts) error {
 		return fmt.Errorf("error creating group: %w", err)
 	}
 
-	return opts.Output.Show(grp, format.Pretty, "name", "description")
+	fmt.Fprintf(opts.IO.Err(), "%s Group %q created\n",
+		opts.IO.ColorScheme().SuccessIcon(),
+		opts.Name,
+	)
+	return nil
 }
