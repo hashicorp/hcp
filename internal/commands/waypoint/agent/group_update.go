@@ -15,12 +15,12 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 )
 
-func NewCmdGroupCreate(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
+func NewCmdGroupUpdate(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
 	cmd := &cmd.Command{
-		Name:      "create",
-		ShortHelp: "Create a new HCP Waypoint Agent group.",
+		Name:      "update",
+		ShortHelp: "Update an HCP Waypoint Agent group.",
 		LongHelp: heredoc.New(ctx.IO).Must(`
-		The {{ template "mdCodeOrBold" "hcp waypoint agent group create" }} command creates a new Agent group.
+		The {{ template "mdCodeOrBold" "hcp waypoint agent group update" }} command updates an existing Agent group.
 		`),
 		Flags: cmd.Flags{
 			Local: []*cmd.Flag{
@@ -28,7 +28,7 @@ func NewCmdGroupCreate(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
 					Name:         "name",
 					Shorthand:    "n",
 					DisplayValue: "NAME",
-					Description:  "Name for the new group.",
+					Description:  "Name of the group to update.",
 					Value:        flagvalue.Simple("", &opts.Name),
 					Required:     true,
 				},
@@ -36,15 +36,15 @@ func NewCmdGroupCreate(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
 					Name:         "description",
 					Shorthand:    "d",
 					DisplayValue: "DESCRIPTION",
-					Description:  "Description for the group.",
+					Description:  "New description for the group.",
 					Value:        flagvalue.Simple("", &opts.Description),
 				},
 			},
 		},
 		Examples: []cmd.Example{
 			{
-				Preamble: "Create a new group:",
-				Command:  "$ hcp waypoint agent group create -n='prod:us-west-2' -d='us west production access'",
+				Preamble: "Update a group's description:",
+				Command:  "$ hcp waypoint agent group update -n='prod:us-west-2' -d='updated description'",
 			},
 		},
 		PersistentPreRun: func(c *cmd.Command, args []string) error {
@@ -54,34 +54,33 @@ func NewCmdGroupCreate(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
 			if opts.testFunc != nil {
 				return opts.testFunc(c, args)
 			}
-			return agentGroupCreate(c.Logger(), opts)
+			return agentGroupUpdate(c.Logger(), opts)
 		},
 	}
 
 	return cmd
 }
 
-func agentGroupCreate(log hclog.Logger, opts *GroupOpts) error {
+func agentGroupUpdate(log hclog.Logger, opts *GroupOpts) error {
 	ctx := opts.Ctx
 
-	grp := &models.HashicorpCloudWaypointAgentGroup{
+	update := &models.HashicorpCloudWaypointV20241122WaypointServiceUpdateAgentGroupBody{
 		Description: opts.Description,
-		Name:        opts.Name,
 	}
-	_, err := opts.WS2024Client.WaypointServiceCreateAgentGroup(&waypoint_service.WaypointServiceCreateAgentGroupParams{
+
+	_, err := opts.WS2024Client.WaypointServiceUpdateAgentGroup(&waypoint_service.WaypointServiceUpdateAgentGroupParams{
+		Name:                            opts.Name,
 		NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
 		NamespaceLocationProjectID:      opts.Profile.ProjectID,
-		Body: &models.HashicorpCloudWaypointV20241122WaypointServiceCreateAgentGroupBody{
-			Group: grp,
-		},
-		Context: ctx,
+		Body:                            update,
+		Context:                         ctx,
 	}, nil)
 
 	if err != nil {
-		return fmt.Errorf("error creating group: %w", err)
+		return fmt.Errorf("error updating group: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Group %q created\n",
+	fmt.Fprintf(opts.IO.Err(), "%s Group %q updated\n",
 		opts.IO.ColorScheme().SuccessIcon(),
 		opts.Name,
 	)

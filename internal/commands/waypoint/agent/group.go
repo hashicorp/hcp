@@ -37,6 +37,8 @@ func NewCmdGroup(ctx *cmd.Context) *cmd.Command {
 	cmd.AddChild(NewCmdGroupCreate(ctx, opts))
 	cmd.AddChild(NewCmdGroupList(ctx, opts))
 	cmd.AddChild(NewCmdGroupDelete(ctx, opts))
+	cmd.AddChild(NewCmdGroupUpdate(ctx, opts))
+	cmd.AddChild(NewCmdGroupRead(ctx, opts))
 
 	return cmd
 }
