@@ -1,0 +1,3 @@
+```release-note:feature
+waypoint: Add `hcp waypoint agent group read` and `hcp waypoint agent group update` commands to read and update Waypoint Agent groups.
+```
