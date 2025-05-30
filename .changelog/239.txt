@@ -1,0 +1,3 @@
+```release-note:bug
+waypoint: Send status code on error executing Waypoint agent operation
+```
