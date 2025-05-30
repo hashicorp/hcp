@@ -218,6 +218,7 @@ func runOp(
 	opStat, err := exec.Execute(ctx, ao)
 	if err != nil {
 		status = "error execution operation: " + err.Error()
+		statusCode = 2
 
 		log.Error("error executing operation", "error", err)
 		return

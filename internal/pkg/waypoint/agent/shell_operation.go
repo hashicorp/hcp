@@ -54,6 +54,8 @@ func (s *ShellOperation) exec(ctx context.Context, log hclog.Logger, cmd []strin
 
 	data := bytes.TrimSpace(out.Bytes())
 
+	// Only return last line of output for security reasons.
+	// Users can use the API to send more output as a status log, if desired.
 	if idx := bytes.LastIndexByte(data, '\n'); idx != -1 {
 		status.Status = "output: " + string(data[idx:])
 	} else if len(data) > 0 {
