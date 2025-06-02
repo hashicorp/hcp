@@ -1,3 +1,17 @@
+## 0.10.0 (June 2, 2025)
+
+FEATURES:
+
+* waypoint: Add `hcp waypoint agent group read` and `hcp waypoint agent group update` commands to read and update Waypoint Agent groups. [[GH-237](https://github.com/hashicorp/hcp/issues/237)]
+
+IMPROVEMENTS:
+
+* waypoint: Support creating Waypoint Actions of the agent type. [[GH-236](https://github.com/hashicorp/hcp/issues/236)]
+
+BUG FIXES:
+
+* waypoint: Send status code on error executing Waypoint agent operation [[GH-239](https://github.com/hashicorp/hcp/issues/239)]
+
 ## 0.9.1 (May 2, 2025)
 
 BUG FIXES:
