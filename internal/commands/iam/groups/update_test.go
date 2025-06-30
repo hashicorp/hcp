@@ -196,11 +196,8 @@ func TestCreateUpdate(t *testing.T) {
 				call.Return(nil, groups_service.NewGroupsServiceUpdateGroup2Default(http.StatusForbidden))
 			} else {
 				ok := groups_service.NewGroupsServiceUpdateGroup2OK()
-				ok.Payload = &models.HashicorpCloudIamCreateGroupResponse{
-					Group: &models.HashicorpCloudIamGroup{
-						ResourceID:   "iam.group:123456",
-						ResourceName: c.ExpectedName,
-					},
+				ok.Payload = &models.HashicorpCloudIamUpdateGroupResponse{
+					OperationID: "test",
 				}
 
 				call.Return(ok, nil)
