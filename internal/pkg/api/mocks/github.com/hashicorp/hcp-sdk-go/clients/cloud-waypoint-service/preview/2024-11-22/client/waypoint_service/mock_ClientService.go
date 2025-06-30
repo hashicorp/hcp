@@ -721,6 +721,154 @@ func (_c *MockClientService_WaypointServiceCreateApplicationTemplate2_Call) RunA
 	return _c
 }
 
+// WaypointServiceCreateGitHubSession provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) WaypointServiceCreateGitHubSession(params *waypoint_service.WaypointServiceCreateGitHubSessionParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceCreateGitHubSessionOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WaypointServiceCreateGitHubSession")
+	}
+
+	var r0 *waypoint_service.WaypointServiceCreateGitHubSessionOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceCreateGitHubSessionParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceCreateGitHubSessionOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceCreateGitHubSessionParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) *waypoint_service.WaypointServiceCreateGitHubSessionOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*waypoint_service.WaypointServiceCreateGitHubSessionOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*waypoint_service.WaypointServiceCreateGitHubSessionParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_WaypointServiceCreateGitHubSession_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WaypointServiceCreateGitHubSession'
+type MockClientService_WaypointServiceCreateGitHubSession_Call struct {
+	*mock.Call
+}
+
+// WaypointServiceCreateGitHubSession is a helper method to define mock.On call
+//   - params *waypoint_service.WaypointServiceCreateGitHubSessionParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...waypoint_service.ClientOption
+func (_e *MockClientService_Expecter) WaypointServiceCreateGitHubSession(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_WaypointServiceCreateGitHubSession_Call {
+	return &MockClientService_WaypointServiceCreateGitHubSession_Call{Call: _e.mock.On("WaypointServiceCreateGitHubSession",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_WaypointServiceCreateGitHubSession_Call) Run(run func(params *waypoint_service.WaypointServiceCreateGitHubSessionParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption)) *MockClientService_WaypointServiceCreateGitHubSession_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]waypoint_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(waypoint_service.ClientOption)
+			}
+		}
+		run(args[0].(*waypoint_service.WaypointServiceCreateGitHubSessionParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceCreateGitHubSession_Call) Return(_a0 *waypoint_service.WaypointServiceCreateGitHubSessionOK, _a1 error) *MockClientService_WaypointServiceCreateGitHubSession_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceCreateGitHubSession_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceCreateGitHubSessionParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceCreateGitHubSessionOK, error)) *MockClientService_WaypointServiceCreateGitHubSession_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// WaypointServiceCreateIntegration provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) WaypointServiceCreateIntegration(params *waypoint_service.WaypointServiceCreateIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceCreateIntegrationOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WaypointServiceCreateIntegration")
+	}
+
+	var r0 *waypoint_service.WaypointServiceCreateIntegrationOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceCreateIntegrationParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceCreateIntegrationOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceCreateIntegrationParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) *waypoint_service.WaypointServiceCreateIntegrationOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*waypoint_service.WaypointServiceCreateIntegrationOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*waypoint_service.WaypointServiceCreateIntegrationParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_WaypointServiceCreateIntegration_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WaypointServiceCreateIntegration'
+type MockClientService_WaypointServiceCreateIntegration_Call struct {
+	*mock.Call
+}
+
+// WaypointServiceCreateIntegration is a helper method to define mock.On call
+//   - params *waypoint_service.WaypointServiceCreateIntegrationParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...waypoint_service.ClientOption
+func (_e *MockClientService_Expecter) WaypointServiceCreateIntegration(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_WaypointServiceCreateIntegration_Call {
+	return &MockClientService_WaypointServiceCreateIntegration_Call{Call: _e.mock.On("WaypointServiceCreateIntegration",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_WaypointServiceCreateIntegration_Call) Run(run func(params *waypoint_service.WaypointServiceCreateIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption)) *MockClientService_WaypointServiceCreateIntegration_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]waypoint_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(waypoint_service.ClientOption)
+			}
+		}
+		run(args[0].(*waypoint_service.WaypointServiceCreateIntegrationParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceCreateIntegration_Call) Return(_a0 *waypoint_service.WaypointServiceCreateIntegrationOK, _a1 error) *MockClientService_WaypointServiceCreateIntegration_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceCreateIntegration_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceCreateIntegrationParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceCreateIntegrationOK, error)) *MockClientService_WaypointServiceCreateIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // WaypointServiceCreateNamespace provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) WaypointServiceCreateNamespace(params *waypoint_service.WaypointServiceCreateNamespaceParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceCreateNamespaceOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -1531,6 +1679,154 @@ func (_c *MockClientService_WaypointServiceDeleteApplicationTemplate4_Call) Retu
 }
 
 func (_c *MockClientService_WaypointServiceDeleteApplicationTemplate4_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceDeleteApplicationTemplate4Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceDeleteApplicationTemplate4OK, error)) *MockClientService_WaypointServiceDeleteApplicationTemplate4_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// WaypointServiceDeleteIntegration provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) WaypointServiceDeleteIntegration(params *waypoint_service.WaypointServiceDeleteIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceDeleteIntegrationOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WaypointServiceDeleteIntegration")
+	}
+
+	var r0 *waypoint_service.WaypointServiceDeleteIntegrationOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceDeleteIntegrationParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceDeleteIntegrationOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceDeleteIntegrationParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) *waypoint_service.WaypointServiceDeleteIntegrationOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*waypoint_service.WaypointServiceDeleteIntegrationOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*waypoint_service.WaypointServiceDeleteIntegrationParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_WaypointServiceDeleteIntegration_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WaypointServiceDeleteIntegration'
+type MockClientService_WaypointServiceDeleteIntegration_Call struct {
+	*mock.Call
+}
+
+// WaypointServiceDeleteIntegration is a helper method to define mock.On call
+//   - params *waypoint_service.WaypointServiceDeleteIntegrationParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...waypoint_service.ClientOption
+func (_e *MockClientService_Expecter) WaypointServiceDeleteIntegration(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_WaypointServiceDeleteIntegration_Call {
+	return &MockClientService_WaypointServiceDeleteIntegration_Call{Call: _e.mock.On("WaypointServiceDeleteIntegration",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_WaypointServiceDeleteIntegration_Call) Run(run func(params *waypoint_service.WaypointServiceDeleteIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption)) *MockClientService_WaypointServiceDeleteIntegration_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]waypoint_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(waypoint_service.ClientOption)
+			}
+		}
+		run(args[0].(*waypoint_service.WaypointServiceDeleteIntegrationParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceDeleteIntegration_Call) Return(_a0 *waypoint_service.WaypointServiceDeleteIntegrationOK, _a1 error) *MockClientService_WaypointServiceDeleteIntegration_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceDeleteIntegration_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceDeleteIntegrationParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceDeleteIntegrationOK, error)) *MockClientService_WaypointServiceDeleteIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// WaypointServiceDeleteIntegration2 provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) WaypointServiceDeleteIntegration2(params *waypoint_service.WaypointServiceDeleteIntegration2Params, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceDeleteIntegration2OK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WaypointServiceDeleteIntegration2")
+	}
+
+	var r0 *waypoint_service.WaypointServiceDeleteIntegration2OK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceDeleteIntegration2Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceDeleteIntegration2OK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceDeleteIntegration2Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) *waypoint_service.WaypointServiceDeleteIntegration2OK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*waypoint_service.WaypointServiceDeleteIntegration2OK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*waypoint_service.WaypointServiceDeleteIntegration2Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_WaypointServiceDeleteIntegration2_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WaypointServiceDeleteIntegration2'
+type MockClientService_WaypointServiceDeleteIntegration2_Call struct {
+	*mock.Call
+}
+
+// WaypointServiceDeleteIntegration2 is a helper method to define mock.On call
+//   - params *waypoint_service.WaypointServiceDeleteIntegration2Params
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...waypoint_service.ClientOption
+func (_e *MockClientService_Expecter) WaypointServiceDeleteIntegration2(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_WaypointServiceDeleteIntegration2_Call {
+	return &MockClientService_WaypointServiceDeleteIntegration2_Call{Call: _e.mock.On("WaypointServiceDeleteIntegration2",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_WaypointServiceDeleteIntegration2_Call) Run(run func(params *waypoint_service.WaypointServiceDeleteIntegration2Params, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption)) *MockClientService_WaypointServiceDeleteIntegration2_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]waypoint_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(waypoint_service.ClientOption)
+			}
+		}
+		run(args[0].(*waypoint_service.WaypointServiceDeleteIntegration2Params), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceDeleteIntegration2_Call) Return(_a0 *waypoint_service.WaypointServiceDeleteIntegration2OK, _a1 error) *MockClientService_WaypointServiceDeleteIntegration2_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceDeleteIntegration2_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceDeleteIntegration2Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceDeleteIntegration2OK, error)) *MockClientService_WaypointServiceDeleteIntegration2_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -3089,6 +3385,376 @@ func (_c *MockClientService_WaypointServiceGetApplicationTemplate4_Call) RunAndR
 	return _c
 }
 
+// WaypointServiceGetGitHubInstallations provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) WaypointServiceGetGitHubInstallations(params *waypoint_service.WaypointServiceGetGitHubInstallationsParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetGitHubInstallationsOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WaypointServiceGetGitHubInstallations")
+	}
+
+	var r0 *waypoint_service.WaypointServiceGetGitHubInstallationsOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceGetGitHubInstallationsParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetGitHubInstallationsOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceGetGitHubInstallationsParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) *waypoint_service.WaypointServiceGetGitHubInstallationsOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*waypoint_service.WaypointServiceGetGitHubInstallationsOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*waypoint_service.WaypointServiceGetGitHubInstallationsParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_WaypointServiceGetGitHubInstallations_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WaypointServiceGetGitHubInstallations'
+type MockClientService_WaypointServiceGetGitHubInstallations_Call struct {
+	*mock.Call
+}
+
+// WaypointServiceGetGitHubInstallations is a helper method to define mock.On call
+//   - params *waypoint_service.WaypointServiceGetGitHubInstallationsParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...waypoint_service.ClientOption
+func (_e *MockClientService_Expecter) WaypointServiceGetGitHubInstallations(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_WaypointServiceGetGitHubInstallations_Call {
+	return &MockClientService_WaypointServiceGetGitHubInstallations_Call{Call: _e.mock.On("WaypointServiceGetGitHubInstallations",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_WaypointServiceGetGitHubInstallations_Call) Run(run func(params *waypoint_service.WaypointServiceGetGitHubInstallationsParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption)) *MockClientService_WaypointServiceGetGitHubInstallations_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]waypoint_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(waypoint_service.ClientOption)
+			}
+		}
+		run(args[0].(*waypoint_service.WaypointServiceGetGitHubInstallationsParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceGetGitHubInstallations_Call) Return(_a0 *waypoint_service.WaypointServiceGetGitHubInstallationsOK, _a1 error) *MockClientService_WaypointServiceGetGitHubInstallations_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceGetGitHubInstallations_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceGetGitHubInstallationsParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetGitHubInstallationsOK, error)) *MockClientService_WaypointServiceGetGitHubInstallations_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// WaypointServiceGetGitHubRepos provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) WaypointServiceGetGitHubRepos(params *waypoint_service.WaypointServiceGetGitHubReposParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetGitHubReposOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WaypointServiceGetGitHubRepos")
+	}
+
+	var r0 *waypoint_service.WaypointServiceGetGitHubReposOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceGetGitHubReposParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetGitHubReposOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceGetGitHubReposParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) *waypoint_service.WaypointServiceGetGitHubReposOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*waypoint_service.WaypointServiceGetGitHubReposOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*waypoint_service.WaypointServiceGetGitHubReposParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_WaypointServiceGetGitHubRepos_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WaypointServiceGetGitHubRepos'
+type MockClientService_WaypointServiceGetGitHubRepos_Call struct {
+	*mock.Call
+}
+
+// WaypointServiceGetGitHubRepos is a helper method to define mock.On call
+//   - params *waypoint_service.WaypointServiceGetGitHubReposParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...waypoint_service.ClientOption
+func (_e *MockClientService_Expecter) WaypointServiceGetGitHubRepos(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_WaypointServiceGetGitHubRepos_Call {
+	return &MockClientService_WaypointServiceGetGitHubRepos_Call{Call: _e.mock.On("WaypointServiceGetGitHubRepos",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_WaypointServiceGetGitHubRepos_Call) Run(run func(params *waypoint_service.WaypointServiceGetGitHubReposParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption)) *MockClientService_WaypointServiceGetGitHubRepos_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]waypoint_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(waypoint_service.ClientOption)
+			}
+		}
+		run(args[0].(*waypoint_service.WaypointServiceGetGitHubReposParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceGetGitHubRepos_Call) Return(_a0 *waypoint_service.WaypointServiceGetGitHubReposOK, _a1 error) *MockClientService_WaypointServiceGetGitHubRepos_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceGetGitHubRepos_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceGetGitHubReposParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetGitHubReposOK, error)) *MockClientService_WaypointServiceGetGitHubRepos_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// WaypointServiceGetGitHubWorkflows provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) WaypointServiceGetGitHubWorkflows(params *waypoint_service.WaypointServiceGetGitHubWorkflowsParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetGitHubWorkflowsOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WaypointServiceGetGitHubWorkflows")
+	}
+
+	var r0 *waypoint_service.WaypointServiceGetGitHubWorkflowsOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceGetGitHubWorkflowsParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetGitHubWorkflowsOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceGetGitHubWorkflowsParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) *waypoint_service.WaypointServiceGetGitHubWorkflowsOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*waypoint_service.WaypointServiceGetGitHubWorkflowsOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*waypoint_service.WaypointServiceGetGitHubWorkflowsParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_WaypointServiceGetGitHubWorkflows_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WaypointServiceGetGitHubWorkflows'
+type MockClientService_WaypointServiceGetGitHubWorkflows_Call struct {
+	*mock.Call
+}
+
+// WaypointServiceGetGitHubWorkflows is a helper method to define mock.On call
+//   - params *waypoint_service.WaypointServiceGetGitHubWorkflowsParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...waypoint_service.ClientOption
+func (_e *MockClientService_Expecter) WaypointServiceGetGitHubWorkflows(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_WaypointServiceGetGitHubWorkflows_Call {
+	return &MockClientService_WaypointServiceGetGitHubWorkflows_Call{Call: _e.mock.On("WaypointServiceGetGitHubWorkflows",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_WaypointServiceGetGitHubWorkflows_Call) Run(run func(params *waypoint_service.WaypointServiceGetGitHubWorkflowsParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption)) *MockClientService_WaypointServiceGetGitHubWorkflows_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]waypoint_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(waypoint_service.ClientOption)
+			}
+		}
+		run(args[0].(*waypoint_service.WaypointServiceGetGitHubWorkflowsParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceGetGitHubWorkflows_Call) Return(_a0 *waypoint_service.WaypointServiceGetGitHubWorkflowsOK, _a1 error) *MockClientService_WaypointServiceGetGitHubWorkflows_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceGetGitHubWorkflows_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceGetGitHubWorkflowsParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetGitHubWorkflowsOK, error)) *MockClientService_WaypointServiceGetGitHubWorkflows_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// WaypointServiceGetIntegration provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) WaypointServiceGetIntegration(params *waypoint_service.WaypointServiceGetIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetIntegrationOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WaypointServiceGetIntegration")
+	}
+
+	var r0 *waypoint_service.WaypointServiceGetIntegrationOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceGetIntegrationParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetIntegrationOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceGetIntegrationParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) *waypoint_service.WaypointServiceGetIntegrationOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*waypoint_service.WaypointServiceGetIntegrationOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*waypoint_service.WaypointServiceGetIntegrationParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_WaypointServiceGetIntegration_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WaypointServiceGetIntegration'
+type MockClientService_WaypointServiceGetIntegration_Call struct {
+	*mock.Call
+}
+
+// WaypointServiceGetIntegration is a helper method to define mock.On call
+//   - params *waypoint_service.WaypointServiceGetIntegrationParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...waypoint_service.ClientOption
+func (_e *MockClientService_Expecter) WaypointServiceGetIntegration(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_WaypointServiceGetIntegration_Call {
+	return &MockClientService_WaypointServiceGetIntegration_Call{Call: _e.mock.On("WaypointServiceGetIntegration",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_WaypointServiceGetIntegration_Call) Run(run func(params *waypoint_service.WaypointServiceGetIntegrationParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption)) *MockClientService_WaypointServiceGetIntegration_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]waypoint_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(waypoint_service.ClientOption)
+			}
+		}
+		run(args[0].(*waypoint_service.WaypointServiceGetIntegrationParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceGetIntegration_Call) Return(_a0 *waypoint_service.WaypointServiceGetIntegrationOK, _a1 error) *MockClientService_WaypointServiceGetIntegration_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceGetIntegration_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceGetIntegrationParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetIntegrationOK, error)) *MockClientService_WaypointServiceGetIntegration_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// WaypointServiceGetIntegration2 provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) WaypointServiceGetIntegration2(params *waypoint_service.WaypointServiceGetIntegration2Params, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetIntegration2OK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WaypointServiceGetIntegration2")
+	}
+
+	var r0 *waypoint_service.WaypointServiceGetIntegration2OK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceGetIntegration2Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetIntegration2OK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceGetIntegration2Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) *waypoint_service.WaypointServiceGetIntegration2OK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*waypoint_service.WaypointServiceGetIntegration2OK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*waypoint_service.WaypointServiceGetIntegration2Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_WaypointServiceGetIntegration2_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WaypointServiceGetIntegration2'
+type MockClientService_WaypointServiceGetIntegration2_Call struct {
+	*mock.Call
+}
+
+// WaypointServiceGetIntegration2 is a helper method to define mock.On call
+//   - params *waypoint_service.WaypointServiceGetIntegration2Params
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...waypoint_service.ClientOption
+func (_e *MockClientService_Expecter) WaypointServiceGetIntegration2(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_WaypointServiceGetIntegration2_Call {
+	return &MockClientService_WaypointServiceGetIntegration2_Call{Call: _e.mock.On("WaypointServiceGetIntegration2",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_WaypointServiceGetIntegration2_Call) Run(run func(params *waypoint_service.WaypointServiceGetIntegration2Params, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption)) *MockClientService_WaypointServiceGetIntegration2_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]waypoint_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(waypoint_service.ClientOption)
+			}
+		}
+		run(args[0].(*waypoint_service.WaypointServiceGetIntegration2Params), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceGetIntegration2_Call) Return(_a0 *waypoint_service.WaypointServiceGetIntegration2OK, _a1 error) *MockClientService_WaypointServiceGetIntegration2_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceGetIntegration2_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceGetIntegration2Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetIntegration2OK, error)) *MockClientService_WaypointServiceGetIntegration2_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // WaypointServiceGetNamespace provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) WaypointServiceGetNamespace(params *waypoint_service.WaypointServiceGetNamespaceParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGetNamespaceOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -3903,6 +4569,80 @@ func (_c *MockClientService_WaypointServiceGetVariable_Call) RunAndReturn(run fu
 	return _c
 }
 
+// WaypointServiceGitHubCallbackSession provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) WaypointServiceGitHubCallbackSession(params *waypoint_service.WaypointServiceGitHubCallbackSessionParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGitHubCallbackSessionOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WaypointServiceGitHubCallbackSession")
+	}
+
+	var r0 *waypoint_service.WaypointServiceGitHubCallbackSessionOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceGitHubCallbackSessionParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGitHubCallbackSessionOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceGitHubCallbackSessionParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) *waypoint_service.WaypointServiceGitHubCallbackSessionOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*waypoint_service.WaypointServiceGitHubCallbackSessionOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*waypoint_service.WaypointServiceGitHubCallbackSessionParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_WaypointServiceGitHubCallbackSession_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WaypointServiceGitHubCallbackSession'
+type MockClientService_WaypointServiceGitHubCallbackSession_Call struct {
+	*mock.Call
+}
+
+// WaypointServiceGitHubCallbackSession is a helper method to define mock.On call
+//   - params *waypoint_service.WaypointServiceGitHubCallbackSessionParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...waypoint_service.ClientOption
+func (_e *MockClientService_Expecter) WaypointServiceGitHubCallbackSession(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_WaypointServiceGitHubCallbackSession_Call {
+	return &MockClientService_WaypointServiceGitHubCallbackSession_Call{Call: _e.mock.On("WaypointServiceGitHubCallbackSession",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_WaypointServiceGitHubCallbackSession_Call) Run(run func(params *waypoint_service.WaypointServiceGitHubCallbackSessionParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption)) *MockClientService_WaypointServiceGitHubCallbackSession_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]waypoint_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(waypoint_service.ClientOption)
+			}
+		}
+		run(args[0].(*waypoint_service.WaypointServiceGitHubCallbackSessionParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceGitHubCallbackSession_Call) Return(_a0 *waypoint_service.WaypointServiceGitHubCallbackSessionOK, _a1 error) *MockClientService_WaypointServiceGitHubCallbackSession_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceGitHubCallbackSession_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceGitHubCallbackSessionParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceGitHubCallbackSessionOK, error)) *MockClientService_WaypointServiceGitHubCallbackSession_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // WaypointServiceListActionConfigs provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) WaypointServiceListActionConfigs(params *waypoint_service.WaypointServiceListActionConfigsParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceListActionConfigsOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -4643,6 +5383,80 @@ func (_c *MockClientService_WaypointServiceListApplications_Call) RunAndReturn(r
 	return _c
 }
 
+// WaypointServiceListIntegrations provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) WaypointServiceListIntegrations(params *waypoint_service.WaypointServiceListIntegrationsParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceListIntegrationsOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WaypointServiceListIntegrations")
+	}
+
+	var r0 *waypoint_service.WaypointServiceListIntegrationsOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceListIntegrationsParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceListIntegrationsOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceListIntegrationsParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) *waypoint_service.WaypointServiceListIntegrationsOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*waypoint_service.WaypointServiceListIntegrationsOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*waypoint_service.WaypointServiceListIntegrationsParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_WaypointServiceListIntegrations_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WaypointServiceListIntegrations'
+type MockClientService_WaypointServiceListIntegrations_Call struct {
+	*mock.Call
+}
+
+// WaypointServiceListIntegrations is a helper method to define mock.On call
+//   - params *waypoint_service.WaypointServiceListIntegrationsParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...waypoint_service.ClientOption
+func (_e *MockClientService_Expecter) WaypointServiceListIntegrations(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_WaypointServiceListIntegrations_Call {
+	return &MockClientService_WaypointServiceListIntegrations_Call{Call: _e.mock.On("WaypointServiceListIntegrations",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_WaypointServiceListIntegrations_Call) Run(run func(params *waypoint_service.WaypointServiceListIntegrationsParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption)) *MockClientService_WaypointServiceListIntegrations_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]waypoint_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(waypoint_service.ClientOption)
+			}
+		}
+		run(args[0].(*waypoint_service.WaypointServiceListIntegrationsParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceListIntegrations_Call) Return(_a0 *waypoint_service.WaypointServiceListIntegrationsOK, _a1 error) *MockClientService_WaypointServiceListIntegrations_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceListIntegrations_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceListIntegrationsParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceListIntegrationsOK, error)) *MockClientService_WaypointServiceListIntegrations_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // WaypointServiceListNoCodeModules provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) WaypointServiceListNoCodeModules(params *waypoint_service.WaypointServiceListNoCodeModulesParams, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceListNoCodeModulesOK, error) {
 	_va := make([]interface{}, len(opts))
@@ -5379,6 +6193,80 @@ func (_c *MockClientService_WaypointServiceSendStatusLog_Call) Return(_a0 *waypo
 }
 
 func (_c *MockClientService_WaypointServiceSendStatusLog_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceSendStatusLogParams, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceSendStatusLogOK, error)) *MockClientService_WaypointServiceSendStatusLog_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// WaypointServiceSendStatusLog2 provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) WaypointServiceSendStatusLog2(params *waypoint_service.WaypointServiceSendStatusLog2Params, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceSendStatusLog2OK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WaypointServiceSendStatusLog2")
+	}
+
+	var r0 *waypoint_service.WaypointServiceSendStatusLog2OK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceSendStatusLog2Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceSendStatusLog2OK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceSendStatusLog2Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) *waypoint_service.WaypointServiceSendStatusLog2OK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*waypoint_service.WaypointServiceSendStatusLog2OK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*waypoint_service.WaypointServiceSendStatusLog2Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_WaypointServiceSendStatusLog2_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WaypointServiceSendStatusLog2'
+type MockClientService_WaypointServiceSendStatusLog2_Call struct {
+	*mock.Call
+}
+
+// WaypointServiceSendStatusLog2 is a helper method to define mock.On call
+//   - params *waypoint_service.WaypointServiceSendStatusLog2Params
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...waypoint_service.ClientOption
+func (_e *MockClientService_Expecter) WaypointServiceSendStatusLog2(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_WaypointServiceSendStatusLog2_Call {
+	return &MockClientService_WaypointServiceSendStatusLog2_Call{Call: _e.mock.On("WaypointServiceSendStatusLog2",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_WaypointServiceSendStatusLog2_Call) Run(run func(params *waypoint_service.WaypointServiceSendStatusLog2Params, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption)) *MockClientService_WaypointServiceSendStatusLog2_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]waypoint_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(waypoint_service.ClientOption)
+			}
+		}
+		run(args[0].(*waypoint_service.WaypointServiceSendStatusLog2Params), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceSendStatusLog2_Call) Return(_a0 *waypoint_service.WaypointServiceSendStatusLog2OK, _a1 error) *MockClientService_WaypointServiceSendStatusLog2_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceSendStatusLog2_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceSendStatusLog2Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceSendStatusLog2OK, error)) *MockClientService_WaypointServiceSendStatusLog2_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -6563,6 +7451,154 @@ func (_c *MockClientService_WaypointServiceUpdateAddOnDefinition2_Call) Return(_
 }
 
 func (_c *MockClientService_WaypointServiceUpdateAddOnDefinition2_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceUpdateAddOnDefinition2Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceUpdateAddOnDefinition2OK, error)) *MockClientService_WaypointServiceUpdateAddOnDefinition2_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// WaypointServiceUpdateAddOnDefinition3 provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) WaypointServiceUpdateAddOnDefinition3(params *waypoint_service.WaypointServiceUpdateAddOnDefinition3Params, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceUpdateAddOnDefinition3OK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WaypointServiceUpdateAddOnDefinition3")
+	}
+
+	var r0 *waypoint_service.WaypointServiceUpdateAddOnDefinition3OK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceUpdateAddOnDefinition3Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceUpdateAddOnDefinition3OK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceUpdateAddOnDefinition3Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) *waypoint_service.WaypointServiceUpdateAddOnDefinition3OK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*waypoint_service.WaypointServiceUpdateAddOnDefinition3OK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*waypoint_service.WaypointServiceUpdateAddOnDefinition3Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_WaypointServiceUpdateAddOnDefinition3_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WaypointServiceUpdateAddOnDefinition3'
+type MockClientService_WaypointServiceUpdateAddOnDefinition3_Call struct {
+	*mock.Call
+}
+
+// WaypointServiceUpdateAddOnDefinition3 is a helper method to define mock.On call
+//   - params *waypoint_service.WaypointServiceUpdateAddOnDefinition3Params
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...waypoint_service.ClientOption
+func (_e *MockClientService_Expecter) WaypointServiceUpdateAddOnDefinition3(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_WaypointServiceUpdateAddOnDefinition3_Call {
+	return &MockClientService_WaypointServiceUpdateAddOnDefinition3_Call{Call: _e.mock.On("WaypointServiceUpdateAddOnDefinition3",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_WaypointServiceUpdateAddOnDefinition3_Call) Run(run func(params *waypoint_service.WaypointServiceUpdateAddOnDefinition3Params, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption)) *MockClientService_WaypointServiceUpdateAddOnDefinition3_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]waypoint_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(waypoint_service.ClientOption)
+			}
+		}
+		run(args[0].(*waypoint_service.WaypointServiceUpdateAddOnDefinition3Params), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceUpdateAddOnDefinition3_Call) Return(_a0 *waypoint_service.WaypointServiceUpdateAddOnDefinition3OK, _a1 error) *MockClientService_WaypointServiceUpdateAddOnDefinition3_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceUpdateAddOnDefinition3_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceUpdateAddOnDefinition3Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceUpdateAddOnDefinition3OK, error)) *MockClientService_WaypointServiceUpdateAddOnDefinition3_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// WaypointServiceUpdateAddOnDefinition4 provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) WaypointServiceUpdateAddOnDefinition4(params *waypoint_service.WaypointServiceUpdateAddOnDefinition4Params, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceUpdateAddOnDefinition4OK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for WaypointServiceUpdateAddOnDefinition4")
+	}
+
+	var r0 *waypoint_service.WaypointServiceUpdateAddOnDefinition4OK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceUpdateAddOnDefinition4Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceUpdateAddOnDefinition4OK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*waypoint_service.WaypointServiceUpdateAddOnDefinition4Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) *waypoint_service.WaypointServiceUpdateAddOnDefinition4OK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*waypoint_service.WaypointServiceUpdateAddOnDefinition4OK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*waypoint_service.WaypointServiceUpdateAddOnDefinition4Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_WaypointServiceUpdateAddOnDefinition4_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'WaypointServiceUpdateAddOnDefinition4'
+type MockClientService_WaypointServiceUpdateAddOnDefinition4_Call struct {
+	*mock.Call
+}
+
+// WaypointServiceUpdateAddOnDefinition4 is a helper method to define mock.On call
+//   - params *waypoint_service.WaypointServiceUpdateAddOnDefinition4Params
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...waypoint_service.ClientOption
+func (_e *MockClientService_Expecter) WaypointServiceUpdateAddOnDefinition4(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_WaypointServiceUpdateAddOnDefinition4_Call {
+	return &MockClientService_WaypointServiceUpdateAddOnDefinition4_Call{Call: _e.mock.On("WaypointServiceUpdateAddOnDefinition4",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_WaypointServiceUpdateAddOnDefinition4_Call) Run(run func(params *waypoint_service.WaypointServiceUpdateAddOnDefinition4Params, authInfo runtime.ClientAuthInfoWriter, opts ...waypoint_service.ClientOption)) *MockClientService_WaypointServiceUpdateAddOnDefinition4_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]waypoint_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(waypoint_service.ClientOption)
+			}
+		}
+		run(args[0].(*waypoint_service.WaypointServiceUpdateAddOnDefinition4Params), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceUpdateAddOnDefinition4_Call) Return(_a0 *waypoint_service.WaypointServiceUpdateAddOnDefinition4OK, _a1 error) *MockClientService_WaypointServiceUpdateAddOnDefinition4_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_WaypointServiceUpdateAddOnDefinition4_Call) RunAndReturn(run func(*waypoint_service.WaypointServiceUpdateAddOnDefinition4Params, runtime.ClientAuthInfoWriter, ...waypoint_service.ClientOption) (*waypoint_service.WaypointServiceUpdateAddOnDefinition4OK, error)) *MockClientService_WaypointServiceUpdateAddOnDefinition4_Call {
 	_c.Call.Return(run)
 	return _c
 }

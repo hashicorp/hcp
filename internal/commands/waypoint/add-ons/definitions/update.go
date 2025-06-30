@@ -142,7 +142,7 @@ func addOnDefinitionUpdate(opts *AddOnDefinitionOpts) error {
 	}
 
 	// read variable options file and parse hcl
-	var variables []*models.HashicorpCloudWaypointTFModuleVariable
+	var variables []*models.HashicorpCloudWaypointV20241122TFModuleVariable
 	if opts.VariableOptionsFile != "" {
 		vars, err := internal.ParseVariableOptionsFile(opts.VariableOptionsFile)
 		if err != nil {
@@ -161,12 +161,12 @@ func addOnDefinitionUpdate(opts *AddOnDefinitionOpts) error {
 			Context:                         opts.Ctx,
 			ExistingAddOnDefinitionName:     opts.Name,
 			Body: &models.HashicorpCloudWaypointV20241122WaypointServiceUpdateAddOnDefinitionBody{
-				AddOnDefinition: &models.HashicorpCloudWaypointAddOnDefinition{
+				AddOnDefinition: &models.HashicorpCloudWaypointV20241122AddOnDefinition{
 					Summary:                opts.Summary,
 					Description:            opts.Description,
 					ReadmeMarkdownTemplate: readmeTpl,
 					Labels:                 opts.Labels,
-					TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointTerraformCloudWorkspaceDetails{
+					TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointV20241122TerraformCloudWorkspaceDetails{
 						ProjectID: opts.TerraformCloudProjectID,
 						Name:      opts.TerraformCloudProjectName,
 					},

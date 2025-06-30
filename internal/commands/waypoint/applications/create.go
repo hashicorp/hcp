@@ -95,9 +95,9 @@ $ hcp waypoint application create -n=my-application -t=my-template
 }
 
 func applicationCreate(opts *ApplicationOpts) error {
-	actionConfigs := make([]*models.HashicorpCloudWaypointActionCfgRef, len(opts.ActionConfigNames))
+	actionConfigs := make([]*models.HashicorpCloudWaypointV20241122ActionCfgRef, len(opts.ActionConfigNames))
 	for i, name := range opts.ActionConfigNames {
-		actionConfigs[i] = &models.HashicorpCloudWaypointActionCfgRef{
+		actionConfigs[i] = &models.HashicorpCloudWaypointV20241122ActionCfgRef{
 			Name: name,
 		}
 	}
@@ -106,7 +106,7 @@ func applicationCreate(opts *ApplicationOpts) error {
 
 	// a map is used with the key being the variable name, so that
 	// flags can override file values.
-	ivs := make(map[string]*models.HashicorpCloudWaypointInputVariable)
+	ivs := make(map[string]*models.HashicorpCloudWaypointV20241122InputVariable)
 	if opts.VariablesFile != "" {
 		variables, err := internal.ParseInputVariablesFile(opts.VariablesFile)
 		if err != nil {
@@ -116,7 +116,7 @@ func applicationCreate(opts *ApplicationOpts) error {
 			)
 		}
 		for _, v := range variables {
-			ivs[v.Name] = &models.HashicorpCloudWaypointInputVariable{
+			ivs[v.Name] = &models.HashicorpCloudWaypointV20241122InputVariable{
 				Name:  v.Name,
 				Value: v.Value,
 			}
@@ -126,13 +126,13 @@ func applicationCreate(opts *ApplicationOpts) error {
 	// Flags are processed second, so that they can override file values.
 	// Flags take precedence over file values.
 	for k, v := range opts.Variables {
-		ivs[k] = &models.HashicorpCloudWaypointInputVariable{
+		ivs[k] = &models.HashicorpCloudWaypointV20241122InputVariable{
 			Name:  k,
 			Value: v,
 		}
 	}
 
-	var vars []*models.HashicorpCloudWaypointInputVariable
+	var vars []*models.HashicorpCloudWaypointV20241122InputVariable
 	for _, v := range ivs {
 		vars = append(vars, v)
 	}
@@ -146,7 +146,7 @@ func applicationCreate(opts *ApplicationOpts) error {
 			Context:                         opts.Ctx,
 			Body: &models.HashicorpCloudWaypointV20241122WaypointServiceCreateApplicationFromTemplateBody{
 				Name: opts.Name,
-				ApplicationTemplate: &models.HashicorpCloudWaypointRefApplicationTemplate{
+				ApplicationTemplate: &models.HashicorpCloudWaypointV20241122RefApplicationTemplate{
 					Name: opts.TemplateName,
 				},
 				ActionCfgRefs: actionConfigs,

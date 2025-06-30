@@ -125,7 +125,7 @@ func TestAgentGroupRead(t *testing.T) {
 			Name: "Not found",
 			SetupMock: func(ws *mock_waypoint_service.MockClientService) {
 				ok := waypoint_service.NewWaypointServiceGetAgentGroupOK()
-				ok.Payload = &models.HashicorpCloudWaypointGetAgentGroupResponse{Group: nil}
+				ok.Payload = &models.HashicorpCloudWaypointV20241122GetAgentGroupResponse{Group: nil}
 				ws.EXPECT().WaypointServiceGetAgentGroup(mock.Anything, mock.Anything).Return(ok, nil)
 			},
 			Opts: &GroupOpts{
@@ -143,8 +143,8 @@ func TestAgentGroupRead(t *testing.T) {
 			Name: "Success",
 			SetupMock: func(ws *mock_waypoint_service.MockClientService) {
 				ok := waypoint_service.NewWaypointServiceGetAgentGroupOK()
-				ok.Payload = &models.HashicorpCloudWaypointGetAgentGroupResponse{
-					Group: &models.HashicorpCloudWaypointAgentGroup{
+				ok.Payload = &models.HashicorpCloudWaypointV20241122GetAgentGroupResponse{
+					Group: &models.HashicorpCloudWaypointV20241122AgentGroup{
 						Name:        "foo",
 						Description: "desc",
 					},

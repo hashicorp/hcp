@@ -28,13 +28,13 @@ type StatusOperation struct {
 
 func (s *StatusOperation) Run(ctx context.Context, log hclog.Logger) (OperationStatus, error) {
 	ret, err := s.wp.WaypointServiceSendStatusLog(&waypoint_service.WaypointServiceSendStatusLogParams{
-		ActionConfigID:                  s.cfgID,
-		ActionRunSeq:                    s.runID,
+		ActionRunSpecifierActionID:      s.cfgID,
+		ActionRunSpecifierSequence:      s.runID,
 		NamespaceLocationOrganizationID: s.orgID,
 		NamespaceLocationProjectID:      s.projID,
 
 		Body: &models.HashicorpCloudWaypointV20241122WaypointServiceSendStatusLogBody{
-			StatusLog: &models.HashicorpCloudWaypointStatusLog{
+			StatusLog: &models.HashicorpCloudWaypointV20241122StatusLog{
 				EmittedAt: strfmt.DateTime(time.Now()),
 				Log:       s.Message,
 				Metadata:  s.Values,

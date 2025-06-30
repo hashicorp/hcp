@@ -40,7 +40,7 @@ $ hcp waypoint templates list
 }
 
 func listTemplates(opts *TemplateOpts) error {
-	var templates []*models.HashicorpCloudWaypointApplicationTemplate
+	var templates []*models.HashicorpCloudWaypointV20241122ApplicationTemplate
 
 	resp, err := opts.WS2024Client.WaypointServiceListApplicationTemplates(
 		&waypoint_service.WaypointServiceListApplicationTemplatesParams{

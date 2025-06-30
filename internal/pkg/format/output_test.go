@@ -178,7 +178,7 @@ func TestWithSlice(t *testing.T) {
     "previous_page_token": ""
   }
 }`
-	thing := example.HashicorpCloudWaypointListActionConfigResponse{}
+	thing := example.HashicorpCloudWaypointV20241122ListActionConfigResponse{}
 	err := json.Unmarshal([]byte(j), &thing)
 	r.NoError(err)
 	io := iostreams.Test()
@@ -187,7 +187,69 @@ func TestWithSlice(t *testing.T) {
 
 	r.NoError(err)
 	fmt.Println(io.Output.String())
-	r.Equal(
-		"Action UR L:                     \nCreated At:                      2024-08-16T18:11:19.777Z\nDescription:                     test description\nID:                              00000000-0000-0000-0000-000000000000\nName:                            Agent Smith\nRequest Agent Op Action Run ID:  \nRequest Agent Op Body:           \nRequest Agent Op Group:          Enforcements\nRequest Agent Op ID:             Agent Smith\nRequest Custom Body:             \nRequest Custom Headers:          \nRequest Custom Method:           \nRequest Custom UR L:             \nRequest Github Auth Token:       \nRequest Github Enable Debug Log: \nRequest Github Inputs:           \nRequest Github Method:           \nRequest Github Ref:              \nRequest Github Repo:             \nRequest Github Run ID:           \nRequest Github Username:         \nRequest Github Workflow ID:      \n---\nAction UR L:                     \nCreated At:                      2024-06-13T17:31:17.436Z\nDescription:                     Runs an action against https://hashicorp.com\nID:                              11111111-1111-1111-1111-111111111111\nName:                            Example\nRequest Agent Op Action Run ID:  \nRequest Agent Op Body:           \nRequest Agent Op Group:          \nRequest Agent Op ID:             \nRequest Custom Body:             \nRequest Custom Headers:          []\nRequest Custom Method:           GET\nRequest Custom UR L:             https://hashicorp.com\nRequest Github Auth Token:       \nRequest Github Enable Debug Log: \nRequest Github Inputs:           \nRequest Github Method:           \nRequest Github Ref:              \nRequest Github Repo:             \nRequest Github Run ID:           \nRequest Github Username:         \nRequest Github Workflow ID:      \n---\nAction UR L:                     \nCreated At:                      2024-08-07T21:56:00.043Z\nDescription:                     An action to test the variables feature.\nID:                              22222222-2222-2222-2222-222222222222\nName:                            Variables\nRequest Agent Op Action Run ID:  \nRequest Agent Op Body:           \nRequest Agent Op Group:          \nRequest Agent Op ID:             \nRequest Custom Body:             \nRequest Custom Headers:          []\nRequest Custom Method:           GET\nRequest Custom UR L:             https://${var.company}.com\nRequest Github Auth Token:       \nRequest Github Enable Debug Log: \nRequest Github Inputs:           \nRequest Github Method:           \nRequest Github Ref:              \nRequest Github Repo:             \nRequest Github Run ID:           \nRequest Github Username:         \nRequest Github Workflow ID:      \n",
-		io.Output.String())
+
+	expected := `Action UR L:                              
+Created At:                               2024-08-16T18:11:19.777Z
+Description:                              test description
+ID:                                       00000000-0000-0000-0000-000000000000
+Name:                                     Agent Smith
+Request Agent Op Action Run ID:           
+Request Agent Op Body:                    
+Request Agent Op Group:                   Enforcements
+Request Agent Op ID:                      Agent Smith
+Request Custom Body:                      
+Request Custom Headers:                   
+Request Custom Method:                    
+Request Custom UR L:                      
+Request Github Enable Debug Log:          
+Request Github Gh Enabled Workflow Param: 
+Request Github Git Ref:                   
+Request Github Inputs:                    
+Request Github Install Name:              
+Request Github Repository:                
+Request Github Workflow ID:               
+---
+Action UR L:                              
+Created At:                               2024-06-13T17:31:17.436Z
+Description:                              Runs an action against https://hashicorp.com
+ID:                                       11111111-1111-1111-1111-111111111111
+Name:                                     Example
+Request Agent Op Action Run ID:           
+Request Agent Op Body:                    
+Request Agent Op Group:                   
+Request Agent Op ID:                      
+Request Custom Body:                      
+Request Custom Headers:                   []
+Request Custom Method:                    GET
+Request Custom UR L:                      https://hashicorp.com
+Request Github Enable Debug Log:          
+Request Github Gh Enabled Workflow Param: 
+Request Github Git Ref:                   
+Request Github Inputs:                    
+Request Github Install Name:              
+Request Github Repository:                
+Request Github Workflow ID:               
+---
+Action UR L:                              
+Created At:                               2024-08-07T21:56:00.043Z
+Description:                              An action to test the variables feature.
+ID:                                       22222222-2222-2222-2222-222222222222
+Name:                                     Variables
+Request Agent Op Action Run ID:           
+Request Agent Op Body:                    
+Request Agent Op Group:                   
+Request Agent Op ID:                      
+Request Custom Body:                      
+Request Custom Headers:                   []
+Request Custom Method:                    GET
+Request Custom UR L:                      https://${var.company}.com
+Request Github Enable Debug Log:          
+Request Github Gh Enabled Workflow Param: 
+Request Github Git Ref:                   
+Request Github Inputs:                    
+Request Github Install Name:              
+Request Github Repository:                
+Request Github Workflow ID:               
+`
+	r.Equal(expected, io.Output.String())
 }

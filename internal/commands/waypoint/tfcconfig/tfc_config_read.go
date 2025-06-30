@@ -75,11 +75,11 @@ func readRun(opts *ReadOpts) error {
 }
 
 type configDisplayer struct {
-	config        *models.HashicorpCloudWaypointTFCConfig
+	config        *models.HashicorpCloudWaypointV20241122TFCConfig
 	defaultFormat format.Format
 }
 
-func newDisplayer(defaultFormat format.Format, config *models.HashicorpCloudWaypointTFCConfig) *configDisplayer {
+func newDisplayer(defaultFormat format.Format, config *models.HashicorpCloudWaypointV20241122TFCConfig) *configDisplayer {
 	return &configDisplayer{
 		config:        config,
 		defaultFormat: defaultFormat,

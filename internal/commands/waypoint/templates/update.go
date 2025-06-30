@@ -180,12 +180,12 @@ func templateUpdate(opts *TemplateOpts) error {
 	template := respPayload.ApplicationTemplate
 
 	// start our updated template with the existing template
-	updatedTpl := &models.HashicorpCloudWaypointApplicationTemplate{
+	updatedTpl := &models.HashicorpCloudWaypointV20241122ApplicationTemplate{
 		Name:        opts.UpdatedName,
 		Summary:     opts.Summary,
 		Description: opts.Description,
 		// Labels:   opts.Labels
-		TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointTerraformCloudWorkspaceDetails{
+		TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointV20241122TerraformCloudWorkspaceDetails{
 			Name:      opts.TerraformCloudProjectName,
 			ProjectID: opts.TerraformCloudProjectID,
 		},
@@ -202,13 +202,13 @@ func templateUpdate(opts *TemplateOpts) error {
 	// over
 	updatedTpl.ActionCfgRefs = template.ActionCfgRefs
 
-	// var tags []*models.HashicorpCloudWaypointTag
+	// var tags []*models.HashicorpCloudWaypointV20241122Tag
 	tags := template.Tags
 	if len(opts.Tags) > 0 {
 		// clear out the existing tags to replace with new ones
-		tags = []*models.HashicorpCloudWaypointTag{}
+		tags = []*models.HashicorpCloudWaypointV20241122Tag{}
 		for k, v := range opts.Tags {
-			tags = append(tags, &models.HashicorpCloudWaypointTag{
+			tags = append(tags, &models.HashicorpCloudWaypointV20241122Tag{
 				Key:   k,
 				Value: v,
 			})
@@ -233,7 +233,7 @@ func templateUpdate(opts *TemplateOpts) error {
 	updatedTpl.ReadmeMarkdownTemplate = readmeTpl
 
 	// read variable options file and parse hcl
-	var variables []*models.HashicorpCloudWaypointTFModuleVariable
+	var variables []*models.HashicorpCloudWaypointV20241122TFModuleVariable
 	if opts.VariableOptionsFile != "" {
 		vars, err := internal.ParseVariableOptionsFile(opts.VariableOptionsFile)
 		if err != nil {

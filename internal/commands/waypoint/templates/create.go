@@ -165,11 +165,11 @@ $ hcp waypoint templates create -n=my-template \
 
 func templateCreate(opts *TemplateOpts) error {
 	var (
-		tags []*models.HashicorpCloudWaypointTag
+		tags []*models.HashicorpCloudWaypointV20241122Tag
 		err  error
 	)
 	for k, v := range opts.Tags {
-		tags = append(tags, &models.HashicorpCloudWaypointTag{
+		tags = append(tags, &models.HashicorpCloudWaypointV20241122Tag{
 			Key:   k,
 			Value: v,
 		})
@@ -187,7 +187,7 @@ func templateCreate(opts *TemplateOpts) error {
 	}
 
 	// read variable options file and parse hcl
-	var variables []*models.HashicorpCloudWaypointTFModuleVariable
+	var variables []*models.HashicorpCloudWaypointV20241122TFModuleVariable
 	if opts.VariableOptionsFile != "" {
 		variables, err = internal.ParseVariableOptionsFile(opts.VariableOptionsFile)
 		if err != nil {
@@ -203,14 +203,14 @@ func templateCreate(opts *TemplateOpts) error {
 			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
 			NamespaceLocationProjectID:      opts.Profile.ProjectID,
 			Body: &models.HashicorpCloudWaypointV20241122WaypointServiceCreateApplicationTemplateBody{
-				ApplicationTemplate: &models.HashicorpCloudWaypointApplicationTemplate{
+				ApplicationTemplate: &models.HashicorpCloudWaypointV20241122ApplicationTemplate{
 					Name:                   opts.Name,
 					Summary:                opts.Summary,
 					Description:            opts.Description,
 					ReadmeMarkdownTemplate: readmeTpl,
 					Labels:                 opts.Labels,
 					Tags:                   tags,
-					TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointTerraformCloudWorkspaceDetails{
+					TerraformCloudWorkspaceDetails: &models.HashicorpCloudWaypointV20241122TerraformCloudWorkspaceDetails{
 						Name:      opts.TerraformCloudProjectName,
 						ProjectID: opts.TerraformCloudProjectID,
 					},

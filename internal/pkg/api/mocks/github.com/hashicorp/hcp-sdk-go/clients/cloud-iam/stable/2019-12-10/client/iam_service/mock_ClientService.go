@@ -835,6 +835,80 @@ func (_c *MockClientService_IamServiceSearchPrincipals_Call) RunAndReturn(run fu
 	return _c
 }
 
+// IamServiceUnifyUserPrincipal provides a mock function with given fields: params, authInfo, opts
+func (_m *MockClientService) IamServiceUnifyUserPrincipal(params *iam_service.IamServiceUnifyUserPrincipalParams, authInfo runtime.ClientAuthInfoWriter, opts ...iam_service.ClientOption) (*iam_service.IamServiceUnifyUserPrincipalOK, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, params, authInfo)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for IamServiceUnifyUserPrincipal")
+	}
+
+	var r0 *iam_service.IamServiceUnifyUserPrincipalOK
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*iam_service.IamServiceUnifyUserPrincipalParams, runtime.ClientAuthInfoWriter, ...iam_service.ClientOption) (*iam_service.IamServiceUnifyUserPrincipalOK, error)); ok {
+		return rf(params, authInfo, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(*iam_service.IamServiceUnifyUserPrincipalParams, runtime.ClientAuthInfoWriter, ...iam_service.ClientOption) *iam_service.IamServiceUnifyUserPrincipalOK); ok {
+		r0 = rf(params, authInfo, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*iam_service.IamServiceUnifyUserPrincipalOK)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*iam_service.IamServiceUnifyUserPrincipalParams, runtime.ClientAuthInfoWriter, ...iam_service.ClientOption) error); ok {
+		r1 = rf(params, authInfo, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClientService_IamServiceUnifyUserPrincipal_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'IamServiceUnifyUserPrincipal'
+type MockClientService_IamServiceUnifyUserPrincipal_Call struct {
+	*mock.Call
+}
+
+// IamServiceUnifyUserPrincipal is a helper method to define mock.On call
+//   - params *iam_service.IamServiceUnifyUserPrincipalParams
+//   - authInfo runtime.ClientAuthInfoWriter
+//   - opts ...iam_service.ClientOption
+func (_e *MockClientService_Expecter) IamServiceUnifyUserPrincipal(params interface{}, authInfo interface{}, opts ...interface{}) *MockClientService_IamServiceUnifyUserPrincipal_Call {
+	return &MockClientService_IamServiceUnifyUserPrincipal_Call{Call: _e.mock.On("IamServiceUnifyUserPrincipal",
+		append([]interface{}{params, authInfo}, opts...)...)}
+}
+
+func (_c *MockClientService_IamServiceUnifyUserPrincipal_Call) Run(run func(params *iam_service.IamServiceUnifyUserPrincipalParams, authInfo runtime.ClientAuthInfoWriter, opts ...iam_service.ClientOption)) *MockClientService_IamServiceUnifyUserPrincipal_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		variadicArgs := make([]iam_service.ClientOption, len(args)-2)
+		for i, a := range args[2:] {
+			if a != nil {
+				variadicArgs[i] = a.(iam_service.ClientOption)
+			}
+		}
+		run(args[0].(*iam_service.IamServiceUnifyUserPrincipalParams), args[1].(runtime.ClientAuthInfoWriter), variadicArgs...)
+	})
+	return _c
+}
+
+func (_c *MockClientService_IamServiceUnifyUserPrincipal_Call) Return(_a0 *iam_service.IamServiceUnifyUserPrincipalOK, _a1 error) *MockClientService_IamServiceUnifyUserPrincipal_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClientService_IamServiceUnifyUserPrincipal_Call) RunAndReturn(run func(*iam_service.IamServiceUnifyUserPrincipalParams, runtime.ClientAuthInfoWriter, ...iam_service.ClientOption) (*iam_service.IamServiceUnifyUserPrincipalOK, error)) *MockClientService_IamServiceUnifyUserPrincipal_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // IamServiceUpdateWebConsolePreferences provides a mock function with given fields: params, authInfo, opts
 func (_m *MockClientService) IamServiceUpdateWebConsolePreferences(params *iam_service.IamServiceUpdateWebConsolePreferencesParams, authInfo runtime.ClientAuthInfoWriter, opts ...iam_service.ClientOption) (*iam_service.IamServiceUpdateWebConsolePreferencesOK, error) {
 	_va := make([]interface{}, len(opts))

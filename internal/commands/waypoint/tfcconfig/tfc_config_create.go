@@ -99,7 +99,7 @@ func createRun(opts *CreateOpts) error {
 			NamespaceLocationOrganizationID: opts.Profile.OrganizationID,
 			NamespaceLocationProjectID:      opts.Profile.ProjectID,
 			Body: &models.HashicorpCloudWaypointV20241122WaypointServiceCreateTFCConfigBody{
-				TfcConfig: &models.HashicorpCloudWaypointTFCConfig{
+				TfcConfig: &models.HashicorpCloudWaypointV20241122TFCConfig{
 					OrganizationName: opts.TfcOrg,
 					Token:            opts.Token,
 				},
