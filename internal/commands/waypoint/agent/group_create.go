@@ -64,7 +64,7 @@ func NewCmdGroupCreate(ctx *cmd.Context, opts *GroupOpts) *cmd.Command {
 func agentGroupCreate(log hclog.Logger, opts *GroupOpts) error {
 	ctx := opts.Ctx
 
-	grp := &models.HashicorpCloudWaypointAgentGroup{
+	grp := &models.HashicorpCloudWaypointV20241122AgentGroup{
 		Description: opts.Description,
 		Name:        opts.Name,
 	}

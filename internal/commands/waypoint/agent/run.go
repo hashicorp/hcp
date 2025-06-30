@@ -146,7 +146,7 @@ func runOp(
 	log hclog.Logger,
 	ctx context.Context,
 	opts *RunOpts,
-	ao *models.HashicorpCloudWaypointAgentOperation,
+	ao *models.HashicorpCloudWaypointV20241122AgentOperation,
 	exec *agent.Executor,
 ) {
 	var (

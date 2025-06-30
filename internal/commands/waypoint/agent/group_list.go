@@ -59,7 +59,7 @@ func agentGroupList(log hclog.Logger, opts *GroupOpts) error {
 	return opts.Output.Display(groups)
 }
 
-type groupsDisplayer []*models.HashicorpCloudWaypointAgentGroup
+type groupsDisplayer []*models.HashicorpCloudWaypointV20241122AgentGroup
 
 func (d groupsDisplayer) DefaultFormat() format.Format {
 	return format.Table

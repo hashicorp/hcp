@@ -46,8 +46,8 @@ func TestCmdCreate(t *testing.T) {
 			Args: []string{"--name=foo", "--url=https://example.com", "--method=POST"},
 			Expect: &CreateOpts{
 				Name: "foo",
-				Request: &models.HashicorpCloudWaypointActionConfigRequest{
-					Custom: &models.HashicorpCloudWaypointActionConfigFlavorCustom{
+				Request: &models.HashicorpCloudWaypointV20241122ActionConfigRequest{
+					Custom: &models.HashicorpCloudWaypointV20241122ActionConfigFlavorCustom{
 						URL: "https://example.com",
 					},
 				},
@@ -68,10 +68,10 @@ func TestCmdCreate(t *testing.T) {
 			},
 			Expect: &CreateOpts{
 				Name: "foo",
-				Request: &models.HashicorpCloudWaypointActionConfigRequest{
-					Custom: &models.HashicorpCloudWaypointActionConfigFlavorCustom{
+				Request: &models.HashicorpCloudWaypointV20241122ActionConfigRequest{
+					Custom: &models.HashicorpCloudWaypointV20241122ActionConfigFlavorCustom{
 						URL: "https://example.com",
-						Headers: []*models.HashicorpCloudWaypointActionConfigFlavorCustomHeader{
+						Headers: []*models.HashicorpCloudWaypointV20241122ActionConfigFlavorCustomHeader{
 							{Key: "X-First", Value: "abc"},
 							{Key: "Second", Value: "123"},
 						},
@@ -146,8 +146,8 @@ func TestCmdCreate(t *testing.T) {
 			if c.Error == "" {
 				call := ws.EXPECT().WaypointServiceCreateActionConfig(mock.Anything, mock.Anything)
 				ok := waypoint_service.NewWaypointServiceCreateActionConfigOK()
-				ok.Payload = &models.HashicorpCloudWaypointCreateActionConfigResponse{
-					ActionConfig: &models.HashicorpCloudWaypointActionConfig{
+				ok.Payload = &models.HashicorpCloudWaypointV20241122CreateActionConfigResponse{
+					ActionConfig: &models.HashicorpCloudWaypointV20241122ActionConfig{
 						Name:        gotOpts.Name,
 						Description: gotOpts.Description,
 						Request:     gotOpts.Request,
@@ -209,12 +209,12 @@ func TestCreateAction(t *testing.T) {
 				opts.RequestCustomMethod = "POST"
 				call := ws.EXPECT().WaypointServiceCreateActionConfig(mock.Anything, mock.Anything)
 				ok := waypoint_service.NewWaypointServiceCreateActionConfigOK()
-				ok.Payload = &models.HashicorpCloudWaypointCreateActionConfigResponse{
-					ActionConfig: &models.HashicorpCloudWaypointActionConfig{
+				ok.Payload = &models.HashicorpCloudWaypointV20241122CreateActionConfigResponse{
+					ActionConfig: &models.HashicorpCloudWaypointV20241122ActionConfig{
 						Name:        opts.Name,
 						Description: opts.Description,
-						Request: &models.HashicorpCloudWaypointActionConfigRequest{
-							Custom: &models.HashicorpCloudWaypointActionConfigFlavorCustom{
+						Request: &models.HashicorpCloudWaypointV20241122ActionConfigRequest{
+							Custom: &models.HashicorpCloudWaypointV20241122ActionConfigFlavorCustom{
 								URL: opts.Request.Custom.URL,
 							},
 						},
@@ -234,13 +234,13 @@ func TestCreateAction(t *testing.T) {
 				opts.AgentOperation = "op1"
 				call := ws.EXPECT().WaypointServiceCreateActionConfig(mock.Anything, mock.Anything)
 				ok := waypoint_service.NewWaypointServiceCreateActionConfigOK()
-				ok.Payload = &models.HashicorpCloudWaypointCreateActionConfigResponse{
-					ActionConfig: &models.HashicorpCloudWaypointActionConfig{
+				ok.Payload = &models.HashicorpCloudWaypointV20241122CreateActionConfigResponse{
+					ActionConfig: &models.HashicorpCloudWaypointV20241122ActionConfig{
 						Name:        opts.Name,
 						Description: opts.Description,
-						Request: &models.HashicorpCloudWaypointActionConfigRequest{
-							Agent: &models.HashicorpCloudWaypointActionConfigFlavorAgent{
-								Op: &models.HashicorpCloudWaypointAgentOperation{
+						Request: &models.HashicorpCloudWaypointV20241122ActionConfigRequest{
+							Agent: &models.HashicorpCloudWaypointV20241122ActionConfigFlavorAgent{
+								Op: &models.HashicorpCloudWaypointV20241122AgentOperation{
 									Group: opts.AgentGroup,
 									ID:    opts.AgentOperation,
 								},
@@ -280,8 +280,8 @@ func TestCreateAction(t *testing.T) {
 					Output:       format.New(io),
 					WS2024Client: ws,
 				},
-				Request: &models.HashicorpCloudWaypointActionConfigRequest{
-					Custom: &models.HashicorpCloudWaypointActionConfigFlavorCustom{},
+				Request: &models.HashicorpCloudWaypointV20241122ActionConfigRequest{
+					Custom: &models.HashicorpCloudWaypointV20241122ActionConfigFlavorCustom{},
 				},
 			}
 			c.Setup(opts, ws)

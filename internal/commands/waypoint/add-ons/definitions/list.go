@@ -43,7 +43,7 @@ $ hcp waypoint add-ons definitions list
 }
 
 func addOnDefinitionsList(opts *AddOnDefinitionOpts) error {
-	var addOnDefinitions []*models.HashicorpCloudWaypointAddOnDefinition
+	var addOnDefinitions []*models.HashicorpCloudWaypointV20241122AddOnDefinition
 
 	listResp, err := opts.WS2024Client.WaypointServiceListAddOnDefinitions(
 		&waypoint_service.WaypointServiceListAddOnDefinitionsParams{

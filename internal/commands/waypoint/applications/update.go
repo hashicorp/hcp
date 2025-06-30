@@ -74,11 +74,11 @@ $ hcp waypoint applications update -n=my-application --action-config-name my-act
 
 func applicationUpdate(opts *ApplicationOpts) error {
 	var (
-		acrs []*models.HashicorpCloudWaypointActionCfgRef
+		acrs []*models.HashicorpCloudWaypointV20241122ActionCfgRef
 		err  error
 	)
 	for _, acn := range opts.ActionConfigNames {
-		acrs = append(acrs, &models.HashicorpCloudWaypointActionCfgRef{
+		acrs = append(acrs, &models.HashicorpCloudWaypointV20241122ActionCfgRef{
 			Name: acn,
 		})
 	}

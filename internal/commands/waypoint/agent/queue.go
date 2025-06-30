@@ -109,7 +109,7 @@ func agentQueue(log hclog.Logger, opts *QueueOpts) error {
 
 	_, err := opts.WS2024Client.WaypointServiceQueueAgentOperation(&waypoint_service.WaypointServiceQueueAgentOperationParams{
 		Body: &models.HashicorpCloudWaypointV20241122WaypointServiceQueueAgentOperationBody{
-			Operation: &models.HashicorpCloudWaypointAgentOperation{
+			Operation: &models.HashicorpCloudWaypointV20241122AgentOperation{
 				ID:          opts.ID,
 				ActionRunID: opts.ActionRunID,
 				Body:        body,

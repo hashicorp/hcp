@@ -23,7 +23,7 @@ type UpdateOpts struct {
 	Name        string
 	Description string
 	// Request Types. We only support setting a Oneof
-	Request *models.HashicorpCloudWaypointActionConfigRequest
+	Request *models.HashicorpCloudWaypointV20241122ActionConfigRequest
 	// Workarounds due to not being able to set these values directly in cmd.Flag
 	RequestCustomMethod string
 	RequestHeaders      map[string]string
@@ -32,8 +32,8 @@ type UpdateOpts struct {
 func NewCmdUpdate(ctx *cmd.Context) *cmd.Command {
 	opts := &UpdateOpts{
 		WaypointOpts: opts.New(ctx),
-		Request: &models.HashicorpCloudWaypointActionConfigRequest{
-			Custom: &models.HashicorpCloudWaypointActionConfigFlavorCustom{},
+		Request: &models.HashicorpCloudWaypointV20241122ActionConfigRequest{
+			Custom: &models.HashicorpCloudWaypointV20241122ActionConfigFlavorCustom{},
 		},
 	}
 
@@ -110,14 +110,14 @@ func updateAction(c *cmd.Command, args []string, opts *UpdateOpts) error {
 	if opts.Request.Custom != nil {
 		// Parse the headers
 		for k, v := range opts.RequestHeaders {
-			opts.Request.Custom.Headers = append(opts.Request.Custom.Headers, &models.HashicorpCloudWaypointActionConfigFlavorCustomHeader{
+			opts.Request.Custom.Headers = append(opts.Request.Custom.Headers, &models.HashicorpCloudWaypointV20241122ActionConfigFlavorCustomHeader{
 				Key:   k,
 				Value: v,
 			})
 		}
 
 		// Cast the string to a const for the sdk API
-		customMethod := models.HashicorpCloudWaypointActionConfigFlavorCustomMethod(opts.RequestCustomMethod)
+		customMethod := models.HashicorpCloudWaypointV20241122ActionConfigFlavorCustomMethod(opts.RequestCustomMethod)
 		opts.Request.Custom.Method = &customMethod
 	}
 
@@ -127,7 +127,7 @@ func updateAction(c *cmd.Command, args []string, opts *UpdateOpts) error {
 		NamespaceLocationProjectID:      opts.Profile.ProjectID,
 		Context:                         opts.Ctx,
 		Body: &models.HashicorpCloudWaypointV20241122WaypointServiceUpdateActionConfigBody{
-			ActionConfig: &models.HashicorpCloudWaypointActionConfig{
+			ActionConfig: &models.HashicorpCloudWaypointV20241122ActionConfig{
 				Name:        opts.Name,
 				Description: opts.Description,
 				Request:     opts.Request,

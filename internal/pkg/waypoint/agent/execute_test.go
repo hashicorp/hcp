@@ -46,7 +46,7 @@ func TestExecutor(t *testing.T) {
 
 		e.Config = cfg
 
-		ok, err := e.IsAvailable(&models.HashicorpCloudWaypointAgentOperation{
+		ok, err := e.IsAvailable(&models.HashicorpCloudWaypointV20241122AgentOperation{
 			Group: "test",
 			ID:    "launch",
 		})
@@ -81,7 +81,7 @@ func TestExecutor(t *testing.T) {
 
 		e.Config = cfg
 
-		_, err = e.Execute(context.TODO(), &models.HashicorpCloudWaypointAgentOperation{
+		_, err = e.Execute(context.TODO(), &models.HashicorpCloudWaypointV20241122AgentOperation{
 			Group: "test",
 			ID:    "launch",
 		})
@@ -128,7 +128,7 @@ func TestExecutor(t *testing.T) {
 		})
 		r.NoError(err)
 
-		_, err = e.Execute(context.TODO(), &models.HashicorpCloudWaypointAgentOperation{
+		_, err = e.Execute(context.TODO(), &models.HashicorpCloudWaypointV20241122AgentOperation{
 			Group: "test",
 			ID:    "launch",
 			Body:  data,

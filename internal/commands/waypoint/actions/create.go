@@ -23,7 +23,7 @@ type CreateOpts struct {
 	Name        string
 	Description string
 	// Request Types. We only support setting a Oneof
-	Request *models.HashicorpCloudWaypointActionConfigRequest
+	Request *models.HashicorpCloudWaypointV20241122ActionConfigRequest
 	// Workarounds due to not being able to set these values directly in cmd.Flag
 	RequestCustomMethod string
 	RequestHeaders      map[string]string
@@ -36,8 +36,8 @@ type CreateOpts struct {
 func NewCmdCreate(ctx *cmd.Context, opts *CreateOpts) *cmd.Command {
 	opts.WaypointOpts = wpopts.New(ctx)
 	if opts.Request == nil {
-		opts.Request = &models.HashicorpCloudWaypointActionConfigRequest{
-			Custom: &models.HashicorpCloudWaypointActionConfigFlavorCustom{},
+		opts.Request = &models.HashicorpCloudWaypointV20241122ActionConfigRequest{
+			Custom: &models.HashicorpCloudWaypointV20241122ActionConfigFlavorCustom{},
 		}
 	}
 
@@ -149,8 +149,8 @@ func createAction(c *cmd.Command, args []string, opts *CreateOpts) error {
 		}
 
 		// Create agent flavor request
-		opts.Request.Agent = &models.HashicorpCloudWaypointActionConfigFlavorAgent{
-			Op: &models.HashicorpCloudWaypointAgentOperation{
+		opts.Request.Agent = &models.HashicorpCloudWaypointV20241122ActionConfigFlavorAgent{
+			Op: &models.HashicorpCloudWaypointV20241122AgentOperation{
 				Group: opts.AgentGroup,
 				ID:    opts.AgentOperation,
 			},
@@ -160,14 +160,14 @@ func createAction(c *cmd.Command, args []string, opts *CreateOpts) error {
 	} else if hasCustom {
 		// Parse the headers
 		for k, v := range opts.RequestHeaders {
-			opts.Request.Custom.Headers = append(opts.Request.Custom.Headers, &models.HashicorpCloudWaypointActionConfigFlavorCustomHeader{
+			opts.Request.Custom.Headers = append(opts.Request.Custom.Headers, &models.HashicorpCloudWaypointV20241122ActionConfigFlavorCustomHeader{
 				Key:   k,
 				Value: v,
 			})
 		}
 
 		// Cast the string to a const for the sdk API
-		customMethod := models.HashicorpCloudWaypointActionConfigFlavorCustomMethod(opts.RequestCustomMethod)
+		customMethod := models.HashicorpCloudWaypointV20241122ActionConfigFlavorCustomMethod(opts.RequestCustomMethod)
 		opts.Request.Custom.Method = &customMethod
 	} else {
 		return errors.New("must specify either custom action flags (--url) or agent action flags (--agent-group, --agent-operation)")
@@ -179,7 +179,7 @@ func createAction(c *cmd.Command, args []string, opts *CreateOpts) error {
 		NamespaceLocationProjectID:      opts.Profile.ProjectID,
 		Context:                         opts.Ctx,
 		Body: &models.HashicorpCloudWaypointV20241122WaypointServiceCreateActionConfigBody{
-			ActionConfig: &models.HashicorpCloudWaypointActionConfig{
+			ActionConfig: &models.HashicorpCloudWaypointV20241122ActionConfig{
 				Name:        opts.Name,
 				Description: opts.Description,
 				Request:     opts.Request,
@@ -217,7 +217,7 @@ func createAction(c *cmd.Command, args []string, opts *CreateOpts) error {
 		}
 	}
 
-	d := format.NewDisplayer(&models.HashicorpCloudWaypointActionConfig{
+	d := format.NewDisplayer(&models.HashicorpCloudWaypointV20241122ActionConfig{
 		Name:        actionCfg.Name,
 		Description: actionCfg.Description,
 		Request:     actionCfg.Request,

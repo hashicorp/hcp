@@ -37,13 +37,13 @@ type Executor struct {
 
 var ErrUnknownOperation = errors.New("unknown operation")
 
-func (e *Executor) IsAvailable(opInfo *models.HashicorpCloudWaypointAgentOperation) (bool, error) {
+func (e *Executor) IsAvailable(opInfo *models.HashicorpCloudWaypointV20241122AgentOperation) (bool, error) {
 	// TODO this can also validate the operation body against what the operation can support and
 	// return an error here.
 	return e.Config.IsAvailable(opInfo.Group, opInfo.ID)
 }
 
-func (e *Executor) Execute(ctx context.Context, opInfo *models.HashicorpCloudWaypointAgentOperation) (OperationStatus, error) {
+func (e *Executor) Execute(ctx context.Context, opInfo *models.HashicorpCloudWaypointV20241122AgentOperation) (OperationStatus, error) {
 	var (
 		hctx   hcl.EvalContext
 		varMap map[string]any

@@ -81,8 +81,8 @@ func TestCmdGroupList(t *testing.T) {
 				call := ws.EXPECT().WaypointServiceListAgentGroups(mock.Anything, mock.Anything)
 
 				ok := waypoint_service.NewWaypointServiceListAgentGroupsOK()
-				ok.Payload = &models.HashicorpCloudWaypointListAgentGroupsResponse{
-					Groups: []*models.HashicorpCloudWaypointAgentGroup{
+				ok.Payload = &models.HashicorpCloudWaypointV20241122ListAgentGroupsResponse{
+					Groups: []*models.HashicorpCloudWaypointV20241122AgentGroup{
 						{
 							Name:        "test-group",
 							Description: "Test Group",
@@ -114,7 +114,7 @@ func TestGroupListRun(t *testing.T) {
 
 	cases := []struct {
 		Name    string
-		Resp    []*models.HashicorpCloudWaypointAgentGroup
+		Resp    []*models.HashicorpCloudWaypointV20241122AgentGroup
 		RespErr bool
 		Error   string
 	}{
@@ -125,11 +125,11 @@ func TestGroupListRun(t *testing.T) {
 		},
 		{
 			Name: "Good empty",
-			Resp: []*models.HashicorpCloudWaypointAgentGroup{},
+			Resp: []*models.HashicorpCloudWaypointV20241122AgentGroup{},
 		},
 		{
 			Name: "Good",
-			Resp: []*models.HashicorpCloudWaypointAgentGroup{
+			Resp: []*models.HashicorpCloudWaypointV20241122AgentGroup{
 				{
 					Name:        "test-group",
 					Description: "Test Group",
@@ -161,7 +161,7 @@ func TestGroupListRun(t *testing.T) {
 				call.Return(nil, waypoint_service.NewWaypointServiceListAgentGroupsDefault(http.StatusForbidden))
 			} else {
 				ok := waypoint_service.NewWaypointServiceListAgentGroupsOK()
-				ok.Payload = &models.HashicorpCloudWaypointListAgentGroupsResponse{
+				ok.Payload = &models.HashicorpCloudWaypointV20241122ListAgentGroupsResponse{
 					Groups: c.Resp,
 				}
 				call.Return(ok, nil)

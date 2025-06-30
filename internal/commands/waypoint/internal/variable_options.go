@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
 )
 
-func ParseVariableOptionsFile(path string) ([]*models.HashicorpCloudWaypointTFModuleVariable, error) {
+func ParseVariableOptionsFile(path string) ([]*models.HashicorpCloudWaypointV20241122TFModuleVariable, error) {
 	input, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func ParseVariableOptionsFile(path string) ([]*models.HashicorpCloudWaypointTFMo
 //	  ]
 //	  user_editable = false
 //	}
-func parseVariableOptions(filename string, input []byte) ([]*models.HashicorpCloudWaypointTFModuleVariable, error) {
+func parseVariableOptions(filename string, input []byte) ([]*models.HashicorpCloudWaypointV20241122TFModuleVariable, error) {
 	var hc hclVariableOptionsFile
 	var ctx hcl.EvalContext
 	// the Decode method expects a filename to provide context to the error; it
@@ -48,11 +48,11 @@ func parseVariableOptions(filename string, input []byte) ([]*models.HashicorpClo
 		return nil, err
 	}
 
-	// var variables []*models.HashicorpCloudWaypointTFModuleVariable
-	variables := make([]*models.HashicorpCloudWaypointTFModuleVariable, 0)
+	// var variables []*models.HashicorpCloudWaypointV20241122TFModuleVariable
+	variables := make([]*models.HashicorpCloudWaypointV20241122TFModuleVariable, 0)
 	if len(hc.VariableOptions) > 0 {
 		for _, v := range hc.VariableOptions {
-			variables = append(variables, &models.HashicorpCloudWaypointTFModuleVariable{
+			variables = append(variables, &models.HashicorpCloudWaypointV20241122TFModuleVariable{
 				Name:         v.Name,
 				Options:      v.Options,
 				UserEditable: v.UserEditable,
