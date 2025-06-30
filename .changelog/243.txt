@@ -1,0 +1,3 @@
+```release-note:bug
+Waypoint: Fix Waypoint agent stanza operations
+```
