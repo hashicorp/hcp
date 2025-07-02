@@ -13,7 +13,13 @@ type TFEModuleDetailsOperation struct {
 	Version   string
 }
 
-func (s *TFEModuleDetailsOperation) Run(ctx context.Context, log hclog.Logger) error {
+func (s *TFEModuleDetailsOperation) Run(
+	ctx context.Context,
+	log hclog.Logger,
+	api waypoint_service.ClientService,
+	profile *profile.Profile,
+	opInfo *models.HashicorpCloudWaypointV20241122AgentOperation,
+) error {
 	moduleSource := fmt.Sprintf("%s/%s/%s/%s", s.Namespace, s.Name, s.Provider, s.Version)
 	modulePath := fmt.Sprintf("https://app.terraform.io/api/registry/v1/modules/" + moduleSource)
 

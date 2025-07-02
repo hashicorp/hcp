@@ -11,7 +11,9 @@ import (
 
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/client/waypoint_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-waypoint-service/preview/2024-11-22/models"
+	"github.com/hashicorp/hcp/internal/pkg/profile"
 	"github.com/pkg/errors"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -27,7 +29,13 @@ var (
 )
 
 type Operation interface {
-	Run(ctx context.Context, log hclog.Logger) (OperationStatus, error)
+	Run(
+		ctx context.Context,
+		log hclog.Logger,
+		api waypoint_service.ClientService,
+		profile *profile.Profile,
+		opInfo *models.HashicorpCloudWaypointV20241122AgentOperation,
+	) (OperationStatus, error)
 }
 
 type Executor struct {
@@ -43,7 +51,12 @@ func (e *Executor) IsAvailable(opInfo *models.HashicorpCloudWaypointV20241122Age
 	return e.Config.IsAvailable(opInfo.Group, opInfo.ID)
 }
 
-func (e *Executor) Execute(ctx context.Context, opInfo *models.HashicorpCloudWaypointV20241122AgentOperation) (OperationStatus, error) {
+func (e *Executor) Execute(
+	ctx context.Context,
+	api waypoint_service.ClientService,
+	profile *profile.Profile,
+	opInfo *models.HashicorpCloudWaypointV20241122AgentOperation,
+) (OperationStatus, error) {
 	var (
 		hctx   hcl.EvalContext
 		varMap map[string]any
@@ -83,7 +96,7 @@ func (e *Executor) Execute(ctx context.Context, opInfo *models.HashicorpCloudWay
 		return errStatus, err
 	}
 
-	return op.Run(ctx, e.Log)
+	return op.Run(ctx, e.Log, api, profile, opInfo)
 }
 
 // buildVariableMap takes a map of string any values where the keys are expected
