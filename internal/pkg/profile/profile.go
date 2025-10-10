@@ -18,6 +18,8 @@ import (
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/hashicorp/hcp/internal/pkg/api/resourcename"
+	"github.com/hashicorp/hcp/internal/pkg/geography"
+
 	"github.com/posener/complete"
 	"golang.org/x/exp/maps"
 )
@@ -67,6 +69,9 @@ type Profile struct {
 	// ProjectID stores the project_id to make requests against.
 	ProjectID string `hcl:"project_id"`
 
+	// Geography specifies the geographic region for API endpoints
+	Geography string `hcl:"geography,optional" json:",omitempty"`
+
 	// Core stores core CLI configuration values.
 	Core *Core `hcl:"core,block" json:",omitempty"`
 
@@ -104,7 +109,12 @@ func (p *Profile) Predict(args complete.Args) []string {
 
 	// predicting the property
 	if len(args.All) == 1 {
-		return []string{"organization_id", "project_id", "core/", "vault-secrets/"}
+		return []string{"organization_id", "project_id", "geography", "core/", "vault-secrets/"}
+	}
+
+	// Handle geography prediction
+	if len(args.All) >= 1 && args.All[0] == "geography" {
+		return geography.GetSupportedGeographies()
 	}
 
 	return nil
@@ -118,6 +128,11 @@ func (p *Profile) Validate() error {
 	const nameRegex = "^[A-Za-z][A-Za-z0-9-]{0,63}$"
 	if matched, _ := regexp.MatchString(nameRegex, p.Name); !matched {
 		err = multierror.Append(err, ErrInvalidProfileName)
+	}
+
+	// Validate geography
+	if validationErr := ValidateGeography(p.GetGeography()); validationErr != nil {
+		err = multierror.Append(err, validationErr)
 	}
 
 	err = multierror.Append(err, p.Core.Validate())
@@ -237,6 +252,32 @@ func (p *Profile) GetOrgResourcePart() resourcename.Part {
 
 func (p *Profile) GetProjectResourcePart() resourcename.Part {
 	return resourcename.ProjectPart(p.ProjectID)
+}
+
+// GetGeography returns the set geography or an empty string if it has not been configured.
+func (p *Profile) GetGeography() string {
+	if p == nil {
+		return ""
+	}
+
+	if p.Geography == "" {
+		return ""
+	}
+
+	return p.Geography
+}
+
+// IsValidGeography checks if the given geography value is supported.
+func IsValidGeography(geo string) bool {
+	return geo == "" || geography.IsValidGeography(geo)
+}
+
+// ValidateGeography returns an error if the geography is invalid.
+func ValidateGeography(geo string) error {
+	if !IsValidGeography(geo) {
+		return fmt.Errorf("invalid geography %q. Must be one of: %q", geo, geography.GetSupportedGeographies())
+	}
+	return nil
 }
 
 // Core stores configuration settings that impact the CLIs behavior.
