@@ -78,8 +78,22 @@ func realMain() int {
 		}
 	}()
 
-	// Create the HCP Config
-	hcpCfg, err := auth.GetHCPConfig(hcpconf.WithoutBrowserLogin())
+	// Load profile to get geography setting for HCP configuration
+	var geography string
+	profile, err := loadActiveProfile()
+	if err != nil {
+		fmt.Fprintln(io.Err(), err)
+		return 1
+	}
+	geography = profile.GetGeography()
+
+	// Validate geography match and warn about mismatches
+	if err := validateGeographyMatch(io, geography); err != nil {
+		fmt.Fprintf(io.Err(), "Warning: %v\n", err)
+	}
+
+	// Create the HCP Config with geography setting
+	hcpCfg, err := auth.GetHCPConfigWithGeography(geography, hcpconf.WithoutBrowserLogin())
 	if err != nil {
 		fmt.Fprintf(io.Err(), "failed to instantiate HCP config: %v\n", err)
 		return 1
@@ -148,44 +162,45 @@ func realMain() int {
 	return status
 }
 
-// loadProfile loads the active profile and if one doesn't exist, a default
-// profile is created.
-func loadProfile(ctx context.Context, iam iam_service.ClientService, tokenSource oauth2.TokenSource) (*profile.Profile, error) {
+// loadActiveProfile loads the active profile
+func loadActiveProfile() (*profile.Profile, error) {
 	// Create the profile loader
-	profiles, err := profile.NewLoader()
+	loader, err := profile.NewLoader()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create profile loader: %w", err)
 	}
 
 	// Load the active profile
-	activeProfile, err := profiles.GetActiveProfile()
+	activeProfile, err := loader.GetActiveProfile()
 	if err != nil {
 		if !errors.Is(err, profile.ErrNoActiveProfileFilePresent) && !errors.Is(err, profile.ErrActiveProfileFileEmpty) {
 			return nil, fmt.Errorf("failed to read active profile: %w", err)
 		}
 
-		if err := profiles.DefaultActiveProfile().Write(); err != nil {
+		if err := loader.DefaultActiveProfile().Write(); err != nil {
 			return nil, fmt.Errorf("failed to save default active profile config: %w", err)
 		}
 
-		if err := profiles.DefaultProfile().Write(); err != nil {
+		if err := loader.DefaultProfile().Write(); err != nil {
 			return nil, fmt.Errorf("failed to save default profile config: %w", err)
 		}
 
-		activeProfile, err = profiles.GetActiveProfile()
+		activeProfile, err = loader.GetActiveProfile()
 		if err != nil {
 			return nil, fmt.Errorf("failed to save default active profile config: %w", err)
 		}
 	}
 
+	return loader.LoadProfile(activeProfile.Name)
+}
+
+// loadProfile loads the active profile and if one doesn't exist, a default
+// profile is created.
+func loadProfile(ctx context.Context, iam iam_service.ClientService, tokenSource oauth2.TokenSource) (*profile.Profile, error) {
 	// Get the active profile
-	p, err := profiles.LoadProfile(activeProfile.Name)
+	p, err := loadActiveProfile()
 	if err != nil {
-		p = profiles.DefaultProfile()
-		p.Name = activeProfile.Name
-		if err := p.Write(); err != nil {
-			return nil, fmt.Errorf("failed to save default profile config: %w", err)
-		}
+		return nil, err
 	}
 
 	// If the profile has an org, or we don't have a valid access
@@ -230,4 +245,33 @@ func loadProfile(ctx context.Context, iam iam_service.ClientService, tokenSource
 // context.
 func isAutocomplete() bool {
 	return os.Getenv("COMP_LINE") != "" && os.Getenv("COMP_POINT") != ""
+}
+
+// validateGeographyMatch checks if the profile geography matches the cached geography
+// and provides helpful warnings when there's a mismatch.
+func validateGeographyMatch(io iostreams.IOStreams, profileGeography string) error {
+	// Skip validation if profile geography is not set
+	if profileGeography == "" {
+		return nil
+	}
+
+	// Check for geography mismatch
+	isMatch, cachedGeo, err := auth.ValidateGeographyMatch(profileGeography)
+	if err != nil {
+		// Don't fail the entire command for validation errors
+		return fmt.Errorf("could not validate geography match: %w", err)
+	}
+
+	// If there's no cached geography or they match, no warning needed
+	if cachedGeo == "" || isMatch {
+		return nil
+	}
+
+	// There's a mismatch - provide helpful guidance
+	cs := io.ColorScheme()
+	errorMsg := fmt.Sprintf(
+		"Profile is set to %s but you are authenticated to %s. This may cause authentication errors.\n"+
+			"To fix this mismatch, run: %s",
+		cs.String(profileGeography).Bold(), cs.String(cachedGeo).Bold(), cs.String("hcp auth login").Bold())
+	return fmt.Errorf("%s", cs.String(errorMsg).Color(cs.Yellow()))
 }
