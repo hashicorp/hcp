@@ -28,19 +28,19 @@ func TestList(t *testing.T) {
 	}
 
 	// Create a few profiles
-	p1, err := l.NewProfile("alpha")
+	p1, err := l.NewProfile("alpha", "us")
 	r.NoError(err)
 	p1.OrganizationID = "alpha-org-id"
 	p1.ProjectID = "alpha-project-id"
 	r.NoError(p1.Write())
 
-	p2, err := l.NewProfile("beta")
+	p2, err := l.NewProfile("beta", "us")
 	r.NoError(err)
 	p2.OrganizationID = "beta-org-id"
 	p2.ProjectID = "beta-project-id"
 	r.NoError(p2.Write())
 
-	p3, err := l.NewProfile("zed")
+	p3, err := l.NewProfile("zed", "eu")
 	r.NoError(err)
 	p3.OrganizationID = "zed-org-id"
 	p3.ProjectID = "zed-project-id"

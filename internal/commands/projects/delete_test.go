@@ -176,7 +176,7 @@ func TestDeleteRun_ProjectInProfile(t *testing.T) {
 	// Create two profiles with the project ID set
 	expectedProfiles := []string{"profile-a", "profile-b"}
 	for _, name := range expectedProfiles {
-		p, err := l.NewProfile(name)
+		p, err := l.NewProfile(name, "")
 		r.NoError(err)
 		p.ProjectID = projectID
 		r.NoError(p.Write())

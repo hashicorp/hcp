@@ -136,7 +136,7 @@ func unsetRun(opts *UnsetOpts) error {
 	}
 
 	if didDelete {
-		p, err := opts.Profiles.NewProfile(opts.Profile.Name)
+		p, err := opts.Profiles.NewProfile(opts.Profile.Name, "")
 		if err != nil {
 			return err
 		}
