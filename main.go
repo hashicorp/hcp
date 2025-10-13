@@ -88,7 +88,12 @@ func realMain() int {
 	geography = profile.GetGeography()
 
 	// Create the HCP Config with geography setting
-	hcpCfg, err := auth.GetHCPConfigWithGeography(geography, hcpconf.WithoutBrowserLogin())
+	var configOptions []hcpconf.HCPConfigOption
+	configOptions = append(configOptions, hcpconf.WithoutBrowserLogin())
+	if geography != "" {
+		configOptions = append(configOptions, hcpconf.WithGeography(geography))
+	}
+	hcpCfg, err := auth.GetHCPConfig(configOptions...)
 	if err != nil {
 		fmt.Fprintf(io.Err(), "failed to instantiate HCP config: %v\n", err)
 		return 1
