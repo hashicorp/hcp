@@ -8,9 +8,11 @@ import (
 
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
+	"github.com/hashicorp/hcp/internal/pkg/geography"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
+	"github.com/posener/complete"
 )
 
 func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
@@ -49,6 +51,13 @@ func NewCmdCreate(ctx *cmd.Context) *cmd.Command {
 					Value:         flagvalue.Simple(false, &opts.NoActivate),
 					IsBooleanFlag: true,
 				},
+				{
+					Name:         "geography",
+					DisplayValue: "REGION",
+					Description:  "HashiCorp Cloud Platform control plane geography to run commands against.",
+					Value:        flagvalue.Simple("", &opts.Geography),
+					Autocomplete: complete.PredictSet(geography.GetSupportedGeographies()...),
+				},
 			},
 		},
 		NoAuthRequired: true,
@@ -72,6 +81,7 @@ type CreateOpts struct {
 	Profiles   *profile.Loader
 	Name       string
 	NoActivate bool
+	Geography  string
 }
 
 func createRun(opts *CreateOpts) error {
@@ -89,7 +99,7 @@ func createRun(opts *CreateOpts) error {
 	}
 
 	// Create the new profile
-	p, err := opts.Profiles.NewProfile(opts.Name)
+	p, err := opts.Profiles.NewProfile(opts.Name, opts.Geography)
 	if err != nil {
 		return err
 	}
