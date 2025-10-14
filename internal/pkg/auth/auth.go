@@ -22,28 +22,26 @@ const (
 	CredentialsDir = "~/.config/hcp/credentials/"
 )
 
-// GetHCPConfig retrieves the HCP configuration, applying any passed options. If
-// a previous login occurred, GetHCPConfig will attempt to configure the HCP
-// configuration based on the principal that was authenticated.
+// GetHCPConfig retrieves the HCP configuration with geography support.
+// Geography configuration is handled by the HCP SDK through the WithGeography option.
 func GetHCPConfig(options ...hcpconf.HCPConfigOption) (hcpconf.HCPConfig, error) {
 	return GetHCPConfigFromDir(CredentialsDir, options...)
 }
 
-// GetHCPConfigFromDir is like GetHCPConfig but can search non-default
-// directories.
+// GetHCPConfigFromDir is like GetHCPConfig but can search non-default directories.
 func GetHCPConfigFromDir(credFileDir string, options ...hcpconf.HCPConfigOption) (hcpconf.HCPConfig, error) {
 	opts := []hcpconf.HCPConfigOption{
 		hcpconf.WithoutLogging(),
 		hcpconf.FromEnv(),
 	}
 
-	// Get the path the credential file
+	// Get the path to the credential file
 	credFilePath, err := GetHCPCredFilePath(credFileDir)
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve hcp's credential path: %w", err)
 	}
 
-	// Create a credential file
+	// Use credential file if it exists
 	if _, err := os.Stat(credFilePath); err == nil {
 		opts = append(opts, hcpconf.WithCredentialFilePath(credFilePath))
 	}
@@ -65,22 +63,28 @@ func GetHCPCredFilePath(credFileDir string) (string, error) {
 		return "", fmt.Errorf("failed to resolve hcp's credential directory path: %w", err)
 	}
 
-	// Build the path to the credential file
 	credFilePath := filepath.Join(dir, CredFileName)
 	return credFilePath, nil
 }
 
 // IsAuthenticated returns if there is a valid token available.
 func IsAuthenticated() (bool, error) {
-	// Create the HCP Config
 	hcpCfg, err := GetHCPConfig(hcpconf.WithoutBrowserLogin())
 	if err != nil {
 		return false, fmt.Errorf("failed to instantiate HCP config to check authentication status: %w", err)
 	}
 
-	if tkn, err := hcpCfg.Token(); err != nil {
+	return isTokenValid(hcpCfg)
+}
+
+// isTokenValid checks if a token from the given HCP config is valid and not expired.
+func isTokenValid(hcpCfg hcpconf.HCPConfig) (bool, error) {
+	tkn, err := hcpCfg.Token()
+	if err != nil {
 		return false, nil
-	} else if tkn.Expiry.Before(time.Now()) {
+	}
+
+	if tkn.Expiry.Before(time.Now()) {
 		return false, nil
 	}
 
