@@ -15,6 +15,10 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-iam/stable/2019-12-10/client/iam_service"
 	hcpconf "github.com/hashicorp/hcp-sdk-go/config"
 	"github.com/hashicorp/hcp-sdk-go/httpclient"
+	"github.com/mitchellh/cli"
+	"github.com/posener/complete"
+	"golang.org/x/oauth2"
+
 	"github.com/hashicorp/hcp/internal/commands/hcp"
 	"github.com/hashicorp/hcp/internal/pkg/auth"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -23,9 +27,6 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 	"github.com/hashicorp/hcp/internal/pkg/versioncheck"
 	"github.com/hashicorp/hcp/version"
-	"github.com/mitchellh/cli"
-	"github.com/posener/complete"
-	"golang.org/x/oauth2"
 )
 
 const (
