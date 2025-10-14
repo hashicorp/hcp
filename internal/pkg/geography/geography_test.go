@@ -41,10 +41,10 @@ func TestIsValidGeography(t *testing.T) {
 	r.False(IsValidGeography("asia"))
 	r.False(IsValidGeography("invalid"))
 	r.False(IsValidGeography(""))
-	r.False(IsValidGeography(" "))  // whitespace
-	r.False(IsValidGeography("US")) // case sensitivity
-	r.False(IsValidGeography("EU")) // case sensitivity
-	r.False(IsValidGeography("us-east-1")) // AWS-style region
+	r.False(IsValidGeography(" "))            // whitespace
+	r.False(IsValidGeography("US"))           // case sensitivity
+	r.False(IsValidGeography("EU"))           // case sensitivity
+	r.False(IsValidGeography("us-east-1"))    // AWS-style region
 	r.False(IsValidGeography("europe-west1")) // GCP-style region
 }
 
@@ -104,12 +104,11 @@ func TestCredentialCacheStructures(t *testing.T) {
 
 func TestGetCachedGeography(t *testing.T) {
 	t.Parallel()
-
 	tests := []struct {
-		name           string
-		setupCache     func(t *testing.T, tempDir string)
-		expectedGeo    string
-		expectedError  string
+		name          string
+		setupCache    func(t *testing.T, tempDir string)
+		expectedGeo   string
+		expectedError string
 	}{
 		{
 			name: "valid_cache_with_us_geography",
@@ -164,6 +163,7 @@ func TestGetCachedGeography(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			r := require.New(t)
 
 			// Create a temporary directory for this test
@@ -220,7 +220,7 @@ func TestGetCachedGeography_ReadPermissionError(t *testing.T) {
 
 	// Restore permissions after test to allow cleanup
 	t.Cleanup(func() {
-		os.Chmod(cacheFile, 0644)
+		r.NoError(os.Chmod(cacheFile, 0644))
 	})
 
 	// Test should fail with permission error
@@ -294,8 +294,8 @@ func TestGeographyWorkflow_ProfileInitScenario(t *testing.T) {
 	// Step 4: Profile should prefer cached over default
 	defaultGeo := GetDefaultGeography()
 	r.NotEqual(defaultGeo, cachedGeo) // In this test, they should be different
-	r.Equal("us", defaultGeo) // Verify default is still US
-	r.Equal("eu", cachedGeo)  // But cached is EU
+	r.Equal("us", defaultGeo)         // Verify default is still US
+	r.Equal("eu", cachedGeo)          // But cached is EU
 }
 
 func TestGeographyWorkflow_AuthLoginSyncScenario(t *testing.T) {
