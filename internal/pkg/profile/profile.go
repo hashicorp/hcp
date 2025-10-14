@@ -17,11 +17,11 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclwrite"
-	"github.com/hashicorp/hcp/internal/pkg/api/resourcename"
-	"github.com/hashicorp/hcp/internal/pkg/geography"
-
 	"github.com/posener/complete"
 	"golang.org/x/exp/maps"
+
+	"github.com/hashicorp/hcp/internal/pkg/api/resourcename"
+	"github.com/hashicorp/hcp/internal/pkg/geography"
 )
 
 const (

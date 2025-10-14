@@ -6,13 +6,14 @@ package profiles
 import (
 	"fmt"
 
+	"github.com/posener/complete"
+
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
 	"github.com/hashicorp/hcp/internal/pkg/geography"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
-	"github.com/posener/complete"
 )
 
 func NewCmdCreate(ctx *cmd.Context) *cmd.Command {

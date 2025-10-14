@@ -12,8 +12,9 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl/v2/hclsimple"
-	"github.com/hashicorp/hcp/internal/pkg/geography"
 	"github.com/mitchellh/go-homedir"
+
+	"github.com/hashicorp/hcp/internal/pkg/geography"
 )
 
 const (
