@@ -10,10 +10,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/mitchellh/mapstructure"
-
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/organization_service"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/project_service"
+	"github.com/mitchellh/mapstructure"
+
 	"github.com/hashicorp/hcp/internal/pkg/auth"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
@@ -167,12 +167,29 @@ func setRun(opts *SetOpts) error {
 		return nil
 	}
 
+	// Check if geography was changed and clear org/project if needed
+	geographyChanged := false
+	if opts.Property == "geography" {
+		geographyChanged = true
+		// Clear organization_id and project_id to force re-initialization
+		p.OrganizationID = ""
+		p.ProjectID = ""
+	}
+
 	if err := p.Write(); err != nil {
 		return err
 	}
 
 	fmt.Fprintf(opts.IO.Err(), "%s Property %q updated\n",
 		opts.IO.ColorScheme().SuccessIcon(), opts.Property)
+
+	// Notify user about geography changes
+	if geographyChanged {
+		fmt.Fprintf(opts.IO.Err(), "\n%s Geography changed to %q. Organization and project settings have been cleared.\n",
+			opts.IO.ColorScheme().WarningLabel(), opts.Value)
+		fmt.Fprintf(opts.IO.Err(), "Please run %s to reconfigure your organization and project for this geography.\n\n",
+			opts.IO.ColorScheme().String("hcp profile init").Bold())
+	}
 
 	return nil
 }

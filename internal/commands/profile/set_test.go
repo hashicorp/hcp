@@ -25,6 +25,7 @@ func TestSet(t *testing.T) {
 		Property     string
 		Value        string
 		Error        string
+		SetupProfile func(p *profile.Profile) // Add setup function
 		CheckProfile func(p *profile.Profile, r *require.Assertions)
 	}{
 		{
@@ -73,6 +74,22 @@ func TestSet(t *testing.T) {
 			Value:    "bad-value",
 			Error:    "invalid output_format \"bad-value\". Must be one of:",
 		},
+		{
+			Name:     "geography change clears org and project",
+			Property: "geography",
+			Value:    "eu",
+			SetupProfile: func(p *profile.Profile) {
+				// Set initial org and project values
+				p.OrganizationID = "test-org-123"
+				p.ProjectID = "test-project-456"
+			},
+			CheckProfile: func(p *profile.Profile, r *require.Assertions) {
+				// Verify geography is set and org/project are cleared
+				r.Equal("eu", p.GetGeography())
+				r.Equal("", p.OrganizationID)
+				r.Equal("", p.ProjectID)
+			},
+		},
 	}
 
 	for _, c := range cases {
@@ -82,9 +99,16 @@ func TestSet(t *testing.T) {
 			r := require.New(t)
 
 			io := iostreams.Test()
+			profile := profile.TestProfile(t)
+
+			// Setup profile if needed
+			if c.SetupProfile != nil {
+				c.SetupProfile(profile)
+			}
+
 			o := &SetOpts{
 				IO:             io,
-				Profile:        profile.TestProfile(t),
+				Profile:        profile,
 				ProjectService: nil,
 				Property:       c.Property,
 				Value:          c.Value,
@@ -94,7 +118,9 @@ func TestSet(t *testing.T) {
 			err := setRun(o)
 			if c.Error == "" {
 				r.NoError(err)
-				c.CheckProfile(o.Profile, r)
+				if c.CheckProfile != nil {
+					c.CheckProfile(o.Profile, r)
+				}
 			} else {
 				r.ErrorContains(err, c.Error)
 			}
