@@ -149,10 +149,11 @@ func TestInit_OrgAndProject_SP_NoList(t *testing.T) {
 	t.Parallel()
 	r := require.New(t)
 
-	io := iostreams.Test()
-	io.ErrorTTY = true
-	io.InputTTY = true
+	ioTest := iostreams.Test()
+	ioTest.ErrorTTY = true
+	ioTest.InputTTY = true
 
+	io := promptio.Wrap(ioTest)
 	opts := InitOpts{
 		IO:      io,
 		Profile: profile.TestProfile(t),
@@ -168,9 +169,6 @@ func TestInit_OrgAndProject_SP_NoList(t *testing.T) {
 
 	// Say no to service config prompt
 	_, err := io.Input.WriteRune('n')
-	r.NoError(err)
-
-	_, err = io.Input.WriteRune(promptui.KeyEnter)
 	r.NoError(err)
 
 	r.NoError(opts.run())
@@ -208,9 +206,6 @@ func TestInit_OrgAndProject_SP_List(t *testing.T) {
 
 	// Say no to service config prompt
 	_, err = io.Input.WriteRune('n')
-	r.NoError(err)
-
-	_, err = io.Input.WriteRune(promptui.KeyEnter)
 	r.NoError(err)
 
 	r.NoError(opts.run())
@@ -369,9 +364,6 @@ func TestInit_OrgAndProject_User(t *testing.T) {
 			} else {
 				// Say no to configuring service config
 				_, err := io.Input.WriteRune('n')
-				r.NoError(err)
-
-				_, err = io.Input.WriteRune(promptui.KeyEnter)
 				r.NoError(err)
 			}
 

@@ -16,12 +16,14 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/client/project_service"
 	resources "github.com/hashicorp/hcp-sdk-go/clients/cloud-resource-manager/stable/2019-12-10/models"
 	preview_secret_service "github.com/hashicorp/hcp-sdk-go/clients/cloud-vault-secrets/stable/2023-11-28/client/secret_service"
+	"github.com/manifoldco/promptui"
+
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
+	"github.com/hashicorp/hcp/internal/pkg/geography"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
-	"github.com/manifoldco/promptui"
 )
 
 const (
@@ -88,6 +90,10 @@ type InitOpts struct {
 func (i *InitOpts) run() error {
 	if err := i.configureOrgAndProject(); err != nil {
 		return fmt.Errorf("failed configuring organization and project: %w", err)
+	}
+
+	if err := i.configureGeography(); err != nil {
+		return fmt.Errorf("failed configuring geography: %w", err)
 	}
 
 	// If the user hasn't explicitly specified a service to configure, prompt to see if they would like to.
@@ -164,6 +170,36 @@ func (i *InitOpts) configureOrgAndProject() error {
 	}
 
 	i.Profile.ProjectID = projectID
+
+	return nil
+}
+
+func (i *InitOpts) configureGeography() error {
+	defaultGeo := geography.GetDefaultGeography()
+
+	// Check for existing cached geography from authentication
+	cachedGeo, err := geography.GetCachedGeography(profile.ConfigDir)
+	if err != nil {
+		// Log warning but don't fail - continue with default behavior
+		cs := i.IO.ColorScheme()
+		fmt.Fprintf(i.IO.Err(), "%s Could not read cached geography: %v\n", cs.WarningLabel(), err)
+	}
+
+	// Use cached geography if available, otherwise use system default
+	selectedGeo := defaultGeo
+	if cachedGeo != "" {
+		selectedGeo = cachedGeo
+	}
+
+	// Set the geography
+	i.Profile.Geography = selectedGeo
+
+	cs := i.IO.ColorScheme()
+	if cachedGeo != "" {
+		fmt.Fprintf(i.IO.Err(), "%s Using geography %q from cached authentication\n", cs.SuccessIcon(), selectedGeo)
+	} else {
+		fmt.Fprintf(i.IO.Err(), "%s Using default geography %q\n", cs.SuccessIcon(), selectedGeo)
+	}
 
 	return nil
 }
