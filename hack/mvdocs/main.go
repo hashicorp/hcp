@@ -1,4 +1,4 @@
-// Copyright (c) HashiCorp, Inc.
+// Copyright IBM Corp. 2024, 2025
 // SPDX-License-Identifier: MPL-2.0
 
 // This tool is used to move the generated commands documentation from the `web-docs` directory to the `hcp-docs` repository.
