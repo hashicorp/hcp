@@ -34,8 +34,12 @@ func availableProperties(io iostreams.IOStreams) *availablePropertiesBuilder {
 func addCoreProperties(b *availablePropertiesBuilder) {
 	b.AddProperty("", "organization_id", "Organization ID of the HCP organization to operate on.")
 	b.AddProperty("", "project_id", `
-	Project ID of the HCP project to operate on by default.
-	This can be overridden by using the global {{ template "mdCodeOrBold" "--project" }} flag.`)
+		Project ID of the HCP project to operate on by default.
+		This can be overridden by using the global {{ template "mdCodeOrBold" "--project" }} flag.`)
+	b.AddProperty("", "geography", `
+		Default geographic region for HCP API endpoints. This affects which regional
+		endpoints are used for HCP services. Supported regions:
+		{{ template "mdCodeOrBold" "us" }} for United States and {{ template "mdCodeOrBold" "eu" }} for Europe.`)
 
 	b.AddProperty("core", "no_color", "If True, color will not be used when printing messages in the terminal.")
 	b.AddProperty("core", "quiet", "If True, prompts will be disabled and output will be minimized.")

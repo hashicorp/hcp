@@ -15,6 +15,10 @@ import (
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-iam/stable/2019-12-10/client/iam_service"
 	hcpconf "github.com/hashicorp/hcp-sdk-go/config"
 	"github.com/hashicorp/hcp-sdk-go/httpclient"
+	"github.com/mitchellh/cli"
+	"github.com/posener/complete"
+	"golang.org/x/oauth2"
+
 	"github.com/hashicorp/hcp/internal/commands/hcp"
 	"github.com/hashicorp/hcp/internal/pkg/auth"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
@@ -23,9 +27,6 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 	"github.com/hashicorp/hcp/internal/pkg/versioncheck"
 	"github.com/hashicorp/hcp/version"
-	"github.com/mitchellh/cli"
-	"github.com/posener/complete"
-	"golang.org/x/oauth2"
 )
 
 const (
@@ -78,8 +79,22 @@ func realMain() int {
 		}
 	}()
 
-	// Create the HCP Config
-	hcpCfg, err := auth.GetHCPConfig(hcpconf.WithoutBrowserLogin())
+	// Load profile to get geography setting for HCP configuration
+	var geography string
+	profile, err := loadActiveProfile()
+	if err != nil {
+		fmt.Fprintln(io.Err(), err)
+		return 1
+	}
+	geography = profile.GetGeography()
+
+	// Create the HCP Config with geography setting
+	var configOptions []hcpconf.HCPConfigOption
+	configOptions = append(configOptions, hcpconf.WithoutBrowserLogin())
+	if geography != "" {
+		configOptions = append(configOptions, hcpconf.WithGeography(geography))
+	}
+	hcpCfg, err := auth.GetHCPConfig(configOptions...)
 	if err != nil {
 		fmt.Fprintf(io.Err(), "failed to instantiate HCP config: %v\n", err)
 		return 1
@@ -148,44 +163,45 @@ func realMain() int {
 	return status
 }
 
-// loadProfile loads the active profile and if one doesn't exist, a default
-// profile is created.
-func loadProfile(ctx context.Context, iam iam_service.ClientService, tokenSource oauth2.TokenSource) (*profile.Profile, error) {
+// loadActiveProfile loads the active profile
+func loadActiveProfile() (*profile.Profile, error) {
 	// Create the profile loader
-	profiles, err := profile.NewLoader()
+	loader, err := profile.NewLoader()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create profile loader: %w", err)
 	}
 
 	// Load the active profile
-	activeProfile, err := profiles.GetActiveProfile()
+	activeProfile, err := loader.GetActiveProfile()
 	if err != nil {
 		if !errors.Is(err, profile.ErrNoActiveProfileFilePresent) && !errors.Is(err, profile.ErrActiveProfileFileEmpty) {
 			return nil, fmt.Errorf("failed to read active profile: %w", err)
 		}
 
-		if err := profiles.DefaultActiveProfile().Write(); err != nil {
+		if err := loader.DefaultActiveProfile().Write(); err != nil {
 			return nil, fmt.Errorf("failed to save default active profile config: %w", err)
 		}
 
-		if err := profiles.DefaultProfile().Write(); err != nil {
+		if err := loader.DefaultProfile().Write(); err != nil {
 			return nil, fmt.Errorf("failed to save default profile config: %w", err)
 		}
 
-		activeProfile, err = profiles.GetActiveProfile()
+		activeProfile, err = loader.GetActiveProfile()
 		if err != nil {
 			return nil, fmt.Errorf("failed to save default active profile config: %w", err)
 		}
 	}
 
+	return loader.LoadProfile(activeProfile.Name)
+}
+
+// loadProfile loads the active profile and if one doesn't exist, a default
+// profile is created.
+func loadProfile(ctx context.Context, iam iam_service.ClientService, tokenSource oauth2.TokenSource) (*profile.Profile, error) {
 	// Get the active profile
-	p, err := profiles.LoadProfile(activeProfile.Name)
+	p, err := loadActiveProfile()
 	if err != nil {
-		p = profiles.DefaultProfile()
-		p.Name = activeProfile.Name
-		if err := p.Write(); err != nil {
-			return nil, fmt.Errorf("failed to save default profile config: %w", err)
-		}
+		return nil, err
 	}
 
 	// If the profile has an org, or we don't have a valid access

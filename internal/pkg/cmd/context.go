@@ -238,8 +238,17 @@ func isAuthenticated(ctx *Context, c *Command, args []string) error {
 		return nil
 	}
 
-	// Create the HCP Config
-	hcpCfg, err := auth.GetHCPConfig(hcpconf.WithoutBrowserLogin())
+	// Get the geography setting from the profile
+	var configOptions []hcpconf.HCPConfigOption
+	configOptions = append(configOptions, hcpconf.WithoutBrowserLogin())
+	if ctx.Profile != nil {
+		if geography := ctx.Profile.GetGeography(); geography != "" {
+			configOptions = append(configOptions, hcpconf.WithGeography(geography))
+		}
+	}
+
+	// Create the HCP Config with geography configuration
+	hcpCfg, err := auth.GetHCPConfig(configOptions...)
 	if err != nil {
 		return fmt.Errorf("failed to instantiate HCP config: %w", err)
 	}

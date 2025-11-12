@@ -82,7 +82,7 @@ func renameRun(opts *RenameOpts) error {
 	}
 
 	// Validate new name is a valid name.
-	if _, err := opts.Profiles.NewProfile(opts.NewName); err != nil {
+	if _, err := opts.Profiles.NewProfile(opts.NewName, ""); err != nil {
 		return fmt.Errorf("invalid new name %q: %w", opts.NewName, err)
 	}
 

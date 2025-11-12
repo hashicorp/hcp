@@ -180,7 +180,9 @@ func testLoginSP(t *testing.T, profilePreconfigured bool) {
 	r.Contains(io.Error.String(), "Successfully logged in!")
 
 	// Check that the credential file is written
-	f, err := os.Open(filepath.Join(o.CredentialDir, hcpAuth.CredFileName))
+	credFilePath, err := hcpAuth.GetHCPCredFilePath(o.CredentialDir)
+	r.NoError(err)
+	f, err := os.Open(credFilePath)
 	r.NoError(err)
 
 	var credFile auth.CredentialFile
@@ -264,7 +266,9 @@ func TestLogin_CredFile(t *testing.T) {
 	r.Contains(io.Error.String(), "Successfully logged in!")
 
 	// Check that the credential file is written
-	copiedCF, err := os.Open(filepath.Join(o.CredentialDir, hcpAuth.CredFileName))
+	credFilePath, err := hcpAuth.GetHCPCredFilePath(o.CredentialDir)
+	r.NoError(err)
+	copiedCF, err := os.Open(credFilePath)
 	r.NoError(err)
 	defer func() {
 		r.NoError(copiedCF.Close())

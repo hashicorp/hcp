@@ -9,21 +9,22 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 
 	"github.com/hashicorp/hcp-sdk-go/auth"
 	"github.com/hashicorp/hcp-sdk-go/clients/cloud-iam/stable/2019-12-10/client/iam_service"
 	hcpconf "github.com/hashicorp/hcp-sdk-go/config"
 	"github.com/hashicorp/hcp-sdk-go/httpclient"
+	"github.com/mitchellh/go-homedir"
+	"github.com/posener/complete"
+
 	hcpAuth "github.com/hashicorp/hcp/internal/pkg/auth"
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 	"github.com/hashicorp/hcp/internal/pkg/flagvalue"
+	"github.com/hashicorp/hcp/internal/pkg/geography"
 	"github.com/hashicorp/hcp/internal/pkg/heredoc"
 	"github.com/hashicorp/hcp/internal/pkg/iostreams"
 	"github.com/hashicorp/hcp/internal/pkg/profile"
 	"github.com/hashicorp/hcp/version"
-	"github.com/mitchellh/go-homedir"
-	"github.com/posener/complete"
 )
 
 func NewCmdLogin(ctx *cmd.Context) *cmd.Command {
@@ -76,6 +77,10 @@ func NewCmdLogin(ctx *cmd.Context) *cmd.Command {
 				Command:  "$ hcp auth login",
 			},
 			{
+				Preamble: "Login to a specific HCP geography:",
+				Command:  "$ hcp auth login --geography=eu",
+			},
+			{
 				Preamble: "Login using service principal credentials:",
 				Command:  "$ hcp auth login --client-id=spID --client-secret=spSecret",
 			},
@@ -108,6 +113,13 @@ func NewCmdLogin(ctx *cmd.Context) *cmd.Command {
 				`),
 					Value:        flagvalue.Simple("", &opts.CredentialFile),
 					Autocomplete: complete.PredictFiles("*.json"),
+				},
+				{
+					Name:         "geography",
+					DisplayValue: "REGION",
+					Description:  "HashiCorp Cloud Platform control plane geography to run commands against.",
+					Value:        flagvalue.Simple("", &opts.Geography),
+					Autocomplete: complete.PredictSet(geography.GetSupportedGeographies()...),
 				},
 			},
 		},
@@ -151,6 +163,9 @@ type LoginOpts struct {
 	// principal credentials.
 	ClientID     string
 	ClientSecret string
+
+	// Geography is the regional instance of HashiCorp Cloud Platform
+	Geography string
 }
 
 func (o *LoginOpts) Validate() error {
@@ -177,6 +192,14 @@ func loginRun(opts *LoginOpts) error {
 	// Build our options
 	var storeCredFile bool
 	options := []hcpconf.HCPConfigOption{hcpconf.WithoutLogging()}
+
+	// Add geography configuration if available
+	if opts.Geography != "" {
+		options = append(options, hcpconf.WithGeography(opts.Geography))
+	} else if geography := opts.Profile.GetGeography(); geography != "" {
+		options = append(options, hcpconf.WithGeography(geography))
+	}
+
 	if opts.CredentialFile != "" {
 		options = append(options, hcpconf.WithCredentialFilePath(opts.CredentialFile))
 		storeCredFile = true
@@ -201,6 +224,13 @@ func loginRun(opts *LoginOpts) error {
 	// Write any credential file necessary
 	if storeCredFile {
 		if err := writeCredFile(opts); err != nil {
+			return err
+		}
+	}
+
+	// Sync geography from authentication cache to profile for browser login
+	if !storeCredFile {
+		if err := syncGeographyToProfile(opts); err != nil {
 			return err
 		}
 	}
@@ -272,8 +302,13 @@ func writeCredFile(opts *LoginOpts) (err error) {
 		return fmt.Errorf("failed to create hcp's credential directory: %w", err)
 	}
 
-	// Create a credential file
-	credFilePath := filepath.Join(dir, hcpAuth.CredFileName)
+	// Get the credential file path
+	credFilePath, err := hcpAuth.GetHCPCredFilePath(opts.CredentialDir)
+	if err != nil {
+		return fmt.Errorf("failed to resolve credential file path: %w", err)
+	}
+
+	// Create the credential file
 	cf, err := os.Create(credFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to create hcp credential file: %w", err)
@@ -318,6 +353,57 @@ func writeCredFile(opts *LoginOpts) (err error) {
 	e.SetIndent("", "  ")
 	if err := e.Encode(spCF); err != nil {
 		return fmt.Errorf("failed to store service principal credentials: %w", err)
+	}
+
+	return nil
+}
+
+// syncGeographyToProfile synchronizes the geography from the SDK credential cache
+// to the profile after a successful browser login.
+func syncGeographyToProfile(opts *LoginOpts) error {
+	// Get the cached geography from the SDK credential cache
+	cachedGeo, err := geography.GetCachedGeography(profile.ConfigDir)
+	if err != nil {
+		return fmt.Errorf("failed to get cached geography: %w", err)
+	}
+
+	// If no cached geography, nothing to sync
+	if cachedGeo == "" {
+		return nil
+	}
+
+	currentProfileGeo := opts.Profile.GetGeography()
+	cs := opts.IO.ColorScheme()
+
+	// Case 1: Profile has no geography set - auto-set it
+	if currentProfileGeo == "" {
+		// Set the geography from cache directly on the profile
+		opts.Profile.Geography = cachedGeo
+
+		// Write the updated profile
+		if err := opts.Profile.Write(); err != nil {
+			return fmt.Errorf("failed to update profile with geography: %w", err)
+		}
+
+		if !opts.Quiet {
+			fmt.Fprintf(opts.IO.Err(), "%s Profile geography automatically set to %q to match authentication.\n",
+				cs.SuccessIcon(), cachedGeo)
+		}
+		return nil
+	}
+
+	// Case 2: Profile geography matches cached geography - nothing to do
+	if currentProfileGeo == cachedGeo {
+		return nil
+	}
+
+	// Case 3: Profile geography differs from cached geography
+	if !opts.Quiet {
+		warningMsg := fmt.Sprintf(
+			"Profile is set to %q but you authenticated to %q. This may cause authentication issues.\n"+
+				"To fix this, run: hcp profile set geography %s\n",
+			currentProfileGeo, cachedGeo, cachedGeo)
+		fmt.Fprintf(opts.IO.Err(), "%s %s", cs.WarningLabel(), warningMsg)
 	}
 
 	return nil

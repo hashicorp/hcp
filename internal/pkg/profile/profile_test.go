@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/hashicorp/hcp/internal/pkg/geography"
 	"github.com/posener/complete"
 	"github.com/stretchr/testify/require"
 )
@@ -22,6 +23,7 @@ func TestPropertyNames(t *testing.T) {
 	r.Contains(properties, "core/no_color")
 	r.Contains(properties, "core/quiet")
 	r.Contains(properties, "core/verbosity")
+	r.Contains(properties, "geography")
 	r.Contains(properties, "vault-secrets/app")
 }
 
@@ -57,6 +59,14 @@ func TestProfile_Validate(t *testing.T) {
 				},
 			},
 			Error: "invalid output_format",
+		},
+		{
+			Name: "bad geography",
+			Profile: &Profile{
+				Name:      "test",
+				Geography: badOutputFormat,
+			},
+			Error: "invalid geography",
 		},
 		{
 			Name: "valid",
@@ -98,14 +108,14 @@ func TestProfile_Predict(t *testing.T) {
 			Args: complete.Args{
 				All: []string{""},
 			},
-			Expected: []string{"organization_id", "project_id", "core/", "vault-secrets/"},
+			Expected: []string{"organization_id", "project_id", "geography", "core/", "vault-secrets/"},
 		},
 		{
 			Name: "specific field",
 			Args: complete.Args{
 				All: []string{"org"},
 			},
-			Expected: []string{"organization_id", "project_id", "core/", "vault-secrets/"},
+			Expected: []string{"organization_id", "project_id", "geography", "core/", "vault-secrets/"},
 		},
 		{
 			Name: "core",
@@ -120,6 +130,13 @@ func TestProfile_Predict(t *testing.T) {
 				All: []string{"vault-secrets/"},
 			},
 			Expected: []string{"vault-secrets/app"},
+		},
+		{
+			Name: "geography",
+			Args: complete.Args{
+				All: []string{"geography", ""},
+			},
+			Expected: []string{"eu", "us"}, // Expected values from SDK (order determined by SDK)
 		},
 	}
 
@@ -184,6 +201,52 @@ func TestCore_Validate(t *testing.T) {
 			} else {
 				require.ErrorContains(err, c.Error)
 			}
+		})
+	}
+}
+
+func TestProfile_GetGeography(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		Name     string
+		Profile  *Profile
+		Expected string
+	}{
+		{
+			Name:     "nil profile",
+			Profile:  nil,
+			Expected: "",
+		},
+		{
+			Name:     "empty profile",
+			Profile:  &Profile{},
+			Expected: "",
+		},
+		{
+			Name: "us geography",
+			Profile: &Profile{
+				Geography: geography.US,
+			},
+			Expected: geography.US,
+		},
+		{
+			Name: "eu geography",
+			Profile: &Profile{
+				Geography: geography.EU,
+			},
+			Expected: geography.EU,
+		},
+	}
+
+	for _, c := range cases {
+		c := c
+		t.Run(c.Name, func(t *testing.T) {
+			t.Parallel()
+			r := require.New(t)
+
+			result := c.Profile.GetGeography()
+			r.Equal(c.Expected, result)
 		})
 	}
 }

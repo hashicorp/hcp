@@ -13,6 +13,8 @@ import (
 
 	"github.com/hashicorp/hcl/v2/hclsimple"
 	"github.com/mitchellh/go-homedir"
+
+	"github.com/hashicorp/hcp/internal/pkg/geography"
 )
 
 const (
@@ -21,6 +23,9 @@ const (
 
 	// ProfileDir is the directory that contains HCP CLI profiles.
 	ProfileDir = "profiles/"
+
+	// ProfileNameDefault is the default profile name.
+	ProfileNameDefault = "default"
 )
 
 var (
@@ -121,7 +126,7 @@ func (l *Loader) GetActiveProfile() (*ActiveProfile, error) {
 // DefaultActiveProfile returns an active profile set to default.
 func (l *Loader) DefaultActiveProfile() *ActiveProfile {
 	return &ActiveProfile{
-		Name: "default",
+		Name: ProfileNameDefault,
 		dir:  l.configDir,
 	}
 }
@@ -245,26 +250,27 @@ func (l *Loader) DefaultProfile() *Profile {
 	hcpOrganizationID, hcpOrganizationIDOK := os.LookupEnv(envVarHCPOrganizationID)
 	hcpProjectID, hcpProjectIDOK := os.LookupEnv(envVarHCPProjectID)
 
+	profile, _ := l.NewProfile(ProfileNameDefault, "")
+
 	if hcpOrganizationIDOK && hcpProjectIDOK {
-		return &Profile{
-			Name:           "default",
-			OrganizationID: hcpOrganizationID,
-			ProjectID:      hcpProjectID,
-			dir:            l.profilesDir,
-		}
+		profile.OrganizationID = hcpOrganizationID
+		profile.ProjectID = hcpProjectID
 	}
 
-	return &Profile{
-		Name: "default",
-		dir:  l.profilesDir,
-	}
+	return profile
 }
 
-// NewProfile returns an empty profile with the given name.
-func (l *Loader) NewProfile(name string) (*Profile, error) {
+// NewProfile returns an new profile with defaults.
+func (l *Loader) NewProfile(name, geo string) (*Profile, error) {
+	if geo == "" {
+		// Set the default geography from the HCP SDK
+		geo = geography.GetDefaultGeography()
+	}
+
 	p := &Profile{
-		Name: name,
-		dir:  l.profilesDir,
+		Name:      name,
+		Geography: geo,
+		dir:       l.profilesDir,
 	}
 
 	return p, p.Validate()

@@ -102,6 +102,10 @@ func (p *profileDisplayer) FieldTemplates() []format.Field {
 			ValueFormat: "{{ .Name }}",
 		},
 		{
+			Name:        "Geography",
+			ValueFormat: "{{ .GetGeography }}",
+		},
+		{
 			Name:        "Active",
 			ValueFormat: fmt.Sprintf("{{ eq ( .Name ) %q }}", p.activeProfile),
 		},

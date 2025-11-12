@@ -105,7 +105,7 @@ func TestLoader_ListProfiles(t *testing.T) {
 
 		// Create some profiles
 		for _, n := range validProfileNames {
-			p, err := l.NewProfile(n)
+			p, err := l.NewProfile(n, "")
 			r.NoError(err)
 			r.NoError(p.Write())
 		}
@@ -123,7 +123,7 @@ func TestLoader_ListProfiles(t *testing.T) {
 
 		// Create some profiles
 		for _, n := range validProfileNames {
-			p, err := l.NewProfile(n)
+			p, err := l.NewProfile(n, "")
 			r.NoError(err)
 			r.NoError(p.Write())
 		}
@@ -188,7 +188,7 @@ project_id = "456"`,
 		r := require.New(t)
 		l := TestLoader(t)
 
-		p, err := l.NewProfile("test")
+		p, err := l.NewProfile("test", "")
 		r.NoError(err)
 		p.OrganizationID = "123"
 		p.ProjectID = "456"
@@ -207,7 +207,7 @@ project_id = "456"`,
 		r := require.New(t)
 		l := TestLoader(t)
 
-		_, err := l.NewProfile("test!@#$")
+		_, err := l.NewProfile("test!@#$", "")
 		r.ErrorContains(err, "profile name may only include")
 	})
 }
@@ -243,7 +243,7 @@ func TestLoader_LoadProfileEnv(t *testing.T) {
 		defer os.Unsetenv(envVarHCPOrganizationID)
 		defer os.Unsetenv(envVarHCPProjectID)
 
-		p, err := l.NewProfile("test")
+		p, err := l.NewProfile("test", "")
 		r.NoError(err)
 		p.OrganizationID = "123"
 		p.ProjectID = "456"
@@ -286,7 +286,7 @@ func TestLoader_LoadProfiles(t *testing.T) {
 		r := require.New(t)
 		l := TestLoader(t)
 
-		p, err := l.NewProfile("test")
+		p, err := l.NewProfile("test", "")
 		r.NoError(err)
 		p.OrganizationID = "123"
 		p.ProjectID = "456"
@@ -306,13 +306,13 @@ func TestLoader_LoadProfiles(t *testing.T) {
 		r := require.New(t)
 		l := TestLoader(t)
 
-		p, err := l.NewProfile("test")
+		p, err := l.NewProfile("test", "")
 		r.NoError(err)
 		p.OrganizationID = "123"
 		p.ProjectID = "456"
 		r.NoError(p.Write())
 
-		p2, err := l.NewProfile("test2")
+		p2, err := l.NewProfile("test2", "")
 		r.NoError(err)
 		p2.OrganizationID = "456"
 		p2.ProjectID = "789"
@@ -330,6 +330,36 @@ func TestLoader_LoadProfiles(t *testing.T) {
 	})
 }
 
+func TestLoader_NewProfile_DefaultGeography(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+	l := TestLoader(t)
+
+	// Create a new profile
+	p, err := l.NewProfile("test-geography", "")
+	r.NoError(err)
+	r.NotNil(p)
+
+	// Verify the profile has the default geography set
+	r.NotEmpty(p.Geography)
+	r.Equal("us", p.Geography) // Should be the HCP SDK default
+	r.Equal("us", p.GetGeography())
+}
+
+func TestLoader_DefaultProfile_Geography(t *testing.T) {
+	t.Parallel()
+	r := require.New(t)
+	l := TestLoader(t)
+
+	// Get the default profile
+	p := l.DefaultProfile()
+	r.NotNil(p)
+
+	// Verify the profile has the default geography set
+	r.Equal("us", p.Geography) // Should be the HCP SDK default
+	r.Equal("us", p.GetGeography())
+}
+
 func TestLoader_DeleteProfile(t *testing.T) {
 	t.Parallel()
 
@@ -338,7 +368,7 @@ func TestLoader_DeleteProfile(t *testing.T) {
 		r := require.New(t)
 		l := TestLoader(t)
 
-		p, err := l.NewProfile("test")
+		p, err := l.NewProfile("test", "")
 		r.NoError(err)
 		p.OrganizationID = "123"
 		p.ProjectID = "456"

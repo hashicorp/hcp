@@ -73,7 +73,7 @@ func TestUnset(t *testing.T) {
 
 			// Create a profile loader and generate the starting profile
 			l := profile.TestLoader(t)
-			p, err := l.NewProfile("test")
+			p, err := l.NewProfile("test", "")
 			r.NoError(err)
 
 			defaultProfile(p)

@@ -72,7 +72,7 @@ func TestRename(t *testing.T) {
 
 			// Create the profiles
 			for _, name := range c.Create {
-				p, err := l.NewProfile(name)
+				p, err := l.NewProfile(name, "")
 				r.NoError(err)
 				r.NoError(p.Write())
 			}
