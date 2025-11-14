@@ -1,3 +1,13 @@
+## 0.11.0 (Nov 14, 2025)
+
+IMPROVEMENTS:
+
+* Introduce multiple geography support [[GH-247](https://github.com/hashicorp/hcp/issues/247)]
+
+BUG FIXES:
+
+* Waypoint: Fix Waypoint agent status operations [[GH-243](https://github.com/hashicorp/hcp/issues/243)]
+
 ## 0.10.0 (June 2, 2025)
 
 FEATURES:
