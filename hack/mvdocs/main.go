@@ -20,8 +20,8 @@ import (
 
 const (
 	destCommandsDir = "../web-unified-docs/content/hcp-docs/content/docs/cli/commands/"
-	destNavJson     = "../web-unified-docs/content/hcp-docs/data/docs-nav-data.json"
-	genNavJson      = "web-docs/nav.json"
+	destNavJSON     = "../web-unified-docs/content/hcp-docs/data/docs-nav-data.json"
+	genNavJSON      = "web-docs/nav.json"
 )
 
 func main() {
@@ -40,7 +40,7 @@ func run() error {
 
 	flag.StringVar(&srcCommandsDir, "generated-commands-dir", "web-docs/commands", "The generated commands documentation to move to web-unified-docs repository")
 	flag.StringVar(&destCommandsDir, "dest-commands-dir", destCommandsDir, "The destination directory for the generated commands documentation")
-	flag.StringVar(&srcNavJSON, "generated-nav-json", genNavJson, "The output path for the generated nav json")
+	flag.StringVar(&srcNavJSON, "generated-nav-json", genNavJSON, "The output path for the generated nav json")
 	flag.StringVar(&destNavJSON, "dest-nav-json", destNavJSON, "Path to `web-unified-docs` nav json file")
 
 	// Parse the flags
