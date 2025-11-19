@@ -8,6 +8,8 @@ MOCKERY_DIRS=./ internal/commands/auth/ internal/pkg/api/iampolicy internal/pkg/
 MOCKERY_OUTPUT_DIRS=internal/pkg/api/mocks internal/commands/auth/mocks internal/pkg/api/releasesapi/mocks
 MOCKERY_OUTPUT_FILES=internal/pkg/api/iampolicy/mock_setter.go \
 					 internal/pkg/api/iampolicy/mock_resource_updater.go
+DOCS_DEST_DIR=../web-unified-docs/content/hcp-docs/content/docs/cli/commands
+DOCS_DEST_NAV=../web-unified-docs/content/hcp-docs/data/docs-nav-data.json
 
 # TARGET_DIR is set by actions-go-build (https://github.com/hashicorp/actions-go-build?tab=readme-ov-file#environment-variables)
 # if the build target is being invoked outside of the build.yml, we need to set this to something sensible
@@ -23,8 +25,11 @@ docs/gen: go/build ## Generate the HCP CLI documentation
 
 .PHONY: docs/move
 docs/move: go/build ## Copy the generated documentation to the HCP docs repository
-	@./bin/mvdocs -generated-commands-dir web-docs/commands --generated-nav-json web-docs/nav.json \
-		--dest-commands-dir ../web-unified-docs/content/docs/cli/commands --dest-nav-json ../web-unified-docs/data/docs-nav-data.json
+	@./bin/mvdocs \
+		-generated-commands-dir web-docs/commands \
+		--generated-nav-json web-docs/nav.json \
+		--dest-commands-dir $(DOCS_DEST_DIR) \
+		--dest-nav-json $(DOCS_DEST_NAV)
 
 .PHONY: gen/screenshot
 gen/screenshot: go/install ## Create a screenshot of the HCP CLI
