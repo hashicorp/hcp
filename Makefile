@@ -24,7 +24,7 @@ docs/gen: go/build ## Generate the HCP CLI documentation
 .PHONY: docs/move
 docs/move: go/build ## Copy the generated documentation to the HCP docs repository
 	@./bin/mvdocs -generated-commands-dir web-docs/commands --generated-nav-json web-docs/nav.json \
-		--dest-commands-dir ../hcp-docs/content/docs/cli/commands --dest-nav-json ../hcp-docs/data/docs-nav-data.json
+		--dest-commands-dir ../web-unified-docs/content/docs/cli/commands --dest-nav-json ../web-unified-docs/data/docs-nav-data.json
 
 .PHONY: gen/screenshot
 gen/screenshot: go/install ## Create a screenshot of the HCP CLI

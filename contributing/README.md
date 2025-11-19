@@ -466,15 +466,15 @@ To check that the generated documentation for your command is correct before
 committing the code, generate the documentation and run the
 developer.hashicorp.com documentation locally.
 
-First checkout the [`hcp-docs`
-repository](https://github.com/hashicorp/hcp-docs). The following commands
-assume the `hcp-docs` repository is checked out in the same parent directory as
+First checkout the [`web-unified-docs`
+repository](https://github.com/hashicorp/web-unified-docs). The following commands
+assume the `web-unified-docs` repository is checked out in the same parent directory as
 `hcp`.
 
 ```sh
 $ make docs/gen
 $ make docs/move
-$ cd ../hcp-docs
+$ cd ../web-unified-docs
 $ make website
 ```
 
@@ -497,8 +497,7 @@ here](https://hashicorp.atlassian.net/wiki/spaces/RELENG/pages/2303492328/Trigge
 
 After a successful release:
 
-- [ ] Update the `version/VERSION` file to the next version with `-dev` appended.
 - [ ] Update the developer.hashicorp.com documentation by following the steps
   outlined in the [Validating/generating the developer.hashicorp.com documentation](#validating/generating-the-developer.hashicorp.com-documentation) section.
-  PR the changes to the `hcp-docs` repository, have a team member review them,
+  PR the changes to the `web-unified-docs` repository, have a team member review them,
   and merge.

@@ -19,7 +19,7 @@ type DocNavItem struct {
 	Routes []*DocNavItem `json:"routes,omitempty"`
 }
 
-// GenNavJSON generates the navigation JSON in the format that hcp-docs expects,
+// GenNavJSON generates the navigation JSON in the format that web-unified-docs expects,
 // for the command structure.
 func GenNavJSON(c *Command, w io.Writer) error {
 
