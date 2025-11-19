@@ -1,7 +1,7 @@
 // Copyright IBM Corp. 2024, 2025
 // SPDX-License-Identifier: MPL-2.0
 
-// This tool is used to move the generated commands documentation from the `web-docs` directory to the `hcp-docs` repository.
+// This tool is used to move the generated commands documentation from the `web-docs` directory to the `web-unified-docs` repository.
 package main
 
 import (
@@ -32,10 +32,10 @@ func run() error {
 	var srcNavJSON string
 	var destNavJSON string
 
-	flag.StringVar(&srcCommandsDir, "generated-commands-dir", "web-docs/commands", "The generated commands documentation to move to hcp-docs repository")
-	flag.StringVar(&destCommandsDir, "dest-commands-dir", "../hcp-docs/content/docs/cli/commands/", "The destination directory for the generated commands documentation")
+	flag.StringVar(&srcCommandsDir, "generated-commands-dir", "web-docs/commands", "The generated commands documentation to move to web-unified-docs repository")
+	flag.StringVar(&destCommandsDir, "dest-commands-dir", "../web-unified-docs/content/docs/cli/commands/", "The destination directory for the generated commands documentation")
 	flag.StringVar(&srcNavJSON, "generated-nav-json", "web-docs/nav.json", "The output path for the generated nav json")
-	flag.StringVar(&destNavJSON, "dest-nav-json", "../hcp-docs/data/docs-nav-data.json", "Path to `hcp-docs` nav json file")
+	flag.StringVar(&destNavJSON, "dest-nav-json", "../web-unified-docs/data/docs-nav-data.json", "Path to `web-unified-docs` nav json file")
 
 	// Parse the flags
 	flag.Parse()
