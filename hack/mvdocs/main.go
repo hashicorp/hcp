@@ -18,6 +18,12 @@ import (
 	"github.com/hashicorp/hcp/internal/pkg/cmd"
 )
 
+const (
+	destCommandsDir = "../web-unified-docs/content/hcp-docs/content/docs/cli/commands/"
+	destNavJSON     = "../web-unified-docs/content/hcp-docs/data/docs-nav-data.json"
+	genNavJSON      = "web-docs/nav.json"
+)
+
 func main() {
 	if err := run(); err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
@@ -33,9 +39,9 @@ func run() error {
 	var destNavJSON string
 
 	flag.StringVar(&srcCommandsDir, "generated-commands-dir", "web-docs/commands", "The generated commands documentation to move to web-unified-docs repository")
-	flag.StringVar(&destCommandsDir, "dest-commands-dir", "../web-unified-docs/content/docs/cli/commands/", "The destination directory for the generated commands documentation")
-	flag.StringVar(&srcNavJSON, "generated-nav-json", "web-docs/nav.json", "The output path for the generated nav json")
-	flag.StringVar(&destNavJSON, "dest-nav-json", "../web-unified-docs/data/docs-nav-data.json", "Path to `web-unified-docs` nav json file")
+	flag.StringVar(&destCommandsDir, "dest-commands-dir", destCommandsDir, "The destination directory for the generated commands documentation")
+	flag.StringVar(&srcNavJSON, "generated-nav-json", genNavJSON, "The output path for the generated nav json")
+	flag.StringVar(&destNavJSON, "dest-nav-json", destNavJSON, "Path to `web-unified-docs` nav json file")
 
 	// Parse the flags
 	flag.Parse()
