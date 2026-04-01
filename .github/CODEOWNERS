@@ -1,17 +1,17 @@
 # Individual command groups will be owned by product teams but the overall CLI
 # will be owned as follows.
-* @hashicorp/cloud-core-platform-surfaces @hashicorp/cloud-core-platform-systems
+* @hashicorp/cloud-core-platform-systems
 
 # Files that all teams can contribute to
-.changelog
-.mockery.yml
-go.mod
-go.sum
-internal/pkg/api/mocks
+.changelog @hashicorp/cloud-core-platform-systems
+.mockery.yml @hashicorp/cloud-core-platform-systems
+go.mod @hashicorp/cloud-core-platform-systems
+go.sum @hashicorp/cloud-core-platform-systems
+internal/pkg/api/mocks @hashicorp/cloud-core-platform-systems
 
 # Waypoint Owned
-internal/commands/waypoint @hashicorp/cloud-waypoint
-internal/pkg/waypoint @hashicorp/cloud-waypoint
+internal/commands/waypoint @hashicorp/cloud-waypoint @hashicorp/cloud-core-platform-systems
+internal/pkg/waypoint @hashicorp/cloud-waypoint @hashicorp/cloud-core-platform-systems
 
 # Vault Secrets Owned
-internal/commands/vaultsecrets @hashicorp/cloud-vault-secrets
+internal/commands/vaultsecrets @hashicorp/cloud-vault-secrets @hashicorp/cloud-core-platform-systems
