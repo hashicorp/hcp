@@ -1,0 +1,3 @@
+```release-note:security
+patch: upgrades go crypto to 0.54
+```
