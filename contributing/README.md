@@ -56,10 +56,6 @@ Subcommands can have further nested subcommands themselves. When a service has
 an object that has CRUD operations on it, the object should likely be a
 subcommand with further nested commands:
 
-```sh
-$ hcp waypoint applications [create, destroy, list, read, update]
-```
-
 This structure naturally has a layout of chaining nouns together with the last
 command being a verb such as create, delete, list, etc. Other than the top-level
 noun, nouns should be **pluralized**. As an example prefer `hcp iam groups` to `hcp iam
