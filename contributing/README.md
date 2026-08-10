@@ -49,7 +49,6 @@ avoid this, each product is placed in its own subcommand:
 ```sh
 hcp packer
 hcp waypoint
-hcp vault-secrets
 hcp vault-radar
 ```
 
@@ -58,7 +57,7 @@ an object that has CRUD operations on it, the object should likely be a
 subcommand with further nested commands:
 
 ```sh
-$ hcp vault-secrets apps [create, list, delete, read, update]
+$ hcp waypoint applications [create, destroy, list, read, update]
 ```
 
 This structure naturally has a layout of chaining nouns together with the last
