@@ -136,11 +136,6 @@ func TestListRun(t *testing.T) {
 						Title:       "Admin",
 						Description: "describing viewer",
 					},
-					{
-						ID:          "roles/vault-secrets.Admin",
-						Title:       "Vault Secrets Admin",
-						Description: "manage all the secrets",
-					},
 				},
 			},
 		},

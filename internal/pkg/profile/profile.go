@@ -86,9 +86,6 @@ type Profile struct {
 		5. Document the properties in internal/commands/profile/property_docs.go
 	*/
 
-	// VaultSecrets stores vault-secrets CLI configuration values
-	VaultSecrets *VaultSecretsConf `hcl:"vault-secrets,block" json:",omitempty"`
-
 	// dir is the directory the profile should write to.
 	dir string
 }
@@ -96,8 +93,7 @@ type Profile struct {
 // Predict predicts the HCL key names and basic settable values
 func (p *Profile) Predict(args complete.Args) []string {
 	sub := map[string]complete.Predictor{
-		"core":          p.Core,
-		"vault-secrets": p.VaultSecrets,
+		"core": p.Core,
 	}
 
 	if len(args.All) >= 1 {
@@ -109,7 +105,7 @@ func (p *Profile) Predict(args complete.Args) []string {
 
 	// predicting the property
 	if len(args.All) == 1 {
-		return []string{"organization_id", "project_id", "geography", "core/", "vault-secrets/"}
+		return []string{"organization_id", "project_id", "geography", "core/"}
 	}
 
 	// Handle geography prediction
@@ -162,10 +158,6 @@ func (p *Profile) Validate() error {
 func (p *Profile) Clean() {
 	if p.Core.isEmpty() {
 		p.Core = nil
-	}
-
-	if p.VaultSecrets.isEmpty() {
-		p.VaultSecrets = nil
 	}
 }
 

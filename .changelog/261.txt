@@ -1,0 +1,3 @@
+```release-note:deprecation
+vault-secrets: remove references to deprecated service HVS/vault secrets
+```

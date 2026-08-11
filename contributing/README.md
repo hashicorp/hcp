@@ -49,17 +49,12 @@ avoid this, each product is placed in its own subcommand:
 ```sh
 hcp packer
 hcp waypoint
-hcp vault-secrets
 hcp vault-radar
 ```
 
 Subcommands can have further nested subcommands themselves. When a service has
 an object that has CRUD operations on it, the object should likely be a
 subcommand with further nested commands:
-
-```sh
-$ hcp vault-secrets apps [create, list, delete, read, update]
-```
 
 This structure naturally has a layout of chaining nouns together with the last
 command being a verb such as create, delete, list, etc. Other than the top-level
