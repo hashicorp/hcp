@@ -1,0 +1,3 @@
+```release-note:bug
+patch: upgrades go crypto to 0.54
+```
