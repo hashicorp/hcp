@@ -89,7 +89,7 @@ func activateRun(opts *ActivateOpts) error {
 		return fmt.Errorf("failed to save active profile: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Profile %q activated.\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Profile %q activated.\n",
 		opts.IO.ColorScheme().SuccessIcon(), opts.Name)
 	return nil
 }

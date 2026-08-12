@@ -116,7 +116,7 @@ func updateRun(opts *UpdateOpts) error {
 		return fmt.Errorf("failed to update group: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Group %q updated\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Group %q updated\n",
 		opts.IO.ColorScheme().SuccessIcon(), rn)
 	return nil
 }

@@ -130,6 +130,6 @@ func getRun(opts *GetOpts) error {
 		}
 	}
 
-	fmt.Fprintf(opts.IO.Out(), "%v\n", value)
+	_, _ = fmt.Fprintf(opts.IO.Out(), "%v\n", value)
 	return nil
 }

@@ -173,6 +173,6 @@ func setPolicyRun(opts *SetPolicyOpts) error {
 		return err
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s IAM Policy successfully set.\n", opts.IO.ColorScheme().SuccessIcon())
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s IAM Policy successfully set.\n", opts.IO.ColorScheme().SuccessIcon())
 	return nil
 }

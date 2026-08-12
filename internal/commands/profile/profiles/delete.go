@@ -107,12 +107,12 @@ func deleteRun(opts *DeleteOpts) error {
 	}
 
 	if opts.IO.CanPrompt() {
-		fmt.Fprintln(opts.IO.Err(), "The following profiles will be deleted:")
+		_, _ = fmt.Fprintln(opts.IO.Err(), "The following profiles will be deleted:")
 		for _, toDelete := range opts.Names {
-			fmt.Fprintf(opts.IO.Err(), "  - %s\n", toDelete)
+			_, _ = fmt.Fprintf(opts.IO.Err(), "  - %s\n", toDelete)
 		}
 
-		fmt.Fprintln(opts.IO.Err())
+		_, _ = fmt.Fprintln(opts.IO.Err())
 		ok, err := opts.IO.PromptConfirm("Do you want to continue")
 		if err != nil {
 			return err
@@ -128,7 +128,7 @@ func deleteRun(opts *DeleteOpts) error {
 			return fmt.Errorf("failed to delete profile %q: %w", toDelete, err)
 		}
 
-		fmt.Fprintf(opts.IO.Err(), "%s Profile %q deleted.\n", cs.SuccessIcon(), toDelete)
+		_, _ = fmt.Fprintf(opts.IO.Err(), "%s Profile %q deleted.\n", cs.SuccessIcon(), toDelete)
 	}
 
 	return nil

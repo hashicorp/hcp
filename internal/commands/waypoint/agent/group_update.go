@@ -80,7 +80,7 @@ func agentGroupUpdate(log hclog.Logger, opts *GroupOpts) error {
 		return fmt.Errorf("error updating group: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Group %q updated\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Group %q updated\n",
 		opts.IO.ColorScheme().SuccessIcon(),
 		opts.Name,
 	)

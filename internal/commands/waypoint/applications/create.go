@@ -160,7 +160,7 @@ func applicationCreate(opts *ApplicationOpts) error {
 		)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Application %q created.\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Application %q created.\n",
 		opts.IO.ColorScheme().SuccessIcon(),
 		opts.Name,
 	)

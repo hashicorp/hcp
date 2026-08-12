@@ -515,6 +515,6 @@ func createCredFileRun(opts *CreateCredFileOpts) error {
 		return fmt.Errorf("failed to write credential file: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Credential file written to %q\n", opts.OutputFile)
+	_, _ = fmt.Fprintf(opts.IO.Err(), "Credential file written to %q\n", opts.OutputFile)
 	return nil
 }

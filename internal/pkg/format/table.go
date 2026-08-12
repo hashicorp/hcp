@@ -85,7 +85,7 @@ func (o *Outputter) outputTable(d Displayer) error {
 	}
 
 	// Output the table
-	fmt.Fprintln(o.io.Out(), tbl.String())
+	_, _ = fmt.Fprintln(o.io.Out(), tbl.String())
 	return nil
 }
 

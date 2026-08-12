@@ -26,7 +26,7 @@ const (
 
 func main() {
 	if err := run(); err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err)
+		_, _ = fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
 }
@@ -156,14 +156,14 @@ func CopyDir(dst, src string) error {
 		if err != nil {
 			return err
 		}
-		defer in.Close()
+		defer func() { _ = in.Close() }()
 
 		// create output
 		fh, err := os.Create(outpath)
 		if err != nil {
 			return err
 		}
-		defer fh.Close()
+		defer func() { _ = fh.Close() }()
 
 		// make it the same
 		if err := fh.Chmod(info.Mode()); err != nil {

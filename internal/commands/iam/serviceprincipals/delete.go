@@ -106,7 +106,7 @@ func deleteRun(opts *DeleteOpts) error {
 		return fmt.Errorf("failed to delete service principal: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Service principal %q deleted\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Service principal %q deleted\n",
 		opts.IO.ColorScheme().SuccessIcon(), rn)
 	return nil
 }

@@ -266,7 +266,7 @@ func templateUpdate(opts *TemplateOpts) error {
 		)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Template %q updated.\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Template %q updated.\n",
 		opts.IO.ColorScheme().SuccessIcon(),
 		opts.ID,
 	)

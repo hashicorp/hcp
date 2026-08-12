@@ -102,7 +102,7 @@ func deleteRun(opts *DeleteOpts) error {
 		return fmt.Errorf("failed to update group membership: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Membership to group %q updated\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Membership to group %q updated\n",
 		opts.IO.ColorScheme().SuccessIcon(), req.ResourceName)
 	return nil
 }

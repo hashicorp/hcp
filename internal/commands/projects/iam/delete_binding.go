@@ -106,7 +106,7 @@ func deleteBindingRun(opts *DeleteBindingOpts) error {
 		return err
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Principal %q binding to role %q deleted.\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Principal %q binding to role %q deleted.\n",
 		opts.IO.ColorScheme().SuccessIcon(), opts.PrincipalID, opts.Role)
 	return nil
 }

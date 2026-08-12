@@ -113,7 +113,7 @@ func (t *Testing) PromptConfirm(prompt string) (bool, error) {
 	}
 
 	// Output the prompt
-	fmt.Fprintf(t.Error, "%s (y/n)? ", prompt)
+	_, _ = fmt.Fprintf(t.Error, "%s (y/n)? ", prompt)
 
 	// Try to read a single byte from stdin.
 	b, err := t.Input.ReadByte()

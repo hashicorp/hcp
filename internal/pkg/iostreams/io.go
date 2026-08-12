@@ -213,7 +213,7 @@ func (s *system) PromptConfirm(prompt string) (confirmed bool, err error) {
 	}
 
 	// Prompt
-	fmt.Fprintf(s.err, "%s (y/n)? ", prompt)
+	_, _ = fmt.Fprintf(s.err, "%s (y/n)? ", prompt)
 
 	// Read the input in a goroutine so we can handle the command be signaled
 	// or STDIN being closed.
@@ -232,14 +232,14 @@ func (s *system) PromptConfirm(prompt string) (confirmed bool, err error) {
 			switch read {
 			case "y", "yes":
 				confirmed = true
-				fmt.Fprintln(s.err)
+				_, _ = fmt.Fprintln(s.err)
 				return
 			case "n", "no":
 				confirmed = false
-				fmt.Fprintln(s.err)
+				_, _ = fmt.Fprintln(s.err)
 				return
 			default:
-				fmt.Fprint(s.err, "Please enter 'y' or 'n': ")
+				_, _ = fmt.Fprint(s.err, "Please enter 'y' or 'n': ")
 			}
 		}
 	}()
@@ -257,8 +257,8 @@ func (s *system) PromptConfirm(prompt string) (confirmed bool, err error) {
 
 	if err != nil {
 		// Print new lines to separate the error from any user input.
-		fmt.Fprintln(s.err)
-		fmt.Fprintln(s.err)
+		_, _ = fmt.Fprintln(s.err)
+		_, _ = fmt.Fprintln(s.err)
 		return false, err
 	}
 

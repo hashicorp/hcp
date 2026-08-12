@@ -81,7 +81,7 @@ func agentGroupCreate(log hclog.Logger, opts *GroupOpts) error {
 		return fmt.Errorf("error creating group: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Group %q created\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Group %q created\n",
 		opts.IO.ColorScheme().SuccessIcon(),
 		opts.Name,
 	)

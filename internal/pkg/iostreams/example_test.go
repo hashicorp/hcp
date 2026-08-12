@@ -15,14 +15,14 @@ func Example() {
 	io := iostreams.Test()
 
 	cs := io.ColorScheme()
-	fmt.Fprintln(io.Out(), cs.String("Applying Style").Bold())
-	fmt.Fprintln(io.Out(), cs.String("Chaining Styles").Bold().Italic())
+	_, _ = fmt.Fprintln(io.Out(), cs.String("Applying Style").Bold())
+	_, _ = fmt.Fprintln(io.Out(), cs.String("Chaining Styles").Bold().Italic())
 
-	fmt.Fprintln(io.Out(), cs.String("Applying Color").Color(cs.Orange()))
-	fmt.Fprintln(io.Out(), cs.String("Applying Color and Style").Bold().Color(cs.Orange()))
+	_, _ = fmt.Fprintln(io.Out(), cs.String("Applying Color").Color(cs.Orange()))
+	_, _ = fmt.Fprintln(io.Out(), cs.String("Applying Color and Style").Bold().Color(cs.Orange()))
 
 	// Changing the background
-	fmt.Fprintln(io.Out(), cs.String("WARNING").Bold().Background(cs.Orange()).Color(cs.Black()))
+	_, _ = fmt.Fprintln(io.Out(), cs.String("WARNING").Bold().Background(cs.Orange()).Color(cs.Black()))
 
 	// Print the test output
 	fmt.Print(io.Output.String())
@@ -45,12 +45,12 @@ func ExampleIOStreams_ReadSecret() {
 	// Mock stdin to demonstrate reading from stdin.
 	io.Input.WriteString("pa$$w0rd")
 
-	fmt.Fprintln(io.Err(), "Whats your password?")
+	_, _ = fmt.Fprintln(io.Err(), "Whats your password?")
 	data, err := io.ReadSecret()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Fprintf(io.Out(), "%q is a terrible password now!", string(data))
+	_, _ = fmt.Fprintf(io.Out(), "%q is a terrible password now!", string(data))
 
 	// Print the test output
 	fmt.Print(io.Error.String())

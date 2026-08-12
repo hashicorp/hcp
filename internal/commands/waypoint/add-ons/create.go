@@ -153,7 +153,7 @@ func addOnCreate(opts *AddOnOpts) error {
 			opts.Name)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Add-on %q created!\n", opts.IO.ColorScheme().SuccessIcon(), opts.Name)
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Add-on %q created!\n", opts.IO.ColorScheme().SuccessIcon(), opts.Name)
 
 	return nil
 }

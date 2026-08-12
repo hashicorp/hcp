@@ -68,7 +68,7 @@ func templateDelete(opts *TemplateOpts) error {
 		return errors.Wrapf(err, "failed to delete template %q", opts.Name)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Template %q deleted.\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Template %q deleted.\n",
 		opts.IO.ColorScheme().SuccessIcon(),
 		opts.Name,
 	)

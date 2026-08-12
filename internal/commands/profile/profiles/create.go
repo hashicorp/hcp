@@ -111,7 +111,7 @@ func createRun(opts *CreateOpts) error {
 	}
 
 	cs := opts.IO.ColorScheme()
-	fmt.Fprintf(opts.IO.Err(), "%s Profile %q created.\n", cs.SuccessIcon(), p.Name)
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Profile %q created.\n", cs.SuccessIcon(), p.Name)
 
 	if !opts.NoActivate {
 		// Update the active profile.
@@ -125,16 +125,16 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("failed to update active profile: %w", err)
 		}
 
-		fmt.Fprintf(opts.IO.Err(), "%s Profile %q activated.\n", cs.SuccessIcon(), p.Name)
+		_, _ = fmt.Fprintf(opts.IO.Err(), "%s Profile %q activated.\n", cs.SuccessIcon(), p.Name)
 	}
 
-	fmt.Fprintln(opts.IO.Err())
-	fmt.Fprintln(opts.IO.Err(), heredoc.New(opts.IO).Must(`
+	_, _ = fmt.Fprintln(opts.IO.Err())
+	_, _ = fmt.Fprintln(opts.IO.Err(), heredoc.New(opts.IO).Must(`
 		To initialize the newly created profile, run:
 
 		  {{ Bold "$ hcp profile init" }}
 		`))
-	fmt.Fprintln(opts.IO.Err())
+	_, _ = fmt.Fprintln(opts.IO.Err())
 
 	return nil
 }

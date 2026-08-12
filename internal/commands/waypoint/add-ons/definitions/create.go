@@ -207,7 +207,7 @@ func addOnDefinitionCreate(opts *AddOnDefinitionOpts) error {
 		)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Add-on definition %q created.\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Add-on definition %q created.\n",
 		opts.IO.ColorScheme().SuccessIcon(),
 		opts.Name,
 	)

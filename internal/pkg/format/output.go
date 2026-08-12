@@ -143,9 +143,9 @@ func inferFields[T any](payload T, columns []string) []Field {
 			parts := append(slices.Clone(namePrefix), f.Name)
 
 			// If the field is a struct, we need to recurse into it
-			if f.Type.Kind() == reflect.Struct || f.Type.Kind() == reflect.Ptr && f.Type.Elem().Kind() == reflect.Struct {
+			if f.Type.Kind() == reflect.Struct || f.Type.Kind() == reflect.Pointer && f.Type.Elem().Kind() == reflect.Struct {
 				t := f.Type
-				if f.Type.Kind() == reflect.Ptr {
+				if f.Type.Kind() == reflect.Pointer {
 					t = f.Type.Elem()
 				}
 				getFields(t, parts)
@@ -197,10 +197,10 @@ func convertToScopedWithBlocks(input string) string {
 	var builder strings.Builder
 	// Open with blocks
 	for _, part := range parts[:len(parts)-1] {
-		builder.WriteString(fmt.Sprintf("{{ with .%s }}", part))
+		_, _ = fmt.Fprintf(&builder, "{{ with .%s }}", part)
 	}
 	// Final value
-	builder.WriteString(fmt.Sprintf("{{ .%s }}", parts[len(parts)-1]))
+	_, _ = fmt.Fprintf(&builder, "{{ .%s }}", parts[len(parts)-1])
 	// Close all with blocks
 	builder.WriteString(strings.Repeat("{{ end }}", len(parts)-1))
 	return strings.TrimSpace(builder.String())
@@ -345,7 +345,7 @@ func (o *Outputter) outputJSON(d Displayer) error {
 		return fmt.Errorf("failed to marshall result to JSON: %w", err)
 	}
 
-	fmt.Fprintln(o.io.Out(), string(data))
+	_, _ = fmt.Fprintln(o.io.Out(), string(data))
 	return nil
 }
 
@@ -367,7 +367,7 @@ func (o *Outputter) outputPretty(d Displayer) error {
 	rv := reflect.ValueOf(p)
 	if rv.Kind() == reflect.Slice {
 		if rv.Len() == 0 {
-			fmt.Fprintln(o.io.Out(), "Listed 0 items.")
+			_, _ = fmt.Fprintln(o.io.Out(), "Listed 0 items.")
 			return nil
 		}
 
@@ -377,9 +377,9 @@ func (o *Outputter) outputPretty(d Displayer) error {
 				return err
 			}
 
-			fmt.Fprintln(o.io.Out())
+			_, _ = fmt.Fprintln(o.io.Out())
 			if i != rv.Len()-1 {
-				fmt.Fprintln(o.io.Out(), "---")
+				_, _ = fmt.Fprintln(o.io.Out(), "---")
 			}
 		}
 	} else {
@@ -387,7 +387,7 @@ func (o *Outputter) outputPretty(d Displayer) error {
 			return err
 		}
 
-		fmt.Fprintln(o.io.Out())
+		_, _ = fmt.Fprintln(o.io.Out())
 	}
 
 	return nil
@@ -404,9 +404,9 @@ func prettyPrintTemplate(d Displayer) string {
 	// Go through each field and output a new line
 	fields := d.FieldTemplates()
 	for i, f := range fields {
-		fmt.Fprintf(w, "%s:\t%s", f.Name, f.ValueFormat)
+		_, _ = fmt.Fprintf(w, "%s:\t%s", f.Name, f.ValueFormat)
 		if i != len(fields)-1 {
-			fmt.Fprintln(w)
+			_, _ = fmt.Fprintln(w)
 		}
 	}
 

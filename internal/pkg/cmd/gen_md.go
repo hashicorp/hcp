@@ -40,7 +40,7 @@ func GenMarkdownTree(c *Command, dir string, link LinkHandler) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	// Generate the markdown
 	if err := GenMarkdown(c, f, link); err != nil {
@@ -72,8 +72,8 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 	name := c.commandPath()
 
 	buf.WriteString("---\n")
-	buf.WriteString(fmt.Sprintf("page_title: %s\n", name))
-	buf.WriteString(fmt.Sprintf("description: |-\n  The \"%s\" command lets you %s\n", name, (strings.ToLower(c.ShortHelp[:1]) + c.ShortHelp[1:])))
+	_, _ = fmt.Fprintf(buf, "page_title: %s\n", name)
+	_, _ = fmt.Fprintf(buf, "description: |-\n  The \"%s\" command lets you %s\n", name, strings.ToLower(c.ShortHelp[:1])+c.ShortHelp[1:])
 	buf.WriteString("---\n\n")
 
 	_, err := buf.WriteTo(w)
@@ -82,7 +82,7 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 	}
 
 	buf.WriteString("# " + name + "\n\n")
-	buf.WriteString(fmt.Sprintf("Command: `%s` \n\n", name))
+	_, _ = fmt.Fprintf(buf, "Command: `%s` \n\n", name)
 
 	// Description
 	buf.WriteString(c.LongHelp + "\n\n")
@@ -92,14 +92,14 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 	// because we are using a code block.
 	mdIO.SetMD(false)
 	buf.WriteString("## Usage\n\n")
-	buf.WriteString(fmt.Sprintf("```shell-session\n$ %s\n```\n\n", c.useLine()))
+	_, _ = fmt.Fprintf(buf, "```shell-session\n$ %s\n```\n\n", c.useLine())
 	mdIO.SetMD(true)
 
 	// Aliases
 	if len(c.Aliases) > 0 {
 		buf.WriteString("## Aliases\n\n")
 		for a, u := range c.aliasUsages() {
-			buf.WriteString(fmt.Sprintf("- `%s`. For example: `%s`\n", a, u))
+			_, _ = fmt.Fprintf(buf, "- `%s`. For example: `%s`\n", a, u)
 		}
 		buf.WriteString("\n")
 	}
@@ -109,8 +109,8 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 		buf.WriteString("## Examples\n\n")
 
 		for _, e := range c.Examples {
-			buf.WriteString(fmt.Sprintf("%s\n\n", e.Preamble))
-			buf.WriteString(fmt.Sprintf("```shell-session\n%s\n```\n\n", e.Command))
+			_, _ = fmt.Fprintf(buf, "%s\n\n", e.Preamble)
+			_, _ = fmt.Fprintf(buf, "```shell-session\n%s\n```\n\n", e.Command)
 		}
 	}
 
@@ -146,7 +146,7 @@ func GenMarkdown(c *Command, w io.Writer, link LinkHandler) error {
 
 	// Additional docs
 	for _, d := range c.AdditionalDocs {
-		buf.WriteString(fmt.Sprintf("## %s\n", d.Title))
+		_, _ = fmt.Fprintf(buf, "## %s\n", d.Title)
 		buf.WriteString(d.Documentation + "\n")
 	}
 
@@ -163,7 +163,7 @@ func genMarkdownPositionalArgs(c *Command, buf *bytes.Buffer) {
 	buf.WriteString("## Positional arguments\n\n")
 	p := c.Args
 	if p.Preamble != "" {
-		fmt.Fprintln(buf, p.Preamble)
+		_, _ = fmt.Fprintln(buf, p.Preamble)
 	}
 
 	for _, a := range p.Args {
@@ -172,13 +172,13 @@ func genMarkdownPositionalArgs(c *Command, buf *bytes.Buffer) {
 		if a.Repeatable {
 			repeatable = fmt.Sprintf(" [%s ...]", nameUpper)
 		}
-		fmt.Fprintf(buf, "- `%s%s` - ", nameUpper, repeatable)
+		_, _ = fmt.Fprintf(buf, "- `%s%s` - ", nameUpper, repeatable)
 
 		if a.Optional {
-			fmt.Fprintln(buf, cs.String("Optional argument\n").Italic().String())
+			_, _ = fmt.Fprintln(buf, cs.String("Optional argument\n").Italic().String())
 		}
-		fmt.Fprintln(buf, strings.ReplaceAll(a.Documentation, "\n", "\n\t"))
-		fmt.Fprintln(buf)
+		_, _ = fmt.Fprintln(buf, strings.ReplaceAll(a.Documentation, "\n", "\n\t"))
+		_, _ = fmt.Fprintln(buf)
 	}
 }
 
@@ -211,15 +211,15 @@ func genMarkdownFlags(c *Command, buf *bytes.Buffer) {
 	for _, set := range flagSets {
 		required, optional := splitRequiredFlags(set.flags)
 		if required.HasFlags() {
-			buf.WriteString(fmt.Sprintf("## Required %sflags\n\n", set.name))
+			_, _ = fmt.Fprintf(buf, "## Required %sflags\n\n", set.name)
 			genMarkdownFlagsetUsage(required, buf)
 
 			if optional.HasFlags() {
-				buf.WriteString(fmt.Sprintf("## Optional %sflags\n\n", set.name))
+				_, _ = fmt.Fprintf(buf, "## Optional %sflags\n\n", set.name)
 				genMarkdownFlagsetUsage(optional, buf)
 			}
 		} else if optional.HasFlags() {
-			buf.WriteString(fmt.Sprintf("## %sFlags\n\n", set.name))
+			_, _ = fmt.Fprintf(buf, "## %sFlags\n\n", set.name)
 			genMarkdownFlagsetUsage(optional, buf)
 		}
 	}
@@ -233,12 +233,12 @@ func genMarkdownFlagsetUsage(flags *pflag.FlagSet, buf *bytes.Buffer) {
 
 		longDisplay := flagString(flag)
 		if flag.Shorthand != "" && flag.ShorthandDeprecated == "" {
-			fmt.Fprintf(buf, "- `-%s, %s` - ", flag.Shorthand, longDisplay)
+			_, _ = fmt.Fprintf(buf, "- `-%s, %s` - ", flag.Shorthand, longDisplay)
 		} else {
-			fmt.Fprintf(buf, "- `%s` - ", longDisplay)
+			_, _ = fmt.Fprintf(buf, "- `%s` - ", longDisplay)
 		}
 
 		// Add the usage
-		fmt.Fprintf(buf, "%s\n\n", strings.ReplaceAll(flag.Usage, "\n", "\n\t"))
+		_, _ = fmt.Fprintf(buf, "%s\n\n", strings.ReplaceAll(flag.Usage, "\n", "\n\t"))
 	})
 }

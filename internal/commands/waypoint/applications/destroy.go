@@ -85,7 +85,7 @@ func applicationDestroy(opts *ApplicationOpts) error {
 		)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Application %q destroyed.\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Application %q destroyed.\n",
 		opts.IO.ColorScheme().SuccessIcon(),
 		opts.Name)
 

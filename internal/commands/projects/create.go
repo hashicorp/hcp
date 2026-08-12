@@ -137,7 +137,7 @@ func createRun(opts *CreateOpts) error {
 		return fmt.Errorf("failed to mark newly created project as the profile's default project: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "\n%s Project %q set as default project in active profile.\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "\n%s Project %q set as default project in active profile.\n",
 		opts.IO.ColorScheme().SuccessIcon(), resp.Payload.Project.ID)
 	return nil
 }

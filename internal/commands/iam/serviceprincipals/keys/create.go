@@ -147,7 +147,7 @@ func createRun(opts *CreateOpts) error {
 			return fmt.Errorf("failed to write credential file: %w", err)
 		}
 
-		fmt.Fprintf(opts.IO.Err(), "%s Service principal credential file written to %q\n",
+		_, _ = fmt.Fprintf(opts.IO.Err(), "%s Service principal credential file written to %q\n",
 			opts.IO.ColorScheme().SuccessIcon(), *opts.CredentialFilePath)
 		return nil
 	}

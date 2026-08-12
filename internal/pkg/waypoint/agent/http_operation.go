@@ -29,7 +29,7 @@ func (h *HTTPOperation) Run(
 		return errStatus, err
 	}
 
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	return cleanStatus, nil
 }

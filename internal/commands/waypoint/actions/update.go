@@ -139,7 +139,7 @@ func updateAction(c *cmd.Command, args []string, opts *UpdateOpts) error {
 		return fmt.Errorf("failed to update action %q: %w", opts.Name, err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Action %q updated.", opts.Name)
+	_, _ = fmt.Fprintf(opts.IO.Err(), "Action %q updated.", opts.Name)
 
 	respPayload := resp.GetPayload()
 	return opts.Output.Show(respPayload.ActionConfig, format.Pretty)

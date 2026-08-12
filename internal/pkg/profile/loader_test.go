@@ -220,11 +220,8 @@ func TestLoader_LoadProfileEnv(t *testing.T) {
 
 	//nolint:paralleltest
 	t.Run("default profile, env set", func(t *testing.T) {
-		defer os.Unsetenv(envVarHCPOrganizationID)
-		defer os.Unsetenv(envVarHCPProjectID)
-
-		os.Setenv(envVarHCPOrganizationID, "xyz")
-		os.Setenv(envVarHCPProjectID, "abc")
+		t.Setenv(envVarHCPOrganizationID, "xyz")
+		t.Setenv(envVarHCPProjectID, "abc")
 
 		r := require.New(t)
 		l, err := newLoader(t.TempDir())
@@ -240,8 +237,8 @@ func TestLoader_LoadProfileEnv(t *testing.T) {
 		r := require.New(t)
 		l := TestLoader(t)
 
-		defer os.Unsetenv(envVarHCPOrganizationID)
-		defer os.Unsetenv(envVarHCPProjectID)
+		t.Setenv(envVarHCPOrganizationID, "xyz")
+		t.Setenv(envVarHCPProjectID, "")
 
 		p, err := l.NewProfile("test", "")
 		r.NoError(err)
@@ -249,7 +246,7 @@ func TestLoader_LoadProfileEnv(t *testing.T) {
 		p.ProjectID = "456"
 		r.NoError(p.Write())
 
-		os.Setenv(envVarHCPOrganizationID, "xyz")
+		t.Setenv(envVarHCPOrganizationID, "xyz")
 
 		out, err := l.LoadProfile(p.Name)
 		r.NoError(err)
@@ -257,7 +254,7 @@ func TestLoader_LoadProfileEnv(t *testing.T) {
 		r.Equal("xyz", out.OrganizationID)
 		r.Equal(p.ProjectID, out.ProjectID)
 
-		os.Setenv(envVarHCPProjectID, "abc")
+		t.Setenv(envVarHCPProjectID, "abc")
 
 		out, err = l.LoadProfile(p.Name)
 		r.NoError(err)

@@ -87,7 +87,7 @@ func deleteRun(opts *DeleteOpts) error {
 		return fmt.Errorf("failed to delete project: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Project %q deleted\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Project %q deleted\n",
 		opts.IO.ColorScheme().SuccessIcon(), opts.Profile.ProjectID)
 
 	profiles, err := opts.Profiles.LoadProfiles()
@@ -103,8 +103,8 @@ func deleteRun(opts *DeleteOpts) error {
 	}
 
 	if len(impacted) > 0 {
-		fmt.Fprintln(opts.IO.Err())
-		fmt.Fprintln(opts.IO.Err(), heredoc.New(opts.IO).Mustf(`
+		_, _ = fmt.Fprintln(opts.IO.Err())
+		_, _ = fmt.Fprintln(opts.IO.Err(), heredoc.New(opts.IO).Mustf(`
 %s The following profiles have their project_id property set to the deleted project:
 
 {{ PreserveNewLines }}
@@ -119,7 +119,7 @@ Or, to directly set the property, run:
 
   {{ Bold "$ hcp profile set --profile=PROFILE project_id PROJECT_ID" }}
 		`, opts.IO.ColorScheme().WarningLabel(), indent.String(strings.Join(impacted, "\n"), 2)))
-		fmt.Fprintln(opts.IO.Err())
+		_, _ = fmt.Fprintln(opts.IO.Err())
 	}
 
 	return nil
