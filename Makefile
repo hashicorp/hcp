@@ -43,6 +43,10 @@ gen/releasesapi: ## Generate the releases API client
 go/build: ## Build the HCP CLI binary
 	@CGO_ENABLED=0 go build -o bin/ ./...
 
+.PHONY: go/build-verbose
+go/build-verbose: ## Build the HCP CLI binary with verbose output
+	CGO_ENABLED=0 go build -v -o bin/ ./...
+
 .PHONY: go/install
 go/install: ## Install the HCP CLI binary
 	@go install
@@ -73,6 +77,19 @@ ifeq (, $(shell which gotestfmt))
 	@go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest
 endif
 	@go test -json -v  ./... 2>&1 | tee /tmp/gotest.log | gotestfmt -hide all
+
+.PHONY: go/test-verbose
+go/test-verbose: ## Run the unit tests with verbose output
+ifeq (, $(shell which gotestfmt))
+	@go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest
+endif
+ifeq (, $(shell which gotestsum))
+	@go install gotest.tools/gotestsum@latest
+endif
+	@go test -json -v ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
+	@echo ""
+	@echo "=== Test Summary ==="
+	@gotestsum --raw-command --format testname -- cat /tmp/gotest.log
 
 .PHONY: changelog/build
 changelog/build:

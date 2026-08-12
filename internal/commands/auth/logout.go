@@ -78,7 +78,7 @@ func logoutRun(opts *LogoutOpts) error {
 	}
 
 	cs := opts.IO.ColorScheme()
-	fmt.Fprintln(opts.IO.Err(), cs.String("Successfully logged out").Color(cs.Green()))
+	_, _ = fmt.Fprintln(opts.IO.Err(), cs.String("Successfully logged out").Color(cs.Green()))
 
 	return nil
 }

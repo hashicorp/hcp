@@ -55,12 +55,12 @@ func realMain() int {
 	// Create our iostreams
 	io, err := iostreams.System(shutdownCtx)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to configure iostreams: %v\n", err)
+		_, _ = fmt.Fprintf(os.Stderr, "failed to configure iostreams: %v\n", err)
 		return 1
 	}
 	defer func() {
 		if err := io.RestoreConsole(); err != nil {
-			fmt.Fprintf(os.Stderr, "failed to restore console output: %v\n", err)
+			_, _ = fmt.Fprintf(os.Stderr, "failed to restore console output: %v\n", err)
 		}
 	}()
 
@@ -69,13 +69,13 @@ func realMain() int {
 	if err != nil {
 		// On error, a nil checker is returned but it is still safe to call
 		// Check/Display.
-		fmt.Fprintf(os.Stderr, "failed to configure version checker: %v\n", err)
+		_, _ = fmt.Fprintf(os.Stderr, "failed to configure version checker: %v\n", err)
 	}
 
 	// Start checking for a new version as soon as possible
 	go func() {
 		if err := checker.Check(shutdownCtx); err != nil && !errors.Is(err, context.Canceled) {
-			fmt.Fprintf(os.Stderr, "failed to check for new version: %v\n", err)
+			_, _ = fmt.Fprintf(os.Stderr, "failed to check for new version: %v\n", err)
 		}
 	}()
 
@@ -83,7 +83,7 @@ func realMain() int {
 	var geography string
 	profile, err := loadActiveProfile()
 	if err != nil {
-		fmt.Fprintln(io.Err(), err)
+		_, _ = fmt.Fprintln(io.Err(), err)
 		return 1
 	}
 	geography = profile.GetGeography()
@@ -96,7 +96,7 @@ func realMain() int {
 	}
 	hcpCfg, err := auth.GetHCPConfig(configOptions...)
 	if err != nil {
-		fmt.Fprintf(io.Err(), "failed to instantiate HCP config: %v\n", err)
+		_, _ = fmt.Fprintf(io.Err(), "failed to instantiate HCP config: %v\n", err)
 		return 1
 	}
 
@@ -107,14 +107,14 @@ func realMain() int {
 
 	hcpClient, err := httpclient.New(hconfig)
 	if err != nil {
-		fmt.Fprintf(io.Err(), "failed to create HCP API client: %v\n", err)
+		_, _ = fmt.Fprintf(io.Err(), "failed to create HCP API client: %v\n", err)
 		return 1
 	}
 
 	// Load the profile
 	p, err := loadProfile(shutdownCtx, iam_service.New(hcpClient, nil), hcpCfg)
 	if err != nil {
-		fmt.Fprintln(io.Err(), err)
+		_, _ = fmt.Fprintln(io.Err(), err)
 		return 1
 	}
 
@@ -150,7 +150,7 @@ func realMain() int {
 
 	status, err := c.Run()
 	if err != nil {
-		fmt.Fprintf(io.Err(), "Error executing hcp: %s\n", err.Error())
+		_, _ = fmt.Fprintf(io.Err(), "Error executing hcp: %s\n", err.Error())
 	}
 
 	// Display the check results if we aren't being run in autocomplete. The

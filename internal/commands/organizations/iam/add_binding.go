@@ -113,7 +113,7 @@ func addIAMBindingRun(opts *AddBindingOpts) error {
 		return err
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Principal %q bound to role %q.\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Principal %q bound to role %q.\n",
 		opts.IO.ColorScheme().SuccessIcon(), opts.PrincipalID, opts.Role)
 	return nil
 }

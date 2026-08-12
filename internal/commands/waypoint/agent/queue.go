@@ -125,6 +125,6 @@ func agentQueue(log hclog.Logger, opts *QueueOpts) error {
 		return fmt.Errorf("error queuing operation: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Operation '%s' queued.\n", opts.ID)
+	_, _ = fmt.Fprintf(opts.IO.Err(), "Operation '%s' queued.\n", opts.ID)
 	return nil
 }

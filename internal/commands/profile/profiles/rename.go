@@ -112,7 +112,7 @@ func renameRun(opts *RenameOpts) error {
 		return fmt.Errorf("error saving renamed profile: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Profile %q renamed to %q.\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Profile %q renamed to %q.\n",
 		opts.IO.ColorScheme().SuccessIcon(), opts.ExistingName, opts.NewName)
 
 	// Delete the old profile
@@ -134,7 +134,7 @@ func renameRun(opts *RenameOpts) error {
 			return fmt.Errorf("failed to save active profile: %w", err)
 		}
 
-		fmt.Fprintf(opts.IO.Err(), "%s Profile %q activated.\n",
+		_, _ = fmt.Fprintf(opts.IO.Err(), "%s Profile %q activated.\n",
 			opts.IO.ColorScheme().SuccessIcon(), opts.NewName)
 	}
 

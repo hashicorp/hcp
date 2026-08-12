@@ -91,7 +91,7 @@ func deleteRun(opts *DeleteOpts) error {
 		return fmt.Errorf("failed to delete workload identity provider: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Workload identity provider %q deleted\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Workload identity provider %q deleted\n",
 		opts.IO.ColorScheme().SuccessIcon(), opts.Name)
 	return nil
 }

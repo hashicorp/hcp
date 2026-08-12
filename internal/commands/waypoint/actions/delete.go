@@ -68,6 +68,6 @@ func deleteAction(c *cmd.Command, args []string, opts *DeleteOpts) error {
 		return fmt.Errorf("failed to delete action %q: %w", opts.Name, err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "Action %q deleted.", opts.Name)
+	_, _ = fmt.Fprintf(opts.IO.Err(), "Action %q deleted.", opts.Name)
 	return nil
 }

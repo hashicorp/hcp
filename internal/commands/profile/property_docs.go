@@ -95,9 +95,9 @@ func (b availablePropertiesBuilder) buildCLI() string {
 		keys := maps.Keys(topLevel)
 		slices.Sort(keys)
 		for _, k := range keys {
-			fmt.Fprintln(&buf, k)
-			fmt.Fprintln(&buf, indent.String(topLevel[k], 2))
-			fmt.Fprintln(&buf)
+			_, _ = fmt.Fprintln(&buf, k)
+			_, _ = fmt.Fprintln(&buf, indent.String(topLevel[k], 2))
+			_, _ = fmt.Fprintln(&buf)
 		}
 	}
 
@@ -109,14 +109,14 @@ func (b availablePropertiesBuilder) buildCLI() string {
 		}
 
 		// Print the component
-		fmt.Fprintln(&buf, cs.String(c).Underline().String())
+		_, _ = fmt.Fprintln(&buf, cs.String(c).Underline().String())
 
 		keys := maps.Keys(b.properties[c])
 		slices.Sort(keys)
 		for _, k := range keys {
-			fmt.Fprintln(&buf, indent.String(k, 2))
-			fmt.Fprintln(&buf, indent.String(b.properties[c][k], 4))
-			fmt.Fprintln(&buf)
+			_, _ = fmt.Fprintln(&buf, indent.String(k, 2))
+			_, _ = fmt.Fprintln(&buf, indent.String(b.properties[c][k], 4))
+			_, _ = fmt.Fprintln(&buf)
 		}
 	}
 
@@ -133,9 +133,9 @@ func (b availablePropertiesBuilder) buildMD() string {
 		keys := maps.Keys(topLevel)
 		slices.Sort(keys)
 		for _, k := range keys {
-			fmt.Fprintf(&buf, "* `%s`\n", k)
-			fmt.Fprintln(&buf, indent.String(fmt.Sprintf("* %s", topLevel[k]), 4))
-			fmt.Fprintln(&buf)
+			_, _ = fmt.Fprintf(&buf, "* `%s`\n", k)
+			_, _ = fmt.Fprintln(&buf, indent.String(fmt.Sprintf("* %s", topLevel[k]), 4))
+			_, _ = fmt.Fprintln(&buf)
 		}
 	}
 
@@ -147,13 +147,13 @@ func (b availablePropertiesBuilder) buildMD() string {
 		}
 
 		// Print the component
-		fmt.Fprintf(&buf, "* `%s`\n\n", c)
+		_, _ = fmt.Fprintf(&buf, "* `%s`\n\n", c)
 
 		keys := maps.Keys(b.properties[c])
 		slices.Sort(keys)
 		for _, k := range keys {
-			fmt.Fprintln(&buf, indent.String(fmt.Sprintf("* `%s` - %s", cs.String(k), b.properties[c][k]), 4))
-			fmt.Fprintln(&buf)
+			_, _ = fmt.Fprintln(&buf, indent.String(fmt.Sprintf("* `%s` - %s", cs.String(k), b.properties[c][k]), 4))
+			_, _ = fmt.Fprintln(&buf)
 		}
 	}
 

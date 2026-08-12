@@ -155,7 +155,7 @@ func (c *Checker) Display() {
 	}
 
 	cs := c.io.ColorScheme()
-	fmt.Fprintf(c.io.Err(), "\n%s %s: %s -> %s\n\n",
+	_, _ = fmt.Fprintf(c.io.Err(), "\n%s %s: %s -> %s\n\n",
 		cs.String("INFO:").Color(cs.Yellow()),
 		"A new version of the HCP CLI is available",
 		c.currentVersion,
@@ -163,9 +163,9 @@ func (c *Checker) Display() {
 	)
 
 	if isUnderHomebrew() {
-		fmt.Fprintf(c.io.Err(), "To upgrade, run: %s\n", "brew upgrade hcp")
+		_, _ = fmt.Fprintf(c.io.Err(), "To upgrade, run: %s\n", "brew upgrade hcp")
 	}
-	fmt.Fprintf(c.io.Err(), "Release Notes: %s\n", vs.latestRelease.URLChangelog)
+	_, _ = fmt.Fprintf(c.io.Err(), "Release Notes: %s\n", vs.latestRelease.URLChangelog)
 
 	// Save the fact that we've shown the update message
 	_ = vs.write()

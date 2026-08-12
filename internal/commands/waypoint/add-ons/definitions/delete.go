@@ -71,7 +71,7 @@ func addOnDefinitionDelete(opts *AddOnDefinitionOpts) error {
 		)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Add-on definition %q deleted.\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Add-on definition %q deleted.\n",
 		opts.IO.ColorScheme().SuccessIcon(),
 		opts.Name,
 	)

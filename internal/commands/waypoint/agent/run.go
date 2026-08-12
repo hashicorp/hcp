@@ -93,10 +93,10 @@ func agentRun(log hclog.Logger, opts *RunOpts) error {
 	}
 
 	if len(resp2.Payload.UnknownGroups) > 0 {
-		fmt.Fprintf(opts.IO.Err(), "Unknown agent groups detected:\n")
+		_, _ = fmt.Fprintf(opts.IO.Err(), "Unknown agent groups detected:\n")
 
 		for _, g := range resp2.Payload.UnknownGroups {
-			fmt.Fprintf(opts.IO.Err(), "  %s\n ", g)
+			_, _ = fmt.Fprintf(opts.IO.Err(), "  %s\n ", g)
 		}
 		return nil
 	}

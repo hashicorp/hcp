@@ -47,7 +47,7 @@ func NewCmdPrintAccessToken(ctx *cmd.Context) *cmd.Command {
 				return fmt.Errorf("failed to retrieve authenticated principal's access token: %w", err)
 			}
 
-			fmt.Fprintln(ctx.IO.Out(), tkn.AccessToken)
+			_, _ = fmt.Fprintln(ctx.IO.Out(), tkn.AccessToken)
 			return nil
 		},
 		NoAuthRequired: false,

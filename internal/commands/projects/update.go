@@ -106,7 +106,7 @@ func updateRun(opts *UpdateOpts) error {
 		}
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Project %q updated\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Project %q updated\n",
 		opts.IO.ColorScheme().SuccessIcon(), opts.Profile.ProjectID)
 	return nil
 }

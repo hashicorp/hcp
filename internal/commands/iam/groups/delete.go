@@ -100,7 +100,7 @@ func deleteRun(opts *DeleteOpts) error {
 		return fmt.Errorf("failed to delete group: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Group %q deleted\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Group %q deleted\n",
 		opts.IO.ColorScheme().SuccessIcon(), rn)
 	return nil
 }

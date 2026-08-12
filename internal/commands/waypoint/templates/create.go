@@ -232,7 +232,7 @@ func templateCreate(opts *TemplateOpts) error {
 		)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Template %q created.\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Template %q created.\n",
 		opts.IO.ColorScheme().SuccessIcon(),
 		opts.Name,
 	)

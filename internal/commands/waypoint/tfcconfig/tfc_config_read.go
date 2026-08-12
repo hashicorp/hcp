@@ -66,7 +66,7 @@ func readRun(opts *ReadOpts) error {
 		return errors.Wrapf(err, "%s failed to get TFC Config", opts.IO.ColorScheme().FailureIcon())
 	}
 	if resp.Payload.TfcConfig == nil {
-		fmt.Fprintf(opts.IO.Out(), "%s No TFC Config found for this project\n",
+		_, _ = fmt.Fprintf(opts.IO.Out(), "%s No TFC Config found for this project\n",
 			opts.IO.ColorScheme().FailureIcon())
 		return nil
 	}

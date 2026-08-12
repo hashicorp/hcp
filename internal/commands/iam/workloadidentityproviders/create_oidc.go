@@ -222,12 +222,12 @@ func createOIDCRun(opts *CreateOIDCOpts) error {
     --output-file=creds.json \
     [REQUIRED FLAGS]`, resp.Payload.Provider.ResourceName)
 
-	fmt.Fprintln(opts.IO.Err())
-	fmt.Fprintf(opts.IO.Err(), `To create a credential file for the OIDC workload identity provider,
+	_, _ = fmt.Fprintln(opts.IO.Err())
+	_, _ = fmt.Fprintf(opts.IO.Err(), `To create a credential file for the OIDC workload identity provider,
 run the following command, passing the appropriate flags:
 
   %s`, opts.IO.ColorScheme().String(command).Bold())
-	fmt.Fprintln(opts.IO.Err())
+	_, _ = fmt.Fprintln(opts.IO.Err())
 
 	return nil
 }

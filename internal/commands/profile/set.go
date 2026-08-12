@@ -156,9 +156,10 @@ func setRun(opts *SetOpts) error {
 
 	// Check to see if the property being set is valid
 	write := true
-	if opts.Property == "project_id" {
+	switch opts.Property {
+	case "project_id":
 		write, err = opts.validateProject()
-	} else if opts.Property == "organization_id" {
+	case "organization_id":
 		write, err = opts.validateOrg()
 	}
 	if err != nil {
@@ -180,14 +181,14 @@ func setRun(opts *SetOpts) error {
 		return err
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Property %q updated\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Property %q updated\n",
 		opts.IO.ColorScheme().SuccessIcon(), opts.Property)
 
 	// Notify user about geography changes
 	if geographyChanged {
-		fmt.Fprintf(opts.IO.Err(), "\n%s Geography changed to %q. Organization and project settings have been cleared.\n",
+		_, _ = fmt.Fprintf(opts.IO.Err(), "\n%s Geography changed to %q. Organization and project settings have been cleared.\n",
 			opts.IO.ColorScheme().WarningLabel(), opts.Value)
-		fmt.Fprintf(opts.IO.Err(), "Please run %s to reconfigure your organization and project for this geography.\n\n",
+		_, _ = fmt.Fprintf(opts.IO.Err(), "Please run %s to reconfigure your organization and project for this geography.\n\n",
 			opts.IO.ColorScheme().String("hcp profile init").Bold())
 	}
 
@@ -228,7 +229,7 @@ func (o *SetOpts) validateProject() (bool, error) {
 	}
 
 	if !hasAccess {
-		fmt.Fprintf(o.IO.Err(), "%s You do not appear to have access to project %q or it does not exist.\n",
+		_, _ = fmt.Fprintf(o.IO.Err(), "%s You do not appear to have access to project %q or it does not exist.\n",
 			o.IO.ColorScheme().WarningLabel(), o.Value)
 
 		prompt := fmt.Sprintf("\nAre you sure you wish to set the %q property", "project_id")
@@ -272,7 +273,7 @@ func (o *SetOpts) validateOrg() (bool, error) {
 	}
 
 	if !hasAccess {
-		fmt.Fprintf(o.IO.Err(), "%s You do not appear to be a member of organization %q.\n",
+		_, _ = fmt.Fprintf(o.IO.Err(), "%s You do not appear to be a member of organization %q.\n",
 			o.IO.ColorScheme().WarningLabel(), o.Value)
 
 		prompt := fmt.Sprintf("\nAre you sure you wish to set the %q property", "organization_id")

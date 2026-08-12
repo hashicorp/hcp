@@ -47,9 +47,9 @@ func displayRun(opts *DisplayOpts) error {
 			return fmt.Errorf("failed to JSON encode profile: %w", err)
 		}
 
-		fmt.Fprintln(opts.IO.Out(), string(data))
+		_, _ = fmt.Fprintln(opts.IO.Out(), string(data))
 	} else {
-		fmt.Fprintln(opts.IO.Out(), opts.Profile.String())
+		_, _ = fmt.Fprintln(opts.IO.Out(), opts.Profile.String())
 	}
 
 	return nil

@@ -69,7 +69,7 @@ func addOnDestroy(opts *AddOnOpts) error {
 			opts.Name)
 	}
 
-	fmt.Fprintf(opts.IO.Out(), "Add-on %s destroyed\n", opts.Name)
+	_, _ = fmt.Fprintf(opts.IO.Out(), "Add-on %s destroyed\n", opts.Name)
 
 	return nil
 }

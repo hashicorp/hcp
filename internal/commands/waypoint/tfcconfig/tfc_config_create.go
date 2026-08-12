@@ -111,7 +111,7 @@ func createRun(opts *CreateOpts) error {
 		return errors.Wrapf(err, "%s error creating TFC config", opts.IO.ColorScheme().FailureIcon())
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s TFC Config %q created!\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.TfcConfig.OrganizationName)
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s TFC Config %q created!\n", opts.IO.ColorScheme().SuccessIcon(), resp.Payload.TfcConfig.OrganizationName)
 
 	return nil
 }

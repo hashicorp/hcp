@@ -117,7 +117,7 @@ func (i *InitOpts) configureGeography() error {
 	if err != nil {
 		// Log warning but don't fail - continue with default behavior
 		cs := i.IO.ColorScheme()
-		fmt.Fprintf(i.IO.Err(), "%s Could not read cached geography: %v\n", cs.WarningLabel(), err)
+		_, _ = fmt.Fprintf(i.IO.Err(), "%s Could not read cached geography: %v\n", cs.WarningLabel(), err)
 	}
 
 	// Use cached geography if available, otherwise use system default
@@ -131,9 +131,9 @@ func (i *InitOpts) configureGeography() error {
 
 	cs := i.IO.ColorScheme()
 	if cachedGeo != "" {
-		fmt.Fprintf(i.IO.Err(), "%s Using geography %q from cached authentication\n", cs.SuccessIcon(), selectedGeo)
+		_, _ = fmt.Fprintf(i.IO.Err(), "%s Using geography %q from cached authentication\n", cs.SuccessIcon(), selectedGeo)
 	} else {
-		fmt.Fprintf(i.IO.Err(), "%s Using default geography %q\n", cs.SuccessIcon(), selectedGeo)
+		_, _ = fmt.Fprintf(i.IO.Err(), "%s Using default geography %q\n", cs.SuccessIcon(), selectedGeo)
 	}
 
 	return nil
@@ -193,7 +193,7 @@ func (i *InitOpts) gatherOrganizationID() (string, error) {
 	}
 
 	cs := i.IO.ColorScheme()
-	fmt.Fprintf(i.IO.Err(), "%s Organization with name %q and ID %q selected\n", cs.SuccessIcon(), orgName, orgID)
+	_, _ = fmt.Fprintf(i.IO.Err(), "%s Organization with name %q and ID %q selected\n", cs.SuccessIcon(), orgName, orgID)
 	return orgID, nil
 }
 
@@ -211,7 +211,7 @@ func (i *InitOpts) gatherProjectID(detectedProject string) (string, error) {
 	if err != nil {
 		var listErr *project_service.ProjectServiceListDefault
 		if errors.As(err, &listErr) && listErr.IsCode(http.StatusForbidden) && detectedProject != "" {
-			fmt.Fprintln(i.IO.Err(), heredoc.New(i.IO).Mustf(`
+			_, _ = fmt.Fprintln(i.IO.Err(), heredoc.New(i.IO).Mustf(`
 {{ Color "yellow" "Principal does not have permission to list projects." }}
 
 Using the project the principal was created in:
@@ -282,7 +282,7 @@ Using the project the principal was created in:
 	}
 
 	cs := i.IO.ColorScheme()
-	fmt.Fprintf(i.IO.Err(), "%s Project with name %q and ID %q selected\n", cs.SuccessIcon(), projectName, projectID)
+	_, _ = fmt.Fprintf(i.IO.Err(), "%s Project with name %q and ID %q selected\n", cs.SuccessIcon(), projectName, projectID)
 	return projectID, nil
 }
 

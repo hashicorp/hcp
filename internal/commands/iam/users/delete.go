@@ -89,7 +89,7 @@ func deleteRun(opts *DeleteOpts) error {
 		return fmt.Errorf("failed to delete user principal from organization: %w", err)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s User %q deleted from organization\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s User %q deleted from organization\n",
 		opts.IO.ColorScheme().SuccessIcon(), opts.ID)
 	return nil
 }

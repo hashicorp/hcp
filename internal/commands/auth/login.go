@@ -272,18 +272,18 @@ func loginRun(opts *LoginOpts) error {
 
 	cs := opts.IO.ColorScheme()
 	if !opts.Quiet {
-		fmt.Fprintln(opts.IO.Err(), cs.String("Successfully logged in!").Bold().Color(cs.Green()))
+		_, _ = fmt.Fprintln(opts.IO.Err(), cs.String("Successfully logged in!").Bold().Color(cs.Green()))
 
 		// Check to see if we should ask the user to configure their profile
 		if opts.Profile.OrganizationID == "" || opts.Profile.ProjectID == "" {
-			fmt.Fprintln(opts.IO.Err())
-			fmt.Fprintln(opts.IO.Err(), heredoc.New(opts.IO).Must(`
+			_, _ = fmt.Fprintln(opts.IO.Err())
+			_, _ = fmt.Fprintln(opts.IO.Err(), heredoc.New(opts.IO).Must(`
 		No profile configuration detected. To configure {{ Bold "hcp" }} to execute commands against your
 		desired organization and project, run:
 
 		  {{ Bold "$ hcp profile init" }}
 		`))
-			fmt.Fprintln(opts.IO.Err())
+			_, _ = fmt.Fprintln(opts.IO.Err())
 		}
 	}
 
@@ -386,7 +386,7 @@ func syncGeographyToProfile(opts *LoginOpts) error {
 		}
 
 		if !opts.Quiet {
-			fmt.Fprintf(opts.IO.Err(), "%s Profile geography automatically set to %q to match authentication.\n",
+			_, _ = fmt.Fprintf(opts.IO.Err(), "%s Profile geography automatically set to %q to match authentication.\n",
 				cs.SuccessIcon(), cachedGeo)
 		}
 		return nil
@@ -403,7 +403,7 @@ func syncGeographyToProfile(opts *LoginOpts) error {
 			"Profile is set to %q but you authenticated to %q. This may cause authentication issues.\n"+
 				"To fix this, run: hcp profile set geography %s\n",
 			currentProfileGeo, cachedGeo, cachedGeo)
-		fmt.Fprintf(opts.IO.Err(), "%s %s", cs.WarningLabel(), warningMsg)
+		_, _ = fmt.Fprintf(opts.IO.Err(), "%s %s", cs.WarningLabel(), warningMsg)
 	}
 
 	return nil

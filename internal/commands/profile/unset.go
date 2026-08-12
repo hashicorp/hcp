@@ -166,6 +166,6 @@ func unsetRun(opts *UnsetOpts) error {
 	}
 
 	cs := opts.IO.ColorScheme()
-	fmt.Fprintf(opts.IO.Err(), "%s Property %q unset\n", cs.SuccessIcon(), opts.Property)
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Property %q unset\n", cs.SuccessIcon(), opts.Property)
 	return nil
 }

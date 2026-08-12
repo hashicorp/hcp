@@ -46,7 +46,7 @@ func Example() {
 	Lastly, blank spaces at the start and end will be stripped so that you can start your text on a new line and end it like this.
 	`, "wherever")
 
-	fmt.Fprintln(io.Out(), out)
+	_, _ = fmt.Fprintln(io.Out(), out)
 	// Output:
 	// This is an example of documenting a command. You can format in values wherever
 	// you want.
@@ -112,7 +112,7 @@ The code block gets defined then passed to the code block function.
 {{- CodeBlock "example" "json" | Color "green" }}
 	`)
 
-	fmt.Fprintln(io.Out(), out)
+	_, _ = fmt.Fprintln(io.Out(), out)
 	// Output:
 	// When displaying code blocks,the heredoc should have no indentation.
 	//
@@ -145,7 +145,7 @@ func Example_third() {
 	is used to display the IAM policy for a project.
 	`)
 
-	fmt.Fprintln(io.Out(), out)
+	_, _ = fmt.Fprintln(io.Out(), out)
 	// Output:
 	// To display text as bold for non-markdown output and as a code block for
 	// markdown output, use the mdCodeOrBold template.

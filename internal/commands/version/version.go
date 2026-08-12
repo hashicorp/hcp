@@ -19,7 +19,7 @@ func NewCmdVersion(ctx *cmd.Context) *cmd.Command {
 		The {{ template "mdCodeOrBold" "hcp version" }} command displays the HCP CLI version.
 		`),
 		RunF: func(c *cmd.Command, args []string) error {
-			fmt.Fprintln(ctx.IO.Out(), version.GetHumanVersion())
+			_, _ = fmt.Fprintln(ctx.IO.Out(), version.GetHumanVersion())
 			return nil
 		},
 		NoAuthRequired: true,

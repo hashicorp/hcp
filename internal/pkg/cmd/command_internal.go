@@ -42,9 +42,9 @@ func (c *Command) Run(args []string) int {
 
 	// Parse the flags
 	if err := c.parseFlags(args); err != nil {
-		fmt.Fprintf(io.Err(), "%s %s\n", cs.ErrorLabel(), err)
-		fmt.Fprintln(io.Err())
-		fmt.Fprint(io.Err(), c.usageHelp())
+		_, _ = fmt.Fprintf(io.Err(), "%s %s\n", cs.ErrorLabel(), err)
+		_, _ = fmt.Fprintln(io.Err())
+		_, _ = fmt.Fprint(io.Err(), c.usageHelp())
 		return 1
 	}
 
@@ -66,9 +66,9 @@ func (c *Command) Run(args []string) int {
 			plural, strings.Join(requiredFlags, ", ")), 80)
 		requiredErr = strings.TrimSpace(indent.String(requiredErr, 2))
 
-		fmt.Fprintf(io.Err(), "%s %s\n", cs.ErrorLabel(), requiredErr)
-		fmt.Fprintln(io.Err())
-		fmt.Fprint(io.Err(), c.usageHelp())
+		_, _ = fmt.Fprintf(io.Err(), "%s %s\n", cs.ErrorLabel(), requiredErr)
+		_, _ = fmt.Fprintln(io.Err())
+		_, _ = fmt.Fprint(io.Err(), c.usageHelp())
 		return 1
 	}
 
@@ -85,16 +85,16 @@ func (c *Command) Run(args []string) int {
 	slices.Reverse(prerunFuncs)
 	for _, f := range prerunFuncs {
 		if err := f(c, parsedArgs); err != nil {
-			fmt.Fprintln(io.Err(), err)
+			_, _ = fmt.Fprintln(io.Err(), err)
 			return 1
 		}
 	}
 
 	// Validate our arguments.
 	if err := c.Args.validateFunc()(c, parsedArgs); err != nil {
-		fmt.Fprintf(io.Err(), "%s %s\n", cs.ErrorLabel(), err)
-		fmt.Fprintln(io.Err())
-		fmt.Fprint(io.Err(), c.usageHelp())
+		_, _ = fmt.Fprintf(io.Err(), "%s %s\n", cs.ErrorLabel(), err)
+		_, _ = fmt.Fprintln(io.Err())
+		_, _ = fmt.Fprint(io.Err(), c.usageHelp())
 		return 1
 	}
 
@@ -106,17 +106,17 @@ func (c *Command) Run(args []string) int {
 		if errors.Is(err, ErrDisplayHelp) {
 			return cli.RunResultHelp
 		} else if errors.Is(err, ErrDisplayUsage) {
-			fmt.Fprint(io.Err(), c.usageHelp())
+			_, _ = fmt.Fprint(io.Err(), c.usageHelp())
 			return 1
 		} else if errors.As(err, &runtimeErr) && runtimeErr.IsCode(http.StatusUnauthorized) {
 			// Request failed because of authentication issues.
-			fmt.Fprintf(io.Err(), "%s %s\n\n", cs.ErrorLabel(), authErrorHelp(io, c.commandPath(), args))
+			_, _ = fmt.Fprintf(io.Err(), "%s %s\n\n", cs.ErrorLabel(), authErrorHelp(io, c.commandPath(), args))
 			return 1
 		} else if errors.As(err, &exitCodeErr) {
 			exitCode = exitCodeErr.Code
 		}
 
-		fmt.Fprintf(io.Err(), "%s %s\n", cs.ErrorLabel(), wordWrap(err.Error(), 120))
+		_, _ = fmt.Fprintf(io.Err(), "%s %s\n", cs.ErrorLabel(), wordWrap(err.Error(), 120))
 		return exitCode
 	}
 
@@ -253,7 +253,7 @@ func (c *Command) help() string {
 	if len(c.Examples) != 0 {
 		var buf bytes.Buffer
 		for _, e := range c.Examples {
-			fmt.Fprintln(&buf, e.text(cs))
+			_, _ = fmt.Fprintln(&buf, e.text(cs))
 		}
 
 		helpEntries = append(helpEntries, helpEntry{"EXAMPLES", buf.String()})
@@ -274,15 +274,15 @@ func (c *Command) help() string {
 	for i, e := range helpEntries {
 		if e.Title != "" {
 			// If there is a title, add indentation to each line in the body
-			fmt.Fprintln(&buf, cs.String(e.Title).Bold())
-			fmt.Fprintln(&buf, indent.String(strings.Trim(e.Body, "\r\n"), 2))
+			_, _ = fmt.Fprintln(&buf, cs.String(e.Title).Bold())
+			_, _ = fmt.Fprintln(&buf, indent.String(strings.Trim(e.Body, "\r\n"), 2))
 		} else {
 			// If there is no title print the body as is
-			fmt.Fprintln(&buf, e.Body)
+			_, _ = fmt.Fprintln(&buf, e.Body)
 		}
 
 		if i != len(helpEntries)-1 {
-			fmt.Fprintln(&buf)
+			_, _ = fmt.Fprintln(&buf)
 		}
 	}
 
@@ -359,13 +359,13 @@ func (e *Example) text(cs *iostreams.ColorScheme) string {
 	var buf bytes.Buffer
 
 	if e.Preamble != "" {
-		fmt.Fprintln(&buf, wordWrap(e.Preamble, 80))
-		fmt.Fprintln(&buf)
+		_, _ = fmt.Fprintln(&buf, wordWrap(e.Preamble, 80))
+		_, _ = fmt.Fprintln(&buf)
 	}
 	if e.Command != "" {
 		// Use a higher limit for command wrapping since they may include
 		// potentially long identifiers.
-		fmt.Fprintln(&buf, cs.String(wordWrap(e.Command, 120)).Color(cs.Green()))
+		_, _ = fmt.Fprintln(&buf, cs.String(wordWrap(e.Command, 120)).Color(cs.Green()))
 	}
 
 	return buf.String()
@@ -375,11 +375,11 @@ func (e *Example) text(cs *iostreams.ColorScheme) string {
 func (p PositionalArguments) text(cs *iostreams.ColorScheme) string {
 	var buf bytes.Buffer
 	if p.Preamble != "" {
-		fmt.Fprintln(&buf, p.Preamble)
+		_, _ = fmt.Fprintln(&buf, p.Preamble)
 	}
 
 	for _, a := range p.Args {
-		fmt.Fprintln(&buf, a.text(cs))
+		_, _ = fmt.Fprintln(&buf, a.text(cs))
 	}
 
 	return buf.String()
@@ -394,11 +394,11 @@ func (a PositionalArgument) text(cs *iostreams.ColorScheme) string {
 	if a.Repeatable {
 		repeatable = fmt.Sprintf(" [%s ...]", nameUpper)
 	}
-	fmt.Fprintf(&buf, "%s%s\n", cs.String(nameUpper).Underline(), repeatable)
+	_, _ = fmt.Fprintf(&buf, "%s%s\n", cs.String(nameUpper).Underline(), repeatable)
 	if a.Optional {
-		fmt.Fprintln(&buf, indent.String(cs.String("Optional Argument\n").Italic().String(), 2))
+		_, _ = fmt.Fprintln(&buf, indent.String(cs.String("Optional Argument\n").Italic().String(), 2))
 	}
-	fmt.Fprintln(&buf, indent.String(wordWrap(a.Documentation, 80), 2))
+	_, _ = fmt.Fprintln(&buf, indent.String(wordWrap(a.Documentation, 80), 2))
 
 	return buf.String()
 }
@@ -427,8 +427,8 @@ func (c *Command) aliasUsages() map[string]string {
 // flags.
 func (c *Command) usageHelp() string {
 	var buf bytes.Buffer
-	fmt.Fprintf(&buf, "Usage: %s\n", c.useLine())
-	fmt.Fprintln(&buf)
+	_, _ = fmt.Fprintf(&buf, "Usage: %s\n", c.useLine())
+	_, _ = fmt.Fprintln(&buf)
 
 	if len(c.children) != 0 {
 		// Determine the minimum padding
@@ -446,32 +446,32 @@ func (c *Command) usageHelp() string {
 		// Sort the names
 		slices.Sort(names)
 
-		fmt.Fprintln(&buf, "Commands:")
-		fmt.Fprint(&buf, indent.String(strings.Join(names, "\n"), 2))
+		_, _ = fmt.Fprintln(&buf, "Commands:")
+		_, _ = fmt.Fprint(&buf, indent.String(strings.Join(names, "\n"), 2))
 		return buf.String()
 	}
 
 	required, optional := splitRequiredFlags(c.nonGlobalFlags())
 	if required.HasFlags() {
-		fmt.Fprintln(&buf, "Required Flags:")
-		fmt.Fprint(&buf, indent.String(flagsetUsage(required), 2))
+		_, _ = fmt.Fprintln(&buf, "Required Flags:")
+		_, _ = fmt.Fprint(&buf, indent.String(flagsetUsage(required), 2))
 
 		if optional.HasFlags() {
-			fmt.Fprintln(&buf)
-			fmt.Fprintln(&buf, "Optional Flags:")
-			fmt.Fprint(&buf, indent.String(flagsetUsage(optional), 2))
+			_, _ = fmt.Fprintln(&buf)
+			_, _ = fmt.Fprintln(&buf, "Optional Flags:")
+			_, _ = fmt.Fprint(&buf, indent.String(flagsetUsage(optional), 2))
 		}
 	} else if optional.HasFlags() {
 		// If all the flags are optional, group them together.
-		fmt.Fprintln(&buf, "Flags:")
-		fmt.Fprint(&buf, indent.String(flagsetUsage(optional), 2))
+		_, _ = fmt.Fprintln(&buf, "Flags:")
+		_, _ = fmt.Fprint(&buf, indent.String(flagsetUsage(optional), 2))
 	}
 
 	// Print a smaller help output for global flags.
 	global := c.globalFlags()
 	if global.HasFlags() {
-		fmt.Fprintln(&buf, "Global Flags:")
-		fmt.Fprint(&buf, indent.String(flagsetUsageShort(global, "For more global flag details, run $ hcp --help"), 2))
+		_, _ = fmt.Fprintln(&buf, "Global Flags:")
+		_, _ = fmt.Fprint(&buf, indent.String(flagsetUsageShort(global, "For more global flag details, run $ hcp --help"), 2))
 	}
 
 	return buf.String()
@@ -479,7 +479,7 @@ func (c *Command) usageHelp() string {
 
 // Display helpful error message in case subcommand name was mistyped.
 func (c *Command) nestedSuggestFunc(w io.Writer, arg string) {
-	fmt.Fprintf(w, "unknown command %q for %q\n", arg, c.commandPath())
+	_, _ = fmt.Fprintf(w, "unknown command %q for %q\n", arg, c.commandPath())
 
 	var candidates []string
 	if arg == "help" {
@@ -489,13 +489,13 @@ func (c *Command) nestedSuggestFunc(w io.Writer, arg string) {
 	}
 
 	if len(candidates) > 0 {
-		fmt.Fprint(w, "\nDid you mean this?\n")
+		_, _ = fmt.Fprint(w, "\nDid you mean this?\n")
 		for _, c := range candidates {
-			fmt.Fprintf(w, "  %s\n", c)
+			_, _ = fmt.Fprintf(w, "  %s\n", c)
 		}
 	}
 
-	fmt.Fprintln(w)
+	_, _ = fmt.Fprintln(w)
 }
 
 // suggestionsFor provides suggestions for the typedName.
@@ -766,13 +766,13 @@ func flagsetUsage(flags *pflag.FlagSet) string {
 
 		longDisplay := flagString(flag)
 		if flag.Shorthand != "" && flag.ShorthandDeprecated == "" {
-			fmt.Fprintf(&buf, "-%s, %s\n", flag.Shorthand, longDisplay)
+			_, _ = fmt.Fprintf(&buf, "-%s, %s\n", flag.Shorthand, longDisplay)
 		} else {
-			fmt.Fprintf(&buf, "%s\n", longDisplay)
+			_, _ = fmt.Fprintf(&buf, "%s\n", longDisplay)
 		}
 
 		// Add the usage
-		fmt.Fprintf(&buf, "%s\n\n", indent.String(wordWrap(flag.Usage, 80), 2))
+		_, _ = fmt.Fprintf(&buf, "%s\n\n", indent.String(wordWrap(flag.Usage, 80), 2))
 	})
 
 	return buf.String()

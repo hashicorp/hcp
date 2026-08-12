@@ -188,11 +188,11 @@ func createAWSRun(opts *CreateAWSOpts) error {
     %s \
     --aws --output-file=creds.json`, resp.Payload.Provider.ResourceName)
 
-	fmt.Fprintln(opts.IO.Err())
-	fmt.Fprintf(opts.IO.Err(), `To create a credential file for the AWS workload identity provider, run:
+	_, _ = fmt.Fprintln(opts.IO.Err())
+	_, _ = fmt.Fprintf(opts.IO.Err(), `To create a credential file for the AWS workload identity provider, run:
 
   %s`, opts.IO.ColorScheme().String(command).Bold())
-	fmt.Fprintln(opts.IO.Err())
+	_, _ = fmt.Fprintln(opts.IO.Err())
 
 	return nil
 }

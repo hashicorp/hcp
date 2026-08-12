@@ -113,7 +113,7 @@ func applicationUpdate(opts *ApplicationOpts) error {
 		)
 	}
 
-	fmt.Fprintf(opts.IO.Err(), "%s Application %q updated.\n",
+	_, _ = fmt.Fprintf(opts.IO.Err(), "%s Application %q updated.\n",
 		opts.IO.ColorScheme().SuccessIcon(),
 		opts.Name,
 	)

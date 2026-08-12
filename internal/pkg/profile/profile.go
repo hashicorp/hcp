@@ -140,12 +140,12 @@ func (p *Profile) Validate() error {
 
 		numErrors := len(errors)
 		var buf bytes.Buffer
-		fmt.Fprintln(&buf)
-		fmt.Fprintln(&buf)
+		_, _ = fmt.Fprintln(&buf)
+		_, _ = fmt.Fprintln(&buf)
 		for i, e := range errors {
-			fmt.Fprintf(&buf, "  * %s", e)
+			_, _ = fmt.Fprintf(&buf, "  * %s", e)
 			if i != numErrors-1 {
-				fmt.Fprintln(&buf)
+				_, _ = fmt.Fprintln(&buf)
 			}
 		}
 		return buf.String()
@@ -205,7 +205,7 @@ func doWalkStructElements(path string, t reflect.Type, keys map[string]struct{})
 		}
 
 		v := field.Type
-		if v.Kind() == reflect.Ptr {
+		if v.Kind() == reflect.Pointer {
 			v = v.Elem()
 		}
 
