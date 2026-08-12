@@ -1,0 +1,3 @@
+```release-note:bug
+security: upgrades versions of dependencies to mitigate vulnerabilities
+```
