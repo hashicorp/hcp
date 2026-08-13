@@ -55,6 +55,13 @@ go/install: ## Install the HCP CLI binary
 go/lint: ## Run the Go Linter
 	@golangci-lint run
 
+.PHONY: go/vulncheck
+go/vulncheck: ## Run the Go vulnerability checker
+ifeq (, $(shell which govulncheck))
+	@go install golang.org/x/vuln/cmd/govulncheck@latest
+endif
+	@govulncheck ./...
+
 .PHONY: go/mocks
 go/mocks: ## Generates Go mock files.
 	@for dir in $(MOCKERY_OUTPUT_DIRS); do \

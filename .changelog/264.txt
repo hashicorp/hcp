@@ -1,0 +1,3 @@
+```release-note:bug
+security-supression: supressing security vuln scanner for go-2026-5932 as it only applies to pgp which we are not using
+```
