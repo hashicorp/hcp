@@ -17,7 +17,6 @@ container {
 				"CVE-2025-48060",
  				"GO-2026-5932", // does not use crypto/pgp where the vuln is actually reported
             ]
-			]
 		}
   	}
 }
