@@ -15,8 +15,8 @@ container {
 				"CVE-2024-58251",
 				"CVE-2024-23337",
 				"CVE-2025-48060",
-        "GO-2026-5932", //does not use crypto/pgp where the vuln is actually reported
-			]
+ 				"GO-2026-5932", // does not use crypto/pgp where the vuln is actually reported
+            ]
 		}
   	}
 }
@@ -27,4 +27,11 @@ binary {
 	osv          = true
 	oss_index    = false
 	nvd          = false
+	triage {
+        suppress {
+            vulnerabilities = [
+                "GO-2026-5932", // does not use crypto/pgp where the vuln is actually reported
+            ]
+        }
+    }
 }
