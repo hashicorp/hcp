@@ -78,7 +78,6 @@ jobs:
           - {goos: "linux", goarch: "arm64", runs-on: "ubuntu-latest" }
           - {goos: "windows", goarch: "386", runs-on: "ubuntu-latest"}
           - {goos: "windows", goarch: "amd64", runs-on: "ubuntu-latest"}
-          - {goos: "windows", goarch: "arm", runs-on: "ubuntu-latest"}
           - {goos: "windows", goarch: "arm64", runs-on: "ubuntu-latest"}
           - { goos: "darwin", goarch: "amd64", runs-on: "macos-latest" }
           - { goos: "darwin", goarch: "arm64", runs-on: "macos-latest" }
