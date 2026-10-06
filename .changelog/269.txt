@@ -1,0 +1,3 @@
+```release-note:improvement
+chore: upgrade dependencies and CI configuration for Go 1.26
+```

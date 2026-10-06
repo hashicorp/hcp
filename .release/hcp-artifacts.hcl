@@ -12,7 +12,6 @@ artifacts {
     "hcp_${version}_linux_arm64.zip",
     "hcp_${version}_windows_386.zip",
     "hcp_${version}_windows_amd64.zip",
-    "hcp_${version}_windows_arm.zip",
     "hcp_${version}_windows_arm64.zip",
   ]
   rpm = [
