@@ -1,6 +1,6 @@
 module github.com/hashicorp/hcp
 
-go 1.25.13
+go 1.26.2
 
 require (
 	github.com/MakeNowJust/heredoc/v2 v2.0.1
