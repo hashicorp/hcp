@@ -1,0 +1,3 @@
+```release-note:improvement
+ci: remove unsupported windows/arm target from build matrix for Go 1.26+
+```
