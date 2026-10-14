@@ -1,0 +1,3 @@
+```release-note:bug
+security: bump Go version to 1.26.9 to address SECVULN-59780 (CVE-2026-33811 crash when handling long CNAME response in net)
+```
